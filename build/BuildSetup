@@ -1,0 +1,361 @@
+
+switch $(OS) {
+	case HAIKU :	HOST_PLATFORM = haiku ;
+	case LINUX :	HOST_PLATFORM = linux ;
+	case * :		Exit "BuildSetup: Unsupported OS: " $(OS) ;
+}
+
+# TODO: For the time being we assume GCC 4.
+HOST_GCC_VERSION = 4 ;
+
+# analyze and optionally replace jam's target parameters
+ProcessCommandLineArguments ;
+
+
+# supported debug levels
+HAM_DEBUG_LEVELS = 0 1 2 3 4 5 ;
+
+# configuration header directories
+HAM_CONFIG_HEADERS = [ FDirName $(HAM_TOP) build user_config_headers ]
+	[ FDirName $(HAM_TOP) build config_headers ] ;
+
+
+#pragma mark -
+
+# host platform settings
+
+# save jam's variables for the build platform
+HOST_AR				?= $(AR) ;
+HOST_CC				?= $(CC) ;
+HOST_C++			?= $(C++) ;
+HOST_LINK			?= $(LINK) ;
+HOST_RANLIB			?= $(RANLIB) ;
+HOST_CPPFLAGS		?= $(CPPFLAGS) ;
+HOST_CCFLAGS		?= $(CCFLAGS) ;
+HOST_C++FLAGS		?= $(C++FLAGS) ;
+HOST_LDFLAGS		?= $(LDFLAGS) ;
+HOST_LINKFLAGS		?= $(LINKFLAGS) ;
+HOST_DEFINES		?= $(DEFINES) ;
+HOST_HDRS			?= $(HDRS) ;
+
+
+# split up HOST_AR into the command name and flags
+HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
+					  $(HOST_AR[2-]) ;
+HOST_ARFLAGS		= $(HOST_AR[2-]) ;
+HOST_AR				= $(HOST_AR[1]) ;
+HOST_UNARFLAGS		?= x ;
+
+# check the host platform compatibility
+SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
+	: linux openbsd freebsd darwin sunos cygwin ;
+
+if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
+	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin
+	|| $(HOST_PLATFORM) = sunos || $(HOST_PLATFORM) = openbsd {
+	# don't use lex: otherwise rc will not work correctly
+	if $(LEX) = lex {
+		LEX = flex ;
+	}
+}
+
+if $(HOST_PLATFORM) = cygwin {
+	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker
+		--enable-auto-import ;
+}
+
+HOST_CPU	?= $(OSPLAT:L) ;
+
+HOST_ARCH				?= $(HOST_CPU) ;
+HOST_ARCH_MACRO_DEFINE	= ARCH_$(HOST_CPU) ;
+
+
+# directories
+HOST_OBJECT_BASE_DIR = [ FDirName $(HAM_OBJECT_DIR) $(HOST_PLATFORM) ] ;
+HOST_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) common ] ;
+HOST_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) $(HOST_ARCH) ] ;
+HOST_COMMON_DEBUG_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) common ] ;
+HOST_DEBUG_0_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) release ] ;
+
+local level ;
+for level in $(HAM_DEBUG_LEVELS[2-]) {
+	HOST_DEBUG_$(level)_OBJECT_DIR
+		= [ FDirName $(HOST_ARCH_OBJECT_DIR) debug_$(level) ] ;
+}
+
+# set variables for gcc header options
+SetIncludePropertiesVariables HOST ;
+
+# assembler flags
+HOST_ASFLAGS = ;
+
+# C/C++ flags
+HOST_CCFLAGS += -Wno-multichar ;
+HOST_C++FLAGS += -Wno-multichar ;
+
+if $(HOST_PLATFORM) != cygwin {
+	HOST_PIC_CCFLAGS += -fPIC ;
+	HOST_PIC_C++FLAGS += -fPIC ;
+}
+
+# warning flags
+HOST_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith
+	-Wcast-align -Wsign-compare ;
+HOST_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
+	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
+
+# debug flags
+switch $(HOST_PLATFORM) {
+	case haiku : 		HOST_DEBUG_FLAGS ?= -ggdb ;
+	case haiku_host :	HOST_DEBUG_FLAGS ?= -ggdb ;
+	case linux :		HOST_DEBUG_FLAGS ?= -ggdb ;
+	case freebsd :		HOST_DEBUG_FLAGS ?= -ggdb ;
+	case darwin :		HOST_DEBUG_FLAGS ?= -ggdb ;
+	case * :			HOST_DEBUG_FLAGS ?= -g ;
+}
+
+# debug 0: suppress asserts
+HOST_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+HOST_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+local level ;
+for level in $(HAM_DEBUG_LEVELS[2-]) {
+	local flags = $(HOST_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+	HOST_DEBUG_$(level)_CCFLAGS			= $(flags) ;
+	HOST_DEBUG_$(level)_C++FLAGS		= $(flags) ;
+}
+
+# ld flags
+if $(HOST_ARCH) = x86 && $(HAM_HOST_USE_32BIT) = 1 {
+	HOST_LDFLAGS += -melf_i386 ;
+}
+
+HOST_DEFINES += $(HOST_ARCH_MACRO_DEFINE) ;
+HOST_DEFINES += _NO_INLINE_ASM ;
+
+# for builds of tools in the current environment
+HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
+
+# For the generic attributes emulation: Target rm_attrs -- rm replacement that
+# also removes the attributes.
+HOST_RM_ATTRS_TARGET = ;
+
+HOST_LIBSTDC++ = stdc++ ;
+HOST_LIBROOT = libroot_build.so ;
+HOST_STATIC_LIBROOT = libroot_build.a ;
+HOST_LIBBE = libbe_build.so ;
+if $(HOST_PLATFORM) = cygwin {
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export PATH=$PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+} else if $(HOST_PLATFORM) = darwin {
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+} else {
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+}
+
+# the C++ support library
+if $(HOST_GCC_VERSION[1]) < 3 {
+	HOST_LIBSUPC++ = ;
+} else {
+	HOST_LIBSUPC++ = supc++ ;
+}
+
+if $(HOST_PLATFORM) = darwin {
+	# part of the C++ runtime lives in libstdc++ on Darwin
+	HOST_LIBSUPC++ = gcc_s.1 stdc++ ;
+	HOST_LIBSTDC++ = ;
+} else if $(HOST_PLATFORM) = freebsd {
+	if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) = 1 {
+		# amd64 FreeBSD 8 doesn't come without a shared libsupc++, and the
+		# static one prevents us from building shared libraries. So we have
+		# to work around by using the shared libstdc++.
+		HOST_LIBSUPC++ = stdc++ ;
+		HOST_LIBSTDC++ = ;
+	}
+}
+
+# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
+if $(HOST_PLATFORM) = freebsd {
+	HOST_LIBROOT += /usr/lib/libgnuregex.so ;
+	HOST_STATIC_LIBROOT += /usr/lib/libgnuregex.so ;
+} else if $(HOST_PLATFORM) = darwin {
+	HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
+	HOST_STATIC_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
+}
+
+# Supposing this is a glibc platform, let's try to get features like large
+# file support, ISO C 99 definitions, etc. On some platforms we need to
+# request 64 bit off_t support explicitely.
+HOST_DEFINES += _GNU_SOURCE _FILE_OFFSET_BITS=64 __STDC_FORMAT_MACROS
+	__STDC_LIMIT_MACROS ;
+
+# On Linux with xattr support we can use it for our attribute emulation,
+# which is somewhat more robust.
+if $(HAM_HOST_USE_XATTR) = 1 {
+	HOST_DEFINES += HAM_HOST_USE_XATTR ;
+} else {
+	# Otherwise the generic attribute emulation is used, which uses a
+	# directory per file to store its attribute. We need to redefine RM so
+	# that the attributes are removed as well. We use a wrapper script,
+	# which invokes a build tool. If the build tool hasn't been built yet,
+	# the normal "rm" is used and the attributes are leaked (likely there
+	# aren't any yet).
+	RM = $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ";"
+		[ FDirName $(HAM_TOP) build scripts rm_attrs ]
+		[ FDirName $(HAM_OBJECT_DIR) $(HOST_PLATFORM) $(HOST_ARCH) release
+			tools rm_attrs ] -f ;
+		# assumes that rm_attrs is built with debugging disabled
+	HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
+}
+
+
+#pragma mark -
+
+# Set TARGET_* variables either from HAM_* or HOST_* depending on the
+# specified TARGET_PLATFORM.
+
+local buildVars =
+	AR CC C++ LD OBJCOPY RANLIB
+
+	GCC_VERSION
+
+	INCLUDES_SEPARATOR LOCAL_INCLUDES_OPTION SYSTEM_INCLUDES_OPTION
+
+	HDRS CPPFLAGS CCFLAGS C++FLAGS LDFLAGS LINK LINKFLAGS DEFINES
+	ARFLAGS UNARFLAGS
+
+	WARNING_CCFLAGS WARNING_C++FLAGS
+
+	DEBUG_FLAGS
+
+	DEBUG_$(HAM_DEBUG_LEVELS)_CCFLAGS DEBUG_$(HAM_DEBUG_LEVELS)_C++FLAGS
+
+	LIBSTDC++ LIBSUPC++
+	STATIC_LIBSTDC++ STATIC_LIBSUPC++
+
+	NETWORK_LIBS NETAPI_LIB SELECT_UNAME_ETC_LIB
+
+	ARCH_MACRO_DEFINE EXECUTABLE_MIME_TYPE
+
+	OBJECT_BASE_DIR COMMON_ARCH_OBJECT_DIR COMMON_DEBUG_OBJECT_DIR
+	DEBUG_$(HAM_DEBUG_LEVELS)_OBJECT_DIR
+;
+
+local var ;
+for var in $(buildVars) {
+	TARGET_$(var) = $(HOST_$(var)) ;
+}
+
+TARGET_LIBRARY_NAME_MAP		= HOST_LIBRARY_NAME_MAP ;
+
+# define macro, for identifying the platform
+switch $(TARGET_PLATFORM) {
+	case haiku		: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_HAIKU ;
+	case linux		: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_LINUX ;
+	case freebsd	: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_FREEBSD ;
+	case darwin		: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_DARWIN ;
+	case cygwin		: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_CYGWIN ;
+	case sunos		: TARGET_DEFINES	+= HAM_TARGET_PLATFORM_SUNOS ;
+}
+
+# define macro, for identifying the host platform
+switch $(HOST_PLATFORM) {
+	case haiku		: HOST_DEFINES	+= HAM_HOST_PLATFORM_HAIKU ;
+	case linux		: HOST_DEFINES	+= HAM_HOST_PLATFORM_LINUX ;
+	case freebsd	: HOST_DEFINES	+= HAM_HOST_PLATFORM_FREEBSD ;
+	case darwin		: HOST_DEFINES	+= HAM_HOST_PLATFORM_DARWIN ;
+	case cygwin		: HOST_DEFINES	+= HAM_HOST_PLATFORM_CYGWIN ;
+	case sunos		: HOST_DEFINES	+= HAM_HOST_PLATFORM_SUNOS ;
+}
+
+
+#pragma mark -
+
+# common stuff
+
+# start with a clean state
+CCFLAGS = ;
+C++FLAGS = ;
+DEFINES = ;
+
+# Set CC, C++, LINK to invalid values, so that we realize early, that we use
+# the wrong compiler.
+CC = bad-cc ;
+C++ = bad-c++ ;
+LINK = bad-link ;
+
+# Defaults for warnings, optimization, and debugging.
+#
+WARNINGS ?= 1 ;
+OPTIM ?= -O2 ;
+DEBUG ?= 0 ;
+
+
+# Set the defaults for PLATFORM and SUPPORTED_PLATFORMS. PLATFORM is only
+# overridden for targets to be built for the host platform. SUPPORTED_PLATFORMS
+# can be overridden by the author of a component.
+PLATFORM = $(TARGET_PLATFORM) ;
+SUPPORTED_PLATFORMS = haiku ;
+
+
+# Instructs the Library rule to not make its object files temporary.
+# This is needed as some objects are used in a static library and for an
+# executable.
+KEEPOBJS = true ;
+
+
+# Set permissions to how they should be on the image.
+EXEMODE		= 755 ;
+FILEMODE	= 644 ;
+SHELLMODE	= 755 ;
+
+
+# output directories
+# TODO: Review this.
+HAM_DOCUMENTATION_DIR ?= [ FDirName $(HAM_OUTPUT_DIR) documentation ] ;
+HAM_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAM_COMMON_PLATFORM_OBJECT_DIR)
+	documentation ] ;
+
+# TODO: Rethink test stuff.
+HAM_TEST_DIR			?= [ FDirName $(HAM_OUTPUT_DIR) tests
+	$(TARGET_PLATFORM) $(HAM_ARCH) ] ;
+HAM_APP_TEST_DIR		?= [ FDirName $(HAM_TEST_DIR) apps ] ;
+HAM_APP_TEST_LIB_DIR 	?= [ FDirName $(HAM_APP_TEST_DIR) lib ] ;
+HAM_TMP_DIR			?= [ FDirName $(HAM_OUTPUT_DIR) tmp ] ;
+
+HAM_PACKAGE_DIR ?= [ FDirName $(HAM_OUTPUT_DIR) packages ] ;
+HAM_PACKAGE_OBJECT_DIR ?= [ FDirName $(HAM_OBJECT_DIR) packages ] ;
+
+TARGET_TEST_DIR				?= [ FDirName $(HAM_TEST_DIR)
+									$(TARGET_PLATFORM) ] ;
+TARGET_UNIT_TEST_DIR		?= [ FDirName $(TARGET_TEST_DIR) unittests ] ;
+TARGET_UNIT_TEST_LIB_DIR	?= [ FDirName $(TARGET_UNIT_TEST_DIR) lib ] ;
+
+# automatically setup the objects directory per subdirectory
+SUBDIRRULES += SetupObjectsDir ;
+
+# Add the standard (userland) warning flags variables to the ones restored in
+# every subdirectory. Thus we can easily meddle with them in subdirectories
+# with imported sources.
+AUTO_SET_UP_CONFIG_VARIABLES +=
+	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
+	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+
+	# also add PLATFORM and SUPPORTED_PLATFORMS
+	PLATFORM SUPPORTED_PLATFORMS
+;
+
+
+# enable -Werror for certain parts of the source tree
+
+# -Wuninitialized gives too many false positives.
+rule EnableWerror dirTokens : scope {
+	AppendToConfigVar CCFLAGS : HAM_TOP $(dirTokens)
+		: -Werror -Wno-error=uninitialized : $(scope) ;
+	AppendToConfigVar C++FLAGS : HAM_TOP $(dirTokens)
+		: -Werror -Wno-error=uninitialized : $(scope) ;
+}
+
+EnableWerror . ;

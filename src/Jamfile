@@ -1,0 +1,80 @@
+SubDir HAM_TOP src ;
+
+SubDirSysHdrs /home/bonefish/develop/boost_1_44_0 ;
+
+#myVar on blah default foo = for default ;
+#Echo myVar on blah: [ on blah return $(myVar) ] ;
+#Echo myVar on foo: [ on foo return $(myVar) ] ;
+#Echo myVar on default: [ on default return $(myVar) ] ;
+#"for" on blah = 9 ;
+"for" = 9 ;
+#foo"bar" = 7 ;
+#Echo foobar: $(foobar) ;
+#Echo for: $(for) ;
+
+rule func1
+{
+	return a1 ;
+}
+
+rule func2
+{
+	return a2 ;
+}
+
+actions func2
+{
+#	echo # {
+}
+
+allFuncs = func1 func2 ;
+Echo result: [ $(allFuncs) ] ;
+
+a = 1 8 ;
+b = 2 3 ;
+
+empty = ;
+#if ! ( 1 && $(empty) ) {
+if ! ! 4 in 1 2 3 {
+	Echo true ;
+} else {
+	Echo false ;
+}
+
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
+
+
+BinCommand ham
+	:
+	ham.cpp
+
+	# code
+	ActionsDefinition.cpp
+	Assignment.cpp
+	BinaryExpression.cpp
+	Block.cpp
+	Case.cpp
+	DumpContext.cpp
+	If.cpp
+	Include.cpp
+	For.cpp
+	FunctionCall.cpp
+	InListExpression.cpp
+	Jump.cpp
+	Leaf.cpp
+	List.cpp
+	LocalVariableDeclaration.cpp
+	Node.cpp
+	NotExpression.cpp
+	OnExpression.cpp
+	RuleDefinition.cpp
+	Switch.cpp
+	While.cpp
+
+	# data
+	String.cpp
+	:
+	$(TARGET_LIBSTDC++)
+;

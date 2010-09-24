@@ -1,0 +1,321 @@
+# UserBuildConfig ReadMe
+# ----------------------
+
+# UserBuildConfig can be used to customize the build according to your needs.
+# If existent it is included by the build system, but it is ignored by svn.
+# This file documents a few examples, what can be done. Don't just rename it
+# to UserBuildConfig -- you don't want all the things to happen, that are
+# specified here. Rather create an empty UserBuildConfig and copy the lines
+# you really want, or start out with UserBuildConfig.sample.
+# Of course, noone reads ReadMe files, so they will just get an error here
+# when copying it and jamming:
+Exit You must NOT copy UserBuildConfig.ReadMe directly but use parts of it! ;
+
+
+# Adjusting Build Variables
+
+# The following variables can be configured per subdirectory (or subtree) or
+# even per object file:
+#
+#	CCFLAGS C++FLAGS DEBUG DEFINES HDRS LINKFLAGS OPTIM OPTIMIZE SYSHDRS
+#	WARNINGS
+#	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
+#	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+#	PLATFORM SUPPORTED_PLATFORMS
+#
+# The following examples would work analogously for any of these variables.
+
+# Turn off warnings in directory src/system/kernel. As fourth (scope) parameter
+# "local" is specified, which means, that this setting applies only to the
+# given directory, but not any of its subdirectories.
+SetConfigVar WARNINGS : HAM_TOP src system kernel : 0 : local ;
+
+# Set the debug level for directory src/system/boot/loader and recursively all
+# of its subdirectories (scope is "global") to 1. All affected generated files
+# will be put into another subtree of the "generated" directory, which allows
+# for fast switching between normal and debug builds.
+SetConfigVar DEBUG : HAM_TOP src system boot loader : 1 : global ;
+
+# Add "RUN_WITHOUT_REGISTRAR" to the DEFINES for the directory src/kits and
+# all of its subdirectories.
+AppendToConfigVar DEFINES : HAM_TOP src kits : RUN_WITHOUT_REGISTRAR
+	: global ;
+
+# Set the debug level for file src/bin/gdb/gdb/haiku-nat.c (note, that
+# the object file must be specified) to 1. It is worth mentioning, that the
+# executable the object file is linked into (gdb), will still be placed in
+# generated/objects/.../release/... Only when setting DEBUG for the executable,
+# too, it will be placed in .../debug_1/.... Apart from that, the DEBUG variable
+# has no effect on executables or other shared objects.
+DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
+
+# Enables the SSL build feature. Several targets will be compiled with SSL
+# support. Adding the OpenSSL optional package will automatically enable this
+# feature.
+HAM_BUILD_FEATURE_SSL = 1 ;
+
+
+# Haiku Image Related Modifications
+
+# Create a 100 MB image at /tmp/walter.image.
+HAM_IMAGE_NAME	= walter.image ;
+HAM_IMAGE_DIR		= /tmp ;
+HAM_IMAGE_SIZE	= 100 ;
+
+# Set image volume label to "Walter". Default label is "Haiku".
+HAM_IMAGE_LABEL	= Walter ;
+
+# Name the VMWare image walter.vmdk (in directory $(HAM_IMAGE_DIR)).
+HAM_VMWARE_IMAGE_NAME	= walter.vmdk ;
+
+# Install Haiku in directory /Haiku.
+HAM_INSTALL_DIR = /Haiku ;
+
+# If the image does already exist it won't be zeroed out. It will nevertheless
+# freshly be initialized with BFS. Useful when installing Haiku on a partition.
+HAM_DONT_CLEAR_IMAGE = 1 ;
+
+
+# Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
+# targets on which the HAM_INCLUDE_IN_IMAGE variable has been set will be
+# updated in the image file/installation directory.
+# The update-image, update-vmware-image, and update-install targets always invoke
+# this rule, so one likely doesn't ever need to do it manually.
+SetUpdateHaikuImageOnly 1 ;
+
+# libbe.so and the kernel will be updated on image updates. Note that this
+# generally doesn't work for pseudo targets (it does where special support
+# has been added, like for "kernel").
+HAM_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
+
+# Add "crashing_app" to the system/bin directory of the Haiku image/installation.
+# Note, that this also makes the image depend on the target, i.e. it is
+# automatically updated when the image is built.
+AddFilesToHaikuImage system bin : crashing_app ;
+
+# Make a symlink to home/config/bin/crash.
+AddSymlinkToHaikuImage home config bin : /bin/crashing_app : crash ;
+
+# Add keymap settings.
+AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
+
+# Adds the source directories src/kits/storage and src/tests/servers/debug
+# (recursively) to the image (as /boot/home/HaikuSources/src/kits/storage
+# and /boot/home/HaikuSources/src/tests/servers/debug respectively).
+# Note that the second directory will also be copied, if the image will only
+# be updated; the first one won't in that case.
+AddSourceDirectoryToHaikuImage src/kits/storage ;
+AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
+
+# Copy the jam sources (assuming they are located ../buildtools/jam relatively
+# to your Haiku sources) to the image as /boot/home/Desktop/jam-src, excluding
+# any file or directory named ".svn" and any source path that matches the
+# pattern "*/jam/./bin.*". Note that the "*" character needs to be escaped with
+# two backslashes (one because it goes through a shell and one to quote the
+# first one in jam), and that the build system always appends "/." to the source
+# path (hence this pattern). Just as AddSourceDirectoryToHaikuImage this rule
+# can also take another optional parameter indicating whether the directory shall
+# also be copied in update mode.
+CopyDirectoryToHaikuImage home Desktop
+	: $(HAM_TOP)/../buildtools/jam
+	: "jam-src" : -x .svn -X \\*/jam/./bin.\\* ;
+
+# Extracts the given archive onto the image under /boot/develop/tools.
+ExtractArchiveToHaikuImage develop tools
+	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
+
+# Add the optional package WonderBrush to the image. The package is downloaded
+# via wget (i.e. wget must be installed).
+AddOptionalHaikuImagePackages WonderBrush ;
+
+# Add the optional package WebPositive to the image but don't add its
+# dependent SQLite optional package to the image. WebPositive still needs
+# SQLite to run, this allows you to test a different version of it though.
+AddOptionalHaikuImagePackages WebPositive ;
+SuppressOptionalHaikuImagePackages SQLite ;
+
+# Don't add the libraries built with the alternative gcc version.
+# If the alternative gcc generated directory has been specified via the
+# configure option --alternative-gcc-output-dir, the libraries for the
+# alternative gcc version are added by default. Unsetting this variable disables
+# building and adding the libraries. Ignored, if --alternative-gcc-output-dir
+# was not specified.
+HAM_ADD_ALTERNATIVE_GCC_LIBS = 0 ;
+
+# Specify scripts that shall be run when populating the image/installation
+# directory. The "early" script is run before anything has been copied onto
+# the image/into the installation directory. The "late" script is run after
+# everything has been copied, but before the MIME database is installed.
+HAM_IMAGE_EARLY_USER_SCRIPTS	= $(HAM_TOP)/../early-image-script.sh ;
+HAM_IMAGE_LATE_USER_SCRIPTS	= $(HAM_TOP)/../late-image-script.sh ;
+
+# Set name and real name of the root user. Defaults to "baron" and "Root User".
+HAM_ROOT_USER_NAME = bond  ;
+HAM_ROOT_USER_REAL_NAME = "James Bond" ;
+
+# Set host name to "mybox". By default the installation doesn't have a host
+# name.
+HAM_IMAGE_HOST_NAME = mybox ;
+
+# Add user "walter" with user ID 1000 and group ID 100 (note, that a group with
+# that ID should exist -- 100 already exists and is the "users" group), home
+# directory "/boot/home", shell "/bin/bash", and real name "Just Walter" to the
+# image.
+AddUserToHaikuImage walter : 1000 : 100 : /boot/home : /bin/bash
+	: "Just Walter" ;
+
+# Add group "party" with group ID 101 and members "baron" and "walter" to the
+# image.
+AddGroupToHaikuImage party : 101 : baron walter ;
+
+
+# Build Profiles
+
+# A build profile is a named set of settings for building a Haiku image or
+# installation. The following lines define five different build profiles:
+# disk    - Installation on device /dev/sda57. A lengthy list of optional
+#           packages will be included. Profile type "disk" implies
+#           "HAM_DONT_CLEAR_IMAGE = 1".
+# qemu    - A plain 200 MB disk image (type "image") named "haiku-qemu.image".
+#           Since only the image name is given, the default location will be
+#           chosen for the image, unless HAM_IMAGE_DIR has been set
+#           beforehand.
+# vmware  - A 400 MB VMware image (type "vmware-image"). It will not be zeroed,
+#           if not necessary. The optional packages Development and Pe will be
+#           installed. No image name or path is given, so the defaults
+#            ("haiku.vmdk" in the generated directory) will be used, unless the
+#           respective variables are set.
+# anyboot - A custom image (type "anyboot-image"), its size will be 4 MB larger
+#           than the value of HAM_IMAGE_SIZE, named haiku-anyboot.image.
+# crash   - Similar to the vmware profile, but created at a specific location
+#           and 1 GB size. Furthermore a "crash-tests" directory will be copied
+#           to the image.
+# install - Installation in directory "/Haiku2" (type "install").
+
+DefineBuildProfile disk : disk : "/dev/sda57" ;
+DefineBuildProfile qemu : image : "haiku-qemu.image" ;
+DefineBuildProfile vmware : vmware-image ;
+DefineBuildProfile anyboot : anyboot-image : "haiku-anyboot.image" ;
+DefineBuildProfile crash : vmware-image
+	: "/home/foobar/vmware/Virtual Machines/CrashOMatic/CrashOMatic.vmdk" ;
+DefineBuildProfile install : install : /Haiku2 ;
+
+switch $(HAM_BUILD_PROFILE) {
+	case "disk" : {
+		AddOptionalHaikuImagePackages BeBook BeHappy BePDF Bluetooth CVS
+			Development Firefox OpenSSH OpenSSL P7zip Pe Subversion Vision
+			Welcome WonderBrush ;
+	}
+
+	case "qemu" : {
+		HAM_IMAGE_SIZE = 200 ;
+	}
+
+	case "vmware" : {
+		HAM_IMAGE_SIZE = 400 ;
+		HAM_DONT_CLEAR_IMAGE = 1 ;
+		AddOptionalHaikuImagePackages Development Pe ;
+	}
+
+	case "anyboot" : {
+		HAM_IMAGE_SIZE = 400 ;
+	}
+
+	case "crash" : {
+		HAM_IMAGE_SIZE = 1024 ;
+		HAM_DONT_CLEAR_IMAGE = 1 ;
+		AddOptionalHaikuImagePackages Development Pe ;
+		CopyDirectoryToHaikuImage home Desktop : $(HAM_TOP)/../crash-tests ;
+	}
+}
+
+# By specifying the build profile name as first (non-option) parameter on the
+# jam command line prefixed by an "@" character, the profile will be selected.
+# The second parameter specifies the action to be performed, further optional
+# parameters may follow. Jam command line examples:
+#
+# jam -q @disk build
+#	-> Equivalent to running "jam -q haiku-image" with the settings for the
+#      "disk" profile. "build" is the default action, so it could even be
+#      omitted.
+# jam -q @vmware update kernel
+#	-> Equivalent to running "jam -q update-vmware-image kernel" with the
+#      settings for the "vmware" profile.
+# jam -q @crash mount
+#	-> Enters the bfs_shell mounting the image specified by the "crash" profile.
+#
+# Note, that the build system will automatically define the build profiles
+# "image", "vmware-image", and "install", unless they are already defined in
+# the UserBuildConfig. They correspond to the respective build profile types
+# and use the values of the variables HAM[_VMWARE]_IMAGE_NAME,
+# HAM_IMAGE_DIR, HAM_INSTALL_DIR, respectively their default values.
+# "jam -q @image" will therefore be equivalent to "jam -q haiku-image".
+
+
+# Creating Sourceable Shell Scripts
+
+# If you use shell scripts (e.g. for testing) that need to access targets or
+# build system properties, you can tell the build system to generate a
+# variables defining shell script you can source from your shell script.
+
+# General setup for the shell script to generate. Name is test.inc, located
+# in the output directory.
+MakeLocate test.inc : $(HAM_OUTPUT_DIR) ;
+Always test.inc ;
+
+# Define variable "outputDir" in the shell script, with the value of
+# HAM_OUTPUT_DIR.
+AddVariableToScript test.inc : outputDir : $(HAM_OUTPUT_DIR) ;
+
+# Define variables "bfsShell" and "fsShellCommand" referring to the
+# generated bfs_shell and fs_shell_command respectively.
+AddTargetVariableToScript test.inc : bfs_shell : bfsShell ;
+AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
+
+# If no variable name is given, the name (without grist) of the target is
+# used, i.e. a variable "rc" referring to the rc command built for the host
+# platform is defined in the script.
+AddTargetVariableToScript test.inc : <build>rc ;
+
+
+# Optimizing Jamfile Parsing Times / Third Party Inclusion
+
+# Setting this variable will prevent the root Jamfile to include the Jamfile
+# in the src directory. Instead only the directories required for building the
+# build tools are included. Only useful in combination with DeferredSubInclude.
+HAM_DONT_INCLUDE_SRC = 1 ;
+
+# Schedule the given subdirectory for inclusion at the end of the root
+# Jamfile (directly using SubInclude here is not possible). Using this
+# feature together with HAM_DONT_INCLUDE_SRC allows developers working
+# only on a subproject to reduce Jamfile parsing times considerably.
+DeferredSubInclude HAM_TOP src tests add-ons kernel file_systems
+	userlandfs ;
+
+# Schedule src/3rdparty/myproject/Jamfile.haiku for later inclusion. The "local"
+# parameter specifies that the alternative Jamfile name shall not be used for
+# any subdirectory of the given directory (i.e. "Jamfile" will be used as
+# usual). Omitting this parameter or specifying "global" will cause the given
+# name to be used recursively.
+DeferredSubInclude HAM_TOP src 3rdparty myproject : Jamfile.haiku : local ;
+
+# The following rules can be overriden to do things at different points of
+# the build system execution by jam (note: we're talking about execution of
+# Jamfiles, not the build actions they define):
+#
+# UserBuildConfigRulePostBuildTargets:
+#	Executed after the complete Jamfile tree has been processed. I.e. all build
+#	targets are known and located at this point.
+# UserBuildConfigRulePreImage:
+#	Executed after the contents of the Haiku image has been defined, but before
+#	the scripts generating the images are defined.
+# UserBuildConfigRulePostImage:
+#	Executed after the Haiku image build target has been fully defined.
+#
+# E.g. making use of the fact that all targets have already been located when
+# UserBuildConfigRulePostBuildTargets is called, we can print the directory
+# where the StyledEdit executable will be generated.
+rule UserBuildConfigRulePostBuildTargets
+{
+	Echo "StyledEdit will appear here:" [ on StyledEdit return $(LOCATE) ] ;
+}
