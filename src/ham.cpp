@@ -30,6 +30,7 @@
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
 #include "code/While.h"
+#include "grammar/Skipper.h"
 
 
 namespace ascii = boost::spirit::ascii;
@@ -45,22 +46,6 @@ static const uint32_t kActionFlagQuietly		= 0x08;
 static const uint32_t kActionFlagPiecemeal		= 0x10;
 static const uint32_t kActionFlagExisting		= 0x20;
 static const uint32_t kActionFlagMaxLineFactor	= 0x40;
-
-
-template <typename Iterator>
-struct HamSkipParser : qi::grammar<Iterator> {
-	HamSkipParser() : HamSkipParser::base_type(fStart)
-	{
-		using qi::char_;
-		using qi::lit;
-		using qi::space;
-
-		fStart = space | lit('#') >> *(char_ - '\n' - '\r');
-	}
-
-private:
-	qi::rule<Iterator> fStart;
-};
 
 
 template <typename Iterator, typename Skipper>
@@ -185,11 +170,7 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 				>> +fSubString
 					[ _val += _1 ]
 		;
-		fIdentifier
-			= !(fListDelimiter >> (space | eoi))
-				>> +fSubString
-					[ _val += _1 ]
-		;
+		fIdentifier = fString ;
 			// TODO: This should also exclude keywords!
 
 		fArgument
@@ -556,8 +537,8 @@ const char* kTestString =
 
 	code::Node* result = NULL;
 	bool r = qi::phrase_parse(begin, end,
-		HamParser<IteratorType, HamSkipParser<IteratorType> >(),
-		HamSkipParser<IteratorType>(), result);
+		HamParser<IteratorType, grammar::Skipper<IteratorType> >(),
+		grammar::Skipper<IteratorType>(), result);
 
 	if (r && begin == end) {
 		std::cout << "-------------------------\n";
