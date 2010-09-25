@@ -1,4 +1,4 @@
-#define BOOST_SPIRIT_DEBUG 1
+//#define BOOST_SPIRIT_DEBUG 1
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
@@ -30,6 +30,7 @@
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
 #include "code/While.h"
+#include "grammar/Iterator.h"
 #include "grammar/Skipper.h"
 #include "grammar/String.h"
 
@@ -102,27 +103,6 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 			("=", code::ASSIGNMENT_OPERATOR_ASSIGN)
 			("+=", code::ASSIGNMENT_OPERATOR_APPEND)
 			("?=", code::ASSIGNMENT_OPERATOR_DEFAULT)
-		;
-
-		fListDelimiter.add
-			(":", 0)
-			(";", 1)
-			("]", 2)
-			("=", 3)
-			("+=", 3)
-			("?=", 3)
-			("||", 3)
-			("|", 3)
-			("&&", 3)
-			("&", 3)
-			("!=", 3)
-			(")", 3)
-			("<", 3)
-			("<=", 3)
-			(">", 3)
-			(">=", 3)
-			("{", 3)
-			("}", 3)
 		;
 
 		fActionFlag.add
@@ -387,7 +367,7 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 
 		fStart = fBlock;
 
-#if 1
+#if 0
 		qi::debug(fStart);
 		qi::debug(fBlock);
 		qi::debug(fLocalVariableDeclaration);
@@ -442,7 +422,6 @@ private:
 	qi::rule<Iterator, qi::unused_type> fActions;
 	qi::rule<Iterator, String()> fIdentifier;
 	grammar::String<Iterator> fString;
-	qi::symbols<char, unsigned> fListDelimiter;
 	qi::symbols<char, uint32_t> fActionFlag;
 	qi::symbols<char, code::AssignmentOperator> fAssignmentOperator;
 };
@@ -453,11 +432,11 @@ main(int argc, const char* const* argv)
 {
 	std::noskipws(std::cin);
 
-	typedef std::istream_iterator<char> BaseIteratorType;
+	using grammar::BaseIteratorType;
+	using grammar::IteratorType;
 
 	// convert input iterator to forward iterator, usable by spirit parser
 #if 1
-	typedef boost::spirit::multi_pass<BaseIteratorType> IteratorType;
 	IteratorType begin = boost::spirit::make_default_multi_pass(
 		BaseIteratorType(std::cin));
 	IteratorType end;

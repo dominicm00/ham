@@ -15,7 +15,7 @@ namespace qi = boost::spirit::qi;
 namespace grammar {
 
 
-template <typename Iterator>
+template<typename Iterator>
 struct Skipper : qi::grammar<Iterator> {
 	Skipper() : Skipper::base_type(fStart)
 	{

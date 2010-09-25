@@ -8,4 +8,5 @@ SubDirHdrs [ FDirName $(HAM_TOP) src ] ;
 StaticLibrary libham_grammar
 	:
 	String.cpp
+	Symbols.cpp
 ;
