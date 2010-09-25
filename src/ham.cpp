@@ -31,6 +31,7 @@
 #include "code/Switch.h"
 #include "code/While.h"
 #include "grammar/Skipper.h"
+#include "grammar/String.h"
 
 
 namespace ascii = boost::spirit::ascii;
@@ -77,11 +78,7 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 		fActionsBindList(std::string("actionsBindList")),
 		fActions(std::string("actions")),
 		fIdentifier(std::string("identifier")),
-		fString(std::string("string")),
-		fSubString(std::string("subString")),
-		fQuotedChar(std::string("quotedChar")),
-		fUnquotedChar(std::string("unquotedChar")),
-		fEscapedChar(std::string("escapedChar"))
+		fString()
 	{
 		using qi::eoi;
 		using qi::eps;
@@ -160,16 +157,6 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 "actions"
 #endif
 
-		fQuotedChar = fEscapedChar | (char_ - '"');
-		fUnquotedChar = fEscapedChar | (char_ - '"' - space);
-		fEscapedChar = '\\' >> char_;
-
-		fSubString = ('"' >> *fQuotedChar >> '"') | +fUnquotedChar;
-		fString
-			= !(fListDelimiter >> (space | eoi))
-				>> +fSubString
-					[ _val += _1 ]
-		;
 		fIdentifier = fString ;
 			// TODO: This should also exclude keywords!
 
@@ -425,8 +412,6 @@ struct HamParser : qi::grammar<Iterator, code::Node*(), Skipper> {
 		qi::debug(fAtom);
 		qi::debug(fArgument);
 		qi::debug(fIdentifier);
-		qi::debug(fString);
-		qi::debug(fSubString);
 #endif
 	}
 
@@ -456,11 +441,7 @@ private:
 	qi::rule<Iterator, code::List*(), Skipper> fActionsBindList;
 	qi::rule<Iterator, qi::unused_type> fActions;
 	qi::rule<Iterator, String()> fIdentifier;
-	qi::rule<Iterator, String()> fString;
-	qi::rule<Iterator, String()> fSubString;
-	qi::rule<Iterator, char()> fQuotedChar;
-	qi::rule<Iterator, char()> fUnquotedChar;
-	qi::rule<Iterator, char()> fEscapedChar;
+	grammar::String<Iterator> fString;
 	qi::symbols<char, unsigned> fListDelimiter;
 	qi::symbols<char, uint32_t> fActionFlag;
 	qi::symbols<char, code::AssignmentOperator> fAssignmentOperator;

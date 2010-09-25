@@ -1,6 +1,6 @@
 SubDir HAM_TOP src ;
 
-SubDirSysHdrs /home/bonefish/develop/boost_1_44_0 ;
+SubDirSysHdrs $(HAM_BOOST_HEADERS) ;
 
 #myVar on blah default foo = for default ;
 #Echo myVar on blah: [ on blah return $(myVar) ] ;
@@ -76,5 +76,9 @@ BinCommand ham
 	# data
 	String.cpp
 	:
+	libham_grammar.a
 	$(TARGET_LIBSTDC++)
 ;
+
+
+SubInclude HAM_TOP src grammar ;

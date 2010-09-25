@@ -1,0 +1,11 @@
+SubDir HAM_TOP src grammar ;
+
+SubDirSysHdrs $(HAM_BOOST_HEADERS) ;
+
+SubDirHdrs [ FDirName $(HAM_TOP) src ] ;
+
+
+StaticLibrary libham_grammar
+	:
+	String.cpp
+;
