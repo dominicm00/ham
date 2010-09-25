@@ -2,8 +2,8 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_GRAMMAR_STRING_H
-#define HAM_GRAMMAR_STRING_H
+#ifndef HAM_GRAMMAR_SKIPPER_H
+#define HAM_GRAMMAR_SKIPPER_H
 
 
 #include <boost/spirit/include/qi.hpp>
@@ -34,4 +34,4 @@ private:
 } // namespace grammar
 
 
-#endif	// HAM_GRAMMAR_STRING_H
+#endif	// HAM_GRAMMAR_SKIPPER_H
