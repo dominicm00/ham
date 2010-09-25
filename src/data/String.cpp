@@ -7,5 +7,11 @@
 #include "data/String.h"
 
 
+namespace data {
+
+
 const StringList kTrueStringList = StringList(1, "1");
 const StringList kFalseStringList;
+
+
+} // namespace data
