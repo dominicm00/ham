@@ -23,6 +23,23 @@ LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(HAM_BUILD_OUTPUT_DIR) ;
 # LOCATE on BuildConfig = $(HAM_BUILD_OUTPUT_DIR) ;
 # include BuildConfig ;
 
+
+# Include EarlyUserBuildConfig.
+if ! $(HAM_IGNORE_USER_BUILD_CONFIG) {
+	local userBuildConfig
+		= [ GLOB $(HAM_BUILD_RULES_DIR) : EarlyUserBuildConfig ] ;
+	if $(userBuildConfig) {
+		include $(userBuildConfig) ;
+	}
+
+	# allow for a separate UserBuildConfig per output directory
+	local userBuildConfig = [ GLOB $(HAM_OUTPUT_DIR) : EarlyUserBuildConfig ] ;
+	if $(userBuildConfig) {
+		include $(userBuildConfig) ;
+	}
+}
+
+
 # The build setup and rules are neatly organized in several files. Include
 # them now. Start with the side-effect-less rules, since they are the most
 # likely to be used in the top level context (i.e. not only in rules).
