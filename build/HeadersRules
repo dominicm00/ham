@@ -402,5 +402,24 @@ rule FStandardHeaders
 	return $(headers) ;
 }
 
+
+rule PrecompileHeader header
+{
+	# grist the header file
+	header = [ FGristFiles $(header) ] ;
+
+	# the target name of the precompiled header
+	local precompiledHeader = $(header:GBS=$(header:S).gch) ;
+Echo precompiled header: $(precompiledHeader) ;
+
+	# We tell jam that the header includes the precompiled header. This way all
+	# objects whose sources include the header directly or indirectly will
+	# depend on the precompiled header, thus causing it to be rebuilt.
+	Includes $(header) : $(precompiledHeader) ;
+
+	Object $(precompiledHeader) : $(header) ;
+}
+
+
 # SUBDIRSYSHDRS shall be reset automatically for each subdir
 SUBDIRRESET += SYSHDRS ;

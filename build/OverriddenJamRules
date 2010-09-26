@@ -132,6 +132,8 @@ rule Object
 	    case .cc :	C++ $(<) : $(>) ;
 	    case .cpp : C++ $(<) : $(>) ;
 	    case .f :	Fortran $(<) : $(>) ;
+		case .hpp :	C++ $(<) : $(>) ;
+			# NOTE: This makes precompiled headers work only in C++ mode.
 	    case .l :	if [ on $(2) return $(GENERATE_C++) ] {
 	    				InheritPlatform $(<:S=.cpp) : $(1) ;
 						C++ $(<) : $(<:S=.cpp) ;
@@ -297,7 +299,7 @@ rule Cc
 
 actions Cc
 {
-	$(CC) $(CCFLAGS) -c "$(2)" $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCHDRS) -c "$(2)" -o "$(1)" ;
 }
 
 rule C++
@@ -364,7 +366,7 @@ rule C++
 
 actions C++
 {
-	$(C++) -c "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(C++) $(C++FLAGS) $(CCDEFS) $(CCHDRS) -c "$(2)" -o "$(1)" ;
 }
 
 actions together Archive
