@@ -20,7 +20,7 @@ FunctionCall::FunctionCall(Node* function)
 {
 }
 
-FunctionCall::FunctionCall(Node* function, const ListList& arguments)
+FunctionCall::FunctionCall(Node* function, const NodeList& arguments)
 	:
 	fFunction(function),
 	fArguments(arguments)

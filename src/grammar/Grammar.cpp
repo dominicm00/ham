@@ -9,22 +9,17 @@
 
 #include "grammar/Grammar.h"
 
-#include "code/ActionsDefinition.h"
 #include "code/Assignment.h"
-#include "code/BinaryExpression.h"
 #include "code/Block.h"
 #include "code/Case.h"
-#include "code/DumpContext.h"
 #include "code/For.h"
 #include "code/FunctionCall.h"
 #include "code/If.h"
 #include "code/Include.h"
 #include "code/InListExpression.h"
 #include "code/Jump.h"
-#include "code/Leaf.h"
 #include "code/List.h"
 #include "code/LocalVariableDeclaration.h"
-#include "code/NotExpression.h"
 #include "code/OnExpression.h"
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
@@ -77,7 +72,11 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	fBracketOnExpression(std::string("bracketOnExpression")),
 	fBracketExpression(std::string("bracketExpression")),
 	fIdentifier(std::string("identifier")),
-	fString()
+	fString(std::string("string")),
+	fSubString(std::string("subString")),
+	fQuotedChar(std::string("quotedChar")),
+	fUnquotedChar(std::string("unquotedChar")),
+	fEscapedChar(std::string("escapedChar"))
 {
 	using qi::eps;
 	using qi::_val;
@@ -86,6 +85,27 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	using qi::_3;
 	using qi::_4;
 	using phoenix::new_;
+
+	fListDelimiter =
+		":",
+		";",
+		"]",
+		"=",
+		"+=",
+		"?=",
+		"||",
+		"|",
+		"&&",
+		"&",
+		"!=",
+		")",
+		"<",
+		"<=",
+		">",
+		">=",
+		"{",
+		"}"
+	;
 
 	fAssignmentOperator.add
 		("=", code::ASSIGNMENT_OPERATOR_ASSIGN)
@@ -107,6 +127,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	_InitExpression();
 	_InitRuleDefinition();
 	_InitStatement();
+	_InitString();
 
 #if 0
 	fKeywords.add
@@ -237,6 +258,8 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	qi::debug(fBracketOnExpression);
 	qi::debug(fArgument);
 	qi::debug(fIdentifier);
+	qi::debug(fString);
+	qi::debug(fSubString);
 #endif
 }
 

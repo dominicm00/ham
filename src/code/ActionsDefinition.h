@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-#include "code/List.h"
+#include "code/Node.h"
 
 
 namespace code {
@@ -17,7 +17,7 @@ namespace code {
 class ActionsDefinition : public Node {
 public:
 								ActionsDefinition(uint32_t flags,
-									const String& identifier, List* variables,
+									const String& identifier, Node* variables,
 									const String& actions);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
@@ -26,7 +26,7 @@ public:
 
 private:
 			String				fIdentifier;
-			List*				fVariables;
+			Node*				fVariables;
 			String				fActions;
 			uint32_t			fFlags;
 };

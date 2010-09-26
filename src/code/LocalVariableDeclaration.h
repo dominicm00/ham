@@ -6,7 +6,7 @@
 #define HAM_CODE_LOCAL_VARIABLE_DECLARATION_H
 
 
-#include "code/List.h"
+#include "code/Node.h"
 
 
 namespace code {
@@ -14,22 +14,22 @@ namespace code {
 
 class LocalVariableDeclaration : public Node {
 public:
-								LocalVariableDeclaration(List* variables);
+								LocalVariableDeclaration(Node* variables);
 
-	inline	void				SetInitializer(List* initializer);
+	inline	void				SetInitializer(Node* initializer);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 
 	virtual	void				Dump(DumpContext& context) const;
 
 private:
-			List*				fVariables;
-			List*				fInitializer;
+			Node*				fVariables;
+			Node*				fInitializer;
 };
 
 
 void
-LocalVariableDeclaration::SetInitializer(List* initializer)
+LocalVariableDeclaration::SetInitializer(Node* initializer)
 {
 	fInitializer = initializer;
 }

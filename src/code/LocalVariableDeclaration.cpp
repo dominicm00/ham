@@ -13,7 +13,7 @@
 using code::LocalVariableDeclaration;
 
 
-LocalVariableDeclaration::LocalVariableDeclaration(List* variables)
+LocalVariableDeclaration::LocalVariableDeclaration(Node* variables)
 	:
 	fVariables(variables),
 	fInitializer(NULL)

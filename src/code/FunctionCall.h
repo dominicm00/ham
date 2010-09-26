@@ -6,7 +6,7 @@
 #define HAM_CODE_FUNCTION_CALL_H
 
 
-#include "code/List.h"
+#include "code/Node.h"
 
 
 namespace code {
@@ -16,16 +16,16 @@ class FunctionCall : public Node {
 public:
 								FunctionCall(Node* function);
 								FunctionCall(Node* function,
-									const ListList& arguments);
+									const NodeList& arguments);
 
-	inline	void				AddArgument(List* argument);
+	inline	void				AddArgument(Node* argument);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 
 	virtual	void				Dump(DumpContext& context) const;
 
 private:
-			typedef ListList ArgumentList;
+			typedef NodeList ArgumentList;
 
 			Node*				fFunction;
 			ArgumentList		fArguments;
@@ -33,7 +33,7 @@ private:
 
 
 void
-FunctionCall::AddArgument(List* argument)
+FunctionCall::AddArgument(Node* argument)
 {
 	fArguments.push_back(argument);
 }

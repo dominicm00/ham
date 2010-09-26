@@ -13,8 +13,8 @@
 using code::Assignment;
 
 
-Assignment::Assignment(Node* left, AssignmentOperator operatorType, List* right,
-	List* onTargets)
+Assignment::Assignment(Node* left, AssignmentOperator operatorType, Node* right,
+	Node* onTargets)
 	:
 	fLeft(left),
 	fRight(right),

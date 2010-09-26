@@ -13,26 +13,22 @@
 
 #include "code/Assignment.h"
 	// TODO: Remove/move, if possible!
-#include "grammar/String.h"
 
 
 namespace code {
-	class ActionsDefinition;
 	class Block;
 	class Case;
-	class For;
 	class FunctionCall;
 	class If;
 	class List;
 	class LocalVariableDeclaration;
-	class OnExpression;
 	class Node;
+	class OnExpression;
 	class RuleDefinition;
 	class Switch;
-	class While;
 
-	typedef std::list<List*> ListList;
-		// TODO: Not nice!
+	typedef std::list<Node*> NodeList;
+		// TODO: Not nice! Defined in code/Node.h.
 }
 
 
@@ -53,6 +49,7 @@ private:
 			void				_InitExpression();
 			void				_InitRuleDefinition();
 			void				_InitStatement();
+			void				_InitString();
 
 private:
 	qi::rule<Iterator, code::Node*(), Skipper> fStart;
@@ -60,16 +57,16 @@ private:
 	qi::rule<Iterator, code::LocalVariableDeclaration*(), Skipper>
 		fLocalVariableDeclaration;
 	qi::rule<Iterator, code::RuleDefinition*(), Skipper> fRuleDefinition;
-	qi::rule<Iterator, code::ActionsDefinition*(), Skipper> fActionsDefinition;
+	qi::rule<Iterator, code::Node*(), Skipper> fActionsDefinition;
 	qi::rule<Iterator, code::If*(), Skipper> fIfStatement;
-	qi::rule<Iterator, code::For*(), Skipper> fForStatement;
-	qi::rule<Iterator, code::While*(), Skipper> fWhileStatement;
+	qi::rule<Iterator, code::Node*(), Skipper> fForStatement;
+	qi::rule<Iterator, code::Node*(), Skipper> fWhileStatement;
 	qi::rule<Iterator, code::Switch*(), Skipper> fSwitchStatement;
 	qi::rule<Iterator, code::Case*(), Skipper> fCaseStatement;
 	qi::rule<Iterator, code::Node*(), Skipper> fStatement;
 	qi::rule<Iterator, code::FunctionCall*(), Skipper> fFunctionCall;
-	qi::rule<Iterator, code::OnExpression*(), Skipper> fOnStatement;
-	qi::rule<Iterator, code::ListList(), Skipper> fListOfLists;
+	qi::rule<Iterator, code::Node*(), Skipper> fOnStatement;
+	qi::rule<Iterator, code::NodeList(), Skipper> fListOfLists;
 	qi::rule<Iterator, code::List*(), Skipper> fList;
 	qi::rule<Iterator, uint32_t(), Skipper> fActionsFlags;
 	qi::rule<Iterator, code::List*(), Skipper> fActionsBindList;
@@ -80,9 +77,13 @@ private:
 	qi::rule<Iterator, code::OnExpression*(), Skipper> fBracketOnExpression;
 	qi::rule<Iterator, code::Node*(), Skipper> fBracketExpression;
 	qi::rule<Iterator, data::String()> fIdentifier;
+	qi::rule<Iterator, data::String()> fString;
+	qi::rule<Iterator, data::String()> fSubString;
+	qi::rule<Iterator, char()> fQuotedChar;
+	qi::rule<Iterator, char()> fUnquotedChar;
+	qi::rule<Iterator, char()> fEscapedChar;
 
-	grammar::String<Iterator> fString;
-
+	qi::symbols<char, unsigned> fListDelimiter;
 	qi::symbols<char, uint32_t> fActionFlag;
 	qi::symbols<char, code::AssignmentOperator> fAssignmentOperator;
 };

@@ -29,9 +29,6 @@ private:
 };
 
 
-typedef std::list<List*> ListList;
-
-
 List&
 List::operator+=(Node* child)
 {

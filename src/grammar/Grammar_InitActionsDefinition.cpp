@@ -18,6 +18,7 @@
 namespace grammar {
 
 
+namespace ascii = boost::spirit::ascii;
 namespace phoenix = boost::phoenix;
 
 

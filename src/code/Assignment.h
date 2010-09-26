@@ -6,7 +6,7 @@
 #define HAM_CODE_ASSIGMENT_H
 
 
-#include "code/List.h"
+#include "code/Node.h"
 
 
 namespace code {
@@ -23,7 +23,7 @@ class Assignment : public Node {
 public:
 								Assignment(Node* left,
 									AssignmentOperator operatorType,
-									List* right, List* onTargets = NULL);
+									Node* right, Node* onTargets = NULL);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 
@@ -31,8 +31,8 @@ public:
 
 private:
 			Node*				fLeft;
-			List*				fRight;
-			List*				fOnTargets;
+			Node*				fRight;
+			Node*				fOnTargets;
 			AssignmentOperator fOperator;
 };
 

@@ -14,7 +14,7 @@ using code::ActionsDefinition;
 
 
 ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
-	List* variables, const String& actions)
+	Node* variables, const String& actions)
 	:
 	fIdentifier(identifier),
 	fVariables(variables),
