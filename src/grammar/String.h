@@ -6,7 +6,8 @@
 #define HAM_GRAMMAR_STRING_H
 
 
-#include <boost/spirit/include/qi.hpp>
+#include "grammar/Spirit.h"
+	// precompiled -- must be first
 
 #include "data/String.h"
 

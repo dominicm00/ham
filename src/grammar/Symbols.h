@@ -6,7 +6,8 @@
 #define HAM_GRAMMAR_SYMBOLS_H
 
 
-#include <boost/spirit/include/qi.hpp>
+#include "grammar/Spirit.h"
+	// precompiled -- must be first
 
 
 namespace grammar {

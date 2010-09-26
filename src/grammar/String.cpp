@@ -6,8 +6,6 @@
 
 #include "grammar/String.h"
 
-#include <boost/spirit/include/phoenix_operator.hpp>
-
 #include "grammar/Iterator.h"
 #include "grammar/Symbols.h"
 

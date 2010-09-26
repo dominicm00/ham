@@ -6,9 +6,10 @@
 #define HAM_GRAMMAR_ITERATOR_H
 
 
-#include <istream>
+#include "grammar/Spirit.h"
+	// precompiled -- must be first
 
-#include <boost/spirit/include/support_multi_pass.hpp>
+#include <istream>
 
 
 namespace grammar {

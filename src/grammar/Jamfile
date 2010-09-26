@@ -2,11 +2,24 @@ SubDir HAM_TOP src grammar ;
 
 SubDirSysHdrs $(HAM_BOOST_HEADERS) ;
 
+SubDirHdrs [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) $(DOTDOT) ] ;
+	# So that the precompiled header is found first.
+
 SubDirHdrs [ FDirName $(HAM_TOP) src ] ;
 
 
 StaticLibrary libham_grammar
 	:
+	Grammar.cpp
+	Grammar_InitActionsDefinition.cpp
+	Grammar_InitArgument.cpp
+	Grammar_InitExpression.cpp
+	Grammar_InitRuleDefinition.cpp
+	Grammar_InitStatement.cpp
+	Parser.cpp
 	String.cpp
 	Symbols.cpp
 ;
+
+
+#PrecompileHeader grammar/Spirit.hpp ;
