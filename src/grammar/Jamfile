@@ -22,4 +22,4 @@ StaticLibrary libham_grammar
 ;
 
 
-#PrecompileHeader grammar/Spirit.hpp ;
+PrecompileHeader grammar/Spirit.hpp ;

@@ -4,6 +4,9 @@
  */
 
 
+#include "grammar/Spirit.h"
+	// precompiled -- must be first
+
 #include "grammar/String.h"
 
 #include "grammar/Iterator.h"
