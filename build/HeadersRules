@@ -410,7 +410,6 @@ rule PrecompileHeader header
 
 	# the target name of the precompiled header
 	local precompiledHeader = $(header:GBS=$(header:S).gch) ;
-Echo precompiled header: $(precompiledHeader) ;
 
 	# We tell jam that the header includes the precompiled header. This way all
 	# objects whose sources include the header directly or indirectly will
