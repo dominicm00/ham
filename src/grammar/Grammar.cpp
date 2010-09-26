@@ -35,15 +35,6 @@ namespace phoenix = boost::phoenix;
 namespace ascii = boost::spirit::ascii;
 
 
-static const uint32_t kActionFlagUpdated		= 0x01;
-static const uint32_t kActionFlagTogether		= 0x02;
-static const uint32_t kActionFlagIgnore			= 0x04;
-static const uint32_t kActionFlagQuietly		= 0x08;
-static const uint32_t kActionFlagPiecemeal		= 0x10;
-static const uint32_t kActionFlagExisting		= 0x20;
-static const uint32_t kActionFlagMaxLineFactor	= 0x40;
-
-
 template<>
 Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	:
@@ -85,6 +76,24 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	using qi::_3;
 	using qi::_4;
 	using phoenix::new_;
+
+	fKeyword =
+		"local",
+		"include",
+		"jumptoeof",
+		"on",
+		"break",
+		"continue",
+		"return",
+		"for",
+		"in",
+		"switch",
+		"if",
+		"else",
+		"while",
+		"rule",
+		"actions"
+	;
 
 	fListDelimiter =
 		":",
@@ -129,30 +138,6 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	_InitStatement();
 	_InitString();
 
-#if 0
-	fKeywords.add
-		()
-		;
-"local"
-"include"
-"jumptoeof"
-"on"
-"break"
-"continue"
-"return"
-"for"
-"in"
-"switch"
-"if"
-"else"
-"while"
-"rule"
-"actions"
-#endif
-
-	fIdentifier = fString ;
-		// TODO: This should also exclude keywords!
-
 	fList = eps
 			[ _val = new_<code::List>() ]
 		>> *(fArgument
@@ -162,15 +147,8 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	fListOfLists = fList % ':';
 
 	fFunctionCall
-		= fArgument
-				[ _val = new_<code::FunctionCall>(_1) ]
-			>> -(fList
-					[ bind(&code::FunctionCall::AddArgument, _val, _1) ]
-				>> *(':' >> fList
-						[ bind(&code::FunctionCall::AddArgument, _val, _1) ]
-					)
-				)
-// TODO: Parse fListOfLists here, too.
+		= (fArgument >> fListOfLists)
+				[ _val = new_<code::FunctionCall>(_1, _2) ]
 	;
 
 	fBlock

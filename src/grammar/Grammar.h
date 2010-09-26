@@ -13,6 +13,7 @@
 
 #include "code/Assignment.h"
 	// TODO: Remove/move, if possible!
+#include "code/Node.h"
 
 
 namespace code {
@@ -22,14 +23,20 @@ namespace code {
 	class If;
 	class List;
 	class LocalVariableDeclaration;
-	class Node;
 	class OnExpression;
 	class RuleDefinition;
 	class Switch;
-
-	typedef std::list<Node*> NodeList;
-		// TODO: Not nice! Defined in code/Node.h.
 }
+
+
+// TODO: Move to code::.
+static const uint32_t kActionFlagUpdated		= 0x01;
+static const uint32_t kActionFlagTogether		= 0x02;
+static const uint32_t kActionFlagIgnore			= 0x04;
+static const uint32_t kActionFlagQuietly		= 0x08;
+static const uint32_t kActionFlagPiecemeal		= 0x10;
+static const uint32_t kActionFlagExisting		= 0x20;
+static const uint32_t kActionFlagMaxLineFactor	= 0x40;
 
 
 namespace grammar {
@@ -83,6 +90,7 @@ private:
 	qi::rule<Iterator, char()> fUnquotedChar;
 	qi::rule<Iterator, char()> fEscapedChar;
 
+	qi::symbols<char, unsigned> fKeyword;
 	qi::symbols<char, unsigned> fListDelimiter;
 	qi::symbols<char, uint32_t> fActionFlag;
 	qi::symbols<char, code::AssignmentOperator> fAssignmentOperator;

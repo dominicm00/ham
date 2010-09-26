@@ -9,6 +9,8 @@
 
 #include "grammar/Grammar.h"
 
+#include <stdlib.h>
+
 #include "code/ActionsDefinition.h"
 #include "code/List.h"
 #include "grammar/Iterator.h"
@@ -20,6 +22,13 @@ namespace grammar {
 
 namespace ascii = boost::spirit::ascii;
 namespace phoenix = boost::phoenix;
+
+
+static uint32_t
+string_to_maxline(const std::string& string)
+{
+	return (uint32_t)atoi(string.c_str()) * kActionFlagMaxLineFactor;
+}
 
 
 template<>
@@ -50,7 +59,8 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitActionsDefinition()
 	fActionsFlags
 		= *(fActionFlag
 				[ _val |= _1 ]
-// TODO: Support "maxline ARG"!
+			| ("maxline" >> fString)
+				[ _val |= bind(&string_to_maxline, _1) ]
 			)
 	;
 

@@ -41,6 +41,12 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitString()
 			>> +fSubString
 				[ _val += _1 ]
 	;
+
+	fIdentifier
+		= !((fListDelimiter | fKeyword) >> (space | eoi))
+			>> +fSubString
+				[ _val += _1 ]
+	;
 }
 
 
