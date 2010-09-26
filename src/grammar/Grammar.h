@@ -13,7 +13,7 @@
 
 #include "code/Assignment.h"
 	// TODO: Remove/move, if possible!
-#include "grammar/Expression.h"
+#include "grammar/String.h"
 
 
 namespace code {
