@@ -17,6 +17,7 @@ StaticLibrary libham_grammar
 	Grammar_InitRuleDefinition.cpp
 	Grammar_InitStatement.cpp
 	Grammar_InitString.cpp
+	NodeRegistry.cpp
 	Parser.cpp
 ;
 
