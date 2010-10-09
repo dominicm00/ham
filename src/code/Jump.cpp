@@ -22,11 +22,29 @@ Jump<JumpType>::Jump(Node* result)
 
 
 template<typename JumpType>
+Jump<JumpType>::~Jump()
+{
+	delete fResult;
+}
+
+
+template<typename JumpType>
 StringList
 Jump<JumpType>::Evaluate(EvaluationContext& context)
 {
 	JumpType::Setup();
 	return fResult->Evaluate(context);
+}
+
+
+template<typename JumpType>
+code::Node*
+Jump<JumpType>::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fResult->Visit(visitor);
 }
 
 

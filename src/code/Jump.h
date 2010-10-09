@@ -16,9 +16,10 @@ template<typename JumpType>
 class Jump : public Node {
 public:
 								Jump(Node* result);
+	virtual						~Jump();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

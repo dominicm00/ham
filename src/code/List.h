@@ -17,11 +17,12 @@ namespace code {
 class List : public Node {
 public:
 								List();
+	virtual						~List();
 
 	inline	List&				operator+=(Node* child);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

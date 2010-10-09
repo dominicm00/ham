@@ -15,9 +15,10 @@ namespace code {
 class Case : public Node {
 public:
 								Case(const String& pattern, Node* block);
+	virtual						~Case();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

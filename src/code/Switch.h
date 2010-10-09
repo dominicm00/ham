@@ -17,11 +17,12 @@ namespace code {
 class Switch : public Node {
 public:
 								Switch(Node* argument);
+	virtual						~Switch();
 
 	inline	void				AddCase(Case* caseStatement);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

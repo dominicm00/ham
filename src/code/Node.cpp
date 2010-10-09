@@ -8,6 +8,12 @@
 
 
 using code::Node;
+using code::NodeVisitor;
+
+
+NodeVisitor::~NodeVisitor()
+{
+}
 
 
 Node::~Node()

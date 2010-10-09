@@ -17,9 +17,10 @@ namespace code {
 class Block : public Node {
 public:
 								Block();
+	virtual						~Block();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 	inline	Block&				operator+=(Node* statement);

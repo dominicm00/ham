@@ -24,11 +24,35 @@ Assignment::Assignment(Node* left, AssignmentOperator operatorType, Node* right,
 }
 
 
+Assignment::~Assignment()
+{
+	delete fLeft;
+	delete fRight;
+	delete fOnTargets;
+}
+
+
 StringList
 Assignment::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement!
 	return kFalseStringList;
+}
+
+
+code::Node*
+Assignment::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fLeft->Visit(visitor))
+		return result;
+
+	if (Node* result = fRight->Visit(visitor))
+		return result;
+
+	return fOnTargets != NULL ? fOnTargets->Visit(visitor) : NULL;
 }
 
 

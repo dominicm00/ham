@@ -21,11 +21,31 @@ While::While(Node* expression, Node* block)
 }
 
 
+While::~While()
+{
+	delete fExpression;
+	delete fBlock;
+}
+
+
 StringList
 While::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement...
 	return kFalseStringList;
+}
+
+
+code::Node*
+While::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fExpression->Visit(visitor))
+		return result;
+
+	return fBlock->Visit(visitor);
 }
 
 

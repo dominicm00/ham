@@ -21,11 +21,41 @@ Switch::Switch(Node* argument)
 }
 
 
+Switch::~Switch()
+{
+	delete fArgument;
+
+	for (CaseList::const_iterator it = fCases.begin();
+			it != fCases.end(); ++it) {
+		delete *it;
+	}
+}
+
+
 StringList
 Switch::Evaluate(EvaluationContext& context)
 {
 // TODO: Implement!
 	return kFalseStringList;
+}
+
+
+code::Node*
+Switch::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fArgument->Visit(visitor))
+		return result;
+
+	for (CaseList::const_iterator it = fCases.begin();
+			it != fCases.end(); ++it) {
+		if (Node* result = (*it)->Visit(visitor))
+			return result;
+	}
+
+	return NULL;
 }
 
 
@@ -38,7 +68,7 @@ Switch::Dump(DumpContext& context) const
 	fArgument->Dump(context);
 
 	for (CaseList::const_iterator it = fCases.begin();
-		it != fCases.end(); ++it) {
+			it != fCases.end(); ++it) {
 		(*it)->Dump(context);
 	}
 

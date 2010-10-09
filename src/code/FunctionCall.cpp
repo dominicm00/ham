@@ -20,12 +20,20 @@ FunctionCall::FunctionCall(Node* function)
 {
 }
 
+
 FunctionCall::FunctionCall(Node* function, const NodeList& arguments)
 	:
 	fFunction(function),
 	fArguments(arguments)
 {
 }
+
+
+FunctionCall::~FunctionCall()
+{
+	delete fFunction;
+}
+
 
 StringList
 FunctionCall::Evaluate(EvaluationContext& context)
@@ -34,6 +42,26 @@ FunctionCall::Evaluate(EvaluationContext& context)
 // TODO: Call each function. Concatenate the results.
 	return kFalseStringList;
 }
+
+
+code::Node*
+FunctionCall::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fFunction->Visit(visitor))
+		return result;
+
+	for (ArgumentList::const_iterator it = fArguments.begin();
+			it != fArguments.end(); ++it) {
+		if (Node* result = (*it)->Visit(visitor))
+			return result;
+	}
+
+	return NULL;
+}
+
 
 void
 FunctionCall::Dump(DumpContext& context) const
@@ -44,7 +72,7 @@ FunctionCall::Dump(DumpContext& context) const
 	fFunction->Dump(context);
 
 	for (ArgumentList::const_iterator it = fArguments.begin();
-		it != fArguments.end(); ++it) {
+			it != fArguments.end(); ++it) {
 		(*it)->Dump(context);
 	}
 

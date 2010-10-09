@@ -24,9 +24,10 @@ public:
 								Assignment(Node* left,
 									AssignmentOperator operatorType,
 									Node* right, Node* onTargets = NULL);
+	virtual						~Assignment();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

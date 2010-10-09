@@ -16,6 +16,16 @@ namespace code {
 
 class DumpContext;
 class EvaluationContext;
+class Node;
+
+
+class NodeVisitor {
+public:
+	virtual						~NodeVisitor();
+
+	// return true to terminate visiting
+	virtual	bool				VisitNode(Node* node) = 0;
+};
 
 
 class Node {
@@ -23,6 +33,7 @@ public:
 	virtual						~Node();
 
 	virtual	StringList			Evaluate(EvaluationContext& context) = 0;
+	virtual	Node*				Visit(NodeVisitor& visitor) = 0;
 	virtual	void				Dump(DumpContext& context) const = 0;
 };
 

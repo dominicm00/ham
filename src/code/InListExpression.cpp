@@ -23,6 +23,13 @@ InListExpression::InListExpression(Node* left, Node* right)
 }
 
 
+InListExpression::~InListExpression()
+{
+	delete fLeft;
+	delete fRight;
+}
+
+
 StringList
 InListExpression::Evaluate(EvaluationContext& context)
 {
@@ -35,6 +42,19 @@ InListExpression::Evaluate(EvaluationContext& context)
 	}
 
 	return kTrueStringList;
+}
+
+
+code::Node*
+InListExpression::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fLeft->Visit(visitor))
+		return result;
+
+	return fRight->Visit(visitor);
 }
 
 

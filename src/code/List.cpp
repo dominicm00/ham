@@ -18,6 +18,14 @@ List::List()
 }
 
 
+List::~List()
+{
+	size_t childCount = fChildren.size();
+	for (size_t i = 0; i < childCount; i++)
+		delete fChildren[i];
+}
+
+
 StringList
 List::Evaluate(EvaluationContext& context)
 {
@@ -29,6 +37,22 @@ List::Evaluate(EvaluationContext& context)
 	}
 
 	return result;
+}
+
+
+code::Node*
+List::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	size_t childCount = fChildren.size();
+	for (size_t i = 0; i < childCount; i++) {
+		if (Node* result = fChildren[i]->Visit(visitor))
+			return result;
+	}
+
+	return NULL;
 }
 
 

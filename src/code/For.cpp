@@ -22,11 +22,35 @@ For::For(Node* variable, Node* list, Node* block)
 }
 
 
+For::~For()
+{
+	delete fVariable;
+	delete fList;
+	delete fBlock;
+}
+
+
 StringList
 For::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement...
 	return kFalseStringList;
+}
+
+
+code::Node*
+For::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fVariable->Visit(visitor))
+		return result;
+
+	if (Node* result = fList->Visit(visitor))
+		return result;
+
+	return fBlock->Visit(visitor);
 }
 
 

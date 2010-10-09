@@ -15,9 +15,10 @@ namespace code {
 class InListExpression : public Node {
 public:
 								InListExpression(Node* left, Node* right);
+	virtual						~InListExpression();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

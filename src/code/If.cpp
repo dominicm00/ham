@@ -22,6 +22,14 @@ If::If(Node* expression, Node* block)
 }
 
 
+If::~If()
+{
+	delete fExpression;
+	delete fBlock;
+	delete fElseBlock;
+}
+
+
 StringList
 If::Evaluate(EvaluationContext& context)
 {
@@ -29,6 +37,22 @@ If::Evaluate(EvaluationContext& context)
 		? fBlock->Evaluate(context)
 		: (fElseBlock != NULL
 			? fBlock->Evaluate(context) : kFalseStringList);
+}
+
+
+code::Node*
+If::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fExpression->Visit(visitor))
+		return result;
+
+	if (Node* result = fBlock->Visit(visitor))
+		return result;
+
+	return fElseBlock != NULL ? fElseBlock->Visit(visitor) : NULL;
 }
 
 

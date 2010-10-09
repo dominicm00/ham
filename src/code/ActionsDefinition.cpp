@@ -24,11 +24,27 @@ ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
 }
 
 
+ActionsDefinition::~ActionsDefinition()
+{
+	delete fVariables;
+}
+
+
 StringList
 ActionsDefinition::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement!
 	return kFalseStringList;
+}
+
+
+code::Node*
+ActionsDefinition::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fVariables->Visit(visitor);
 }
 
 

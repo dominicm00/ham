@@ -15,12 +15,13 @@ namespace code {
 class RuleDefinition : public Node {
 public:
 								RuleDefinition(const String& ruleName);
+	virtual						~RuleDefinition();
 
 	inline	void				AddParameterName(const String& parameterName);
 	inline	void				SetBlock(Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

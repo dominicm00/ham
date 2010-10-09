@@ -15,11 +15,12 @@ namespace code {
 class If : public Node {
 public:
 								If(Node* expression, Node* block);
+	virtual						~If();
 
 	inline	void				SetElseBlock(Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

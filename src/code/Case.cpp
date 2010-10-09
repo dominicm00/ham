@@ -21,10 +21,26 @@ Case::Case(const String& pattern, Node* block)
 }
 
 
+Case::~Case()
+{
+	delete fBlock;
+}
+
+
 StringList
 Case::Evaluate(EvaluationContext& context)
 {
 	return fBlock->Evaluate(context);
+}
+
+
+code::Node*
+Case::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fBlock->Visit(visitor);
 }
 
 

@@ -15,9 +15,10 @@ namespace code {
 class Include : public Node {
 public:
 								Include(Node* fileNames);
+	virtual						~Include();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

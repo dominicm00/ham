@@ -20,16 +20,41 @@ Block::Block()
 }
 
 
+Block::~Block()
+{
+	for (StatementList::const_iterator it = fStatements.begin();
+			it != fStatements.end(); ++it) {
+		delete *it;
+	}
+}
+
+
 StringList
 Block::Evaluate(EvaluationContext& context)
 {
 	for (StatementList::const_iterator it = fStatements.begin();
-		it != fStatements.end(); ++it) {
+			it != fStatements.end(); ++it) {
 		/*StringList result =*/ (*it)->Evaluate(context);
 		// TODO: In case of break/continue/return, return here.
 	}
 
 	return kFalseStringList;
+}
+
+
+code::Node*
+Block::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	for (StatementList::const_iterator it = fStatements.begin();
+			it != fStatements.end(); ++it) {
+		if (Node* result = (*it)->Visit(visitor))
+			return result;
+	}
+
+	return NULL;
 }
 
 
@@ -40,7 +65,7 @@ Block::Dump(DumpContext& context) const
 	context.BeginChildren();
 
 	for (StatementList::const_iterator it = fStatements.begin();
-		it != fStatements.end(); ++it) {
+			it != fStatements.end(); ++it) {
 		(*it)->Dump(context);
 	}
 

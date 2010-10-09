@@ -20,6 +20,22 @@ NotExpression::NotExpression(Node* child)
 }
 
 
+NotExpression::~NotExpression()
+{
+	delete fChild;
+}
+
+
+code::Node*
+NotExpression::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fChild->Visit(visitor);
+}
+
+
 StringList
 NotExpression::Evaluate(EvaluationContext& context)
 {

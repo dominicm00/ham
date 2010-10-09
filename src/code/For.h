@@ -16,9 +16,10 @@ class For : public Node {
 public:
 								For(Node* variable, Node* list,
 									Node* block);
+	virtual						~For();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

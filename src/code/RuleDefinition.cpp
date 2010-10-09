@@ -22,11 +22,27 @@ RuleDefinition::RuleDefinition(const String& ruleName)
 }
 
 
+RuleDefinition::~RuleDefinition()
+{
+	delete fBlock;
+}
+
+
 StringList
 RuleDefinition::Evaluate(EvaluationContext& context)
 {
 	// TODO: Define the rule!
 	return kFalseStringList;
+}
+
+
+code::Node*
+RuleDefinition::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fBlock->Visit(visitor);
 }
 
 
@@ -36,7 +52,7 @@ RuleDefinition::Dump(DumpContext& context) const
 	context << "RuleDefinition(\"" << fRuleName << "\", (";
 
 	for (StringList::const_iterator it = fParameterNames.begin();
-		it != fParameterNames.end(); ++it) {
+			it != fParameterNames.end(); ++it) {
 		if (it != fParameterNames.begin())
 			context << ", ";
 		context << *it;

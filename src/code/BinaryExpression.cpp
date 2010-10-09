@@ -23,6 +23,14 @@ BinaryExpression<Operator>::BinaryExpression(Node* left, Node* right)
 
 
 template<typename Operator>
+BinaryExpression<Operator>::~BinaryExpression()
+{
+	delete fLeft;
+	delete fRight;
+}
+
+
+template<typename Operator>
 StringList
 BinaryExpression<Operator>::Evaluate(EvaluationContext& context)
 {
@@ -31,6 +39,20 @@ BinaryExpression<Operator>::Evaluate(EvaluationContext& context)
 
 	return Operator::Do(fLeft->Evaluate(context),
 		fRight->Evaluate(context));
+}
+
+
+template<typename Operator>
+code::Node*
+BinaryExpression<Operator>::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fLeft->Visit(visitor))
+		return result;
+
+	return fRight->Visit(visitor);
 }
 
 

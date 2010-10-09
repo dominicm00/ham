@@ -15,9 +15,10 @@ namespace code {
 class Leaf : public Node {
 public:
 								Leaf(const String& string);
+	virtual						~Leaf();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

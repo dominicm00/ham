@@ -16,9 +16,10 @@ template<typename Operator>
 class BinaryExpression : public Node {
 public:
 								BinaryExpression(Node* left, Node* right);
+	virtual						~BinaryExpression();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

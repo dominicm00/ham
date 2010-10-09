@@ -15,11 +15,12 @@ namespace code {
 class LocalVariableDeclaration : public Node {
 public:
 								LocalVariableDeclaration(Node* variables);
+	virtual						~LocalVariableDeclaration();
 
 	inline	void				SetInitializer(Node* initializer);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

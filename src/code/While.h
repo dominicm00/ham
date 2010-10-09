@@ -15,9 +15,10 @@ namespace code {
 class While : public Node {
 public:
 								While(Node* expression, Node* block);
+	virtual						~While();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

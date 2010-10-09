@@ -21,11 +21,31 @@ LocalVariableDeclaration::LocalVariableDeclaration(Node* variables)
 }
 
 
+LocalVariableDeclaration::~LocalVariableDeclaration()
+{
+	delete fVariables;
+	delete fInitializer;
+}
+
+
 StringList
 LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement!
 	return kFalseStringList;
+}
+
+
+code::Node*
+LocalVariableDeclaration::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fVariables->Visit(visitor))
+		return result;
+
+	return fInitializer != NULL ? fInitializer->Visit(visitor) : NULL;
 }
 
 

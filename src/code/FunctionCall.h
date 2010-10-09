@@ -17,11 +17,12 @@ public:
 								FunctionCall(Node* function);
 								FunctionCall(Node* function,
 									const NodeList& arguments);
+	virtual						~FunctionCall();
 
 	inline	void				AddArgument(Node* argument);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

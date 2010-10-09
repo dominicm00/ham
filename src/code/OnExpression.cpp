@@ -29,6 +29,13 @@ OnExpression::OnExpression(Node* object, Node* expression)
 }
 
 
+OnExpression::~OnExpression()
+{
+	delete fObject;
+	delete fExpression;
+}
+
+
 StringList
 OnExpression::Evaluate(EvaluationContext& context)
 {
@@ -38,6 +45,19 @@ OnExpression::Evaluate(EvaluationContext& context)
 	StringList result = fExpression->Evaluate(context);
 
 	return result;
+}
+
+
+code::Node*
+OnExpression::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	if (Node* result = fObject->Visit(visitor))
+		return result;
+
+	return fExpression->Visit(visitor);
 }
 
 

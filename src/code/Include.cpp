@@ -20,12 +20,28 @@ Include::Include(Node* fileNames)
 }
 
 
+Include::~Include()
+{
+	delete fFileNames;
+}
+
+
 StringList
 Include::Evaluate(EvaluationContext& context)
 {
 //		StringList fileNames = fFileNames->Evaluate(context);
 // TODO: Include each file. Concatenate the results/return the last one?
 	return kFalseStringList;
+}
+
+
+code::Node*
+Include::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return fFileNames->Visit(visitor);
 }
 
 

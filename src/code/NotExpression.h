@@ -15,9 +15,10 @@ namespace code {
 class NotExpression : public Node {
 public:
 								NotExpression(Node* child);
+	virtual						~NotExpression();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

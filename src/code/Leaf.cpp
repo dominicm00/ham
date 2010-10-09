@@ -19,6 +19,11 @@ Leaf::Leaf(const String& string)
 {
 }
 
+Leaf::~Leaf()
+{
+}
+
+
 StringList
 Leaf::Evaluate(EvaluationContext& context)
 {
@@ -27,6 +32,16 @@ Leaf::Evaluate(EvaluationContext& context)
 	list.push_back(fString);
 	return list;
 }
+
+code::Node*
+Leaf::Visit(NodeVisitor& visitor)
+{
+	if (visitor.VisitNode(this))
+		return this;
+
+	return NULL;
+}
+
 
 void
 Leaf::Dump(DumpContext& context) const

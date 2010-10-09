@@ -19,9 +19,10 @@ public:
 								ActionsDefinition(uint32_t flags,
 									const String& identifier, Node* variables,
 									const String& actions);
+	virtual						~ActionsDefinition();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:

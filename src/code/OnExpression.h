@@ -16,11 +16,12 @@ class OnExpression : public Node {
 public:
 								OnExpression(Node* object);
 								OnExpression(Node* object, Node* expression);
+	virtual						~OnExpression();
 
 	inline	void				SetExpression(Node* expression);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
-
+	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
 private:
