@@ -9,10 +9,13 @@
 
 #include "grammar/Parser.h"
 
+#include <fstream>
+
 #include "code/DumpContext.h"
 #include "code/Node.h"
 #include "grammar/Grammar.h"
 #include "grammar/Iterator.h"
+#include "grammar/NodeRegistry.h"
 #include "grammar/Skipper.h"
 
 
@@ -27,7 +30,23 @@ Parser::Parser()
 void
 Parser::Test(int argc, const char* const* argv)
 {
-	std::noskipws(std::cin);
+#if 0
+// 	if (argc < 2) {
+// 		printf("Usage:...\n");
+// 		return;
+// 	}
+//
+// 	std::ifstream input(argv[1]);
+	std::ifstream input("testdata/test1");
+	if (input.fail()) {
+		printf("Failed to open \"%s\"n", argv[1]);
+		return;
+	}
+#else
+	std::istream& input = std::cin;
+#endif
+
+	std::noskipws(input);
 
 	using grammar::BaseIteratorType;
 	using grammar::IteratorType;
@@ -35,7 +54,7 @@ Parser::Test(int argc, const char* const* argv)
 	// convert input iterator to forward iterator, usable by spirit parser
 #if 1
 	IteratorType begin = boost::spirit::make_default_multi_pass(
-		BaseIteratorType(std::cin));
+		BaseIteratorType(input));
 	IteratorType end;
 
 #else
@@ -92,9 +111,12 @@ const char* kTestString =
 		std::cout << *it;
 	std::cout << "\" ...\n";
 
+	NodeRegistry nodeRegistry;
+
 	code::Node* result = NULL;
 	bool r = qi::phrase_parse(begin, end,
-		grammar::Grammar<IteratorType, grammar::Skipper<IteratorType> >(),
+		grammar::Grammar<IteratorType, grammar::Skipper<IteratorType> >(
+			nodeRegistry),
 		grammar::Skipper<IteratorType>(), result);
 
 	if (r && begin == end) {
@@ -103,15 +125,35 @@ const char* kTestString =
 		code::DumpContext dumpContext;
 		result->Dump(dumpContext);
 		std::cout << "-------------------------\n";
+		nodeRegistry.Dump();
+
+		struct CountVisitor : code::NodeVisitor {
+			size_t count;
+
+			CountVisitor()
+				:
+				count(0)
+			{
+			}
+
+			virtual bool VisitNode(code::Node* node)
+			{
+				count++;
+				return false;
+			}
+		} visitor;
+
+		result->Visit(visitor);
+		std::cout << "Counted " << visitor.count << " nodes in tree\n";
+
+		delete result;
 	} else {
 		data::String rest(begin, end);
 		std::cout << "-------------------------\n";
 		std::cout << "Parsing failed\n";
 		std::cout << "stopped at: \"" << rest << "\"\n";
 		std::cout << "-------------------------\n";
-if (result != NULL) {
-code::DumpContext dumpContext;
-result->Dump(dumpContext);
-}
+		nodeRegistry.Dump();
+		nodeRegistry.DeleteNodes();
 	}
 }

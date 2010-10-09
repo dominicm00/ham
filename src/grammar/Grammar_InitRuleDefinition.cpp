@@ -11,6 +11,7 @@
 
 #include "code/Block.h"
 #include "code/RuleDefinition.h"
+#include "grammar/ActorFactory.h"
 #include "grammar/Iterator.h"
 #include "grammar/Skipper.h"
 
@@ -27,11 +28,12 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitRuleDefinition()
 {
 	using qi::_val;
 	using qi::_1;
-	using phoenix::new_;
+
+	ActorFactory<Factory> factory(fFactory);
 
 	fRuleDefinition
 		= ("rule" >> fIdentifier)
-				[ _val = new_<code::RuleDefinition>(_1)]
+				[ _val = factory.Create<code::RuleDefinition>(_1)]
 			>> -(fIdentifier
 					[ bind(&code::RuleDefinition::AddParameterName, _val,
 						_1) ]

@@ -14,6 +14,8 @@
 #include "code/Assignment.h"
 	// TODO: Remove/move, if possible!
 #include "code/Node.h"
+#include "grammar/NodeRegistry.h"
+#include "grammar/SimpleFactory.h"
 
 
 namespace code {
@@ -48,7 +50,10 @@ namespace qi = boost::spirit::qi;
 template<typename Iterator, typename Skipper>
 class Grammar : public qi::grammar<Iterator, code::Node*(), Skipper> {
 public:
-								Grammar();
+								Grammar(NodeRegistry& nodeRegistry);
+
+private:
+			typedef SimpleFactory<NodeRegistry::RegistryHook> Factory;
 
 private:
 			void				_InitActionsDefinition();
@@ -59,6 +64,9 @@ private:
 			void				_InitString();
 
 private:
+			NodeRegistry&		fNodeRegistry;
+			Factory				fFactory;
+
 	qi::rule<Iterator, code::Node*(), Skipper> fStart;
 	qi::rule<Iterator, code::Block*(), Skipper> fBlock;
 	qi::rule<Iterator, code::LocalVariableDeclaration*(), Skipper>

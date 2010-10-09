@@ -24,6 +24,7 @@
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
 #include "code/While.h"
+#include "grammar/ActorFactory.h"
 #include "grammar/Iterator.h"
 #include "grammar/Skipper.h"
 
@@ -36,9 +37,12 @@ namespace ascii = boost::spirit::ascii;
 
 
 template<>
-Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
+Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
+	NodeRegistry& nodeRegistry)
 	:
 	Grammar::base_type(fStart),
+	fNodeRegistry(nodeRegistry),
+	fFactory(fNodeRegistry),
 	fStart(std::string("start")),
 	fBlock(std::string("block")),
 	fLocalVariableDeclaration(std::string("localVariableDeclaration")),
@@ -75,7 +79,8 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	using qi::_2;
 	using qi::_3;
 	using qi::_4;
-	using phoenix::new_;
+
+	ActorFactory<Factory> factory(fFactory);
 
 	fKeyword =
 		"local",
@@ -139,7 +144,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 	_InitString();
 
 	fList = eps
-			[ _val = new_<code::List>() ]
+			[ _val = factory.Create<code::List>() ]
 		>> *(fArgument
 				[ *_val += _1 ]
 			);
@@ -148,12 +153,12 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 
 	fFunctionCall
 		= (fArgument >> fListOfLists)
-				[ _val = new_<code::FunctionCall>(_1, _2) ]
+				[ _val = factory.Create<code::FunctionCall>(_1, _2) ]
 	;
 
 	fBlock
 		= eps
-				[ _val = new_<code::Block>() ]
+				[ _val = factory.Create<code::Block>() ]
 			>> *(fStatement
 					[ *_val += _1 ]
 				| fLocalVariableDeclaration
@@ -163,7 +168,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 
 	fLocalVariableDeclaration
 		= "local" >> fList
-				[ _val = new_<code::LocalVariableDeclaration>(_1) ]
+				[ _val = factory.Create<code::LocalVariableDeclaration>(_1) ]
 			>> -('=' >> fList
 					[ bind(&code::LocalVariableDeclaration::SetInitializer,
 						_val, _1) ]
@@ -173,7 +178,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 
 	fIfStatement
 		= ("if" >> fExpression >> '{' >> fBlock >> '}')
-				[ _val = new_<code::If>(_1, _2) ]
+				[ _val = factory.Create<code::If>(_1, _2) ]
 			>> -("else" >> fStatement
 					[ bind(&code::If::SetElseBlock, _val, _1) ]
 				)
@@ -181,27 +186,27 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar()
 
 	fForStatement
 		= ("for" >> fArgument >> "in" >> fList >> '{' >> fBlock >> '}')
-				[ _val = new_<code::For>(_1, _2, _3) ]
+				[ _val = factory.Create<code::For>(_1, _2, _3) ]
 	;
 
 	fWhileStatement
 		= ("while" >> fExpression >> '{' >> fBlock >> '}')
-				[ _val = new_<code::While>(_1, _2) ]
+				[ _val = factory.Create<code::While>(_1, _2) ]
 	;
 
 	fOnStatement
 		= ("on" >> fArgument >> fStatement)
-				[ _val = new_<code::OnExpression>(_1, _2) ]
+				[ _val = factory.Create<code::OnExpression>(_1, _2) ]
 	;
 
 	fCaseStatement
 		= ("case" >> fIdentifier >> ':' >> fBlock)
-				[ _val = new_<code::Case>(_1, _2) ]
+				[ _val = factory.Create<code::Case>(_1, _2) ]
 	;
 
 	fSwitchStatement
 		= ("switch" >> fList)
-				[ _val = new_<code::Switch>(_1) ]
+				[ _val = factory.Create<code::Switch>(_1) ]
 			>> '{'
 			>> *(fCaseStatement
 					[ bind(&code::Switch::AddCase, _val, _1) ]

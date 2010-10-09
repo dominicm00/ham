@@ -13,6 +13,7 @@
 
 #include "code/ActionsDefinition.h"
 #include "code/List.h"
+#include "grammar/ActorFactory.h"
 #include "grammar/Iterator.h"
 #include "grammar/Skipper.h"
 
@@ -39,7 +40,6 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitActionsDefinition()
 	using phoenix::begin;
 	using phoenix::construct;
 	using phoenix::end;
-	using phoenix::new_;
 	using qi::_val;
 	using qi::_1;
 	using qi::_2;
@@ -47,12 +47,14 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitActionsDefinition()
 	using qi::_4;
 	using qi::raw;
 
+	ActorFactory<Factory> factory(fFactory);
+
 	fActionsDefinition
 		= ("actions" >> fActionsFlags >> fIdentifier >> fActionsBindList
 			>> '{'
 			>> raw[fActions]
 			>> '}')
-					[ _val = new_<code::ActionsDefinition>(_1, _2, _3,
+					[ _val = factory.Create<code::ActionsDefinition>(_1, _2, _3,
 						construct<std::string>(begin(_4), end(_4))) ]
 	;
 

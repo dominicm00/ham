@@ -13,35 +13,6 @@
 namespace grammar {
 
 
-struct SimpleFactory {
-	template<typename Type>
-	Type* Create()
-	{
-		return new Type();
-	}
-
-	template<typename Type, typename Argument1>
-	Type* Create(const Argument1& arg1)
-	{
-		return new Type(arg1);
-	}
-
-	template<typename Type, typename Argument1, typename Argument2>
-	Type* Create(const Argument1& arg1, const Argument2& arg2)
-	{
-		return new Type(arg1, arg2);
-	}
-
-	template<typename Type, typename Argument1, typename Argument2,
-		typename Argument3>
-	Type* Create(const Argument1& arg1, const Argument2& arg2,
-		const Argument3& arg3)
-	{
-		return new Type(arg1, arg2, arg3);
-	}
-};
-
-
 template<typename T>
 struct FactoryCreateEval0
 {
@@ -52,10 +23,6 @@ struct FactoryCreateEval0
 	};
 
 	typedef boost::mpl::true_ no_nullary;
-
-	FactoryCreateEval0()
-	{
-	}
 
 	template<typename RT, typename Env, typename Factory>
 	static T* eval(const Env& env, Factory& factory)
@@ -76,10 +43,6 @@ struct FactoryCreateEval1
 
 	typedef boost::mpl::true_ no_nullary;
 
-	FactoryCreateEval1()
-	{
-	}
-
 	template<typename RT, typename Env, typename Factory, typename Argument1>
 	static T* eval(const Env& env, Factory& factory, const Argument1& arg1)
 	{
@@ -99,10 +62,6 @@ struct FactoryCreateEval2
 	};
 
 	typedef boost::mpl::true_ no_nullary;
-
-	FactoryCreateEval2()
-	{
-	}
 
 	template<typename RT, typename Env, typename Factory, typename Argument1,
 		typename Argument2>
@@ -127,10 +86,6 @@ struct FactoryCreateEval3
 
 	typedef boost::mpl::true_ no_nullary;
 
-	FactoryCreateEval3()
-	{
-	}
-
 	template<typename RT, typename Env, typename Factory, typename Argument1,
 		typename Argument2, typename Argument3>
 	static T* eval(const Env& env, Factory& factory, const Argument1& arg1,
@@ -138,6 +93,29 @@ struct FactoryCreateEval3
 	{
 		return factory.eval(env).template Create<T>(arg1.eval(env),
 			arg2.eval(env), arg3.eval(env));
+	}
+};
+
+
+template<typename T>
+struct FactoryCreateEval4
+{
+	template <typename Env, typename Factory, typename Argument1,
+		typename Argument2, typename Argument3, typename Argument4>
+	struct result
+	{
+		typedef T* type;
+	};
+
+	typedef boost::mpl::true_ no_nullary;
+
+	template<typename RT, typename Env, typename Factory, typename Argument1,
+		typename Argument2, typename Argument3, typename Argument4>
+	static T* eval(const Env& env, Factory& factory, const Argument1& arg1,
+		const Argument2& arg2, const Argument3& arg3, const Argument4& arg4)
+	{
+		return factory.eval(env).template Create<T>(arg1.eval(env),
+			arg2.eval(env), arg3.eval(env), arg4.eval(env));
 	}
 };
 
@@ -192,6 +170,19 @@ struct ActorFactory {
 	{
 		return boost::phoenix::compose<FactoryCreateEval3<T> >(
 			boost::phoenix::ref(fFactory), arg1, arg2, arg3);
+	}
+
+	template<typename T, typename Argument1, typename Argument2,
+		typename Argument3, typename Argument4>
+	const boost::phoenix::actor<
+		typename boost::phoenix::as_composite<FactoryCreateEval4<T>,
+			boost::phoenix::actor<boost::phoenix::reference<Factory> >,
+			Argument1, Argument2, Argument3, Argument4>::type>
+	Create(const Argument1& arg1, const Argument2& arg2, const Argument3& arg3,
+		const Argument4& arg4)
+	{
+		return boost::phoenix::compose<FactoryCreateEval4<T> >(
+			boost::phoenix::ref(fFactory), arg1, arg2, arg3, arg4);
 	}
 
 private:
