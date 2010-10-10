@@ -35,7 +35,10 @@ Grammar<IteratorType, Skipper<IteratorType> >::_InitString()
 	fUnquotedChar = fEscapedChar | (char_ - '"' - space);
 	fEscapedChar = '\\' >> char_;
 
-	fSubString = ('"' >> *fQuotedChar >> '"') | +fUnquotedChar;
+	fSubString = ('"' >> *fQuotedChar [ _val += _1 ] >> '"')
+		| +fUnquotedChar [ _val += _1 ]
+	;
+
 	fString
 		= !(fListDelimiter >> (space | eoi))
 			>> +fSubString

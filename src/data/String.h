@@ -9,6 +9,8 @@
 #include <list>
 #include <string>
 
+#include "StringBuffer.h"
+
 
 namespace data {
 

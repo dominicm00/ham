@@ -41,6 +41,17 @@ static const uint32_t kActionFlagExisting		= 0x20;
 static const uint32_t kActionFlagMaxLineFactor	= 0x40;
 
 
+namespace boost { namespace spirit { namespace traits {
+
+template<>
+struct container_value<data::StringBuffer>
+{
+    typedef data::String	type;
+};
+
+}}}
+
+
 namespace grammar {
 
 
@@ -91,9 +102,9 @@ private:
 	qi::rule<Iterator, code::Node*(), Skipper> fArgument;
 	qi::rule<Iterator, code::OnExpression*(), Skipper> fBracketOnExpression;
 	qi::rule<Iterator, code::Node*(), Skipper> fBracketExpression;
-	qi::rule<Iterator, data::String()> fIdentifier;
-	qi::rule<Iterator, data::String()> fString;
-	qi::rule<Iterator, data::String()> fSubString;
+	qi::rule<Iterator, data::StringBuffer()> fIdentifier;
+	qi::rule<Iterator, data::StringBuffer()> fString;
+	qi::rule<Iterator, data::StringBuffer()> fSubString;
 	qi::rule<Iterator, char()> fQuotedChar;
 	qi::rule<Iterator, char()> fUnquotedChar;
 	qi::rule<Iterator, char()> fEscapedChar;
