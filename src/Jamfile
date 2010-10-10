@@ -6,10 +6,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
 
 
-BinCommand ham
+SharedLibrary libham.so
 	:
-	ham.cpp
-
 	# code
 	ActionsDefinition.cpp
 	Assignment.cpp
@@ -35,8 +33,19 @@ BinCommand ham
 
 	# data
 	String.cpp
+
 	:
-	libham_grammar.a
+	<nogrist>ham_grammar.o
+	$(TARGET_LIBSTDC++)
+;
+
+
+BinCommand ham
+	:
+	ham.cpp
+
+	:
+	libham.so
 	$(TARGET_LIBSTDC++)
 ;
 

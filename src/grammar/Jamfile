@@ -8,7 +8,12 @@ SubDirHdrs [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(HAM_TOP) src ] ;
 
 
-StaticLibrary libham_grammar
+# We might need PIC flags, since we're building a shared library.
+CCFLAGS += $(TARGET_PIC_CCFLAGS) ;
+C++FLAGS += $(TARGET_PIC_C++FLAGS) ;
+
+
+MergeObject ham_grammar.o
 	:
 	Grammar.cpp
 	Grammar_InitActionsDefinition.cpp
