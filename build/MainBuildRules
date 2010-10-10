@@ -115,7 +115,7 @@ rule Addon target : sources : libraries : isExecutable
 
 	local linkFlags = -Xlinker -soname=\"$(target:G=)\" ;
 	if $(isExecutable) != true {
-		linkFlags = -nostart $(linkFlags) ;
+		linkFlags = -shared $(linkFlags) ;
 	}
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
 	LinkAgainst $(target) : $(libraries) ;
@@ -415,8 +415,10 @@ rule SharedLibraryFromObjects
 	soname ?= $(_lib:BS) ;
 
 	MainFromObjects $(_lib) : $(2) ;
+	CCFLAGS on $(2) += $(TARGET_PIC_CCFLAGS) ;
+	C++FLAGS on $(2) += $(TARGET_PIC_C++FLAGS) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
-		-nostart -Xlinker -soname=\"$(soname)\" ;
+		-shared -Xlinker -soname=\"$(soname)\" ;
 	LinkAgainst $(_lib) : $(3) ;
 
 	AddSharedObjectGlueCode $(_lib) : false ;

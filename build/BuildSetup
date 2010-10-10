@@ -37,7 +37,8 @@ HOST_LDFLAGS		?= $(LDFLAGS) ;
 HOST_LINKFLAGS		?= $(LINKFLAGS) ;
 HOST_DEFINES		?= $(DEFINES) ;
 HOST_HDRS			?= $(HDRS) ;
-
+HOST_LD				?= ld ;
+	# TODO: Should be configurable.
 
 # split up HOST_AR into the command name and flags
 HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
@@ -202,6 +203,7 @@ local buildVars =
 
 	HDRS CPPFLAGS CCFLAGS C++FLAGS LDFLAGS LINK LINKFLAGS DEFINES
 	ARFLAGS UNARFLAGS
+	PIC_CCFLAGS PIC_C++FLAGS
 
 	WARNING_CCFLAGS WARNING_C++FLAGS
 
