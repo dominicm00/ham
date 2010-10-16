@@ -27,4 +27,4 @@ MergeObject ham_grammar.o
 ;
 
 
-PrecompileHeader grammar/Spirit.hpp ;
+#PrecompileHeader grammar/Spirit.hpp ;

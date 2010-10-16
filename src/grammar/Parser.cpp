@@ -26,6 +26,45 @@ Parser::Parser()
 {
 }
 
+#include <boost/spirit/include/lex_lexertl.hpp>
+
+namespace lex = boost::spirit::lex;
+
+enum TestTokenID {
+	ID_STRING,
+	ID_SPACE
+};
+
+template<typename Lexer>
+struct TestLexer : lex::lexer<Lexer> {
+	TestLexer()
+	{
+		this->self.add_pattern("WORD", "[^ \t\n\r]+");
+
+		word = "{WORD}";
+
+		this->self.add
+			(word)
+			("[ \t\n\r]+", ID_SPACE)
+		;
+	}
+
+	lex::token_def<std::string> word;
+};
+
+template<typename Iterator>
+struct TestGrammar : qi::grammar<Iterator, StringList()>
+{
+	template<typename TokenDef>
+	TestGrammar(const TokenDef& tokens)
+		:
+		TestGrammar::base_type(fStart)
+	{
+		fStart = tokens.word % qi::token(ID_SPACE);
+	}
+
+	qi::rule<Iterator, StringList()> fStart;
+};
 
 void
 Parser::Test(int argc, const char* const* argv)
@@ -105,6 +144,103 @@ const char* kTestString =
 	IteratorType begin = kTestString;
 	IteratorType end = begin + strlen(begin);
 #endif
+
+
+{
+//	typedef lex::lexertl::token<const char*, boost::mpl::vector<std::string> >
+//		token_type;
+	typedef lex::lexertl::token<IteratorType, boost::mpl::vector<std::string> >
+		token_type;
+	typedef lex::lexertl::lexer<token_type> lexer_type;
+	typedef TestLexer<lexer_type>::iterator_type iterator_type;
+
+	TestLexer<lexer_type> testLexer;
+
+	StringList result;
+	bool r = lex::tokenize_and_parse(begin, end, testLexer,
+		TestGrammar<iterator_type>(testLexer), result);
+	printf("parsing %s\n", r ? "succeeded" : "failed");
+
+	printf("result:\n");
+	for (StringList::iterator it = result.begin(); it != result.end(); ++it) {
+		std::cout << "  " << *it << std::endl;
+	}
+
+#if 0
+boost::spirit::lex::lexer<
+	boost::spirit::lex::lexertl::lexer<
+		boost::spirit::lex::lexertl::token<
+			const char*,
+			boost::mpl::vector<
+				std::basic_string<
+					char,
+					std::char_traits<char>,
+					std::allocator<char>
+				>,
+				mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+				mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+				mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+				mpl_::na
+			>,
+			mpl_::bool_<true>
+		>,
+		const char*,
+		boost::spirit::lex::lexertl::functor<
+			boost::spirit::lex::lexertl::token<
+				const char*,
+				boost::mpl::vector<
+					std::basic_string<
+						char,
+						std::char_traits<char>,
+						std::allocator<char>
+					>,
+					mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+					mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+					mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na,
+					mpl_::na
+				>,
+				mpl_::bool_<true>
+			>,
+			boost::spirit::lex::lexertl::detail::data,
+			const char*,
+			mpl_::bool_<false>,
+			mpl_::bool_<true>
+		>
+	>
+>::begin(
+	boost::spirit::multi_pass<
+		std::istream_iterator<char, char, std::char_traits<char>, long int>,
+		boost::spirit::iterator_policies::default_policy<
+			boost::spirit::iterator_policies::ref_counted,
+		 	boost::spirit::iterator_policies::no_check,
+		 	boost::spirit::iterator_policies::buffering_input_iterator,
+		 	boost::spirit::iterator_policies::split_std_deque
+		>
+	>&,
+	const boost::spirit::multi_pass<
+		std::istream_iterator<char, char, std::char_traits<char>, long int>,
+		boost::spirit::iterator_policies::default_policy<
+			boost::spirit::iterator_policies::ref_counted,
+			boost::spirit::iterator_policies::no_check,
+			boost::spirit::iterator_policies::buffering_input_iterator,
+			boost::spirit::iterator_policies::split_std_deque
+		>
+	>&,
+	const char*&) const
+
+boost::spirit::lex::lexertl::iterator<Functor>
+boost::spirit::lex::lexertl::lexer<Token, Iterator, Functor>::begin(
+	Iterator&,
+	const Iterator&,
+	const typename boost::detail::iterator_traits<Iterator2>::value_type*) const
+[with Token = boost::spirit::lex::lexertl::token<const char*, boost::mpl::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, mpl_::bool_<true> >, Iterator = const char*, Functor = boost::spirit::lex::lexertl::functor<boost::spirit::lex::lexertl::token<const char*, boost::mpl::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, mpl_::bool_<true> >, boost::spirit::lex::lexertl::detail::data, const char*, mpl_::bool_<false>, mpl_::bool_<true> >]
+#endif
+
+	return;
+
+}
+
+
 
 	std::cout << "Parsing: \"";
 	for (IteratorType it = begin; it != end; ++it)
