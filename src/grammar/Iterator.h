@@ -12,11 +12,14 @@
 #include <istream>
 
 
+#include "grammar/Lexer.h"
+
+
 namespace grammar {
 
 
 	typedef std::istream_iterator<char> BaseIteratorType;
-	typedef boost::spirit::multi_pass<BaseIteratorType> IteratorType;
+	typedef TokenIterator<BaseIteratorType> IteratorType;
 
 
 } // namespace grammar

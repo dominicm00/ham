@@ -7,6 +7,7 @@
 //#define BOOST_SPIRIT_DEBUG 1
 
 
+#include <boost/spirit/include/lex_lexertl.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
 #include <boost/spirit/include/phoenix_container.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>

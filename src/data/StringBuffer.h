@@ -29,7 +29,10 @@ public:
 	inline	bool				operator==(const StringBuffer& other) const;
 	inline	bool				operator!=(const StringBuffer& other) const;
 
+	inline	char				operator[](int index) const;
+
 	inline						operator std::string() const;
+	inline						operator const char*() const;
 
 	template<typename Output>
 	friend inline Output&		operator<<(Output& out,
@@ -119,9 +122,22 @@ StringBuffer::operator!=(const StringBuffer& other) const
 }
 
 
+char
+StringBuffer::operator[](int index) const
+{
+	return fData[index];
+}
+
+
 StringBuffer::operator std::string() const
 {
 	return std::string(Data());
+}
+
+
+StringBuffer::operator const char*() const
+{
+	return Data();
 }
 
 

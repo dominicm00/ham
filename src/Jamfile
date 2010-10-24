@@ -51,3 +51,4 @@ BinCommand ham
 
 
 SubInclude HAM_TOP src grammar ;
+SubInclude HAM_TOP src tests ;

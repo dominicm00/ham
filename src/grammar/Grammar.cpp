@@ -37,8 +37,8 @@ namespace ascii = boost::spirit::ascii;
 
 
 template<>
-Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
-	NodeRegistry& nodeRegistry)
+Grammar<IteratorType>::Grammar(
+	LexerType& lexer, NodeRegistry& nodeRegistry)
 	:
 	Grammar::base_type(fStart),
 	fNodeRegistry(nodeRegistry),
@@ -67,11 +67,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
 	fBracketOnExpression(std::string("bracketOnExpression")),
 	fBracketExpression(std::string("bracketExpression")),
 	fIdentifier(std::string("identifier")),
-	fString(std::string("string")),
-	fSubString(std::string("subString")),
-	fQuotedChar(std::string("quotedChar")),
-	fUnquotedChar(std::string("unquotedChar")),
-	fEscapedChar(std::string("escapedChar"))
+	fString(std::string("string"))
 {
 	using qi::eps;
 	using qi::_val;
@@ -79,47 +75,11 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
 	using qi::_2;
 	using qi::_3;
 	using qi::_4;
+	using qi::_5;
+	using qi::_6;
+	using qi::token;
 
 	ActorFactory<Factory> factory(fFactory);
-
-	fKeyword =
-		"local",
-		"include",
-		"jumptoeof",
-		"on",
-		"break",
-		"continue",
-		"return",
-		"for",
-		"in",
-		"switch",
-		"if",
-		"else",
-		"while",
-		"rule",
-		"actions"
-	;
-
-	fListDelimiter =
-		":",
-		";",
-		"]",
-		"=",
-		"+=",
-		"?=",
-		"||",
-		"|",
-		"&&",
-		"&",
-		"!=",
-		")",
-		"<",
-		"<=",
-		">",
-		">=",
-		"{",
-		"}"
-	;
 
 	fAssignmentOperator.add
 		("=", code::ASSIGNMENT_OPERATOR_ASSIGN)
@@ -149,7 +109,7 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
 				[ *_val += _1 ]
 			);
 
-	fListOfLists = fList % ':';
+	fListOfLists = fList % token(TOKEN_COLON);
 
 	fFunctionCall
 		= (fArgument >> fListOfLists)
@@ -167,51 +127,54 @@ Grammar<IteratorType, Skipper<IteratorType> >::Grammar(
 	;
 
 	fLocalVariableDeclaration
-		= "local" >> fList
-				[ _val = factory.Create<code::LocalVariableDeclaration>(_1) ]
-			>> -('=' >> fList
+		= token(TOKEN_LOCAL) >> fList
+				[ _val = factory.Create<code::LocalVariableDeclaration>(_2) ]
+			>> -(token(TOKEN_ASSIGN) >> fList
 					[ bind(&code::LocalVariableDeclaration::SetInitializer,
-						_val, _1) ]
+						_val, _2) ]
 				)
-			>> ';'
+			>> token(TOKEN_SEMICOLON)
 	;
 
 	fIfStatement
-		= ("if" >> fExpression >> '{' >> fBlock >> '}')
-				[ _val = factory.Create<code::If>(_1, _2) ]
-			>> -("else" >> fStatement
-					[ bind(&code::If::SetElseBlock, _val, _1) ]
+		= (token(TOKEN_IF) >> fExpression >> token(TOKEN_LEFT_BRACE)
+			>> fBlock >> token(TOKEN_RIGHT_BRACE))
+					[ _val = factory.Create<code::If>(_2, _4) ]
+			>> -(token(TOKEN_ELSE) >> fStatement
+					[ bind(&code::If::SetElseBlock, _val, _2) ]
 				)
 	;
 
 	fForStatement
-		= ("for" >> fArgument >> "in" >> fList >> '{' >> fBlock >> '}')
-				[ _val = factory.Create<code::For>(_1, _2, _3) ]
+		= (token(TOKEN_FOR) >> fArgument >> token(TOKEN_IN) >> fList
+			>> token(TOKEN_LEFT_BRACE) >> fBlock >> token(TOKEN_RIGHT_BRACE))
+					[ _val = factory.Create<code::For>(_2, _4, _6) ]
 	;
 
 	fWhileStatement
-		= ("while" >> fExpression >> '{' >> fBlock >> '}')
-				[ _val = factory.Create<code::While>(_1, _2) ]
+		= (token(TOKEN_WHILE) >> fExpression >> token(TOKEN_LEFT_BRACE)
+			>> fBlock >> token(TOKEN_RIGHT_BRACE))
+					[ _val = factory.Create<code::While>(_2, _4) ]
 	;
 
 	fOnStatement
-		= ("on" >> fArgument >> fStatement)
-				[ _val = factory.Create<code::OnExpression>(_1, _2) ]
+		= (token(TOKEN_ON) >> fArgument >> fStatement)
+				[ _val = factory.Create<code::OnExpression>(_2, _3) ]
 	;
 
 	fCaseStatement
-		= ("case" >> fIdentifier >> ':' >> fBlock)
-				[ _val = factory.Create<code::Case>(_1, _2) ]
+		= (token(TOKEN_CASE) >> fIdentifier >> token(TOKEN_COLON) >> fBlock)
+				[ _val = factory.Create<code::Case>(_2, _4) ]
 	;
 
 	fSwitchStatement
-		= ("switch" >> fList)
-				[ _val = factory.Create<code::Switch>(_1) ]
-			>> '{'
+		= (token(TOKEN_SWITCH) >> fList)
+				[ _val = factory.Create<code::Switch>(_2) ]
+			>> token(TOKEN_LEFT_BRACE)
 			>> *(fCaseStatement
 					[ bind(&code::Switch::AddCase, _val, _1) ]
 				)
-			>> '}'
+			>> token(TOKEN_RIGHT_BRACE)
 	;
 
 	fStart = fBlock;
