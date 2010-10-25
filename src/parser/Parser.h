@@ -2,14 +2,14 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_GRAMMAR_PARSER_H
-#define HAM_GRAMMAR_PARSER_H
+#ifndef HAM_PARSER_PARSER_H
+#define HAM_PARSER_PARSER_H
 
 
 #include <iterator>
 
 #include "code/Defs.h"
-#include "grammar/Lexer.h"
+#include "parser/Lexer.h"
 
 
 namespace code {
@@ -19,7 +19,7 @@ namespace code {
 }
 
 
-namespace grammar {
+namespace parser {
 
 
 class Parser {
@@ -30,7 +30,7 @@ public:
 
 private:
 			typedef std::istream_iterator<char> BaseIteratorType;
-			typedef grammar::Lexer<BaseIteratorType> LexerType;
+			typedef parser::Lexer<BaseIteratorType> LexerType;
 
 			struct NodeListContainer;
 
@@ -96,7 +96,7 @@ Parser::_Expect(NodeType* node, const char* message)
 }
 
 
-} // namespace grammar
+} // namespace parser
 
 
-#endif	// HAM_GRAMMAR_PARSER_H
+#endif	// HAM_PARSER_PARSER_H

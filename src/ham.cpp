@@ -1,11 +1,11 @@
 
-#include "grammar/Parser.h"
+#include "parser/Parser.h"
 
 
 int
 main(int argc, const char* const* argv)
 {
-	grammar::Parser().Test(argc, argv);
+	parser::Parser().Test(argc, argv);
 
 	return 0;
 }

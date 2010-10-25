@@ -4,7 +4,7 @@
  */
 
 
-#include "grammar/Parser.h"
+#include "parser/Parser.h"
 
 #include <stdlib.h>
 
@@ -32,10 +32,10 @@
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
 #include "code/While.h"
-#include "grammar/ParseException.h"
+#include "parser/ParseException.h"
 
 
-using grammar::Parser;
+using parser::Parser;
 
 
 namespace {

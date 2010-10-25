@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "grammar/Lexer.h"
+#include "parser/Lexer.h"
 
 
 int
@@ -37,27 +37,16 @@ main(int argc, const char* const* argv)
 
 
 	typedef std::istream_iterator<char> BaseIteratorType;
-	typedef grammar::Lexer<BaseIteratorType> LexerType;
+	typedef parser::Lexer<BaseIteratorType> LexerType;
 
 	LexerType lexer;
 	lexer.Init(BaseIteratorType(input), BaseIteratorType());
 
  	std::cout << "tokens:\n";
- 	while (lexer.CurrentToken() != grammar::TOKEN_EOF) {
+ 	while (lexer.CurrentToken() != parser::TOKEN_EOF) {
  		std::cout << "  " << lexer.CurrentToken() << std::endl;
 		lexer.NextToken();
 	}
-
-// 	StringList result;
-// 	bool r = qi::parse(lexer.begin(), lexer.end(),
-// 		TestGrammar<IteratorType>(lexer), result);
-// 	printf("parsing %s\n", r ? "succeeded" : "failed");
-//
-// 	printf("result:\n");
-// 	for (StringList::iterator it = result.begin(); it != result.end(); ++it) {
-// 		std::cout << "  " << *it << std::endl;
-// 	}
-
 
 	return 0;
 }

@@ -2,14 +2,14 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_GRAMMAR_TOKEN_H
-#define HAM_GRAMMAR_TOKEN_H
+#ifndef HAM_PARSER_TOKEN_H
+#define HAM_PARSER_TOKEN_H
 
 
 #include "data/String.h"
 
 
-namespace grammar {
+namespace parser {
 
 
 enum TokenID {
@@ -129,7 +129,7 @@ private:
 };
 
 
-} // namespace grammar
+} // namespace parser
 
 
-#endif	// HAM_GRAMMAR_TOKEN_H
+#endif	// HAM_PARSER_TOKEN_H

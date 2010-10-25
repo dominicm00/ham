@@ -2,14 +2,14 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_GRAMMAR_LEX_EXCEPTION_H
-#define HAM_GRAMMAR_LEX_EXCEPTION_H
+#ifndef HAM_PARSER_LEX_EXCEPTION_H
+#define HAM_PARSER_LEX_EXCEPTION_H
 
 
 #include <string>
 
 
-namespace grammar {
+namespace parser {
 
 
 struct LexLocation {
@@ -45,7 +45,7 @@ private:
 };
 
 
-} // namespace grammar
+} // namespace parser
 
 
-#endif	// HAM_GRAMMAR_LEX_EXCEPTION_H
+#endif	// HAM_PARSER_LEX_EXCEPTION_H

@@ -2,7 +2,7 @@ SubDir HAM_TOP src ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) grammar ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
 
 
 SharedLibrary libham.so
@@ -33,7 +33,7 @@ SharedLibrary libham.so
 	# data
 	String.cpp
 
-	# grammar
+	# parser
 	Parser.cpp
 
 	:
