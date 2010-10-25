@@ -38,7 +38,7 @@ private:
 			code::Block*		_ParseFile();
 			code::Block*		_ParseBlock();
 			code::Node*			_TryParseStatement();
-			code::Node*			_TryParseLocalVariableDeclaration();
+			code::Node*			_ParseLocalVariableDeclaration();
 			code::List*			_ParseList();
 			code::Node*			_TryParseArgument();
 			code::Node*			_ParseBracketExpression();

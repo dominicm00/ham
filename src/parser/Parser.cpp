@@ -103,15 +103,19 @@ Parser::Test(int argc, const char* const* argv)
 	fLexer.Init(BaseIteratorType(input), BaseIteratorType());
 
 	try {
-		code::Block* block = _ParseBlock();
+		code::Block* block = _ParseFile();
 		std::cout << "Parse tree:\n";
 		code::DumpContext dumpContext;
 		block->Dump(dumpContext);
 		delete block;
 	} catch (LexException& exception) {
-		printf("Parser::Test(): Lex exception: %s\n", exception.Message());
+		printf("Parser::Test(): %zu:%zu Lex exception: %s\n",
+			exception.Position().Line() + 1, exception.Position().Column() + 1,
+			exception.Message());
 	} catch (ParseException& exception) {
-		printf("Parser::Test(): Parse exception: %s\n", exception.Message());
+		printf("Parser::Test(): %zu:%zu Parse exception: %s\n",
+			exception.Position().Line() + 1, exception.Position().Column() + 1,
+			exception.Message());
 	} catch (...) {
 		printf("Parser::Test(): Caught exception\n");
 	}
@@ -136,10 +140,10 @@ Parser::_ParseBlock()
 	std::auto_ptr<code::Block> block(new code::Block);
 
 	while (true) {
-		// statement or local variable declaration
-		if (code::Node* statement = _TryParseStatement())
-			*block += statement;
-		else if (code::Node* statement = _TryParseLocalVariableDeclaration())
+		// local variable declaration or statement
+		if (_Token() == TOKEN_LOCAL)
+			*block += _ParseLocalVariableDeclaration();
+		else if (code::Node* statement = _TryParseStatement())
 			*block += statement;
 		else
 			break;
@@ -534,11 +538,12 @@ Parser::_TryParseStatement()
 
 
 code::Node*
-Parser::_TryParseLocalVariableDeclaration()
+Parser::_ParseLocalVariableDeclaration()
 {
+	// "local" list [ "=" list ] ";"
+
 	// "local" keyword
-	if (!_TrySkipToken(TOKEN_LOCAL))
-		return NULL;
+	_SkipToken(TOKEN_LOCAL, "Expected 'local' keyword");
 
 	// variable list
 	std::auto_ptr<code::Node> variables(_ParseList());
@@ -547,6 +552,10 @@ Parser::_TryParseLocalVariableDeclaration()
 	std::auto_ptr<code::Node> initializer;
 	if (_TrySkipToken(TOKEN_ASSIGN))
 		initializer.reset(_ParseList());
+
+	// skip ";"
+	_SkipToken(TOKEN_SEMICOLON,
+		"Expected ';' after local variable declaration");
 
 	// create node
 	code::LocalVariableDeclaration* result
@@ -817,5 +826,5 @@ Parser::_ParseAssignmentOperator()
 void
 Parser::_Throw(const char* message)
 {
-	throw ParseException(message);
+	throw ParseException(message, fLexer.CurrentTokenPosition());
 }
