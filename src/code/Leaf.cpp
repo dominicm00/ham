@@ -46,5 +46,5 @@ Leaf::Visit(NodeVisitor& visitor)
 void
 Leaf::Dump(DumpContext& context) const
 {
-	context << "CodeLeaf(\"" << fString << "\")\n";
+	context << "Leaf(\"" << fString << "\")\n";
 }
