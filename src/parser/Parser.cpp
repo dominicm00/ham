@@ -128,7 +128,7 @@ Parser::_ParseFile()
 	std::auto_ptr<code::Block> block(_ParseBlock());
 
 	if (_Token() != TOKEN_EOF)
-		_Throw("Expected statement or local variable declaration");
+		_ThrowExpected("Expected statement or local variable declaration");
 
 	return block.release();
 }
@@ -320,7 +320,7 @@ Parser::_TryParseStatement()
 			// each case: "case" identifier ":" block
 			while (_TrySkipToken(TOKEN_CASE)) {
 				if (_Token() != TOKEN_STRING)
-					_Throw("Expected pattern string after 'case'");
+					_ThrowExpected("Expected pattern string after 'case'");
 
 				data::String pattern = _Token();
 				_NextToken();
@@ -366,7 +366,7 @@ Parser::_TryParseStatement()
 			_NextToken();
 
 			if (_Token() != TOKEN_STRING)
-				_Throw("Expected rule name string after 'rule'");
+				_ThrowExpected("Expected rule name string after 'rule'");
 			data::String ruleName = _Token();
 			_NextToken();
 
@@ -380,8 +380,10 @@ Parser::_TryParseStatement()
 				_NextToken();
 
 				while (_TrySkipToken(TOKEN_COLON)) {
-					if (_Token() != TOKEN_STRING)
-						_Throw("Expected 'rule' parameter name after ':'");
+					if (_Token() != TOKEN_STRING) {
+						_ThrowExpected(
+							"Expected 'rule' parameter name after ':'");
+					}
 
 					rule->AddParameterName(_Token());
 					_NextToken();
@@ -414,8 +416,8 @@ Parser::_TryParseStatement()
 				uint32_t flag = it->second;
 				if (flag == code::kActionFlagMaxLineFactor) {
 					if (_Token() != TOKEN_STRING) {
-						_Throw("Expected number after 'actions' flag "
-							"'maxline'");
+						_ThrowExpected(
+							"Expected number after 'actions' flag 'maxline'");
 					}
 
 					actionsFlags = (actionsFlags & code::kActionFlagMask)
@@ -428,7 +430,7 @@ Parser::_TryParseStatement()
 
 			// rule name
 			if (_Token() != TOKEN_STRING)
-				_Throw("Expected 'actions' rule name");
+				_ThrowExpected("Expected 'actions' rule name");
 
 			data::String ruleName = _Token();
 			_NextToken();
@@ -440,7 +442,7 @@ Parser::_TryParseStatement()
 
 			// the actions block
 			if (_Token() != TOKEN_LEFT_BRACE)
-				_Throw("Expected '{' after 'actions' head");
+				_ThrowExpected("Expected '{' after 'actions' head");
 
 			data::String commands(fLexer.ScanActions());
 			_NextToken();
@@ -588,7 +590,8 @@ Parser::_TryParseArgument()
 	// either a bracket expression or a simple string
 	if (_TrySkipToken(TOKEN_LEFT_BRACKET)) {
 		std::auto_ptr<code::Node> result(_ParseBracketExpression());
-		_SkipToken(TOKEN_RIGHT_BRACKET, "Expected ']'");
+		_SkipToken(TOKEN_RIGHT_BRACKET,
+			"Expected ']' at the end of a bracket expression");
 		return result.release();
 	}
 
@@ -612,7 +615,7 @@ Parser::_ParseBracketExpression()
 	if (code::Node* node = _TryParseFunctionCall())
 		return node;
 
-	_Throw("Expected statement or local variable declaration");
+	_ThrowExpected("Expected statement or local variable declaration");
 
 	return NULL;
 }
@@ -634,8 +637,10 @@ Parser::_TryParseBracketOnExpression()
 		expression.reset(_ParseList());
 	} else {
 		expression.reset(_TryParseFunctionCall());
-		if (expression.get() == NULL)
-			_Throw("Expected 'return' or function call in 'on' expression");
+		if (expression.get() == NULL) {
+			_ThrowExpected(
+				"Expected 'return' or function call in 'on' expression");
+		}
 	}
 
 	// create result
@@ -817,7 +822,7 @@ Parser::_ParseAssignmentOperator()
 			_NextToken();
 			return code::ASSIGNMENT_OPERATOR_DEFAULT;
 		default:
-			_Throw("Expected assignment operator");
+			_ThrowExpected("Expected assignment operator");
 			return code::ASSIGNMENT_OPERATOR_DEFAULT;
 	}
 }
@@ -827,4 +832,17 @@ void
 Parser::_Throw(const char* message)
 {
 	throw ParseException(message, fLexer.CurrentTokenPosition());
+}
+
+
+void
+Parser::_ThrowExpected(const char* expected)
+{
+	std::string message(expected);
+	if (_Token() == TOKEN_EOF)
+		message += ". Encountered end of input";
+	else
+		message += ". Got '" + _Token() + "'";
+
+	_Throw(message.c_str());
 }

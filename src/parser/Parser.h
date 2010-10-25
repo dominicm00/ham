@@ -51,16 +51,17 @@ private:
 	inline	code::AssignmentOperator _ParseAssignmentOperator();
 
 			void				_Throw(const char* message);
+			void				_ThrowExpected(const char* expected);
 
 			const Token&		_Token() const
 									{ return fLexer.CurrentToken(); }
 			const Token&		_NextToken()
 									{ return fLexer.NextToken(); }
 	inline	bool				_TrySkipToken(TokenID id);
-	inline	void				_SkipToken(TokenID id, const char* message);
+	inline	void				_SkipToken(TokenID id, const char* expected);
 
 	template<typename NodeType>
-	inline	NodeType*			_Expect(NodeType* node, const char* message);
+	inline	NodeType*			_Expect(NodeType* node, const char* expected);
 
 private:
 			LexerType			fLexer;
@@ -79,19 +80,19 @@ Parser::_TrySkipToken(TokenID id)
 
 
 void
-Parser::_SkipToken(TokenID id, const char* message)
+Parser::_SkipToken(TokenID id, const char* expected)
 {
 	if (!_TrySkipToken(id))
-		_Throw(message);
+		_ThrowExpected(expected);
 }
 
 
 template<typename NodeType>
 NodeType*
-Parser::_Expect(NodeType* node, const char* message)
+Parser::_Expect(NodeType* node, const char* expected)
 {
 	if (node == NULL)
-		_Throw(message);
+		_ThrowExpected(expected);
 	return node;
 }
 
