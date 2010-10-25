@@ -8,12 +8,10 @@
 
 #include <string>
 
+#include "parser/ParsePosition.h"
+
 
 namespace parser {
-
-
-struct LexLocation {
-};
 
 
 class LexException {
@@ -23,9 +21,10 @@ public:
 	}
 
 	LexException(const std::string& message,
-		const LexLocation& location = LexLocation())
+		const ParsePosition& position = ParsePosition())
 		:
-		fMessage(message)
+		fMessage(message),
+		fPosition(position)
 	{
 	}
 
@@ -34,14 +33,14 @@ public:
 		return fMessage.c_str();
 	}
 
-	const LexLocation& Location() const
+	const ParsePosition& Position() const
 	{
-		return fLocation;
+		return fPosition;
 	}
 
 private:
-	std::string	fMessage;
-	LexLocation	fLocation;
+	std::string		fMessage;
+	ParsePosition	fPosition;
 };
 
 

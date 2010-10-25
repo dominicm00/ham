@@ -8,12 +8,10 @@
 
 #include <string>
 
+#include "parser/ParsePosition.h"
+
 
 namespace parser {
-
-
-struct ParseLocation {
-};
 
 
 class ParseException {
@@ -23,9 +21,10 @@ public:
 	}
 
 	ParseException(const std::string& message,
-		const ParseLocation& location = ParseLocation())
+		const ParsePosition& position = ParsePosition())
 		:
-		fMessage(message)
+		fMessage(message),
+		fPosition(position)
 	{
 	}
 
@@ -34,14 +33,14 @@ public:
 		return fMessage.c_str();
 	}
 
-	const ParseLocation& Location() const
+	const ParsePosition& Position() const
 	{
-		return fLocation;
+		return fPosition;
 	}
 
 private:
 	std::string		fMessage;
-	ParseLocation	fLocation;
+	ParsePosition	fPosition;
 };
 
 
