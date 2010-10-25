@@ -13,6 +13,13 @@
 #include "parser/Token.h"
 
 
+//#define TRACE_PARSER_LEXER
+#ifdef TRACE_PARSER_LEXER
+#	define TRACE(...)	printf(__VA_ARGS__)
+#else
+#	define TRACE(...)	do { } while (false)
+#endif
+
 namespace parser {
 
 
@@ -21,6 +28,76 @@ template<typename BaseIterator> struct TokenIterator;
 
 template<typename BaseIterator>
 class Lexer {
+private:
+	struct Iterator {
+		Iterator()
+			:
+			fLine(0),
+			fColumn(0)
+		{
+		}
+
+		size_t Line() const
+		{
+			return fLine;
+		}
+
+		size_t Column() const
+		{
+			return fColumn;
+		}
+
+		Iterator& operator=(const BaseIterator& iterator)
+		{
+			fIterator = iterator;
+			fLine = 0;
+			fColumn = 0;
+			return *this;
+		}
+
+		bool operator==(const Iterator& other) const
+		{
+			return fIterator == other.fIterator;
+		}
+
+		bool operator==(const BaseIterator& iterator) const
+		{
+			return fIterator == iterator;
+		}
+
+		bool operator!=(const Iterator& other) const
+		{
+			return !(*this == other);
+		}
+
+		bool operator!=(const BaseIterator& iterator) const
+		{
+			return !(*this == iterator);
+		}
+
+		Iterator& operator++()
+		{
+			if (*fIterator == '\n') {
+				fLine++;
+				fColumn = 0;
+			} else
+				fColumn++;
+
+			++fIterator;
+			return *this;
+		}
+
+		char operator*()
+		{
+			return *fIterator;
+		}
+
+	private:
+		BaseIterator	fIterator;
+		size_t			fLine;
+		size_t			fColumn;
+	};
+
 public:
 	Lexer()
 	{
@@ -31,6 +108,8 @@ public:
 	{
 		fPosition = start;
 		fEnd = end;
+
+		fFilePosition.SetTo(0, 0);
 
 		_ReadNextToken();
 	}
@@ -44,6 +123,11 @@ public:
 	const Token& CurrentToken() const
 	{
 		return fCurrentToken;
+	}
+
+	const ParsePosition& CurrentTokenPosition() const
+	{
+		return fFilePosition;
 	}
 
 	data::String ScanActions()
@@ -67,9 +151,10 @@ public:
 		}
 
 		if (braces >= 0)
-			throw LexException("Unterminated actions");
+			throw LexException("Unterminated actions", fFilePosition);
 
-printf("ScanActions(): read: '%s'\n", token.Data());
+		TRACE("ScanActions(): read: '%s'\n", token.Data());
+
 		return data::String(token.Data());
 	}
 
@@ -124,6 +209,8 @@ private:
 	{
 		_SkipWhiteSpace();
 
+		fFilePosition.SetTo(fPosition.Line(), fPosition.Column());
+
 		if (fPosition == fEnd) {
 			fCurrentToken.SetTo(TOKEN_EOF, std::string());
 			return;
@@ -143,8 +230,10 @@ private:
 				// escaped char
 				quotedOrEscaped = true;
 
-				if (fPosition == fEnd)
-					throw LexException("Backslash at end of file");
+				if (fPosition == fEnd) {
+					throw LexException("Backslash at end of file",
+						fFilePosition);
+				}
 
 				// fetch the escaped char
 				c = *fPosition;
@@ -178,8 +267,10 @@ private:
 					token += c;
 				}
 
-				if (!foundEnd)
-					throw LexException("Unterminated string literal");
+				if (!foundEnd) {
+					throw LexException("Unterminated string literal",
+						fFilePosition);
+				}
 
 				continue;
 			}
@@ -266,19 +357,24 @@ private:
 			}
 		}
 
-printf("_ReadNextToken(): read token %d: '%s'\n", tokenID, token.Data());
+		TRACE("_ReadNextToken(): read token %d: '%s'\n", tokenID, token.Data());
+
 		fCurrentToken.SetTo(tokenID, token);
 	}
 
 private:
-	BaseIterator	fPosition;
+	Iterator		fPosition;
 	BaseIterator	fEnd;
 	Token			fCurrentToken;
 	KeywordMap		fKeywords;
+	ParsePosition	fFilePosition;
 };
 
 
 } // namespace parser
+
+
+#undef TRACE
 
 
 #endif	// HAM_PARSER_TOKEN_H
