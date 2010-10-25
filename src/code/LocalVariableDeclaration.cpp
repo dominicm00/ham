@@ -13,10 +13,11 @@
 using code::LocalVariableDeclaration;
 
 
-LocalVariableDeclaration::LocalVariableDeclaration(Node* variables)
+LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
+	Node* initializer)
 	:
 	fVariables(variables),
-	fInitializer(NULL)
+	fInitializer(initializer)
 {
 }
 

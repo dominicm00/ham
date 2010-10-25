@@ -35,8 +35,13 @@ private:
 Block&
 Block::operator+=(Node* statement)
 {
-	fStatements.push_back(statement);
-	return *this;
+	try {
+		fStatements.push_back(statement);
+		return *this;
+	} catch (...) {
+		delete statement;
+		throw;
+	}
 }
 
 

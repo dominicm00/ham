@@ -7,16 +7,10 @@
 
 
 #include "code/Node.h"
+#include "code/Defs.h"
 
 
 namespace code {
-
-
-enum AssignmentOperator {
-	ASSIGNMENT_OPERATOR_ASSIGN,
-	ASSIGNMENT_OPERATOR_APPEND,
-	ASSIGNMENT_OPERATOR_DEFAULT
-};
 
 
 class Assignment : public Node {

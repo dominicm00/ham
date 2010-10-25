@@ -39,10 +39,15 @@ public:
 									const StringBuffer& buffer);
 
 private:
-			std::string			fData;
+			enum {
+				MIN_BUFFER_SIZE = 256
+			};
 
-	static	const size_t		kMinBufferSize = 256;
+private:
+			std::string			fData;
 };
+
+
 
 
 StringBuffer::StringBuffer()
@@ -89,7 +94,7 @@ StringBuffer::operator+=(char c)
 {
 	size_t newSize = fData.size() + 1;
 	if (newSize > fData.capacity())
-		fData.reserve(std::max(newSize * 2, kMinBufferSize));
+		fData.reserve(std::max(newSize * 2, (size_t)MIN_BUFFER_SIZE));
 
 	fData += c;
 	return *this;
@@ -101,7 +106,7 @@ StringBuffer::operator+=(const StringBuffer& other)
 {
 	size_t newSize = fData.size() + other.fData.size();
 	if (newSize > fData.capacity())
-		fData.reserve(std::max(newSize * 2, kMinBufferSize));
+		fData.reserve(std::max(newSize * 2, (size_t)MIN_BUFFER_SIZE));
 
 	fData += other.fData;
 	return *this;

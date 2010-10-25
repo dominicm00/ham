@@ -14,10 +14,9 @@ namespace code {
 
 class LocalVariableDeclaration : public Node {
 public:
-								LocalVariableDeclaration(Node* variables);
+								LocalVariableDeclaration(Node* variables,
+									Node* initializer);
 	virtual						~LocalVariableDeclaration();
-
-	inline	void				SetInitializer(Node* initializer);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -27,13 +26,6 @@ private:
 			Node*				fVariables;
 			Node*				fInitializer;
 };
-
-
-void
-LocalVariableDeclaration::SetInitializer(Node* initializer)
-{
-	fInitializer = initializer;
-}
 
 
 }	// namespace code

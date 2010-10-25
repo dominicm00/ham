@@ -1,9 +1,8 @@
 SubDir HAM_TOP src ;
 
-SubDirSysHdrs $(HAM_BOOST_HEADERS) ;
-
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) grammar ] ;
 
 
 SharedLibrary libham.so
@@ -34,8 +33,10 @@ SharedLibrary libham.so
 	# data
 	String.cpp
 
+	# grammar
+	Parser.cpp
+
 	:
-	<nogrist>ham_grammar.o
 	$(TARGET_LIBSTDC++)
 ;
 
@@ -50,5 +51,4 @@ BinCommand ham
 ;
 
 
-SubInclude HAM_TOP src grammar ;
 SubInclude HAM_TOP src tests ;

@@ -33,8 +33,13 @@ private:
 List&
 List::operator+=(Node* child)
 {
-	fChildren.push_back(child);
-	return *this;
+	try {
+		fChildren.push_back(child);
+		return *this;
+	} catch (...) {
+		delete child;
+		throw;
+	}
 }
 
 

@@ -13,14 +13,6 @@
 using code::OnExpression;
 
 
-OnExpression::OnExpression(Node* object)
-	:
-	fObject(object),
-	fExpression(NULL)
-{
-}
-
-
 OnExpression::OnExpression(Node* object, Node* expression)
 	:
 	fObject(object),

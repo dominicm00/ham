@@ -13,11 +13,11 @@
 using code::If;
 
 
-If::If(Node* expression, Node* block)
+If::If(Node* expression, Node* block, Node* elseBlock)
 	:
 	fExpression(expression),
 	fBlock(block),
-	fElseBlock(NULL)
+	fElseBlock(elseBlock)
 {
 }
 

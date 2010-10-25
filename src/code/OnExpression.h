@@ -14,11 +14,8 @@ namespace code {
 
 class OnExpression : public Node {
 public:
-								OnExpression(Node* object);
 								OnExpression(Node* object, Node* expression);
 	virtual						~OnExpression();
-
-	inline	void				SetExpression(Node* expression);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -28,13 +25,6 @@ private:
 			Node*				fObject;
 			Node*				fExpression;
 };
-
-
-void
-OnExpression::SetExpression(Node* expression)
-{
-	fExpression = expression;
-}
 
 
 }	// namespace code

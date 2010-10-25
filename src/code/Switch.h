@@ -36,7 +36,12 @@ private:
 void
 Switch::AddCase(Case* caseStatement)
 {
-	fCases.push_back(caseStatement);
+	try {
+		fCases.push_back(caseStatement);
+	} catch (...) {
+		delete caseStatement;
+		throw;
+	}
 }
 
 

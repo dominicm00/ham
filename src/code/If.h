@@ -14,10 +14,9 @@ namespace code {
 
 class If : public Node {
 public:
-								If(Node* expression, Node* block);
+								If(Node* expression, Node* block,
+									Node* elseBlock = NULL);
 	virtual						~If();
-
-	inline	void				SetElseBlock(Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -28,13 +27,6 @@ private:
 			Node*				fBlock;
 			Node*				fElseBlock;
 };
-
-
-void
-If::SetElseBlock(Node* block)
-{
-	fElseBlock = block;
-}
 
 
 }	// namespace code

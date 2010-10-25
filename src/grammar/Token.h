@@ -25,19 +25,23 @@ enum TokenID {
 	TOKEN_LEFT_PARENTHESIS,
 	TOKEN_RIGHT_PARENTHESIS,
 	TOKEN_ASSIGN,
+	TOKEN_EQUAL = TOKEN_ASSIGN,
 	TOKEN_ASSIGN_PLUS,
 	TOKEN_ASSIGN_DEFAULT,
 	TOKEN_OR,
 	TOKEN_AND,
-	TOKEN_EQUAL = TOKEN_ASSIGN,
 	TOKEN_NOT_EQUAL,
 	TOKEN_LESS,
 	TOKEN_LESS_OR_EQUAL,
 	TOKEN_GREATER,
 	TOKEN_GREATER_OR_EQUAL,
+	TOKEN_NOT,
+
+	TOKEN_DELIMITERS_END,
 
 	// keywords
-	TOKEN_ACTIONS,
+	TOKEN_ACTIONS = TOKEN_DELIMITERS_END,
+	TOKEN_BIND,
 	TOKEN_BREAK,
 	TOKEN_CASE,
 	TOKEN_CONTINUE,
@@ -54,8 +58,13 @@ enum TokenID {
 	TOKEN_SWITCH,
 	TOKEN_WHILE,
 
+	TOKEN_KEYWORDS_END,
+
 	// the text within an actions block
-	TOKEN_ACTIONS_TEXT
+	TOKEN_ACTIONS_TEXT = TOKEN_KEYWORDS_END,
+
+	// end of file
+	TOKEN_EOF
 };
 
 
@@ -82,20 +91,34 @@ public:
 		fID = id;
 	}
 
-	TokenID id() const
+	TokenID ID() const
 	{
 		return fID;
 	}
 
-	size_t state() const
+	bool IsKeyword() const
 	{
-		return 0;
+		return fID >= TOKEN_DELIMITERS_END && fID < TOKEN_KEYWORDS_END;
+	}
+
+	bool IsStringOrKeyword() const
+	{
+		return fID == TOKEN_STRING || IsKeyword();
+	}
+
+	bool operator==(TokenID id) const
+	{
+		return fID == id;
+	}
+
+	bool operator!=(TokenID id) const
+	{
+		return !(*this == id);
 	}
 
 	template<typename Stream>
 	friend
-	Stream&
-	operator<<(Stream& stream, const Token& token)
+	Stream& operator<<(Stream& stream, const Token& token)
 	{
 		stream << '(' << token.fID << ", \"" << (const String&)token << "\")";
 		return stream;

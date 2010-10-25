@@ -6,146 +6,99 @@
 #define HAM_GRAMMAR_LEXER_H
 
 
-#include "grammar/Spirit.h"
-	// precompiled -- must be first
-
+#include <map>
 #include <stdexcept>
 
+#include "grammar/LexException.h"
 #include "grammar/Token.h"
 
 
 namespace grammar {
 
 
-namespace lex = boost::spirit::lex;
-namespace qi = boost::spirit::qi;
-
-
 template<typename BaseIterator> struct TokenIterator;
 
 
 template<typename BaseIterator>
-struct Lexer {
-	typedef Token TokenType;
-	typedef TokenType value_type;
-	typedef TokenIterator<BaseIterator> iterator_type;
-
-	enum ScanMode {
-		SCAN_NORMAL,
-		SCAN_ACTIONS
-	};
-
-	enum KeywordMode {
-		KEYWORDS_ON,
-		KEYWORDS_OFF
-	};
-
+class Lexer {
 public:
-	Lexer(const BaseIterator& start, const BaseIterator& end)
-		:
-		fPosition(start),
-		fEnd(end),
-		fCurrentTokenID(0),
-		fScanActions(false),
-		fIgnoreKeywords(false)
+	Lexer()
 	{
-		fString.id(TOKEN_STRING);
-		fString.collect(*this, std::string("string"));
-
-		fKeywords.add
-			("case", TOKEN_CASE)
-			("local", TOKEN_LOCAL)
-			("include", TOKEN_INCLUDE)
-			("jumptoeof", TOKEN_JUMPTOEOF)
-			("on", TOKEN_ON)
-			("break", TOKEN_BREAK)
-			("continue", TOKEN_CONTINUE)
-			("return", TOKEN_RETURN)
-			("for", TOKEN_FOR)
-			("in", TOKEN_IN)
-			("switch", TOKEN_SWITCH)
-			("if", TOKEN_IF)
-			("else", TOKEN_ELSE)
-			("while", TOKEN_WHILE)
-			("rule", TOKEN_RULE)
-			("actions", TOKEN_ACTIONS)
-		;
+		_Init();
 	}
 
-	size_t add_state(const char* name)
+	void Init(const BaseIterator& start, const BaseIterator& end)
 	{
-		// Just to satisfy the lexer interface. Not needed.
-		return 0;
+		fPosition = start;
+		fEnd = end;
+
+		_ReadNextToken();
 	}
 
-	template<typename A, typename B>
-	size_t add_token(const A&, const B&, size_t tokenID)
+	const Token& NextToken()
 	{
-		// Just to satisfy the lexer interface. Not needed.
-		return tokenID;
+		_ReadNextToken();
+		return fCurrentToken;
 	}
 
-	size_t get_next_id()
+	const Token& CurrentToken() const
 	{
-		// Just to satisfy the lexer interface. Not needed.
-		return 0;
+		return fCurrentToken;
 	}
 
-	size_t NextToken(size_t id)
+	data::String ScanActions()
 	{
-		if (id == fCurrentTokenID)
-			return _IsEndOfInput() ? kEndTokenID : id + 1;
-
-		if (id == fCurrentTokenID - 1)
-			return fCurrentTokenID;
-
-		if (id == kEndTokenID)
-			return kEndTokenID;
-
-//		throw std::invalid_argument(
-//			std::string("Lexer::NextToken(): Obsolete token ID ") + id
-//				+ ", current ID is: " + fCurrentTokenID);
-		throw std::invalid_argument(
-			"Lexer::NextToken(): Obsolete token ID");
-	}
-
-	value_type& CurrentToken(size_t id)
-	{
-		if (id == fCurrentTokenID)
-			return fCurrentToken;
-
-		if (id == fCurrentTokenID + 1) {
-			if (_ReadNextToken()) {
-				_SkipWhiteSpace();
-				return fCurrentToken;
+		// read until we find an unmatched closing brace
+		// TODO: This algorithm needs to be improved! We don't recognize braces
+		// in comments, strings, or quoted braces.
+		data::StringBuffer token;
+		int braces = 0;
+		while (fPosition != fEnd) {
+			char c = *fPosition;
+			if (c == '{') {
+				braces++;
+			} else if (c == '}') {
+				if (--braces < 0)
+					break;
 			}
+
+			token += c;
+			++fPosition;
 		}
 
-//		throw std::invalid_argument(
-//			std::string("Lexer::CurrentToken(): Invalid token ID ") + id
-//				+ ", current ID is: " + fCurrentTokenID);
-		throw std::invalid_argument(
-			"Lexer::CurrentToken(): Invalid token ID");
-	}
+		if (braces >= 0)
+			throw LexException("Unterminated actions");
 
-	inline iterator_type begin();
-	inline iterator_type end();
-
-	Lexer& operator=(KeywordMode mode)
-	{
-		fIgnoreKeywords = mode == KEYWORDS_OFF;
-printf("setting keyword mode: %s\n", fIgnoreKeywords ? "off" : "on");
-		return *this;
-	}
-
-	Lexer& operator=(ScanMode mode)
-	{
-		fScanActions = mode == SCAN_ACTIONS;
-printf("setting scan mode: %s\n", fScanActions ? "actions" : "normal");
-		return *this;
+printf("ScanActions(): read: '%s'\n", token.Data());
+		return data::String(token.Data());
 	}
 
 private:
+	typedef std::map<std::string, TokenID> KeywordMap;
+
+private:
+	void _Init()
+	{
+		// TODO: Use a better map.
+		fKeywords["actions"] = TOKEN_ACTIONS;
+		fKeywords["bind"] = TOKEN_BIND;
+		fKeywords["break"] = TOKEN_BREAK;
+		fKeywords["case"] = TOKEN_CASE;
+		fKeywords["continue"] = TOKEN_CONTINUE;
+		fKeywords["else"] = TOKEN_ELSE;
+		fKeywords["for"] = TOKEN_FOR;
+		fKeywords["if"] = TOKEN_IF;
+		fKeywords["in"] = TOKEN_IN;
+		fKeywords["include"] = TOKEN_INCLUDE;
+		fKeywords["jumptoeof"] = TOKEN_JUMPTOEOF;
+		fKeywords["local"] = TOKEN_LOCAL;
+		fKeywords["on"] = TOKEN_ON;
+		fKeywords["return"] = TOKEN_RETURN;
+		fKeywords["rule"] = TOKEN_RULE;
+		fKeywords["switch"] = TOKEN_SWITCH;
+		fKeywords["while"] = TOKEN_WHILE;
+	}
+
 	void _SkipWhiteSpace()
 	{
 		while (true) {
@@ -167,16 +120,14 @@ private:
 		return fPosition == fEnd;
 	}
 
-	bool _ReadNextToken()
+	void _ReadNextToken()
 	{
-		if (fScanActions)
-			return _ReadActions();
+		_SkipWhiteSpace();
 
-		while (fPosition != fEnd && isspace(*fPosition))
-			++fPosition;
-
-		if (fPosition == fEnd)
-			return false;
+		if (fPosition == fEnd) {
+			fCurrentToken.SetTo(TOKEN_EOF, std::string());
+			return;
+		}
 
 		bool quotedOrEscaped = false;
 
@@ -192,10 +143,8 @@ private:
 				// escaped char
 				quotedOrEscaped = true;
 
-				if (fPosition == fEnd) {
-					throw std::invalid_argument(
-						"Lexer::_ReadNextToken(): Backslash at end of file");
-				}
+				if (fPosition == fEnd)
+					throw LexException("Backslash at end of file");
 
 				// fetch the escaped char
 				c = *fPosition;
@@ -229,10 +178,8 @@ private:
 					token += c;
 				}
 
-				if (!foundEnd) {
-					throw std::invalid_argument(
-						"Lexer::_ReadNextToken(): Unterminated string literal");
-				}
+				if (!foundEnd)
+					throw LexException("Unterminated string literal");
 
 				continue;
 			}
@@ -284,6 +231,9 @@ private:
 					case '>':
 						tokenID = TOKEN_GREATER;
 						break;
+					case '!':
+						tokenID = TOKEN_NOT;
+						break;
 				}
 			} else if (token.Length() == 2) {
 				if (token[1] == '=') {
@@ -304,190 +254,28 @@ private:
 							tokenID = TOKEN_GREATER_OR_EQUAL;
 							break;
 					}
-				} else if (!fIgnoreKeywords)
-					tokenID = fKeywords.at(token);
-			} else if (!fIgnoreKeywords)
-				tokenID = fKeywords.at(token);
+				} else {
+					KeywordMap::iterator it = fKeywords.find(token);
+					if (it != fKeywords.end())
+						tokenID = it->second;
+				}
+			} else {
+				KeywordMap::iterator it = fKeywords.find(token);
+				if (it != fKeywords.end())
+					tokenID = it->second;
+			}
 		}
 
 printf("_ReadNextToken(): read token %d: '%s'\n", tokenID, token.Data());
 		fCurrentToken.SetTo(tokenID, token);
-		fCurrentTokenID++;
-
-		return true;
 	}
-
-	bool _ReadActions()
-	{
-		// read until we find an unmatched closing brace
-		data::StringBuffer token;
-		int braces = 0;
-		while (fPosition != fEnd) {
-			char c = *fPosition;
-			if (c == '{') {
-				braces++;
-			} else if (c == '}') {
-				if (--braces < 0)
-					break;
-			}
-
-			token += c;
-			++fPosition;
-		}
-
-		if (braces >= 0) {
-			throw std::invalid_argument(
-				"Lexer::_ReadActions(): Unterminated actions");
-		}
-
-printf("_ReadActions(): read: '%s'\n", token.Data());
-		fCurrentToken.SetTo(TOKEN_ACTIONS_TEXT, token);
-		fCurrentTokenID++;
-
-		return true;
-	}
-
-public:
-	lex::token_def<String> fString;
 
 private:
-//	static const size_t kEndTokenID = std::numeric_limits<size_t>::max();
-	static const size_t kEndTokenID = SIZE_MAX;
-
 	BaseIterator	fPosition;
 	BaseIterator	fEnd;
 	Token			fCurrentToken;
-	size_t			fCurrentTokenID;
-	qi::symbols<char, TokenID> fKeywords;
-	bool			fScanActions;
-	bool			fIgnoreKeywords;
+	KeywordMap		fKeywords;
 };
-
-
-template<typename BaseIterator>
-struct TokenIterator {
-	typedef Lexer<BaseIterator> LexerType;
-
-	// standard iterator typedefs
-	typedef std::forward_iterator_tag iterator_category;
-	typedef BaseIterator base_iterator_type;
-	typedef typename LexerType::value_type value_type;
-	typedef ssize_t difference_type;
-	typedef ssize_t distance_type;
-	typedef value_type& reference;
-	typedef value_type* pointer;
-
-public:
-	TokenIterator()
-		:
-		fLexer(NULL),
-		fID(0)
-	{
-	}
-
-	TokenIterator(LexerType* lexer, size_t id)
-		:
-		fLexer(lexer),
-		fID(id)
-	{
-	}
-
-	TokenIterator(const TokenIterator& other)
-		:
-		fLexer(other.fLexer),
-		fID(other.fID)
-	{
-	}
-
-	TokenIterator& operator=(const TokenIterator& other)
-	{
-		fLexer = other.fLexer;
-		fID = other.fID;
-		return *this;
-	}
-
-	bool operator==(const TokenIterator& other) const
-	{
-		return fLexer == other.fLexer && fID == other.fID;
-	}
-
-	bool operator!=(const TokenIterator& other) const
-	{
-		return !(*this == other);
-	}
-
-	bool operator<(const TokenIterator& other) const
-	{
-		if (fLexer != other.fLexer)
-			return fLexer < other.fLexer;
-		return fID < other.fID;
-	}
-
-	bool operator>(const TokenIterator& other) const
-	{
-		return other < *this;
-	}
-
-	bool operator<=(const TokenIterator& other) const
-	{
-		return !(other < *this);
-	}
-
-	bool operator>=(const TokenIterator& other) const
-	{
-		return !(*this < other);
-	}
-
-	TokenIterator& operator++()
-	{
-		if (fLexer != NULL)
-			fID = fLexer->NextToken(fID);
-		return *this;
-	}
-
-	TokenIterator operator++(int)
-	{
-		TokenIterator result = *this;
-		++*this;
-		return result;
-	}
-
-	reference operator*() const
-	{
-		if (fLexer == NULL)
-			throw std::invalid_argument("Dereferencing invalid TokenIterator");
-		return fLexer->CurrentToken(fID);
-	}
-	pointer operator->() const
-	{
-		return &(operator*());
-	}
-
-private:
-	LexerType*	fLexer;
-	size_t		fID;
-};
-
-
-template<typename BaseIterator>
-typename Lexer<BaseIterator>::iterator_type
-Lexer<BaseIterator>::begin()
-{
-	_SkipWhiteSpace();
-
-	if (_IsEndOfInput())
-		return end();
-
-	return iterator_type(this, fCurrentTokenID == 0 ? 1 : fCurrentTokenID);
-}
-
-
-template<typename BaseIterator>
-typename Lexer<BaseIterator>::iterator_type
-Lexer<BaseIterator>::end()
-{
-	return iterator_type(this, kEndTokenID);
-}
 
 
 } // namespace grammar
