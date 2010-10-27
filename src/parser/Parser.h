@@ -24,6 +24,9 @@ namespace parser {
 
 class Parser {
 public:
+			class Listener;
+
+public:
 								Parser();
 
 			void				Test(int argc, const char* const* argv);
@@ -33,6 +36,8 @@ private:
 			typedef parser::Lexer<BaseIteratorType> LexerType;
 
 			struct NodeListContainer;
+			struct ListenerNotifier;
+			struct DumpListener;
 
 private:
 			code::Block*		_ParseFile();
@@ -40,7 +45,7 @@ private:
 			code::Node*			_TryParseStatement();
 			code::Node*			_ParseLocalVariableDeclaration();
 			code::List*			_ParseList();
-			code::Node*			_TryParseArgument();
+			code::Node*			_TryParseArgument(bool allowKeyword = false);
 			code::Node*			_ParseBracketExpression();
 			code::Node*			_TryParseBracketOnExpression();
 			code::Node*			_TryParseFunctionCall();
@@ -55,8 +60,7 @@ private:
 
 			const Token&		_Token() const
 									{ return fLexer.CurrentToken(); }
-			const Token&		_NextToken()
-									{ return fLexer.NextToken(); }
+			const Token&		_NextToken();
 	inline	bool				_TrySkipToken(TokenID id);
 	inline	void				_SkipToken(TokenID id, const char* expected);
 
@@ -64,8 +68,31 @@ private:
 	inline	NodeType*			_Expect(NodeType* node, const char* expected);
 
 private:
-			LexerType			fLexer;
+			LexerType	fLexer;
+			Listener*	fListener;
 };
+
+
+class Parser::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				NonterminalStart(const char* name);
+	virtual	void				NonterminalEnd(const char* name);
+	virtual	void				NextToken(const Token& token);
+};
+
+
+const Token&
+Parser::_NextToken()
+{
+	const Token& token = fLexer.NextToken();
+
+	if (fListener != NULL)
+		fListener->NextToken(token);
+
+	return token;
+}
 
 
 bool

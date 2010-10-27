@@ -7,6 +7,7 @@
 #include "parser/Parser.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <fstream>
 #include <iostream>
@@ -56,6 +57,35 @@ namespace {
 }
 
 
+// #pragma mark - Listener
+
+
+Parser::Listener::~Listener()
+{
+}
+
+
+void
+Parser::Listener::NonterminalStart(const char* name)
+{
+}
+
+
+void
+Parser::Listener::NonterminalEnd(const char* name)
+{
+}
+
+
+void
+Parser::Listener::NextToken(const Token& token)
+{
+}
+
+
+// #pragma mark - NodeListContainer
+
+
 struct Parser::NodeListContainer {
 	code::NodeList	fNodes;
 
@@ -84,7 +114,74 @@ struct Parser::NodeListContainer {
 };
 
 
+// #pragma mark - ListenerNotifier
+
+
+struct Parser::ListenerNotifier {
+	ListenerNotifier(Parser::Listener* listener, const char* name)
+		:
+		fListener(listener)
+	{
+		if (fListener != NULL) {
+			fName = name;
+			fListener->NonterminalStart(fName);
+		}
+	}
+
+	~ListenerNotifier()
+	{
+		if (fListener != NULL)
+			fListener->NonterminalEnd(fName);
+	}
+
+private:
+	Parser::Listener*	fListener;
+	const char*			fName;
+};
+
+
+#define PARSER_NONTERMINAL(name)	ListenerNotifier _notifier(fListener, name);
+
+
+// #pragma mark - DumpListener
+
+
+struct Parser::DumpListener : Parser::Listener {
+	DumpListener()
+		:
+		fLevel(0)
+	{
+	}
+
+	virtual void NonterminalStart(const char* name)
+	{
+		printf("%*s<%s>\n", (int)fLevel * 2, "", name);
+		fLevel++;
+	}
+
+	virtual void NonterminalEnd(const char* name)
+	{
+		fLevel--;
+		printf("%*s</%s>\n", (int)fLevel * 2, "", name);
+	}
+
+	virtual void NextToken(const Token& token)
+	{
+		printf("%*s(%d, \"%s\")\n", (int)fLevel * 2, "", token.ID(),
+			token.c_str());
+	}
+
+private:
+	size_t	fLevel;
+};
+
+
+// #pragma mark - Parser
+
+
 Parser::Parser()
+	:
+	fListener(NULL)
 {
 }
 
@@ -95,18 +192,25 @@ Parser::Test(int argc, const char* const* argv)
 #if 1
 	std::istream& input = std::cin;
 #else
-	std::ifstream input("testdata/test1");
+	std::ifstream input("testdata/test2");
 #endif
 
 	std::noskipws(input);
 
 	fLexer.Init(BaseIteratorType(input), BaseIteratorType());
 
+	DumpListener dumpListener;
+
+	if (argc > 1 && strcmp(argv[1], "-d") == 0) {
+		fListener = &dumpListener;
+		fListener->NextToken(_Token());
+	}
+
 	try {
 		code::Block* block = _ParseFile();
 		std::cout << "Parse tree:\n";
 		code::DumpContext dumpContext;
-		block->Dump(dumpContext);
+//		block->Dump(dumpContext);
 		delete block;
 	} catch (LexException& exception) {
 		printf("Parser::Test(): %zu:%zu Lex exception: %s\n",
@@ -119,6 +223,8 @@ Parser::Test(int argc, const char* const* argv)
 	} catch (...) {
 		printf("Parser::Test(): Caught exception\n");
 	}
+
+	fListener = NULL;
 }
 
 
@@ -137,6 +243,8 @@ Parser::_ParseFile()
 code::Block*
 Parser::_ParseBlock()
 {
+	PARSER_NONTERMINAL("block");
+
 	std::auto_ptr<code::Block> block(new code::Block);
 
 	while (true) {
@@ -156,13 +264,17 @@ Parser::_ParseBlock()
 code::Node*
 Parser::_TryParseStatement()
 {
+	PARSER_NONTERMINAL("statement");
+
 	switch (_Token().ID()) {
 		case TOKEN_LEFT_BRACE:
 		{
 			// "{" block "}"
+			PARSER_NONTERMINAL("braced block");
+
 			_NextToken();
 			std::auto_ptr<code::Block> result(_ParseBlock());
-			_SkipToken(TOKEN_LEFT_BRACE,
+			_SkipToken(TOKEN_RIGHT_BRACE,
 				"Expected '}' at the end of the block");
 			return result.release();
 		}
@@ -170,6 +282,8 @@ Parser::_TryParseStatement()
 		case TOKEN_INCLUDE:
 		{
 			// "include" list ";"
+			PARSER_NONTERMINAL("include");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_SEMICOLON,
@@ -184,6 +298,8 @@ Parser::_TryParseStatement()
 		case TOKEN_BREAK:
 		{
 			// "break" list ";"
+			PARSER_NONTERMINAL("break");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_SEMICOLON,
@@ -198,6 +314,8 @@ Parser::_TryParseStatement()
 		case TOKEN_CONTINUE:
 		{
 			// "continue" list ";"
+			PARSER_NONTERMINAL("continue");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_SEMICOLON,
@@ -212,6 +330,8 @@ Parser::_TryParseStatement()
 		case TOKEN_RETURN:
 		{
 			// "return" list ";"
+			PARSER_NONTERMINAL("return");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_SEMICOLON,
@@ -226,6 +346,8 @@ Parser::_TryParseStatement()
 		case TOKEN_JUMPTOEOF:
 		{
 			// "jumptoeof" list ";"
+			PARSER_NONTERMINAL("jumptoeof");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_SEMICOLON,
@@ -240,6 +362,8 @@ Parser::_TryParseStatement()
 		case TOKEN_IF:
 		{
 			// "if" expression "{" block "}" [ "else" statement ]
+			PARSER_NONTERMINAL("if");
+
 			_NextToken();
 			std::auto_ptr<code::Node> expression(_ParseExpression());
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'if' expression");
@@ -267,6 +391,8 @@ Parser::_TryParseStatement()
 		case TOKEN_FOR:
 		{
 			// "for" argument "in" list "{" block "}"
+			PARSER_NONTERMINAL("for");
+
 			_NextToken();
 			std::auto_ptr<code::Node> argument(_Expect(_TryParseArgument(),
 				"Expected argument after 'for'"));
@@ -290,6 +416,8 @@ Parser::_TryParseStatement()
 		case TOKEN_WHILE:
 		{
 			// "while" expression "{" block "}"
+			PARSER_NONTERMINAL("while");
+
 			_NextToken();
 			std::auto_ptr<code::Node> expression(_ParseExpression());
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'while' head");
@@ -308,6 +436,8 @@ Parser::_TryParseStatement()
 		case TOKEN_SWITCH:
 		{
 			// "switch" list "{" case* "}"
+			PARSER_NONTERMINAL("switch");
+
 			_NextToken();
 			std::auto_ptr<code::Node> list(_ParseList());
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'while' head");
@@ -319,6 +449,8 @@ Parser::_TryParseStatement()
 
 			// each case: "case" identifier ":" block
 			while (_TrySkipToken(TOKEN_CASE)) {
+				PARSER_NONTERMINAL("case");
+
 				if (_Token() != TOKEN_STRING)
 					_ThrowExpected("Expected pattern string after 'case'");
 
@@ -343,6 +475,8 @@ Parser::_TryParseStatement()
 		case TOKEN_ON:
 		{
 			// "on" argument statement
+			PARSER_NONTERMINAL("on");
+
 			_NextToken();
 			std::auto_ptr<code::Node> argument(_Expect(_TryParseArgument(),
 				"Expected argument after 'on'"));
@@ -363,6 +497,8 @@ Parser::_TryParseStatement()
 		{
 			// "rule" identifier [ identifier ( ":" identifier )*  ]
 			// "{" block "}"
+			PARSER_NONTERMINAL("rule definition");
+
 			_NextToken();
 
 			if (_Token() != TOKEN_STRING)
@@ -401,6 +537,8 @@ Parser::_TryParseStatement()
 		{
 			// "actions" actionsFlags identifier [ "bind" list ]
 			// "{" rawActions "}"
+			PARSER_NONTERMINAL("actions definition");
+
 			_NextToken();
 
 			// actionsflags: ( actionsFlag | ("maxline" string) )*
@@ -463,6 +601,7 @@ Parser::_TryParseStatement()
 			// 1. argument "on" list <assignmentOp> list ";"
 			// 2. argument <assignmentOp> list ';'
 			// 3. argument listOfLists ';'
+			PARSER_NONTERMINAL("assigment/rule invocation");
 
 			// each case starts with an argument
 			std::auto_ptr<code::Node> argument(_TryParseArgument());
@@ -473,6 +612,8 @@ Parser::_TryParseStatement()
 				case TOKEN_ON:
 				{
 					// 1. argument "on" list <assignmentOp> list ";"
+					PARSER_NONTERMINAL("on assignment");
+
 					_NextToken();
 					std::auto_ptr<code::Node> onTargets(_ParseList());
 
@@ -499,6 +640,8 @@ Parser::_TryParseStatement()
 				case TOKEN_ASSIGN_DEFAULT:
 				{
 					// 2. argument <assignmentOp> list ';'
+					PARSER_NONTERMINAL("assignment");
+
 					code::AssignmentOperator operatorType
 						= _ParseAssignmentOperator();
 
@@ -519,6 +662,8 @@ Parser::_TryParseStatement()
 				default:
 				{
 					// 3. argument listOfLists ';'
+					PARSER_NONTERMINAL("rule invocation");
+
 					NodeListContainer arguments;
 					_ParseListOfLists(arguments);
 					_SkipToken(TOKEN_SEMICOLON,
@@ -543,6 +688,7 @@ code::Node*
 Parser::_ParseLocalVariableDeclaration()
 {
 	// "local" list [ "=" list ] ";"
+	PARSER_NONTERMINAL("local variable");
 
 	// "local" keyword
 	_SkipToken(TOKEN_LOCAL, "Expected 'local' keyword");
@@ -574,10 +720,12 @@ Parser::_ParseLocalVariableDeclaration()
 code::List*
 Parser::_ParseList()
 {
+	PARSER_NONTERMINAL("list");
+
 	std::auto_ptr<code::List> list(new code::List);
 
 	// zero or more arguments
-	while (code::Node* argument = _TryParseArgument())
+	while (code::Node* argument = _TryParseArgument(true))
 		*list += argument;
 
 	return list.release();
@@ -585,9 +733,11 @@ Parser::_ParseList()
 
 
 code::Node*
-Parser::_TryParseArgument()
+Parser::_TryParseArgument(bool allowKeyword)
 {
 	// either a bracket expression or a simple string
+	PARSER_NONTERMINAL("argument");
+
 	if (_TrySkipToken(TOKEN_LEFT_BRACKET)) {
 		std::auto_ptr<code::Node> result(_ParseBracketExpression());
 		_SkipToken(TOKEN_RIGHT_BRACKET,
@@ -595,7 +745,7 @@ Parser::_TryParseArgument()
 		return result.release();
 	}
 
-	if (_Token().IsStringOrKeyword()) {
+	if (_Token() == TOKEN_STRING || (allowKeyword && _Token().IsKeyword())) {
 		code::Node* result = new code::Leaf(_Token());
 		_NextToken();
 		return result;
@@ -609,6 +759,8 @@ code::Node*
 Parser::_ParseBracketExpression()
 {
 	// either a bracketed "on" expression or a function call
+	PARSER_NONTERMINAL("bracket expression");
+
 	if (code::Node* node = _TryParseBracketOnExpression())
 		return node;
 
@@ -625,6 +777,8 @@ code::Node*
 Parser::_TryParseBracketOnExpression()
 {
 	// "on" keyword
+	PARSER_NONTERMINAL("bracket on expression");
+
 	if (!_TrySkipToken(TOKEN_ON))
 		return NULL;
 
@@ -658,6 +812,8 @@ code::Node*
 Parser::_TryParseFunctionCall()
 {
 	// the function name(s)
+	PARSER_NONTERMINAL("function call expression");
+
 	std::auto_ptr<code::Node> function(_TryParseArgument());
 	if (function.get() == NULL)
 		return NULL;
@@ -680,6 +836,8 @@ void
 Parser::_ParseListOfLists(NodeListContainer& nodes)
 {
 	// one list or more lists, separated by ":"
+	PARSER_NONTERMINAL("list of lists");
+
 	nodes.Add(_ParseList());
 
 	while (_TrySkipToken(TOKEN_COLON))
@@ -691,6 +849,8 @@ code::Node*
 Parser::_ParseExpression()
 {
 	// atom (<op> atom)*
+	PARSER_NONTERMINAL("expression");
+
 	code::Node* result = _ParseAtom();
 	code::Node* rhs;
 
@@ -762,10 +922,14 @@ Parser::_ParseExpression()
 code::Node*
 Parser::_ParseAtom()
 {
+	PARSER_NONTERMINAL("atom");
+
 	switch (_Token().ID()) {
 		case TOKEN_NOT:
 		{
 			// "!" atom
+			PARSER_NONTERMINAL("not expression");
+
 			_NextToken();
 			std::auto_ptr<code::Node> atom(_ParseAtom());
 
@@ -778,6 +942,9 @@ Parser::_ParseAtom()
 		case TOKEN_LEFT_PARENTHESIS:
 		{
 			// "(" expression ")"
+			PARSER_NONTERMINAL("(expression)");
+
+			_NextToken();
 			std::auto_ptr<code::Node> expression(_ParseExpression());
 			_SkipToken(TOKEN_RIGHT_PARENTHESIS,
 				"Expected ')' after expression");
@@ -787,6 +954,8 @@ Parser::_ParseAtom()
 		default:
 		{
 			// argument [ "in" list ]
+			PARSER_NONTERMINAL("argument (in list)");
+
 			std::auto_ptr<code::Node> argument(_Expect(_TryParseArgument(),
 				"Expected argument"));
 
