@@ -165,6 +165,28 @@ private:
 	void _Init()
 	{
 		// TODO: Use a better map.
+		fKeywords[";"] = TOKEN_SEMICOLON;
+		fKeywords[":"] = TOKEN_COLON;
+		fKeywords["["] = TOKEN_LEFT_BRACKET;
+		fKeywords["]"] = TOKEN_RIGHT_BRACKET;
+		fKeywords["{"] = TOKEN_LEFT_BRACE;
+		fKeywords["}"] = TOKEN_RIGHT_BRACE;
+		fKeywords["("] = TOKEN_LEFT_PARENTHESIS;
+		fKeywords[")"] = TOKEN_RIGHT_PARENTHESIS;
+		fKeywords["="] = TOKEN_ASSIGN;
+		fKeywords["+="] = TOKEN_ASSIGN_PLUS;
+		fKeywords["?="] = TOKEN_ASSIGN_DEFAULT;
+		fKeywords["|"] = TOKEN_OR;
+		fKeywords["||"] = TOKEN_OR;
+		fKeywords["&"] = TOKEN_AND;
+		fKeywords["&&"] = TOKEN_AND;
+		fKeywords["!="] = TOKEN_NOT_EQUAL;
+		fKeywords["<"] = TOKEN_LESS;
+		fKeywords["<="] = TOKEN_LESS_OR_EQUAL;
+		fKeywords[">"] = TOKEN_GREATER;
+		fKeywords[">="] = TOKEN_GREATER_OR_EQUAL;
+		fKeywords["!"] = TOKEN_NOT;
+
 		fKeywords["actions"] = TOKEN_ACTIONS;
 		fKeywords["bind"] = TOKEN_BIND;
 		fKeywords["break"] = TOKEN_BREAK;
@@ -281,80 +303,9 @@ private:
 		TokenID tokenID = TOKEN_STRING;
 
 		if (!quotedOrEscaped) {
-			if (token.Length() == 1) {
-				switch (token[0]) {
-					case ';':
-						tokenID = TOKEN_SEMICOLON;
-						break;
-					case ':':
-						tokenID = TOKEN_COLON;
-						break;
-					case '[':
-						tokenID = TOKEN_LEFT_BRACKET;
-						break;
-					case ']':
-						tokenID = TOKEN_RIGHT_BRACKET;
-						break;
-					case '{':
-						tokenID = TOKEN_LEFT_BRACE;
-						break;
-					case '}':
-						tokenID = TOKEN_RIGHT_BRACE;
-						break;
-					case '(':
-						tokenID = TOKEN_LEFT_PARENTHESIS;
-						break;
-					case ')':
-						tokenID = TOKEN_RIGHT_PARENTHESIS;
-						break;
-					case '=':
-						tokenID = TOKEN_ASSIGN;
-						break;
-					case '|':
-						tokenID = TOKEN_OR;
-						break;
-					case '&':
-						tokenID = TOKEN_AND;
-						break;
-					case '<':
-						tokenID = TOKEN_LESS;
-						break;
-					case '>':
-						tokenID = TOKEN_GREATER;
-						break;
-					case '!':
-						tokenID = TOKEN_NOT;
-						break;
-				}
-			} else if (token.Length() == 2) {
-				if (token[1] == '=') {
-					switch (token[0]) {
-						case '+':
-							tokenID = TOKEN_ASSIGN_PLUS;
-							break;
-						case '?':
-							tokenID = TOKEN_ASSIGN_DEFAULT;
-							break;
-						case '!':
-							tokenID = TOKEN_NOT_EQUAL;
-							break;
-						case '<':
-							tokenID = TOKEN_LESS_OR_EQUAL;
-							break;
-						case '>':
-							tokenID = TOKEN_GREATER_OR_EQUAL;
-							break;
-					}
-				} else {
-					KeywordMap::iterator it = fKeywords.find(token);
-					if (it != fKeywords.end())
-						tokenID = it->second;
-				}
-			} else {
-				KeywordMap::iterator it = fKeywords.find(token);
-				if (it != fKeywords.end())
-					tokenID = it->second;
-			}
+			KeywordMap::iterator it = fKeywords.find(token);
+			if (it != fKeywords.end())
+				tokenID = it->second;
 		}
 
 		TRACE("_ReadNextToken(): read token %d: '%s'\n", tokenID, token.Data());
