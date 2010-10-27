@@ -101,11 +101,6 @@ public:
 		return fID >= TOKEN_DELIMITERS_END && fID < TOKEN_KEYWORDS_END;
 	}
 
-	bool IsStringOrKeyword() const
-	{
-		return fID == TOKEN_STRING || IsKeyword();
-	}
-
 	bool operator==(TokenID id) const
 	{
 		return fID == id;
