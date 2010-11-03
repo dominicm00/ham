@@ -14,6 +14,7 @@ SharedLibrary libham.so
 	Block.cpp
 	Case.cpp
 	DumpContext.cpp
+	EvaluationContext.cpp
 	If.cpp
 	Include.cpp
 	For.cpp
@@ -32,6 +33,9 @@ SharedLibrary libham.so
 
 	# data
 	String.cpp
+	Target.cpp
+	TargetPool.cpp
+	VariableScope.cpp
 
 	# parser
 	Parser.cpp
