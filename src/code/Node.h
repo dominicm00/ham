@@ -19,6 +19,10 @@ class EvaluationContext;
 class Node;
 
 
+using data::String;
+using data::StringList;
+
+
 class NodeVisitor {
 public:
 	virtual						~NodeVisitor();
