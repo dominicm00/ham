@@ -17,6 +17,8 @@ public:
 	inline						VariableScope(VariableDomain& domain,
 									VariableScope* parent);
 
+			VariableScope*		Parent() const	{ return fParent; }
+
 			StringList*			Lookup(const String& variable) const;
 	inline	void				Set(const String& variable,
 									const StringList& value);
