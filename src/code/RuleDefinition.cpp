@@ -8,6 +8,8 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "code/RulePool.h"
+#include "code/UserRuleInstructions.h"
 
 
 using code::RuleDefinition;
@@ -31,7 +33,11 @@ RuleDefinition::~RuleDefinition()
 StringList
 RuleDefinition::Evaluate(EvaluationContext& context)
 {
-	// TODO: Define the rule!
+	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
+	rule.SetInstructions(new UserRuleInstructions(fParameterNames, fBlock));
+		// TODO: Unless all node trees shall be kept in memory, we should use
+		// reference counting for the block.
+
 	return kFalseStringList;
 }
 

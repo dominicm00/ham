@@ -7,6 +7,7 @@
 
 
 #include "code/Defs.h"
+#include "code/RulePool.h"
 #include "data/VariableScope.h"
 
 
@@ -38,6 +39,8 @@ public:
 
 			data::TargetPool&	Targets() const	{ return fTargets; }
 
+			RulePool&			Rules()			{ return fRules; }
+
 			JumpCondition		GetJumpCondition() const
 									{ return fJumpCondition; }
 			void				SetJumpCondition(JumpCondition condition)
@@ -49,6 +52,7 @@ private:
 			data::VariableScope* fGlobalScope;
 			data::VariableScope* fLocalScope;
 			data::TargetPool&	fTargets;
+			RulePool			fRules;
 			JumpCondition		fJumpCondition;
 };
 

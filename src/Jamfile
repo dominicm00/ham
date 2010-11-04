@@ -28,6 +28,8 @@ SharedLibrary libham.so
 	NotExpression.cpp
 	OnExpression.cpp
 	RuleDefinition.cpp
+	RuleInstructions.cpp
+	UserRuleInstructions.cpp
 	Switch.cpp
 	While.cpp
 
