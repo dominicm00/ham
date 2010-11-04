@@ -16,6 +16,15 @@ enum AssignmentOperator {
 };
 
 
+enum JumpCondition {
+	JUMP_CONDITION_NONE,
+	JUMP_CONDITION_BREAK,
+	JUMP_CONDITION_CONTINUE,
+	JUMP_CONDITION_RETURN,
+	JUMP_CONDITION_JUMP_TO_EOF
+};
+
+
 }	// namespace code
 
 

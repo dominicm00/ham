@@ -35,7 +35,22 @@ Switch::~Switch()
 StringList
 Switch::Evaluate(EvaluationContext& context)
 {
-// TODO: Implement!
+	const StringList& argument = fArgument->Evaluate(context);
+
+	// find the matching case
+	for (CaseList::iterator it = fCases.begin(); it != fCases.end(); ++it) {
+		if ((*it)->Matches(context, argument)) {
+			// found match -- execute the block
+			const StringList& result = (*it)->Evaluate(context);
+
+			// clear a break jump condition
+			if (context.GetJumpCondition() == JUMP_CONDITION_BREAK)
+				context.SetJumpCondition(JUMP_CONDITION_NONE);
+
+			return result;
+		}
+	}
+
 	return kFalseStringList;
 }
 

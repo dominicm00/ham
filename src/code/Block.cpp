@@ -32,13 +32,17 @@ Block::~Block()
 StringList
 Block::Evaluate(EvaluationContext& context)
 {
+	StringList result;
 	for (StatementList::const_iterator it = fStatements.begin();
 			it != fStatements.end(); ++it) {
-		/*StringList result =*/ (*it)->Evaluate(context);
-		// TODO: In case of break/continue/return, return here.
+		result = (*it)->Evaluate(context);
+
+		// terminate the block early, if a jump condition is set
+		if (context.GetJumpCondition() != JUMP_CONDITION_NONE)
+			break;
 	}
 
-	return kFalseStringList;
+	return result;
 }
 
 

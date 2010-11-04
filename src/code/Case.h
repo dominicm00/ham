@@ -17,6 +17,9 @@ public:
 								Case(const String& pattern, Node* block);
 	virtual						~Case();
 
+			bool				Matches(EvaluationContext& context,
+									const StringList& value) const;
+
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;

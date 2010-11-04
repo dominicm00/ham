@@ -36,8 +36,8 @@ Assignment::~Assignment()
 StringList
 Assignment::Evaluate(EvaluationContext& context)
 {
-	StringList lhs = fLeft->Evaluate(context);
-	StringList rhs = fRight->Evaluate(context);
+	const StringList& lhs = fLeft->Evaluate(context);
+	const StringList& rhs = fRight->Evaluate(context);
 
 	if (fOnTargets != NULL) {
 		// Set the variables on the given targets.

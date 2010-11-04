@@ -27,6 +27,14 @@ Case::~Case()
 }
 
 
+bool
+Case::Matches(EvaluationContext& context, const StringList& value) const
+{
+// TODO: Implement!
+	return false;
+}
+
+
 StringList
 Case::Evaluate(EvaluationContext& context)
 {

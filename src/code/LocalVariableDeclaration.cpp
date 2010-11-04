@@ -32,7 +32,27 @@ LocalVariableDeclaration::~LocalVariableDeclaration()
 StringList
 LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 {
-	// TODO: Implement!
+	// get the variables
+	const StringList& variables = fVariables->Evaluate(context);
+
+	if (fInitializer != NULL) {
+		// we have an initializer -- get the value and init the variables
+		const StringList& value = fInitializer->Evaluate(context);
+
+		for (StringList::const_iterator it = variables.begin();
+				it != variables.end(); ++it) {
+			context.LocalScope()->Set(*it, value);
+		}
+
+		return value;
+	}
+
+	// no initializer -- init with empty list
+	for (StringList::const_iterator it = variables.begin();
+			it != variables.end(); ++it) {
+		context.LocalScope()->Set(*it, kFalseStringList);
+	}
+
 	return kFalseStringList;
 }
 

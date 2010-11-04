@@ -6,6 +6,7 @@
 #define HAM_CODE_EVALUATION_CONTEXT_H
 
 
+#include "code/Defs.h"
 #include "data/VariableScope.h"
 
 
@@ -37,12 +38,18 @@ public:
 
 			data::TargetPool&	Targets() const	{ return fTargets; }
 
+			JumpCondition		GetJumpCondition() const
+									{ return fJumpCondition; }
+			void				SetJumpCondition(JumpCondition condition)
+									{ fJumpCondition = condition; }
+
 private:
 			data::VariableDomain& fGlobalVariables;
 			data::VariableScope	fRootScope;
 			data::VariableScope* fGlobalScope;
 			data::VariableScope* fLocalScope;
 			data::TargetPool&	fTargets;
+			JumpCondition		fJumpCondition;
 };
 
 

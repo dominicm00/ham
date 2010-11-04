@@ -31,8 +31,29 @@ While::~While()
 StringList
 While::Evaluate(EvaluationContext& context)
 {
-	// TODO: Implement...
-	return kFalseStringList;
+	// perform the for loop
+	StringList result;
+	while (!fExpression->Evaluate(context).empty()) {
+		// execute the block
+		result = fBlock->Evaluate(context);
+
+		// handle jump conditions
+		switch (context.GetJumpCondition()) {
+			case JUMP_CONDITION_NONE:
+				break;
+			case JUMP_CONDITION_BREAK:
+				context.SetJumpCondition(JUMP_CONDITION_NONE);
+				return result;
+			case JUMP_CONDITION_CONTINUE:
+				context.SetJumpCondition(JUMP_CONDITION_NONE);
+				break;
+			case JUMP_CONDITION_RETURN:
+			case JUMP_CONDITION_JUMP_TO_EOF:
+				return result;
+		}
+	}
+
+	return result;
 }
 
 

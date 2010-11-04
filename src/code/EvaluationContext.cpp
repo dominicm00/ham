@@ -17,7 +17,8 @@ EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 	fRootScope(fGlobalVariables, NULL),
 	fGlobalScope(&fRootScope),
 	fLocalScope(NULL),
-	fTargets(targets)
+	fTargets(targets),
+	fJumpCondition(JUMP_CONDITION_NONE)
 {
 }
 

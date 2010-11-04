@@ -8,6 +8,7 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "data/TargetPool.h"
 
 
 using code::OnExpression;
@@ -31,10 +32,22 @@ OnExpression::~OnExpression()
 StringList
 OnExpression::Evaluate(EvaluationContext& context)
 {
-//		StringList object = fObject->Evaluate(context);
-	// TODO: Push object context!
+	// get the target names -- we need at least one
+	const StringList& objects = fObject->Evaluate(context);
+	if (objects.empty())
+		return kFalseStringList;
 
-	StringList result = fExpression->Evaluate(context);
+	// get the first of the targets and push its variable domain as a new scope
+	data::Target* target = context.Targets().LookupOrCreate(objects.front());
+
+	data::VariableScope scope(*target->Variables(true), context.GlobalScope());
+	context.SetGlobalScope(&scope);
+
+	// execute the expression
+	const StringList& result = fExpression->Evaluate(context);
+
+	// pop the scope
+	context.SetGlobalScope(scope.Parent());
 
 	return result;
 }

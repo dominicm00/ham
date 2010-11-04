@@ -33,8 +33,52 @@ For::~For()
 StringList
 For::Evaluate(EvaluationContext& context)
 {
-	// TODO: Implement...
-	return kFalseStringList;
+	// get the loop variable -- we ignore all but the first element of the
+	// variable list
+	const StringList& variables = fVariable->Evaluate(context);
+	if (variables.empty())
+		return kFalseStringList;
+
+	// look for a local variable
+	StringList* variableValue = context.LocalScope()->Lookup(variables.front());
+	if (variableValue == NULL) {
+		// no local variable -- check for a global one
+		variableValue = context.GlobalScope()->Lookup(variables.front());
+		if (variableValue == NULL) {
+			// no existing global variable either -- create one
+			variableValue = &context.GlobalVariables()->LookupOrCreate(
+				variables.front());
+		}
+	}
+
+	// perform the for loop
+	StringList result;
+	const StringList& list = fList->Evaluate(context);
+	for (StringList::const_iterator it = list.begin(); it != list.end(); ++it) {
+		// assign the variable
+		variableValue->clear();
+		variableValue->push_back(*it);
+
+		// execute the block
+		result = fBlock->Evaluate(context);
+
+		// handle jump conditions
+		switch (context.GetJumpCondition()) {
+			case JUMP_CONDITION_NONE:
+				break;
+			case JUMP_CONDITION_BREAK:
+				context.SetJumpCondition(JUMP_CONDITION_NONE);
+				return result;
+			case JUMP_CONDITION_CONTINUE:
+				context.SetJumpCondition(JUMP_CONDITION_NONE);
+				break;
+			case JUMP_CONDITION_RETURN:
+			case JUMP_CONDITION_JUMP_TO_EOF:
+				return result;
+		}
+	}
+
+	return result;
 }
 
 
