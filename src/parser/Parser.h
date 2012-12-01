@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_PARSER_PARSER_H
@@ -26,14 +26,17 @@ class Parser {
 public:
 			class Listener;
 
+			typedef std::istream_iterator<char> InputIteratorType;
+
 public:
 								Parser();
+
+			code::Block*		Parse(const InputIteratorType& start, const InputIteratorType& end);
 
 			void				Test(int argc, const char* const* argv);
 
 private:
-			typedef std::istream_iterator<char> BaseIteratorType;
-			typedef parser::Lexer<BaseIteratorType> LexerType;
+			typedef parser::Lexer<InputIteratorType> LexerType;
 
 			struct NodeListContainer;
 			struct ListenerNotifier;
@@ -60,7 +63,7 @@ private:
 
 			const Token&		_Token() const
 									{ return fLexer.CurrentToken(); }
-			const Token&		_NextToken();
+	inline	const Token&		_NextToken();
 	inline	bool				_TrySkipToken(TokenID id);
 	inline	void				_SkipToken(TokenID id, const char* expected);
 

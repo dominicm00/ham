@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -186,6 +186,14 @@ Parser::Parser()
 }
 
 
+code::Block*
+Parser::Parse(const InputIteratorType& start, const InputIteratorType& end)
+{
+	fLexer.Init(start, end);
+	return _ParseFile();
+}
+
+
 void
 Parser::Test(int argc, const char* const* argv)
 {
@@ -197,8 +205,6 @@ Parser::Test(int argc, const char* const* argv)
 
 	std::noskipws(input);
 
-	fLexer.Init(BaseIteratorType(input), BaseIteratorType());
-
 	DumpListener dumpListener;
 
 	if (argc > 1 && strcmp(argv[1], "-d") == 0) {
@@ -207,7 +213,7 @@ Parser::Test(int argc, const char* const* argv)
 	}
 
 	try {
-		code::Block* block = _ParseFile();
+		code::Block* block = Parse(InputIteratorType(input), InputIteratorType());
 		std::cout << "Parse tree:\n";
 		code::DumpContext dumpContext;
 //		block->Dump(dumpContext);
