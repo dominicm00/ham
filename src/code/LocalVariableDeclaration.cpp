@@ -50,10 +50,10 @@ LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 	// no initializer -- init with empty list
 	for (StringList::const_iterator it = variables.begin();
 			it != variables.end(); ++it) {
-		context.LocalScope()->Set(*it, kFalseStringList);
+		context.LocalScope()->Set(*it, data::kFalseStringList);
 	}
 
-	return kFalseStringList;
+	return data::kFalseStringList;
 }
 
 

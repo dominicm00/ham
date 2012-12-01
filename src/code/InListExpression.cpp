@@ -38,10 +38,10 @@ InListExpression::Evaluate(EvaluationContext& context)
 
 	for (StringList::iterator it = left.begin(); it != left.end(); ++it) {
 		if (std::find(right.begin(), right.end(), *it) == right.end())
-			return kFalseStringList;
+			return data::kFalseStringList;
 	}
 
-	return kTrueStringList;
+	return data::kTrueStringList;
 }
 
 

@@ -79,7 +79,8 @@ BinaryExpression<Operator>::Dump(DumpContext& context) const
 																		\
 		static StringList Do(const StringList& a, const StringList& b)	\
 		{																\
-			return expression ? kTrueStringList : kFalseStringList;		\
+			return expression											\
+				? data::kTrueStringList : data::kFalseStringList;		\
 		}																\
 	};																	\
 																		\

@@ -37,7 +37,7 @@ For::Evaluate(EvaluationContext& context)
 	// variable list
 	const StringList& variables = fVariable->Evaluate(context);
 	if (variables.empty())
-		return kFalseStringList;
+		return data::kFalseStringList;
 
 	// look for a local variable
 	StringList* variableValue = context.LocalScope()->Lookup(variables.front());

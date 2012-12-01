@@ -38,7 +38,7 @@ RuleDefinition::Evaluate(EvaluationContext& context)
 		// TODO: Unless all node trees shall be kept in memory, we should use
 		// reference counting for the block.
 
-	return kFalseStringList;
+	return data::kFalseStringList;
 }
 
 

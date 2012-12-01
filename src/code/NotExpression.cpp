@@ -40,7 +40,7 @@ StringList
 NotExpression::Evaluate(EvaluationContext& context)
 {
 	StringList childList = fChild->Evaluate(context);
-	return childList.empty() ? kTrueStringList : kFalseStringList;
+	return childList.empty() ? data::kTrueStringList : data::kFalseStringList;
 }
 
 

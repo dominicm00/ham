@@ -36,7 +36,7 @@ If::Evaluate(EvaluationContext& context)
 	return !fExpression->Evaluate(context).empty()
 		? fBlock->Evaluate(context)
 		: (fElseBlock != NULL
-			? fBlock->Evaluate(context) : kFalseStringList);
+			? fBlock->Evaluate(context) : data::kFalseStringList);
 }
 
 

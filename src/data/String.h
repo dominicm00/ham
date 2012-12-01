@@ -29,8 +29,6 @@ extern const StringList kFalseStringList;
 // TODO: Remove those!
 using data::String;
 using data::StringList;
-using data::kTrueStringList;
-using data::kFalseStringList;
 
 
 #endif	// HAM_DATA_STRING_H
