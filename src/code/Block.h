@@ -11,6 +11,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -46,6 +47,7 @@ Block::operator+=(Node* statement)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_BLOCK_H

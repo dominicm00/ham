@@ -9,6 +9,7 @@
 #include <string>
 
 
+namespace ham {
 namespace data {
 
 
@@ -154,7 +155,8 @@ operator<<(Output& out, const StringBuffer& buffer)
 }
 
 
-} // namespace data
+}	// namespace data
+}	// namespace ham
 
 
 #endif	// HAM_DATA_STRING_BUFFER_H

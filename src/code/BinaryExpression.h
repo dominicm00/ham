@@ -9,6 +9,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -47,6 +48,7 @@ HAM_DECLARE_OPERATOR_EXPRESSION(Or)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_BINARY_EXPRESSION_H

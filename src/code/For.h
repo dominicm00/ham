@@ -9,6 +9,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -30,6 +31,7 @@ private:
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_FOR_H

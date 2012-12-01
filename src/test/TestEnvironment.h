@@ -6,6 +6,7 @@
 #define HAM_TEST_TEST_ENVIRONMENT_H
 
 
+namespace ham {
 namespace test {
 
 
@@ -18,6 +19,7 @@ public:
 
 
 } // namespace test
+} // namespace ham
 
 
 #endif // HAM_TEST_TEST_ENVIRONMENT_H

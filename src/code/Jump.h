@@ -9,6 +9,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -42,6 +43,7 @@ HAM_DECLARE_JUMP_STATEMENT(JumpToEof)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_JUMP_H

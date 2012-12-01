@@ -11,6 +11,7 @@
 #include "code/Rule.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -58,6 +59,7 @@ RulePool::LookupOrCreate(const String& name)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_RULE_POOL_H

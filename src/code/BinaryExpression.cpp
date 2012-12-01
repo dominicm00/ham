@@ -10,6 +10,7 @@
 #include "code/EvaluationContext.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -102,3 +103,4 @@ HAM_DEFINE_OPERATOR_EXPRESSION(Or,				||,	!a.empty() || !b.empty())
 
 
 }	// namespace code
+}	// namespace ham

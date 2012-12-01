@@ -9,7 +9,9 @@
 #include <iostream>
 
 
-using code::DumpContext;
+namespace ham {
+namespace code {
+
 
 DumpContext::DumpContext()
 	:
@@ -43,3 +45,7 @@ DumpContext::PrintString(const std::string& string)
 
 	return *this;
 }
+
+
+}	// namespace code
+}	// namespace ham

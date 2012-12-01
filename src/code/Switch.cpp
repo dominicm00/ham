@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::Switch;
+namespace ham {
+namespace code {
 
 
 Switch::Switch(Node* argument)
@@ -90,3 +91,7 @@ Switch::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

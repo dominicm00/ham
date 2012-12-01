@@ -7,6 +7,7 @@
 #include "code/EvaluationContext.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -24,3 +25,4 @@ EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 
 
 }	// namespace code
+}	// namespace ham

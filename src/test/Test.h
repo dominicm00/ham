@@ -9,6 +9,7 @@
 #include <string>
 
 
+namespace ham {
 namespace test {
 
 
@@ -36,6 +37,7 @@ private:
 
 
 } // namespace test
+} // namespace ham
 
 
 #endif // HAM_TEST_TEST_H

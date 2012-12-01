@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::Case;
+namespace ham {
+namespace code {
 
 
 Case::Case(const String& pattern, Node* block)
@@ -63,3 +64,7 @@ Case::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

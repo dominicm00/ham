@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::Include;
+namespace ham {
+namespace code {
 
 
 Include::Include(Node* fileNames)
@@ -56,3 +57,7 @@ Include::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

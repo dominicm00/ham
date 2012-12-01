@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::LocalVariableDeclaration;
+namespace ham {
+namespace code {
 
 
 LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
@@ -84,3 +85,7 @@ LocalVariableDeclaration::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

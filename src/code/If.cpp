@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::If;
+namespace ham {
+namespace code {
 
 
 If::If(Node* expression, Node* block, Node* elseBlock)
@@ -70,3 +71,7 @@ If::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

@@ -9,6 +9,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -29,6 +30,7 @@ public:
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_RULE_INSTRUCTIONS_H

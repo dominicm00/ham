@@ -12,7 +12,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::InListExpression;
+namespace ham {
+namespace code {
 
 
 InListExpression::InListExpression(Node* left, Node* right)
@@ -70,3 +71,7 @@ InListExpression::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

@@ -11,6 +11,7 @@
 #include "parser/ParsePosition.h"
 
 
+namespace ham {
 namespace parser {
 
 
@@ -44,7 +45,8 @@ private:
 };
 
 
-} // namespace parser
+}	// namespace parser
+}	// namespace ham
 
 
 #endif	// HAM_PARSER_PARSE_EXCEPTION_H

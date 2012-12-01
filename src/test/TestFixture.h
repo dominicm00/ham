@@ -10,6 +10,7 @@
 #include "test/TestException.h"
 
 
+namespace ham {
 namespace test {
 
 
@@ -97,6 +98,7 @@ public:																\
 
 
 } // namespace test
+} // namespace ham
 
 
 #endif // HAM_TEST_TEST_FIXTURE_H

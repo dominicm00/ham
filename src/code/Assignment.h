@@ -10,6 +10,7 @@
 #include "code/Defs.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -33,6 +34,7 @@ private:
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_ASSIGMENT_H

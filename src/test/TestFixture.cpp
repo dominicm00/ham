@@ -9,6 +9,7 @@
 #include <sstream>
 
 
+namespace ham {
 namespace test {
 
 
@@ -88,3 +89,4 @@ TestFixture::ValueToString<std::list<std::string> >(
 
 
 } // namespace test
+} // namespace ham

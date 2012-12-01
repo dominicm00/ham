@@ -12,6 +12,7 @@
 #include "test/RunnableTest.h"
 
 
+namespace ham {
 namespace test {
 
 
@@ -70,6 +71,7 @@ private:
 
 
 } // namespace test
+} // namespace ham
 
 
 #endif // HAM_TEST_TEST_SUITE_H

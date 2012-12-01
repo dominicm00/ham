@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::NotExpression;
+namespace ham {
+namespace code {
 
 
 NotExpression::NotExpression(Node* child)
@@ -55,3 +56,7 @@ NotExpression::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

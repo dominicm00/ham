@@ -13,6 +13,7 @@
 #include "data/VariableScope.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -67,3 +68,4 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 
 
 }	// namespace code
+}	// namespace ham

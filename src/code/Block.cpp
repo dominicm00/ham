@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::Block;
+namespace ham {
+namespace code {
 
 
 Block::Block()
@@ -76,3 +77,7 @@ Block::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

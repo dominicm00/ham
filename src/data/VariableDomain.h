@@ -11,6 +11,7 @@
 #include "String.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -68,6 +69,7 @@ VariableDomain::Set(const String& variable, const StringList& value)
 
 
 } // namespace data
+} // namespace ham
 
 
 #endif	// HAM_DATA_VARIABLE_DOMAIN_H

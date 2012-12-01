@@ -11,6 +11,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -46,6 +47,7 @@ typedef std::list<Node*> NodeList;
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_CODE_H

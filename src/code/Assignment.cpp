@@ -11,7 +11,8 @@
 #include "data/TargetPool.h"
 
 
-using code::Assignment;
+namespace ham {
+namespace code {
 
 
 Assignment::Assignment(Node* left, AssignmentOperator operatorType, Node* right,
@@ -148,3 +149,7 @@ Assignment::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

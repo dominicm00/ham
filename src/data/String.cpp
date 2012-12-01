@@ -7,6 +7,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -15,3 +16,4 @@ const StringList kFalseStringList;
 
 
 } // namespace data
+} // namespace ham

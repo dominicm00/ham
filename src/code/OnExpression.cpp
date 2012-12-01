@@ -11,7 +11,8 @@
 #include "data/TargetPool.h"
 
 
-using code::OnExpression;
+namespace ham {
+namespace code {
 
 
 OnExpression::OnExpression(Node* object, Node* expression)
@@ -78,3 +79,7 @@ OnExpression::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

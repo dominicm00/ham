@@ -7,8 +7,8 @@
 #include "code/Node.h"
 
 
-using code::Node;
-using code::NodeVisitor;
+namespace ham {
+namespace code {
 
 
 NodeVisitor::~NodeVisitor()
@@ -19,3 +19,7 @@ NodeVisitor::~NodeVisitor()
 Node::~Node()
 {
 }
+
+
+}	// namespace code
+}	// namespace ham

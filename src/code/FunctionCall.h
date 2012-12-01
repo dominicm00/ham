@@ -9,6 +9,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -41,6 +42,7 @@ FunctionCall::AddArgument(Node* argument)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_FUNCTION_CALL_H

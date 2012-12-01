@@ -7,6 +7,7 @@
 #include "VariableScope.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -26,4 +27,5 @@ VariableScope::Lookup(const String& variable) const
 }
 
 
-} // namespace data
+}	// namespace data
+}	// namespace ham

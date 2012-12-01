@@ -10,7 +10,8 @@
 #include <stdio.h>
 
 
-using test::TestException;
+namespace ham {
+namespace test {
 
 
 TestException::TestException(const char* file, int line,
@@ -28,3 +29,7 @@ TestException::TestException(const char* file, int line,
 
 	fMessage = buffer;
 }
+
+
+}	// namespace test
+}	// namespace ham

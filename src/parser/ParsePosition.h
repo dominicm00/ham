@@ -9,6 +9,7 @@
 #include <stddef.h>
 
 
+namespace ham {
 namespace parser {
 
 
@@ -49,7 +50,8 @@ private:
 };
 
 
-} // namespace parser
+}	// namespace parser
+}	// namespace ham
 
 
 #endif	// HAM_PARSER_PARSE_POSITION_H

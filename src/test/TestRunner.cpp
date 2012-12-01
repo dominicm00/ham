@@ -13,7 +13,8 @@
 #include "test/TestSuite.h"
 
 
-using test::TestRunner;
+namespace ham {
+namespace test {
 
 
 TestRunner::TestRunner()
@@ -144,3 +145,7 @@ TestRunner::_CleanupFixture()
 	fCurrentTest = NULL;
 	fCurrentTestFixture = NULL;
 }
+
+
+}	// namespace test
+}	// namespace ham

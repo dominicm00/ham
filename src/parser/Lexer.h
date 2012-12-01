@@ -20,6 +20,8 @@
 #	define TRACE(...)	do { } while (false)
 #endif
 
+
+namespace ham {
 namespace parser {
 
 
@@ -322,7 +324,8 @@ private:
 };
 
 
-} // namespace parser
+}	// namespace parser
+}	// namespace ham
 
 
 #undef TRACE

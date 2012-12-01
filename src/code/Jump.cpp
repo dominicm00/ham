@@ -10,6 +10,7 @@
 #include "code/EvaluationContext.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -89,3 +90,4 @@ HAM_DEFINE_JUMP_STATEMENT(JumpToEof,	JUMP_CONDITION_JUMP_TO_EOF)
 
 
 }	// namespace code
+}	// namespace ham

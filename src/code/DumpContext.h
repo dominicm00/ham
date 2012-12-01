@@ -11,6 +11,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -60,6 +61,7 @@ DumpContext::operator<<(const Type& value)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_DUMP_CONTEXT_H

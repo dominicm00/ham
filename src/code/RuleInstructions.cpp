@@ -7,6 +7,7 @@
 #include "code/RuleInstructions.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -16,3 +17,4 @@ RuleInstructions::~RuleInstructions()
 
 
 }	// namespace code
+}	// namespace ham

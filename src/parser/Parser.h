@@ -12,6 +12,9 @@
 #include "parser/Lexer.h"
 
 
+namespace ham {
+
+
 namespace code {
 	class Block;
 	class List;
@@ -127,7 +130,8 @@ Parser::_Expect(NodeType* node, const char* expected)
 }
 
 
-} // namespace parser
+}	// namespace parser
+}	// namespace ham
 
 
 #endif	// HAM_PARSER_PARSER_H

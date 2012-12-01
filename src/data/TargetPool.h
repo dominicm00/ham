@@ -11,6 +11,7 @@
 #include "data/Target.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -54,6 +55,7 @@ TargetPool::LookupOrCreate(const String& name)
 
 
 } // namespace data
+} // namespace ham
 
 
 #endif	// HAM_DATA_TARGET_POOL_H

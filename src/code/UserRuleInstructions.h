@@ -9,6 +9,7 @@
 #include "code/RuleInstructions.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -32,6 +33,7 @@ private:
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_USER_RULE_INSTRUCTIONS_H

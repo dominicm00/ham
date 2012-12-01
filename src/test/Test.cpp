@@ -9,7 +9,8 @@
 #include "test/TestSuite.h"
 
 
-using test::Test;
+namespace ham {
+namespace test {
 
 
 Test::Test(const std::string& name)
@@ -37,3 +38,7 @@ Test::FullyQualifiedName() const
 
 	return name + "::" + fName;
 }
+
+
+}	// namespace test
+}	// namespace ham

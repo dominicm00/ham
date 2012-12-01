@@ -7,7 +7,8 @@
 #include "test/TestSuite.h"
 
 
-using test::TestSuite;
+namespace ham {
+namespace test {
 
 
 TestSuite::TestSuite(const std::string& name)
@@ -51,3 +52,7 @@ TestSuite::AddTest(Test* test)
 	fTests.push_back(test);
 	test->SetTestSuite(this);
 }
+
+
+}	// namespace test
+}	// namespace ham

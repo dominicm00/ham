@@ -11,6 +11,7 @@
 #include "code/Case.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -46,6 +47,7 @@ Switch::AddCase(Case* caseStatement)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_SWITCH_H

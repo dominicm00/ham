@@ -7,6 +7,7 @@
 #include "data/Target.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -16,4 +17,5 @@ Target::~Target()
 }
 
 
-} // namespace data
+}	// namespace data
+}	// namespace ham

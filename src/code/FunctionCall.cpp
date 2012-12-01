@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::FunctionCall;
+namespace ham {
+namespace code {
 
 
 FunctionCall::FunctionCall(Node* function)
@@ -79,3 +80,7 @@ FunctionCall::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

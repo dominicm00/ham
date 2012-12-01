@@ -11,6 +11,9 @@
 #include "data/VariableScope.h"
 
 
+namespace ham {
+
+
 namespace data {
 	class TargetPool;
 }
@@ -58,6 +61,7 @@ private:
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_EVALUATION_CONTEXT_H

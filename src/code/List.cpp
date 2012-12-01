@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::List;
+namespace ham {
+namespace code {
 
 
 List::List()
@@ -69,3 +70,7 @@ List::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

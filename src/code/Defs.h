@@ -6,6 +6,7 @@
 #define HAM_CODE_DEFS_H
 
 
+namespace ham {
 namespace code {
 
 
@@ -26,6 +27,7 @@ enum JumpCondition {
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_DEFS_H

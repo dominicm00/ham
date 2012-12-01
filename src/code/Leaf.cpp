@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::Leaf;
+namespace ham {
+namespace code {
 
 
 Leaf::Leaf(const String& string)
@@ -48,3 +49,7 @@ Leaf::Dump(DumpContext& context) const
 {
 	context << "Leaf(\"" << fString << "\")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

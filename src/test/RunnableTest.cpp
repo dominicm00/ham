@@ -7,7 +7,8 @@
 #include "test/RunnableTest.h"
 
 
-using test::RunnableTest;
+namespace ham {
+namespace test {
 
 
 RunnableTest::RunnableTest(const std::string& name)
@@ -40,3 +41,7 @@ RunnableTest::IndexOfTestCase(const std::string& testCase) const
 
 	return -1;
 }
+
+
+}	// namespace test
+}	// namespace ham

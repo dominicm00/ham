@@ -9,6 +9,7 @@
 #include "data/VariableDomain.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -64,6 +65,7 @@ Target::Variables(bool create)
 
 
 } // namespace data
+} // namespace ham
 
 
 #endif	// HAM_DATA_TARGET_H

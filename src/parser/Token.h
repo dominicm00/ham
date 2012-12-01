@@ -9,6 +9,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace parser {
 
 
@@ -124,7 +125,8 @@ private:
 };
 
 
-} // namespace parser
+}	// namespace parser
+}	// namespace ham
 
 
 #endif	// HAM_PARSER_TOKEN_H

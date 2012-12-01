@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::While;
+namespace ham {
+namespace code {
 
 
 While::While(Node* expression, Node* block)
@@ -82,3 +83,7 @@ While::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

@@ -10,6 +10,7 @@
 #include "data/String.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -78,6 +79,7 @@ Rule::SetActions(RuleActions* actions)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_RULE_H

@@ -12,6 +12,7 @@
 #include "StringBuffer.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -26,9 +27,11 @@ extern const StringList kFalseStringList;
 } // namespace data
 
 
-// TODO: Remove those!
 using data::String;
 using data::StringList;
+
+
+} // namespace ham
 
 
 #endif	// HAM_DATA_STRING_H

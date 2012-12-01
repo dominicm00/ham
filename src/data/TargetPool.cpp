@@ -7,6 +7,7 @@
 #include "data/TargetPool.h"
 
 
+namespace ham {
 namespace data {
 
 
@@ -20,4 +21,5 @@ TargetPool::~TargetPool()
 }
 
 
-} // namespace data
+}	// namespace data
+}	// namespace ham

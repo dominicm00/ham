@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::ActionsDefinition;
+namespace ham {
+namespace code {
 
 
 ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
@@ -38,7 +39,7 @@ ActionsDefinition::Evaluate(EvaluationContext& context)
 }
 
 
-code::Node*
+Node*
 ActionsDefinition::Visit(NodeVisitor& visitor)
 {
 	if (visitor.VisitNode(this))
@@ -66,3 +67,7 @@ ActionsDefinition::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

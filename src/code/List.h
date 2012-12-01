@@ -11,6 +11,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -44,6 +45,7 @@ List::operator+=(Node* child)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_LIST_H

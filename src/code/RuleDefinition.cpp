@@ -12,7 +12,8 @@
 #include "code/UserRuleInstructions.h"
 
 
-using code::RuleDefinition;
+namespace ham {
+namespace code {
 
 
 RuleDefinition::RuleDefinition(const String& ruleName)
@@ -73,3 +74,7 @@ RuleDefinition::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

@@ -10,7 +10,8 @@
 #include "code/EvaluationContext.h"
 
 
-using code::For;
+namespace ham {
+namespace code {
 
 
 For::For(Node* variable, Node* list, Node* block)
@@ -111,3 +112,7 @@ For::Dump(DumpContext& context) const
 	context.EndChildren();
 	context << ")\n";
 }
+
+
+}	// namespace code
+}	// namespace ham

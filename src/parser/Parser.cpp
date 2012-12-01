@@ -36,7 +36,8 @@
 #include "parser/ParseException.h"
 
 
-using parser::Parser;
+namespace ham {
+namespace parser {
 
 
 namespace {
@@ -1021,3 +1022,7 @@ Parser::_ThrowExpected(const char* expected)
 
 	_Throw(message.c_str());
 }
+
+
+}	// namespace parser
+}	// namespace ham

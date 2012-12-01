@@ -9,6 +9,7 @@
 #include "code/Node.h"
 
 
+namespace ham {
 namespace code {
 
 
@@ -46,6 +47,7 @@ RuleDefinition::SetBlock(Node* block)
 
 
 }	// namespace code
+}	// namespace ham
 
 
 #endif	// HAM_CODE_RULE_DEFINITION_H

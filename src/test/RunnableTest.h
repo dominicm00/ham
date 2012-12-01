@@ -13,6 +13,7 @@
 #include "test/TestEnvironment.h"
 
 
+namespace ham {
 namespace test {
 
 
@@ -135,6 +136,7 @@ private:
 
 
 } // namespace test
+} // namespace ham
 
 
 #endif // HAM_TEST_RUNNABLE_TEST_H
