@@ -25,6 +25,9 @@ public:
 			const std::string&	Message() const
 									{ return fMessage; }
 
+			void				ThrowWithExtendedMessage(
+									const char* message,...);
+
 private:
 			const char*			fFile;
 			int					fLine;

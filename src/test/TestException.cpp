@@ -31,5 +31,19 @@ TestException::TestException(const char* file, int line,
 }
 
 
+void
+TestException::ThrowWithExtendedMessage(const char* message,...)
+{
+	char buffer[1024];
+
+	va_list args;
+	va_start(args, message);
+	vsnprintf(buffer, sizeof(buffer), message, args);
+	va_end(args);
+
+	throw TestException(fFile, fLine, "%s\n%s", fMessage.c_str(), buffer);
+}
+
+
 }	// namespace test
 }	// namespace ham
