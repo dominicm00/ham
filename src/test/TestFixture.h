@@ -28,6 +28,8 @@ public:
 									const char* element8 = NULL,
 									const char* element9 = NULL,
 									const char* element10 = NULL);
+	static	data::StringList	MakeStringList(
+									const std::vector<std::string>& testList);
 
 	template<typename Type>
 	static	std::string			ValueToString(const Type& value);
@@ -121,6 +123,14 @@ public:																\
 				test::TestFixture::ValueToString(_testActual).c_str(),		\
 				#actual);													\
 		}																	\
+	}
+
+
+#define HAM_TEST_ADD_INFO(statement, message, ...)							\
+	try {																	\
+		statement;															\
+	} catch (test::TestException& exception) {								\
+		exception.ThrowWithExtendedMessage(message, __VA_ARGS__);			\
 	}
 
 

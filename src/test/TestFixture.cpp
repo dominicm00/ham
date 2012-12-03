@@ -7,10 +7,28 @@
 #include "test/TestFixture.h"
 
 #include <sstream>
+#include <vector>
 
 
 namespace ham {
 namespace test {
+
+
+template<typename Container>
+static std::string
+string_container_to_string(const Container& value)
+{
+	std::ostringstream stream;
+	stream << "{";
+
+	for (typename Container::const_iterator it = value.begin();
+			it != value.end(); ++it) {
+		stream << ' ' << '\'' << *it << '\'';
+	}
+
+	stream << " }";
+	return stream.str();
+}
 
 
 data::StringList
@@ -28,7 +46,20 @@ TestFixture::MakeStringList(const char* element1, const char* element2,
 	for (size_t i = 0; i < sizeof(elements) / sizeof(elements[0]); i++) {
 		if (elements[i] == NULL)
 			break;
-		list.push_back(data::String(elements[i]));
+		list.Append(data::String(elements[i]));
+	}
+
+	return list;
+}
+
+
+data::StringList
+TestFixture::MakeStringList(const std::vector<std::string>& testList)
+{
+	StringList list;
+	for (std::vector<std::string>::const_iterator it = testList.begin();
+			it != testList.end(); ++it) {
+		list.Append(it->c_str());
 	}
 
 	return list;
@@ -64,6 +95,14 @@ DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(long double)
 
 template<>
 std::string
+TestFixture::ValueToString<const char*>(const char* const& value)
+{
+	return value;
+}
+
+
+template<>
+std::string
 TestFixture::ValueToString<std::string>(const std::string& value)
 {
 	return value;
@@ -75,13 +114,36 @@ std::string
 TestFixture::ValueToString<std::list<std::string> >(
 	const std::list<std::string>& value)
 {
+	return string_container_to_string(value);
+}
+
+
+template<>
+std::string
+TestFixture::ValueToString<std::vector<std::string> >(
+	const std::vector<std::string>& value)
+{
+	return string_container_to_string(value);
+}
+
+
+template<>
+std::string
+TestFixture::ValueToString<data::String>(const data::String& value)
+{
+	return value.ToStlString();
+}
+
+
+template<>
+std::string
+TestFixture::ValueToString<data::StringList>(const data::StringList& value)
+{
 	std::ostringstream stream;
 	stream << "{";
 
-	for (std::list<std::string>::const_iterator it = value.begin();
-		it != value.end(); ++it) {
-		stream << ' ' << '\'' << *it << '\'';
-	}
+	for (StringList::Iterator it = value.GetIterator(); it.HasNext();)
+		stream << ' ' << '\'' << it.Next() << '\'';
 
 	stream << " }";
 	return stream.str();
