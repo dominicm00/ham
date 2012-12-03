@@ -108,7 +108,8 @@ private:
 	}
 
 	template<typename Type>
-	static void InitTestCase(Type* fixture, char[sizeof(& Type::InitTestCase)])
+//	static void InitTestCase(Type* fixture, char[sizeof(& Type::InitTestCase)])
+	static void InitTestCase(Type* fixture, decltype(& Type::InitTestCase))
 	{
 		fixture->InitTestCase();
 	}
@@ -120,7 +121,8 @@ private:
 
 	template<typename Type>
 	static void CleanupTestCase(Type* fixture,
-		char[sizeof(& Type::CleanupTestCase)])
+//		char[sizeof(Type::CleanupTestCase)])
+		decltype(&Type::CleanupTestCase))
 	{
 		fixture->CleanupTestCase();
 	}

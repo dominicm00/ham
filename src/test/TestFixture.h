@@ -6,7 +6,9 @@
 #define HAM_TEST_TEST_FIXTURE_H
 
 
-#include "data/String.h"
+#include <vector>
+
+#include "data/StringList.h"
 #include "test/TestException.h"
 
 
@@ -29,6 +31,24 @@ public:
 
 	template<typename Type>
 	static	std::string			ValueToString(const Type& value);
+};
+
+
+template<typename Type>
+struct GetNonReferenceType {
+	typedef Type type;
+};
+
+
+template<typename Type>
+struct GetNonReferenceType<Type&> {
+	typedef Type type;
+};
+
+
+template<typename Type>
+struct GetNonReferenceType<const Type&> {
+	typedef Type type;
 };
 
 
@@ -82,10 +102,17 @@ public:																\
 			"Test condition doesn't hold: %s", #condition);		\
 	}
 
+
 #define HAM_TEST_EQUAL(actual, expected)									\
 	{																		\
-		const typeof(actual)& _testActual = actual;							\
-		const typeof(expected)& _testExpected = expected;					\
+		typedef typename													\
+			ham::test::GetNonReferenceType<decltype(actual)>::type			\
+				_TestActualType;											\
+		typedef typename													\
+			ham::test::GetNonReferenceType<decltype(expected)>::type		\
+				_TestExpectedType;											\
+		const _TestActualType& _testActual = actual;						\
+		const _TestExpectedType& _testExpected = expected;					\
 		if (_testActual != _testExpected) {									\
 			throw test::TestException(__FILE__, __LINE__,					\
 				"Test comparison failed: expected: \"%s\", "				\
