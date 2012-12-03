@@ -35,7 +35,7 @@ StringList
 ActionsDefinition::Evaluate(EvaluationContext& context)
 {
 	// TODO: Implement!
-	return data::kFalseStringList;
+	return StringList::False();
 }
 
 

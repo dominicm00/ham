@@ -32,7 +32,7 @@ Include::Evaluate(EvaluationContext& context)
 {
 //		StringList fileNames = fFileNames->Evaluate(context);
 // TODO: Include each file. Concatenate the results/return the last one?
-	return data::kFalseStringList;
+	return StringList::False();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,9 +11,96 @@ namespace ham {
 namespace data {
 
 
-const StringList kTrueStringList = StringList(1, "1");
-const StringList kFalseStringList;
+String::Buffer String::sEmptyBuffer(0);
 
 
-} // namespace data
-} // namespace ham
+String::String()
+	:
+	fBuffer(&sEmptyBuffer)
+{
+	fBuffer->Acquire();
+}
+
+
+String::String(const char* string)
+	:
+	fBuffer(_CreateBuffer(string, strlen(string)))
+{
+}
+
+
+String::String(const char* string, size_t maxLength)
+	:
+	fBuffer(_CreateBuffer(string, strnlen(string, maxLength)))
+{
+}
+
+
+String::String(const String& other)
+	:
+	fBuffer(other.fBuffer)
+{
+	fBuffer->Acquire();
+}
+
+
+String::~String()
+{
+	fBuffer->Release();
+}
+
+
+String&
+String::operator=(const String& other)
+{
+	if (this != &other) {
+		fBuffer->Release();
+		fBuffer = other.fBuffer;
+		fBuffer->Acquire();
+	}
+
+	return *this;
+}
+
+
+String
+String::operator+(const String& other) const
+{
+	size_t otherLength = other.Length();
+	if (otherLength == 0)
+		return *this;
+
+	size_t length = Length();
+	if (length == 0)
+		return other;
+
+	Buffer* buffer = new Buffer(length + otherLength);
+	memcpy(buffer->fString, ToCString(), length);
+	memcpy(buffer->fString + length, other.fBuffer->fString, otherLength);
+
+	return String(buffer);
+}
+
+String::String(String::Buffer* buffer)
+	:
+	fBuffer(buffer)
+{
+}
+
+
+String::Buffer*
+String::_CreateBuffer(const char* string, size_t length)
+{
+	if (length == 0) {
+		sEmptyBuffer.Acquire();
+		return &sEmptyBuffer;
+	}
+
+	Buffer* buffer = new Buffer(length);
+	memcpy(buffer->fString, string, length);
+	return buffer;
+}
+
+
+}	// namespace data
+}	// namespace ham

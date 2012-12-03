@@ -39,7 +39,7 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 
 	// set the number parameters ($(1) ... $(n))
 	for (size_t i = 0; i < parameterCount; i++) {
-		if (!parameters[i].empty()) {
+		if (!parameters[i].IsEmpty()) {
 			char parameterName[16];
 			snprintf(parameterName, sizeof(parameterName), "%zu", i);
 			localVariables.Set(parameterName, parameters[i]);
@@ -47,11 +47,9 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	}
 
 	// set the named parameters
-	StringList::const_iterator it = fParameterNames.begin();
-	for (size_t i = 0; i < parameterCount && it != fParameterNames.end();
-			i++, ++it) {
-		localVariables.Set(*it, parameters[i]);
-	}
+	StringList::Iterator it = fParameterNames.GetIterator();
+	for (size_t i = 0; i < parameterCount && it.HasNext(); i++)
+		localVariables.Set(it.Next(), parameters[i]);
 
 	// set the local variable scope
 	data::VariableScope* oldLocalScope = context.LocalScope();

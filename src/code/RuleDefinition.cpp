@@ -39,7 +39,7 @@ RuleDefinition::Evaluate(EvaluationContext& context)
 		// TODO: Unless all node trees shall be kept in memory, we should use
 		// reference counting for the block.
 
-	return data::kFalseStringList;
+	return StringList::False();
 }
 
 
@@ -58,11 +58,11 @@ RuleDefinition::Dump(DumpContext& context) const
 {
 	context << "RuleDefinition(\"" << fRuleName << "\", (";
 
-	for (StringList::const_iterator it = fParameterNames.begin();
-			it != fParameterNames.end(); ++it) {
-		if (it != fParameterNames.begin())
+	for (StringList::Iterator it = fParameterNames.GetIterator();
+			it.HasNext();) {
+		if (it != fParameterNames.GetIterator())
 			context << ", ";
-		context << *it;
+		context << it.Next();
 	}
 
 	context << ")\n";

@@ -35,11 +35,11 @@ OnExpression::Evaluate(EvaluationContext& context)
 {
 	// get the target names -- we need at least one
 	const StringList& objects = fObject->Evaluate(context);
-	if (objects.empty())
-		return data::kFalseStringList;
+	if (objects.IsEmpty())
+		return StringList::False();
 
 	// get the first of the targets and push its variable domain as a new scope
-	data::Target* target = context.Targets().LookupOrCreate(objects.front());
+	data::Target* target = context.Targets().LookupOrCreate(objects.Head());
 
 	data::VariableScope scope(*target->Variables(true), context.GlobalScope());
 	context.SetGlobalScope(&scope);

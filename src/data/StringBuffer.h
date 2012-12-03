@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "data/String.h"
+
 
 namespace ham {
 namespace data {
@@ -32,7 +34,8 @@ public:
 
 	inline	char				operator[](int index) const;
 
-	inline						operator std::string() const;
+//	inline						operator std::string() const;
+	inline						operator String() const;
 	inline						operator const char*() const;
 
 	template<typename Output>
@@ -135,9 +138,15 @@ StringBuffer::operator[](int index) const
 }
 
 
-StringBuffer::operator std::string() const
+//StringBuffer::operator std::string() const
+//{
+//	return std::string(Data());
+//}
+
+
+StringBuffer::operator String() const
 {
-	return std::string(Data());
+	return String(Data());
 }
 
 

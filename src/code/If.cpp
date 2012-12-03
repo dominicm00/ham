@@ -34,10 +34,10 @@ If::~If()
 StringList
 If::Evaluate(EvaluationContext& context)
 {
-	return !fExpression->Evaluate(context).empty()
+	return !fExpression->Evaluate(context).IsEmpty()
 		? fBlock->Evaluate(context)
 		: (fElseBlock != NULL
-			? fBlock->Evaluate(context) : data::kFalseStringList);
+			? fBlock->Evaluate(context) : StringList::False());
 }
 
 

@@ -41,7 +41,7 @@ namespace parser {
 
 
 namespace {
-	struct ActionsFlagMap : std::map<std::string, uint32_t> {
+	struct ActionsFlagMap : std::map<data::String, uint32_t> {
 		ActionsFlagMap()
 		{
 			(*this)["updated"] = code::kActionFlagUpdated;
@@ -169,7 +169,7 @@ struct Parser::DumpListener : Parser::Listener {
 	virtual void NextToken(const Token& token)
 	{
 		printf("%*s(%d, \"%s\")\n", (int)fLevel * 2, "", token.ID(),
-			token.c_str());
+			token.ToCString());
 	}
 
 private:
@@ -566,7 +566,7 @@ Parser::_TryParseStatement()
 					}
 
 					actionsFlags = (actionsFlags & code::kActionFlagMask)
-						| (uint32_t)atoi(_Token().c_str())
+						| (uint32_t)atoi(_Token().ToStlString().c_str())
 							* code::kActionFlagMaxLineFactor;
 					_NextToken();
 				} else
@@ -1018,7 +1018,7 @@ Parser::_ThrowExpected(const char* expected)
 	if (_Token() == TOKEN_EOF)
 		message += ". Encountered end of input";
 	else
-		message += ". Got '" + _Token() + "'";
+		message += ". Got '" + _Token().ToStlString() + "'";
 
 	_Throw(message.c_str());
 }

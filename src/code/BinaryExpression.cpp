@@ -35,9 +35,6 @@ template<typename Operator>
 StringList
 BinaryExpression<Operator>::Evaluate(EvaluationContext& context)
 {
-	StringList leftList = fLeft->Evaluate(context);
-	StringList rightList = fRight->Evaluate(context);
-
 	return Operator::Do(fLeft->Evaluate(context),
 		fRight->Evaluate(context));
 }
@@ -81,7 +78,7 @@ BinaryExpression<Operator>::Dump(DumpContext& context) const
 		static StringList Do(const StringList& a, const StringList& b)	\
 		{																\
 			return expression											\
-				? data::kTrueStringList : data::kFalseStringList;		\
+				? StringList::True() : StringList::False();				\
 		}																\
 	};																	\
 																		\
@@ -96,8 +93,10 @@ HAM_DEFINE_OPERATOR_EXPRESSION(Less,			<,	a < b)
 HAM_DEFINE_OPERATOR_EXPRESSION(LessOrEqual,		<=,	a <= b)
 HAM_DEFINE_OPERATOR_EXPRESSION(Greater,			>,	a > b)
 HAM_DEFINE_OPERATOR_EXPRESSION(GreaterOrEqual,	>=,	a >= b)
-HAM_DEFINE_OPERATOR_EXPRESSION(And,				&&,	!a.empty() && !b.empty())
-HAM_DEFINE_OPERATOR_EXPRESSION(Or,				||,	!a.empty() || !b.empty())
+HAM_DEFINE_OPERATOR_EXPRESSION(And,				&&,
+	!a.IsEmpty() && !b.IsEmpty())
+HAM_DEFINE_OPERATOR_EXPRESSION(Or,				||,
+	!a.IsEmpty() || !b.IsEmpty())
 
 #undef HAM_DEFINE_OPERATOR_EXPRESSION
 

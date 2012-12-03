@@ -6,7 +6,7 @@
 #define HAM_CODE_RULE_INSTRUCTIONS_H
 
 
-#include "data/String.h"
+#include "data/StringList.h"
 
 
 namespace ham {
@@ -14,9 +14,6 @@ namespace code {
 
 
 class EvaluationContext;
-
-
-using data::StringList;
 
 
 class RuleInstructions {

@@ -8,7 +8,7 @@
 
 #include <list>
 
-#include "data/String.h"
+#include "data/StringList.h"
 
 
 namespace ham {
@@ -18,10 +18,6 @@ namespace code {
 class DumpContext;
 class EvaluationContext;
 class Node;
-
-
-using data::String;
-using data::StringList;
 
 
 class NodeVisitor {

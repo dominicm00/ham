@@ -41,7 +41,7 @@ StringList
 NotExpression::Evaluate(EvaluationContext& context)
 {
 	StringList childList = fChild->Evaluate(context);
-	return childList.empty() ? data::kTrueStringList : data::kFalseStringList;
+	return childList.IsEmpty() ? StringList::True() : StringList::False();
 }
 
 

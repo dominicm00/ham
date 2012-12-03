@@ -43,26 +43,25 @@ Assignment::Evaluate(EvaluationContext& context)
 	if (fOnTargets != NULL) {
 		// Set the variables on the given targets.
 		StringList targets = fOnTargets->Evaluate(context);
-		for (StringList::const_iterator it = targets.begin();
-				it != targets.end(); ++it) {
+		for (StringList::Iterator it = targets.GetIterator(); it.HasNext();) {
 			// get the target and its variable domain
-			data::Target* target = context.Targets().LookupOrCreate(*it);
+			data::Target* target = context.Targets().LookupOrCreate(it.Next());
 			data::VariableDomain* domain = target->Variables(true);
 
 			// set the variables
-			for (StringList::const_iterator varIt = lhs.begin();
-					varIt != lhs.end(); ++varIt) {
+			for (StringList::Iterator varIt = lhs.GetIterator();
+					varIt.HasNext();) {
+				String variable = varIt.Next();
 				switch (fOperator) {
 					case ASSIGNMENT_OPERATOR_ASSIGN:
-						domain->Set(*varIt, rhs);
+						domain->Set(variable, rhs);
 						break;
 					case ASSIGNMENT_OPERATOR_APPEND:
-						std::copy(rhs.begin(), rhs.end(),
-							domain->LookupOrCreate(*varIt).end());
+						domain->LookupOrCreate(variable).Append(rhs);
 						break;
 					case ASSIGNMENT_OPERATOR_DEFAULT:
-						if (domain->Lookup(*varIt) == NULL)
-							domain->Set(*varIt, rhs);
+						if (domain->Lookup(variable) == NULL)
+							domain->Set(variable, rhs);
 						break;
 				}
 			}
@@ -70,9 +69,8 @@ Assignment::Evaluate(EvaluationContext& context)
 	} else {
 		// No targets. If a local variable with the respective name exists, we
 		// set it, otherwise we set one in a global scope.
-		for (StringList::const_iterator it = lhs.begin();
-				it != lhs.end(); ++it) {
-			const String& variable = *it;
+		for (StringList::Iterator it = lhs.GetIterator(); it.HasNext();) {
+			String variable = it.Next();
 
 			// look for a local variable
 			StringList* data = context.LocalScope()->Lookup(variable);
@@ -92,7 +90,7 @@ Assignment::Evaluate(EvaluationContext& context)
 					*data = rhs;
 					break;
 				case ASSIGNMENT_OPERATOR_APPEND:
-					std::copy(rhs.begin(), rhs.end(), data->end());
+					data->Append(rhs);
 					break;
 				case ASSIGNMENT_OPERATOR_DEFAULT:
 					if (created)

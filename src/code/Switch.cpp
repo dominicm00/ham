@@ -52,7 +52,7 @@ Switch::Evaluate(EvaluationContext& context)
 		}
 	}
 
-	return data::kFalseStringList;
+	return StringList::False();
 }
 
 

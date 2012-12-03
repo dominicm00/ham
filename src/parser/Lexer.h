@@ -9,6 +9,7 @@
 #include <map>
 #include <stdexcept>
 
+#include "data/StringBuffer.h"
 #include "parser/LexException.h"
 #include "parser/Token.h"
 
@@ -161,7 +162,7 @@ public:
 	}
 
 private:
-	typedef std::map<std::string, TokenID> KeywordMap;
+	typedef std::map<data::String, TokenID> KeywordMap;
 
 private:
 	void _Init()
@@ -236,7 +237,7 @@ private:
 		fFilePosition.SetTo(fPosition.Line(), fPosition.Column());
 
 		if (fPosition == fEnd) {
-			fCurrentToken.SetTo(TOKEN_EOF, std::string());
+			fCurrentToken.SetTo(TOKEN_EOF, data::String());
 			return;
 		}
 

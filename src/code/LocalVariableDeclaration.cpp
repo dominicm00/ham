@@ -40,21 +40,17 @@ LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 		// we have an initializer -- get the value and init the variables
 		const StringList& value = fInitializer->Evaluate(context);
 
-		for (StringList::const_iterator it = variables.begin();
-				it != variables.end(); ++it) {
-			context.LocalScope()->Set(*it, value);
-		}
+		for (StringList::Iterator it = variables.GetIterator(); it.HasNext();)
+			context.LocalScope()->Set(it.Next(), value);
 
 		return value;
 	}
 
 	// no initializer -- init with empty list
-	for (StringList::const_iterator it = variables.begin();
-			it != variables.end(); ++it) {
-		context.LocalScope()->Set(*it, data::kFalseStringList);
-	}
+	for (StringList::Iterator it = variables.GetIterator(); it.HasNext();)
+		context.LocalScope()->Set(it.Next(), StringList::False());
 
-	return data::kFalseStringList;
+	return StringList::False();
 }
 
 

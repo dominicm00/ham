@@ -37,28 +37,28 @@ For::Evaluate(EvaluationContext& context)
 	// get the loop variable -- we ignore all but the first element of the
 	// variable list
 	const StringList& variables = fVariable->Evaluate(context);
-	if (variables.empty())
-		return data::kFalseStringList;
+	if (variables.IsEmpty())
+		return StringList::False();
 
 	// look for a local variable
-	StringList* variableValue = context.LocalScope()->Lookup(variables.front());
+	StringList* variableValue = context.LocalScope()->Lookup(variables.Head());
 	if (variableValue == NULL) {
 		// no local variable -- check for a global one
-		variableValue = context.GlobalScope()->Lookup(variables.front());
+		variableValue = context.GlobalScope()->Lookup(variables.Head());
 		if (variableValue == NULL) {
 			// no existing global variable either -- create one
 			variableValue = &context.GlobalVariables()->LookupOrCreate(
-				variables.front());
+				variables.Head());
 		}
 	}
 
 	// perform the for loop
 	StringList result;
 	const StringList& list = fList->Evaluate(context);
-	for (StringList::const_iterator it = list.begin(); it != list.end(); ++it) {
+	for (StringList::Iterator it = list.GetIterator(); it.HasNext();) {
 		// assign the variable
-		variableValue->clear();
-		variableValue->push_back(*it);
+		variableValue->Clear();
+		variableValue->Append(it.Next());
 
 		// execute the block
 		result = fBlock->Evaluate(context);

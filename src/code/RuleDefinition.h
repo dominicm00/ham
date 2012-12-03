@@ -35,7 +35,7 @@ private:
 void
 RuleDefinition::AddParameterName(const String& parameterName)
 {
-	fParameterNames.push_back(parameterName);
+	fParameterNames.Append(parameterName);
 }
 
 

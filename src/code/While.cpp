@@ -34,7 +34,7 @@ While::Evaluate(EvaluationContext& context)
 {
 	// perform the for loop
 	StringList result;
-	while (!fExpression->Evaluate(context).empty()) {
+	while (!fExpression->Evaluate(context).IsEmpty()) {
 		// execute the block
 		result = fBlock->Evaluate(context);
 

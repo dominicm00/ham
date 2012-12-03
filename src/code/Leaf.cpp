@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,9 +28,19 @@ Leaf::~Leaf()
 StringList
 Leaf::Evaluate(EvaluationContext& context)
 {
+#if 0
+	size_t length = fString.length();
+	size_t dollarIndex = 0;
+
+	for (;;) {
+		dollarIndex = fString.find('$');
+		if (dollarIndex == String::n)
+	}
+#endif
+
 	// TODO: Evalutate the string (variable substitution...).
 	StringList list;
-	list.push_back(fString);
+	list.Append(fString);
 	return list;
 }
 

@@ -32,10 +32,8 @@ List::Evaluate(EvaluationContext& context)
 {
 	StringList result;
 	size_t childCount = fChildren.size();
-	for (size_t i = 0; i < childCount; i++) {
-		StringList childList = fChildren[i]->Evaluate(context);
-		result.insert(result.end(), childList.begin(), childList.end());
-	}
+	for (size_t i = 0; i < childCount; i++)
+		result.Append(fChildren[i]->Evaluate(context));
 
 	return result;
 }

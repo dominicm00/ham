@@ -37,12 +37,12 @@ InListExpression::Evaluate(EvaluationContext& context)
 	StringList left = fLeft->Evaluate(context);
 	StringList right = fRight->Evaluate(context);
 
-	for (StringList::iterator it = left.begin(); it != left.end(); ++it) {
-		if (std::find(right.begin(), right.end(), *it) == right.end())
-			return data::kFalseStringList;
+	for (StringList::Iterator it = left.GetIterator(); it.HasNext();) {
+		if (!right.Contains(it.Next()))
+			return StringList::False();
 	}
 
-	return data::kTrueStringList;
+	return StringList::True();
 }
 
 
