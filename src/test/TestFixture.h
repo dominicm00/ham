@@ -108,10 +108,10 @@ public:																\
 #define HAM_TEST_EQUAL(actual, expected)									\
 	{																		\
 		typedef typename													\
-			ham::test::GetNonReferenceType<decltype(actual)>::type			\
+			ham::test::GetNonReferenceType<decltype((actual))>::type		\
 				_TestActualType;											\
 		typedef typename													\
-			ham::test::GetNonReferenceType<decltype(expected)>::type		\
+			ham::test::GetNonReferenceType<decltype((expected))>::type		\
 				_TestExpectedType;											\
 		const _TestActualType& _testActual = actual;						\
 		const _TestExpectedType& _testExpected = expected;					\
