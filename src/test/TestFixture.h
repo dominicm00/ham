@@ -30,6 +30,9 @@ public:
 									const char* element10 = NULL);
 	static	data::StringList	MakeStringList(
 									const std::vector<std::string>& testList);
+	static	data::StringListList MakeStringListList(
+									const std::vector<std::vector<
+										std::string> >& testListList);
 
 	template<typename Type>
 	static	std::string			ValueToString(const Type& value);

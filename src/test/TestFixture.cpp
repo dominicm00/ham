@@ -65,6 +65,19 @@ TestFixture::MakeStringList(const std::vector<std::string>& testList)
 	return list;
 }
 
+/*static*/ data::StringListList
+TestFixture::MakeStringListList(
+	const std::vector<std::vector<std::string> >& testListList)
+{
+	StringListList listList;
+	for (std::vector<std::vector<std::string> >::const_iterator it
+			= testListList.begin(); it != testListList.end(); ++it) {
+		listList.push_back(MakeStringList(*it));
+	}
+
+	return listList;
+}
+
 
 #define DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(type)	\
 	template<>												\
