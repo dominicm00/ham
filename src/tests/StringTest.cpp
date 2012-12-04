@@ -115,7 +115,7 @@ StringTest::Comparison()
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		String string1(testData[i].string1);
 		String string2(testData[i].string2);
-		STRING_COMPARE(string1, string2, testData[i].compare);
+		STRING_COMPARE(string1, string2, testData[i].compare)
 	}
 }
 
