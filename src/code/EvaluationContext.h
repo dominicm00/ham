@@ -40,6 +40,8 @@ public:
 			void				SetLocalScope(data::VariableScope* scope)
 									{ fLocalScope = scope; }
 
+	inline	StringList*			LookupVariable(const String& variable) const;
+
 			data::TargetPool&	Targets() const	{ return fTargets; }
 
 			RulePool&			Rules()			{ return fRules; }
@@ -58,6 +60,18 @@ private:
 			RulePool			fRules;
 			JumpCondition		fJumpCondition;
 };
+
+
+inline StringList*
+EvaluationContext::LookupVariable(const String& variable) const
+{
+	StringList* result = NULL;
+	if (fLocalScope != NULL)
+		result = fLocalScope->Lookup(variable);
+	if (result == NULL)
+		result = fGlobalScope->Lookup(variable);
+	return result;
+}
 
 
 }	// namespace code
