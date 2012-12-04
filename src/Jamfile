@@ -1,5 +1,10 @@
 SubDir HAM_TOP src ;
 
+
+C++FLAGS += -std=c++0x ;
+#C++FLAGS += -std=c++11 ;
+
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
@@ -35,6 +40,7 @@ SharedLibrary libham.so
 
 	# data
 	String.cpp
+	StringList.cpp
 	Target.cpp
 	TargetPool.cpp
 	VariableScope.cpp
@@ -50,6 +56,33 @@ SharedLibrary libham.so
 BinCommand ham
 	:
 	ham.cpp
+
+	:
+	libham.so
+	$(TARGET_LIBSTDC++)
+;
+
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) test ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) tests ] ;
+
+
+BinCommand ham-tests
+	:
+	# tests
+	ham-tests.cpp
+
+	StringListTest.cpp
+	StringTest.cpp
+	VariableExpansionTest.cpp
+
+	# test
+	RunnableTest.cpp
+	Test.cpp
+	TestException.cpp
+	TestFixture.cpp
+	TestRunner.cpp
+	TestSuite.cpp
 
 	:
 	libham.so
