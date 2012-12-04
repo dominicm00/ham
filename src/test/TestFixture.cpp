@@ -16,14 +16,14 @@ namespace test {
 
 template<typename Container>
 static std::string
-string_container_to_string(const Container& value)
+value_container_to_string(const Container& value)
 {
 	std::ostringstream stream;
 	stream << "{";
 
 	for (typename Container::const_iterator it = value.begin();
 			it != value.end(); ++it) {
-		stream << ' ' << '\'' << *it << '\'';
+		stream << ' ' << TestFixture::ValueToString(*it);
 	}
 
 	stream << " }";
@@ -31,7 +31,7 @@ string_container_to_string(const Container& value)
 }
 
 
-data::StringList
+/*static*/ data::StringList
 TestFixture::MakeStringList(const char* element1, const char* element2,
 	const char* element3, const char* element4, const char* element5,
 	const char* element6, const char* element7, const char* element8,
@@ -53,7 +53,7 @@ TestFixture::MakeStringList(const char* element1, const char* element2,
 }
 
 
-data::StringList
+/*static*/ data::StringList
 TestFixture::MakeStringList(const std::vector<std::string>& testList)
 {
 	StringList list;
@@ -107,59 +107,68 @@ DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(long double)
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<const char*>(const char* const& value)
 {
-	return value;
+	return std::string("'") + value + "'";
 }
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<std::string>(const std::string& value)
 {
-	return value;
+	return ValueToString(value.c_str());
 }
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<std::list<std::string> >(
 	const std::list<std::string>& value)
 {
-	return string_container_to_string(value);
+	return value_container_to_string(value);
 }
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<std::vector<std::string> >(
 	const std::vector<std::string>& value)
 {
-	return string_container_to_string(value);
+	return value_container_to_string(value);
 }
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<data::String>(const data::String& value)
 {
-	return value.ToStlString();
+	return TestFixture::ValueToString(value.ToCString());
 }
 
 
 template<>
-std::string
+/*static*/ std::string
 TestFixture::ValueToString<data::StringList>(const data::StringList& value)
 {
 	std::ostringstream stream;
 	stream << "{";
 
 	for (StringList::Iterator it = value.GetIterator(); it.HasNext();)
-		stream << ' ' << '\'' << it.Next() << '\'';
+		stream << ' ' << ValueToString(it.Next());
 
 	stream << " }";
 	return stream.str();
+}
+
+
+template<>
+/*static*/ std::string
+TestFixture::ValueToString<data::StringListList>(
+	const data::StringListList& value)
+{
+	return value_container_to_string(value);
 }
 
 
