@@ -33,6 +33,8 @@ Block::~Block()
 StringList
 Block::Evaluate(EvaluationContext& context)
 {
+// TODO: We need to set up a local variable scope, if our parent hasn't done
+// that yet (e.g. in case of UserRuleInstructions).
 	StringList result;
 	for (StatementList::const_iterator it = fStatements.begin();
 			it != fStatements.end(); ++it) {
