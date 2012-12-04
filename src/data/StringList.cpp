@@ -7,6 +7,7 @@
 #include "StringList.h"
 
 #include <algorithm>
+#include <vector>
 
 
 namespace ham {
@@ -30,6 +31,18 @@ StringList::StringList()
 }
 
 
+StringList::StringList(size_t elementCount)
+	:
+	fData(_CreateData(elementCount)),
+	fOffset(0),
+	fSize(elementCount)
+{
+	for (size_t i = 0; i < elementCount; i++)
+		fData->ConstructElement(i, String());
+	fData->fSize = elementCount;
+}
+
+
 StringList::StringList(const String& string)
 	:
 	fData(_CreateData(1)),
@@ -38,6 +51,39 @@ StringList::StringList(const String& string)
 {
 	fData->ConstructElement(0, string);
 	fData->fSize = 1;
+}
+
+
+StringList::StringList(const StringList* other)
+{
+	if (other != NULL) {
+		fData = other->fData;
+		fOffset = other->fOffset;
+		fSize = other->fSize;
+	} else {
+		fData = &sEmptyData;
+		fOffset = 0;
+		fSize = 0;
+	}
+
+	fData->Acquire();
+}
+
+
+StringList::StringList(const StringList& other, size_t startIndex,
+	size_t endIndex)
+{
+	if (startIndex < other.fSize && startIndex < endIndex) {
+		fData = other.fData;
+		fOffset = other.fOffset + startIndex;
+		fSize = std::min(endIndex, other.fSize) - startIndex;
+	} else {
+		fData = &sEmptyData;
+		fOffset = 0;
+		fSize = 0;
+	}
+
+	fData->Acquire();
 }
 
 
@@ -111,6 +157,98 @@ StringList::Append(const StringList& list)
 		fData->ConstructElement(fSize + i, list.ElementAt(i));
 	fSize += otherSize;
 	fData->fSize = fSize;
+}
+
+
+String
+StringList::Join() const
+{
+	size_t size = fSize;
+	switch (size) {
+		case 0:
+			return String();
+		case 1:
+			return Head();
+		default:
+			break;
+	}
+
+	// compute result string length
+	size_t resultLength = 0;
+	for (size_t i = 0; i < size; i++)
+		resultLength += ElementAt(i).Length();
+
+	// allocate buffer and compute result
+	String::Buffer* buffer = new String::Buffer(resultLength);
+	size_t offset = 0;
+	for (size_t i = 0; i < size; i++) {
+		String element = ElementAt(i);
+		size_t length = element.Length();
+		memcpy(buffer->fString + offset, element.ToCString(), length);
+		resultLength += ElementAt(i).Length();
+		offset += length;
+	}
+
+	return String(buffer);
+}
+
+
+StringList
+StringList::Multiply(const StringListList& listList)
+{
+	// Handle special cases quickly: empty list, single element.
+	if (listList.empty())
+		return StringList();
+
+	size_t listCount = listList.size();
+	if (listCount == 1)
+		return listList.front();
+
+	// Determine result size.
+	size_t resultSize = 1;
+	std::vector<const StringList*> lists(listCount);
+	size_t listIndex = 0;
+	for (StringListList::const_iterator it = listList.begin();
+			it != listList.end(); ++it) {
+		resultSize *= it->Size();
+		lists[listIndex++] = &*it;
+	}
+	if (resultSize == 0)
+		return StringList();
+
+	// Compute the result. We traverse the factor tree
+	StringList resultList(resultSize);
+	StringList factorList(listCount);
+	std::vector<size_t> indexes(listCount, 0);
+	listIndex = 0;
+	size_t resultIndex = 0;
+	for (;;) {
+		// back-track, if through with the current list
+		if (indexes[listIndex] == lists[listIndex]->Size()) {
+			if (listIndex == 0)
+				break;
+			listIndex--;
+			indexes[listIndex]++;
+			continue;
+		}
+
+		factorList.SetElementAt(listIndex,
+			lists[listIndex]->ElementAt(indexes[listIndex]));
+
+		// descend
+		if (listIndex < listCount - 1) {
+			listIndex++;
+			indexes[listIndex] = 0;
+			continue;
+		}
+
+		// add element
+		resultList.SetElementAt(resultIndex++, factorList.Join());
+
+		indexes[listIndex]++;
+	}
+
+	return resultList;
 }
 
 

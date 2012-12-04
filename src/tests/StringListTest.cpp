@@ -6,6 +6,7 @@
 
 #include "tests/StringListTest.h"
 
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -28,6 +29,7 @@ sign(int number)
 
 
 typedef std::vector<std::string> TestList;
+typedef std::vector<TestList> TestListList;
 
 
 static bool
@@ -64,6 +66,15 @@ operator+(const TestList& testList, const char* string)
 }
 
 
+static TestListList
+operator+(const TestListList& testListList, const TestList& testList)
+{
+	TestListList result(testListList);
+	result.push_back(testList);
+	return result;
+}
+
+
 #define LIST_EQUAL(actual, expected)							\
 	HAM_TEST_EQUAL(actual.Size(), (expected).size())			\
 	HAM_TEST_EQUAL(actual, (expected))							\
@@ -92,6 +103,14 @@ ham::tests::StringListTest::Constructor()
 		LIST_EQUAL(list, TestList())
 	}
 
+	// (size_t) constructor
+	{
+		for (size_t size = 0; size < 100; size++) {
+			StringList list(size);
+			LIST_EQUAL(list, TestList(size, std::string()))
+		}
+	}
+
 	// (const String&) constructor
 	{
 		StringList list(String(""));
@@ -101,6 +120,33 @@ ham::tests::StringListTest::Constructor()
 	{
 		StringList list(String("foo"));
 		LIST_EQUAL(list, TestList() + "foo")
+	}
+
+	// (const StringList*) constructor
+	{
+		StringList list2((const StringList*)NULL);
+		LIST_EQUAL(list2, TestList())
+	}
+
+	{
+		StringList list1;
+		LIST_EQUAL(list1, TestList())
+		StringList list2(&list1);
+		LIST_EQUAL(list2, TestList())
+	}
+
+	{
+		StringList list1("foo");
+		LIST_EQUAL(list1, TestList() + "foo")
+		StringList list2(&list1);
+		LIST_EQUAL(list2, TestList() + "foo")
+	}
+
+	{
+		StringList list1 = MakeStringList("foo", "bar", "foobar");
+		LIST_EQUAL(list1, TestList() + "foo" + "bar" + "foobar")
+		StringList list2(&list1);
+		LIST_EQUAL(list2, TestList() + "foo" + "bar" + "foobar")
 	}
 
 	// copy constructor
@@ -119,13 +165,13 @@ ham::tests::StringListTest::Constructor()
 	}
 
 	{
-		StringList list1("foo");
-		list1.Append("bar");
-		list1.Append("foobar");
+		StringList list1 = MakeStringList("foo", "bar", "foobar");
 		LIST_EQUAL(list1, TestList() + "foo" + "bar" + "foobar")
 		StringList list2(list1);
 		LIST_EQUAL(list2, TestList() + "foo" + "bar" + "foobar")
 	}
+
+	// (const StringList&, size_t, size_t) constructor tested in SubList()
 }
 
 
@@ -152,6 +198,51 @@ StringListTest::ElementAccess()
 		// test Head()
 		HAM_TEST_EQUAL(list.Head().ToCString(),
 			size > 0 ? testList[0] : std::string())
+
+		// test SetElementAt(), also for a range beyond the end of the list
+		for (size_t i = 0; i < 2 * size + 10; i++) {
+			std::string testString = ValueToString(i);
+			if (i < size)
+				testList[i] = testString;
+			list.SetElementAt(i, String(testString.c_str()));
+
+			LIST_EQUAL(list, testList);
+		}
+	}
+}
+
+
+void
+StringListTest::SubList()
+{
+	for (size_t size = 0; size < 100; size++) {
+		StringList list;
+		TestList testList;
+		for (size_t i = 0; i < size; i++) {
+			char c = 'a' + (i % 26);
+			size_t length = (5 + i) % 7;
+			std::string element(length, c);
+			testList.push_back(element);
+			list.Append(String(element.c_str()));
+		}
+
+		for (size_t start = 0; start < size + 10; start++) {
+			for (size_t end = 0; end < size + 10; end++) {
+				TestList testSubList;
+				if (start < size && start < end) {
+					size_t actualEnd = std::min(end, size);
+					testSubList.resize(actualEnd - start);
+					std::copy(testList.begin() + start,
+						testList.begin() + actualEnd, testSubList.begin());
+				}
+
+				StringList subList1 = list.SubList(start, end);
+				LIST_EQUAL(subList1, testSubList);
+
+				StringList subList2(list, start, end);
+				LIST_EQUAL(subList2, testSubList);
+			}
+		}
 	}
 }
 
@@ -405,13 +496,102 @@ StringListTest::Clear()
 
 
 void
+StringListTest::Join()
+{
+	const TestList testData[] = {
+		TestList(),
+		TestList() + "",
+		TestList() + "foo",
+		TestList() + "foo" + "",
+		TestList() + "" + "foo",
+		TestList() + "foo" + "bar",
+		TestList() + "foo" + "" + "bar",
+		TestList() + "foo" + "bar" + "",
+		TestList() + "" + "foo" + "" + "" + "bar" + "",
+		TestList() + "foo" + "bar" + "foobar"
+	};
+
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
+		const TestList& testList = testData[i];
+		StringList list = MakeStringList(testList);
+		LIST_EQUAL(list, testList);
+
+		std::string testString
+			= std::accumulate(testList.begin(), testList.end(), std::string());
+		String string = list.Join();
+		HAM_TEST_EQUAL(string.ToCString(), testString)
+	}
+}
+
+
+void
+StringListTest::Multiply()
+{
+	struct TestData {
+		TestListList	listList;
+		TestList		result;
+	};
+
+	const TestData testData[] = {
+		{ TestListList(),
+			TestList() },
+		{ TestListList() + TestList(),
+			TestList() },
+		{ TestListList() + TestList() + TestList(),
+			TestList() },
+		{ TestListList() + (TestList() + ""),
+			TestList() + "" },
+		{ TestListList() + (TestList() + "") + TestList(),
+			TestList() },
+		{ TestListList() + TestList() + (TestList() + ""),
+			TestList() },
+		{ TestListList() + (TestList() + "") + (TestList() + ""),
+			TestList() + "" },
+		{ TestListList() + (TestList() + "foo"),
+			TestList() + "foo" },
+		{ TestListList() + (TestList() + "foo") + (TestList() + "bar"),
+			TestList() + "foobar" },
+		{ TestListList() + (TestList() + "a" + "b") + (TestList() + "bar"),
+			TestList() + "abar" + "bbar" },
+		{ TestListList() + (TestList() + "a" + "b") + (TestList() + "x" + "y"),
+			TestList() + "ax" + "ay" + "bx" + "by" },
+		{ TestListList() + (TestList() + "a" + "b" + "c")
+				+ (TestList() + "x" + "y"),
+			TestList() + "ax" + "ay" + "bx" + "by" + "cx" + "cy" },
+		{ TestListList() + (TestList() + "a" + "b" + "c")
+				+ (TestList() + "x" + "y") + (TestList() + ""),
+			TestList() + "ax" + "ay" + "bx" + "by" + "cx" + "cy" },
+		{ TestListList() + (TestList() + "a" + "b" + "c")
+				+ (TestList() + "x" + "y") + TestList(),
+			TestList() },
+		{ TestListList() + (TestList() + "a" + "b" + "c")
+				+ (TestList() + "x" + "y") + (TestList() + "1" + "2"),
+			TestList() + "ax1" + "ax2" + "ay1" + "ay2" + "bx1" + "bx2" + "by1"
+				+ "by2" + "cx1" + "cx2" + "cy1" + "cy2" },
+	};
+
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
+		const TestListList& testListList = testData[i].listList;
+		const TestList& testList = testData[i].result;
+		StringListList listList = MakeStringListList(testListList);
+		StringList list = StringList::Multiply(listList);
+		HAM_TEST_ADD_INFO(
+			LIST_EQUAL(list, testList),
+			"listList: %s\nlist: %s",
+			ValueToString(listList).c_str(),
+			ValueToString(list).c_str()
+		)
+	}
+}
+
+
+void
 StringListTest::Iteration()
 {
 	const TestList testData[] = {
 		TestList(),
 		TestList() + "",
 		TestList() + "foo",
-		TestList() + "foo" + "bar",
 		TestList() + "foo" + "bar",
 		TestList() + "foo" + "bar" + "foobar"
 	};

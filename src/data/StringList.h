@@ -28,7 +28,11 @@ public:
 
 public:
 								StringList();
+								StringList(size_t elementCount);
 								StringList(const String& string);
+								StringList(const StringList* other);
+								StringList(const StringList& other,
+									size_t startIndex, size_t endIndex);
 								StringList(const StringList& other);
 								~StringList();
 
@@ -42,6 +46,10 @@ public:
 			String				Head() const
 									{ return ElementAt(0); }
 	inline	String				ElementAt(size_t index) const;
+	inline	void				SetElementAt(size_t index, const String& value);
+
+	inline	StringList			SubList(size_t startIndex,
+									size_t endIndex) const;
 
 			bool				Contains(const String& string) const;
 
@@ -52,10 +60,14 @@ public:
 			void				Clear()
 									{ *this = kFalse; }
 
+			String				Join() const;
+
 	static	const StringList&	True()
 									{ return kTrue; }
 	static	const StringList&	False()
 									{ return kFalse; }
+
+	static	StringList			Multiply(const StringListList& listList);
 
 			bool				operator==(const StringList& other) const;
 			bool				operator!=(const StringList& other) const
@@ -196,6 +208,23 @@ inline String
 StringList::ElementAt(size_t index) const
 {
 	return index < fSize ? fData->fElements[fOffset + index] : String();
+}
+
+
+inline void
+StringList::SetElementAt(size_t index, const String& value)
+{
+	if (index < fSize) {
+		_Detach(fSize);
+		fData->fElements[index] = value;
+	}
+}
+
+
+inline StringList
+StringList::SubList(size_t startIndex, size_t endIndex) const
+{
+	return StringList(*this, startIndex, endIndex);
 }
 
 

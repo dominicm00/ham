@@ -16,6 +16,9 @@ namespace ham {
 namespace data {
 
 
+class StringList;
+
+
 class String {
 public:
 								String();
@@ -52,6 +55,8 @@ public:
 			String				operator+(const String& other) const;
 
 private:
+			friend class StringList;
+
 			struct Buffer {
 				Buffer(size_t length)
 					:
