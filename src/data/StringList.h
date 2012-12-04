@@ -10,11 +10,16 @@
 
 #include <stdlib.h>
 
+#include <list>
 #include <new>
 
 
 namespace ham {
 namespace data {
+
+
+class StringList;
+typedef std::list<StringList> StringListList;
 
 
 class StringList {
@@ -198,6 +203,7 @@ StringList::ElementAt(size_t index) const
 
 
 using data::StringList;
+using data::StringListList;
 
 
 }	// namespace ham
