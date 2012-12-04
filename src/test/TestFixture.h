@@ -67,38 +67,75 @@ public:																\
 	template<typename Visitor>										\
 	static void VisitTestCases(Visitor& visitor)					\
 	{																\
-		HAM_ADD_TEST_CASES_VISIT##testCount(fixture, __VA_ARGS__);	\
+		HAM_CALL_MACRO1(testCount, HAM_ADD_TEST_CASES_VISIT,		\
+			fixture, __VA_ARGS__)									\
 	}
 
-#define HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)		\
+#define HAM_ADD_TEST_CASES_VISIT(fixture, testCase)	\
 	visitor.Visit(#testCase, &fixture::testCase);
-#define HAM_ADD_TEST_CASES_VISIT2(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT3(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT2(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT4(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT3(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT5(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT4(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT6(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT5(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT7(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT6(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT8(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT7(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT9(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT8(fixture, __VA_ARGS__)
-#define HAM_ADD_TEST_CASES_VISIT10(fixture, testCase,...)	\
-	HAM_ADD_TEST_CASES_VISIT1(fixture, testCase)			\
-	HAM_ADD_TEST_CASES_VISIT9(fixture, __VA_ARGS__)
+
+
+#define HAM_CALL_MACRO1(count, macro, fixArgument,...)		\
+	HAM_CALL_MACRO1_##count(macro, fixArgument, __VA_ARGS__)
+
+#define HAM_CALL_MACRO1_0(macro, fixArgument)
+#define HAM_CALL_MACRO1_1(macro, fixArgument, argument)			\
+	macro(fixArgument, argument)
+#define HAM_CALL_MACRO1_2(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_1(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_3(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_2(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_4(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_3(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_5(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_4(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_6(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_5(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_7(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_6(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_8(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_7(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_9(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_8(macro, fixArgument, __VA_ARGS__)
+
+#define HAM_CALL_MACRO1_10(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_9(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_11(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_10(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_12(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_11(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_13(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_12(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_14(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_13(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_15(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_14(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_16(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_15(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_17(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_16(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_18(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_17(macro, fixArgument, __VA_ARGS__)
+#define HAM_CALL_MACRO1_19(macro, fixArgument, argument, ...)	\
+	HAM_CALL_MACRO1_1(macro, fixArgument, argument)				\
+	HAM_CALL_MACRO1_18(macro, fixArgument, __VA_ARGS__)
 
 
 #define HAM_TEST_VERIFY(condition)								\
