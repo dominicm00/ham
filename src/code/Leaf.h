@@ -23,6 +23,23 @@ public:
 	virtual	void				Dump(DumpContext& context) const;
 
 private:
+	static	StringList			_EvaluateString(EvaluationContext& context,
+									const char* stringStart,
+									const char* stringEnd,
+									const String* originalString);
+	static	StringList			_EvaluateVariableExpression(
+									EvaluationContext& context,
+									const char* variableStart,
+									const char* variableEnd,
+									const char* colon,
+									const char* openingBracket,
+									const char* closingBracket,
+									bool recursive);
+	static	bool				_ParseSubscripts(const char* start,
+									const char* end, size_t& _firstIndex,
+									size_t& _endIndex);
+
+private:
 			String				fString;
 };
 
