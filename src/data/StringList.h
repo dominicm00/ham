@@ -85,18 +85,6 @@ public:
 
 private:
 			struct Data {
-				Data(size_t capacity)
-					:
-					fReferenceCount(1),
-					fSize(0),
-					fCapacity(capacity)
-				{
-				}
-
-				~Data()
-				{
-				}
-
 				static Data* Create(size_t capacity)
 				{
 					void* memory
@@ -130,11 +118,26 @@ private:
 					fElements[index].~String();
 				}
 
+			private:
+				Data(size_t capacity)
+					:
+					fReferenceCount(1),
+					fSize(0),
+					fCapacity(capacity)
+				{
+				}
+
+				~Data()
+				{
+				}
+
 			public:
 				int			fReferenceCount;
 				size_t		fSize;
 				size_t		fCapacity;
 				String		fElements[0];
+
+				static Data sEmptyData;
 			};
 
 private:
@@ -147,7 +150,6 @@ private:
 			size_t				fOffset;
 			size_t				fSize;
 
-	static	Data				sEmptyData;
 	static	const StringList	kTrue;
 	static	const StringList	kFalse;
 };

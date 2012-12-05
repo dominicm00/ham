@@ -14,7 +14,7 @@ namespace ham {
 namespace data {
 
 
-StringList::Data StringList::sEmptyData(0);
+StringList::Data StringList::Data::sEmptyData(0);
 const StringList StringList::kTrue("1");
 const StringList StringList::kFalse;
 
@@ -23,7 +23,7 @@ static const size_t kMinCapacity = 8;
 
 StringList::StringList()
 	:
-	fData(&sEmptyData),
+	fData(&Data::sEmptyData),
 	fOffset(0),
 	fSize(0)
 {
@@ -61,7 +61,7 @@ StringList::StringList(const StringList* other)
 		fOffset = other->fOffset;
 		fSize = other->fSize;
 	} else {
-		fData = &sEmptyData;
+		fData = &Data::sEmptyData;
 		fOffset = 0;
 		fSize = 0;
 	}
@@ -78,7 +78,7 @@ StringList::StringList(const StringList& other, size_t startIndex,
 		fOffset = other.fOffset + startIndex;
 		fSize = std::min(endIndex, other.fSize) - startIndex;
 	} else {
-		fData = &sEmptyData;
+		fData = &Data::sEmptyData;
 		fOffset = 0;
 		fSize = 0;
 	}
@@ -285,8 +285,8 @@ StringList::Data*
 StringList::_CreateData(size_t size)
 {
 	if (size == 0) {
-		sEmptyData.Acquire();
-		return &sEmptyData;
+		Data::sEmptyData.Acquire();
+		return &Data::sEmptyData;
 	}
 
 	return Data::Create(_CapacityForSize(size));
