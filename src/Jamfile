@@ -41,6 +41,7 @@ SharedLibrary libham.so
 	# data
 	String.cpp
 	StringList.cpp
+	StringListOperations.cpp
 	Target.cpp
 	TargetPool.cpp
 	VariableScope.cpp

@@ -11,6 +11,7 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "data/StringListOperations.h"
 
 
 namespace ham {
@@ -236,7 +237,9 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 
 		// colon
 		if (colon != NULL) {
-			// TODO:...
+			data::StringListOperations operations;
+			if (operations.Parse(colon + 1, variableEnd))
+				variableValue = operations.Apply(variableValue);
 		}
 
 		return variableValue;
