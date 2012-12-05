@@ -179,7 +179,7 @@ StringList::Join() const
 		resultLength += ElementAt(i).Length();
 
 	// allocate buffer and compute result
-	String::Buffer* buffer = new String::Buffer(resultLength);
+	String::Buffer* buffer = String::Buffer::Create(resultLength);
 	size_t offset = 0;
 	for (size_t i = 0; i < size; i++) {
 		String element = ElementAt(i);

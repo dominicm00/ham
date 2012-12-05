@@ -11,12 +11,12 @@ namespace ham {
 namespace data {
 
 
-String::Buffer String::sEmptyBuffer(0);
+String::Buffer String::Buffer::sEmptyBuffer(0);
 
 
 String::String()
 	:
-	fBuffer(&sEmptyBuffer)
+	fBuffer(&Buffer::sEmptyBuffer)
 {
 	fBuffer->Acquire();
 }
@@ -74,7 +74,7 @@ String::operator+(const String& other) const
 	if (length == 0)
 		return other;
 
-	Buffer* buffer = new Buffer(length + otherLength);
+	Buffer* buffer = Buffer::Create(length + otherLength);
 	memcpy(buffer->fString, ToCString(), length);
 	memcpy(buffer->fString + length, other.fBuffer->fString, otherLength);
 
@@ -92,11 +92,11 @@ String::Buffer*
 String::_CreateBuffer(const char* string, size_t length)
 {
 	if (length == 0) {
-		sEmptyBuffer.Acquire();
-		return &sEmptyBuffer;
+		Buffer::sEmptyBuffer.Acquire();
+		return &Buffer::sEmptyBuffer;
 	}
 
-	Buffer* buffer = new Buffer(length);
+	Buffer* buffer = Buffer::Create(length);
 	memcpy(buffer->fString, string, length);
 	return buffer;
 }

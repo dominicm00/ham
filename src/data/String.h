@@ -58,18 +58,12 @@ private:
 			friend class StringList;
 
 			struct Buffer {
-				Buffer(size_t length)
-					:
-					fReferenceCount(1),
-					fString(new char[length + 1]),
-					fLength(length)
+				static Buffer* Create(size_t length)
 				{
-					fString[length] = '\0';
-				}
-
-				~Buffer()
-				{
-					delete[] fString;
+					void* memory = malloc(sizeof(Buffer) + length);
+					if (memory == NULL)
+						throw std::bad_alloc();
+					return new(memory) Buffer(length);
 				}
 
 				void Acquire()
@@ -80,13 +74,28 @@ private:
 				void Release()
 				{
 					if (__sync_fetch_and_sub(&fReferenceCount, 1) == 1)
-						delete this;
+						free(this);
+				}
+
+			private:
+				Buffer(size_t length)
+					:
+					fReferenceCount(1),
+					fLength(length)
+				{
+					fString[length] = '\0';
+				}
+
+				~Buffer()
+				{
 				}
 
 			public:
 				int		fReferenceCount;
-				char*	fString;
 				size_t	fLength;
+				char	fString[1];
+
+				static Buffer sEmptyBuffer;
 			};
 
 private:
@@ -97,8 +106,6 @@ private:
 
 private:
 			Buffer*				fBuffer;
-
-	static	Buffer				sEmptyBuffer;
 };
 
 
