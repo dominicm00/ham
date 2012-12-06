@@ -74,6 +74,7 @@ BinCommand ham-tests
 	ham-tests.cpp
 
 	StringListTest.cpp
+	StringPartTest.cpp
 	StringTest.cpp
 	VariableExpansionTest.cpp
 

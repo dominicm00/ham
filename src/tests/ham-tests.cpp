@@ -10,6 +10,7 @@
 #include "test/TestRunner.h"
 #include "test/TestSuite.h"
 #include "tests/StringListTest.h"
+#include "tests/StringPartTest.h"
 #include "tests/StringTest.h"
 #include "tests/VariableExpansionTest.h"
 
@@ -50,6 +51,7 @@ main(int argc, const char* const* argv)
 	test::TestSuite testSuite;
 	test::TestSuiteBuilder(testSuite)
 		.AddSuite("Data")
+			.Add<StringPartTest>()
 			.Add<StringTest>()
 			.Add<StringListTest>()
 		.End()

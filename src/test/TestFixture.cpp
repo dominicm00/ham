@@ -142,6 +142,14 @@ TestFixture::ValueToString<std::vector<std::string> >(
 
 template<>
 /*static*/ std::string
+TestFixture::ValueToString<data::StringPart>(const data::StringPart& value)
+{
+	return TestFixture::ValueToString(value.ToStlString());
+}
+
+
+template<>
+/*static*/ std::string
 TestFixture::ValueToString<data::String>(const data::String& value)
 {
 	return TestFixture::ValueToString(value.ToCString());
