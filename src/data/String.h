@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include <list>
+#include <ostream>
 #include <string>
 
 
@@ -125,11 +126,8 @@ using data::String;
 }	// namespace ham
 
 
-#include <ostream>
-
-//template<typename Stream>
-//Stream& operator<<(Stream& stream, const ham::data::String& string)
-static inline std::ostream& operator<<(std::ostream& stream, const ham::data::String& string)
+inline
+std::ostream& operator<<(std::ostream& stream, const ham::data::String& string)
 {
 	return stream << string.ToStlString();
 }
