@@ -115,10 +115,10 @@ StringListOperations::Parse(const char* start, const char* end)
 
 
 StringList
-StringListOperations::Apply(const StringList& list) const
+StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 {
 	if (!HasOperations())
-		return list;
+		return inputList;
 
 	bool hasPathPartOperation = (fOperations & PATH_PART_SELECTOR_MASK) != 0
 		|| (fOperations & PATH_PART_REPLACER_MASK) != 0;
@@ -126,12 +126,15 @@ StringListOperations::Apply(const StringList& list) const
 	StringList resultList;
 	StringBuffer buffer;
 
-	if ((fOperations & REPLACE_EMPTY) != 0) {
+	const StringList& list
+		= inputList.IsEmpty() && (fOperations & REPLACE_EMPTY) != 0
+			? StringList(String(fEmptyParameter)) : inputList;
+//	if ((fOperations & REPLACE_EMPTY) != 0) {
 // TODO: Empty first -- even before subscript?
 //REPLACE_EMPTY
-	}
+//	}
 
-	size_t count = list.Size();
+	size_t count = std::min(list.Size(), maxSize);
 	for (size_t i = 0; i < count; i++) {
 		String string = list.ElementAt(i);
 

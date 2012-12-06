@@ -222,6 +222,12 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			String(variableStart, variableNameEnd - variableStart));
 
 		// range subscripts
+		// The logical implementation would be to just limit variableValue to
+		// the sublist specified by the subscripts. But Jam implements them
+		// differently: The first subscript is applied, but from the second
+		// subscript a maximum list size is computed, which is applied only
+		// after the "E=..." operation has been applied.
+		size_t maxSize;
 		if (openingBracket != NULL) {
 			size_t firstIndex;
 			size_t endIndex;
@@ -230,10 +236,12 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 				return StringList();
 			}
 
-			variableValue = variableValue.SubList(firstIndex, endIndex);
-			if (variableValue.IsEmpty())
-				return variableValue;
-		}
+			if (firstIndex > 0)
+				variableValue = variableValue.SubList(firstIndex, endIndex);
+
+			maxSize = endIndex > firstIndex ? endIndex - firstIndex : 0;
+		} else
+			maxSize = std::numeric_limits<size_t>::max();
 
 		// colon
 		if (colon != NULL) {
@@ -248,8 +256,9 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			}
 
 			if (operations.HasOperations())
-				variableValue = operations.Apply(variableValue);
-		}
+				variableValue = operations.Apply(variableValue, maxSize);
+		} else if (maxSize < variableValue.Size())
+			variableValue = variableValue.SubList(0, maxSize);
 
 		return variableValue;
 	}

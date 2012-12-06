@@ -58,7 +58,8 @@ public:
 	inline	void				AddOperations(uint32_t operations)
 									{ fOperations |= operations; }
 
-			StringList			Apply(const StringList& list) const;
+			StringList			Apply(const StringList& list,
+									size_t maxSize) const;
 
 private:
 			struct PathParts;
