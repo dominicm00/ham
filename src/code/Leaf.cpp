@@ -174,7 +174,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// The syntax is:
 	//
 	// expansion			:= variableName [ "[" elementRange "]" ]
-	//							[ ":" variableModifiers ]
+	//							( ":" variableModifiers )*
 	// elementRange			:= elementIndex [ "-" [ elementIndex ] ]
 	// variableModifiers	:= variableSelector* [ variableSubstitution ]
 	// variableSelector		:= "B" | "S" | "M" | "D" | "P" | "G" | "U" | "L"
@@ -238,7 +238,16 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 		// colon
 		if (colon != NULL) {
 			data::StringListOperations operations;
-			if (operations.Parse(colon + 1, variableEnd))
+			for (;;) {
+				const char* colonEnd = std::find(colon, variableEnd, ':');
+				operations.Parse(colon + 1, colonEnd);
+				if (colonEnd == variableEnd)
+					break;
+
+				colon = colonEnd;
+			}
+
+			if (operations.HasOperations())
 				variableValue = operations.Apply(variableValue);
 		}
 

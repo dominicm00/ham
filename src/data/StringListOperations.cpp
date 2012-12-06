@@ -4,57 +4,90 @@
  */
 
 
-#include "StringListOperations.h"
+#include "data/StringListOperations.h"
 
 
 namespace ham {
 namespace data {
 
 
+// #pragma mark - PathParts
+
+
 struct StringListOperations::PathParts {
-// TODO:...
+	StringPart	fGrist;
+	StringPart	fRoot;
+	StringPart	fDirectory;
+	StringPart	fBaseName;
+	StringPart	fSuffix;
+	StringPart	fArchiveMember;
 };
 
 
-bool
+// #pragma mark - StringListOperations
+
+
+StringListOperations::StringListOperations()
+	:
+	fOperations(0),
+	fGristParameter(),
+	fDirectoryParameter(),
+	fBaseNameParameter(),
+	fSuffixParameter(),
+	fArchiveMemberParameter(),
+	fRootParameter(),
+	fEmptyParameter(),
+	fJoinParameter()
+{
+}
+
+
+void
 StringListOperations::Parse(const char* start, const char* end)
 {
-	Clear();
-
-	if (start == end)
-		return false;
-
 	uint32_t pendingOperation = 0;
+	StringPart* pendingParameter = NULL;
 
 	for (; start < end; start++) {
 		if (*start == '=') {
-			SetParameterOperation(pendingOperation & PARAMETER_OPERATION_MASK,
-				start + 1, end);
-			return HasOperations();
+			if (pendingParameter != NULL) {
+				pendingParameter->SetTo(start + 1, end);
+				AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
+			}
+			return;
 		}
 
-		AddOperations(pendingOperation | FLAGS_MASK);
+		AddOperations(pendingOperation | NO_PARAMETER_OPERATION_MASK);
 		pendingOperation = 0;
+		pendingParameter = NULL;
 
 		switch (*start) {
+			case 'G':
+				pendingOperation = SELECT_GRIST | REPLACE_GRIST;
+				pendingParameter = &fGristParameter;
+				break;
+			case 'R':
+				pendingOperation = SELECT_ROOT | REPLACE_ROOT;
+				break;
+			case 'P':
+				pendingOperation = SELECT_PARENT_DIRECTORY;
+				break;
+			case 'D':
+				pendingOperation = SELECT_DIRECTORY | REPLACE_DIRECTORY;
+				pendingParameter = &fDirectoryParameter;
+				break;
 			case 'B':
 				pendingOperation = SELECT_BASE_NAME | REPLACE_BASE_NAME;
+				pendingParameter = &fBaseNameParameter;
 				break;
 			case 'S':
 				pendingOperation = SELECT_SUFFIX | REPLACE_SUFFIX;
+				pendingParameter = &fSuffixParameter;
 				break;
 			case 'M':
 				pendingOperation = SELECT_ARCHIVE_MEMBER
 					| REPLACE_ARCHIVE_MEMBER;
-				break;
-			case 'D':
-				pendingOperation = SELECT_DIRECTORY | REPLACE_DIRECTORY;
-				break;
-			case 'G':
-				pendingOperation = SELECT_GRIST | REPLACE_GRIST;
-				break;
-			case 'P':
-				pendingOperation = SELECT_PARENT_DIRECTORY;
+				pendingParameter = &fArchiveMemberParameter;
 				break;
 			case 'U':
 				pendingOperation = TO_UPPER;
@@ -62,25 +95,21 @@ StringListOperations::Parse(const char* start, const char* end)
 			case 'L':
 				pendingOperation = TO_LOWER;
 				break;
-			case 'R':
-				pendingOperation = REPLACE_ROOT;
-				break;
 			case 'E':
 				pendingOperation = REPLACE_EMPTY;
 				break;
 			case 'J':
-				pendingOperation = JOIN | JOIN_NO_PARAMETER;
+				pendingOperation = JOIN;
+				pendingParameter = &fJoinParameter;
 				break;
 		}
 	}
 
-	if ((pendingOperation & PARAMETER_OPERATION_MASK) != 0) {
-		SetParameterOperation(pendingOperation & PARAMETER_OPERATION_MASK, end,
-			end);
+	if (pendingParameter != NULL) {
+		pendingParameter->SetTo(end, end);
+		AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 	} else
-		AddOperations(pendingOperation | FLAGS_MASK);
-
-	return HasOperations();
+		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 }
 
 
@@ -90,17 +119,22 @@ StringListOperations::Apply(const StringList& list) const
 	if (!HasOperations())
 		return list;
 
-	uint32_t parameterOperation = fOperations & PARAMETER_OPERATION_MASK;
 	bool hasPathPartOperation = (fOperations & PATH_PART_SELECTOR_MASK) != 0
-		|| (parameterOperation >= PATH_PART_REPLACER_MIN
-			&& parameterOperation >= PATH_PART_REPLACER_MAX);
+		|| (fOperations & PATH_PART_REPLACER_MASK) != 0;
 
-	// Handle element-wise operations. Join and replace empty are dealt with at
-	// the end.
+	StringList resultList;
+	StringBuffer buffer;
+
+	if ((fOperations & REPLACE_EMPTY) != 0) {
 // TODO: Empty first -- even before subscript?
+//REPLACE_EMPTY
+	}
+
 	size_t count = list.Size();
 	for (size_t i = 0; i < count; i++) {
 		String string = list.ElementAt(i);
+
+		size_t bufferSizeBeforeElement = buffer.Length();
 
 		// If any of the file name/path part selectors/replacers need to be
 		// applied, we disassemble the string, make the modifications, and
@@ -108,56 +142,145 @@ StringListOperations::Apply(const StringList& list) const
 		if (hasPathPartOperation) {
 			PathParts parts;
 			_DisassemblePath(string, parts);
-// TODO: Apply selectors/replacers!
-//				SELECT_BASE_NAME			= 0x0010,
-//				SELECT_SUFFIX				= 0x0020,
-//				SELECT_ARCHIVE_MEMBER		= 0x0040,
-//				SELECT_DIRECTORY			= 0x0080,
-//				SELECT_PARENT_DIRECTORY		= 0x0100,
-//				SELECT_GRIST				= 0x0200,
-//				REPLACE_GRIST				= 0x0001,
-//				REPLACE_DIRECTORY			= 0x0002,
-//				REPLACE_BASE_NAME			= 0x0003,
-//				REPLACE_SUFFIX				= 0x0004,
-//				REPLACE_ARCHIVE_MEMBER		= 0x0005,
-//				REPLACE_ROOT				= 0x0006,
-			string = _AssemblePath(parts);
-		}
 
-		if ((fOperations & TO_LOWER) != 0) {
-// TODO: Convert string to lower case!
-		}
+			if ((fOperations & REPLACE_GRIST) != 0)
+				parts.fGrist = fGristParameter;
+			else if ((fOperations & SELECT_GRIST) == 0)
+				parts.fGrist.Unset();
+
+			if ((fOperations & REPLACE_ROOT) != 0)
+				parts.fRoot = fRootParameter;
+			else if ((fOperations & SELECT_ROOT) == 0)
+				parts.fRoot.Unset();
+
+// TODO: SELECT_PARENT_DIRECTORY!
+			if ((fOperations & REPLACE_DIRECTORY) != 0)
+				parts.fDirectory = fDirectoryParameter;
+			else if ((fOperations & SELECT_DIRECTORY) == 0)
+				parts.fDirectory.Unset();
+
+			if ((fOperations & REPLACE_BASE_NAME) != 0)
+				parts.fBaseName = fBaseNameParameter;
+			else if ((fOperations & SELECT_BASE_NAME) == 0)
+				parts.fBaseName.Unset();
+
+			if ((fOperations & REPLACE_SUFFIX) != 0)
+				parts.fSuffix = fSuffixParameter;
+			else if ((fOperations & SELECT_SUFFIX) == 0)
+				parts.fSuffix.Unset();
+
+			if ((fOperations & REPLACE_ARCHIVE_MEMBER) != 0)
+				parts.fArchiveMember = fArchiveMemberParameter;
+			else if ((fOperations & SELECT_ARCHIVE_MEMBER) == 0)
+				parts.fArchiveMember.Unset();
+
+			_AssemblePath(parts, buffer);
+		} else
+			buffer += string;
 
 		if ((fOperations & TO_UPPER) != 0) {
-// TODO: Convert string to upper case!
+			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
+			char* end = buffer.Data() + buffer.Length();
+			std::transform(toConvert, end, toConvert, ::toupper);
+		} else if ((fOperations & TO_LOWER) != 0) {
+			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
+			char* end = buffer.Data() + buffer.Length();
+			std::transform(toConvert, end, toConvert, ::tolower);
+		}
+
+		if ((fOperations & JOIN) != 0) {
+			if (i > 0)
+				buffer += fJoinParameter;
+		} else {
+			resultList.Append(buffer);
+			buffer = StringPart();
 		}
 	}
 
-	if (parameterOperation == JOIN || (fOperations & JOIN_NO_PARAMETER) != 0) {
-// TODO: Join!
-	}
+	if (buffer.Length() > 0)
+		resultList.Append(buffer);
 
-	if ((fOperations & REPLACE_EMPTY) != 0) {
-
-	}
-
-// TODO:...
-	return list;
+	return resultList;
 }
 
 
 /*static*/ void
 StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 {
-// TODO:...
+	// TODO: This is platform dependent!
+
+	const char* remainder = path.ToCString();
+	const char* pathEnd = remainder + path.Length();
+
+	// grist
+	if (*remainder == '<') {
+		const char* gristStart = remainder;
+		for (remainder++; *remainder != '\0'; remainder++) {
+			if (*remainder == '>') {
+				remainder++;
+				break;
+			}
+		}
+
+		_parts.fGrist.SetTo(gristStart, remainder);
+	} else
+		_parts.fGrist.Unset();
+
+	// root
+	_parts.fRoot.Unset();
+
+	// directory path
+	if (const char* lastSlash = strrchr(remainder, '/')) {
+		if (lastSlash == remainder)
+		_parts.fDirectory.SetTo(remainder,
+			lastSlash == remainder ? remainder + 1 : lastSlash);
+		remainder = lastSlash + 1;
+	} else
+		_parts.fDirectory.Unset();
+
+	// archive member
+	const char* archiveMemberStart = NULL;
+	if (remainder != pathEnd && pathEnd[-1] == ')')
+		archiveMemberStart = strchr(remainder, '(');
+	if (archiveMemberStart != NULL)
+		_parts.fArchiveMember.SetTo(archiveMemberStart, pathEnd);
+	else
+		_parts.fArchiveMember.Unset();
+
+	// suffix
+	const char* fileNameEnd = archiveMemberStart != NULL
+		? archiveMemberStart : pathEnd;
+	typedef std::reverse_iterator<const char*> ReverseStringIterator;
+	const char* lastDot = std::find(ReverseStringIterator(remainder),
+		ReverseStringIterator(fileNameEnd), '.').base() + 1;
+	if (*lastDot == '.') {
+		_parts.fSuffix.SetTo(lastDot, fileNameEnd);
+		fileNameEnd = lastDot;
+	} else
+		_parts.fSuffix.Unset();
+
+	// base name
+	_parts.fBaseName.SetTo(remainder, fileNameEnd);
 }
 
 
-/*static*/ String
-StringListOperations::_AssemblePath(const PathParts& parts)
+/*static*/ void
+StringListOperations::_AssemblePath(const PathParts& parts,
+	StringBuffer& buffer)
 {
-// TODO:...
-return String();
+	// TODO: This is platform dependent!
+
+	buffer += parts.fRoot;
+	buffer += parts.fDirectory;
+	if (!parts.fDirectory.IsEmpty() && parts.fDirectory != StringPart("/", 1)
+		&& (!parts.fBaseName.IsEmpty() || !parts.fSuffix.IsEmpty()
+			|| !parts.fArchiveMember.IsEmpty())) {
+		buffer += '/';
+	}
+
+	buffer += parts.fBaseName;
+	buffer += parts.fSuffix;
+	buffer += parts.fArchiveMember;
 }
 
 
