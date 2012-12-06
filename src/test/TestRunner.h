@@ -72,6 +72,8 @@ private:
 			TestEnvironment*	fEnvironment;
 			RunnableTest*		fCurrentTest;
 			void*				fCurrentTestFixture;
+			size_t				fPassedTests;
+			size_t				fFailedTests;
 };
 
 

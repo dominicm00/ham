@@ -68,6 +68,8 @@ void
 TestRunner::Run(TestEnvironment* environment)
 {
 	fEnvironment = environment;
+	fPassedTests = 0;
+	fFailedTests = 0;
 
 	for (TestIdentifierList::const_iterator it = fTestsToRun.begin();
 		it != fTestsToRun.end(); ++it) {
@@ -77,6 +79,11 @@ TestRunner::Run(TestEnvironment* environment)
 	_CleanupFixture();
 
 	fEnvironment = NULL;
+
+	size_t totalTests = fPassedTests + fFailedTests;
+	printf("--------\n");
+	printf("Summary: %zu tests run, %zu passed, %zu failed\n", totalTests,
+		fPassedTests, fFailedTests);
 }
 
 
@@ -115,8 +122,10 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 		fflush(stdin);
 		_InitFixture(test);
 		test->RunTestCase(fEnvironment, fCurrentTestFixture, testCase);
+		fPassedTests++;
 		printf("PASSED\n");
 	} catch (TestException& exception) {
+		fFailedTests++;
 		printf("FAILED\n");
 		printf("%s:%d:\n  %s\n", exception.File(), exception.Line(),
 			exception.Message().c_str());
