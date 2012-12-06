@@ -88,6 +88,21 @@ String::String(String::Buffer* buffer)
 }
 
 
+/*static*/ String
+String::_Concatenate(const char* string1, size_t length1, const char* string2,
+	size_t length2)
+{
+	if (length1 == 0 && length2 == 0)
+		return String();
+
+	Buffer* buffer = Buffer::Create(length1 + length2);
+	memcpy(buffer->fString, string1, length1);
+	memcpy(buffer->fString + length1, string2, length2);
+
+	return String(buffer);
+}
+
+
 String::Buffer*
 String::_CreateBuffer(const char* string, size_t length)
 {

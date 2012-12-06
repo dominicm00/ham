@@ -12,6 +12,8 @@
 #include <ostream>
 #include <string>
 
+#include "data/StringPart.h"
+
 
 namespace ham {
 namespace data {
@@ -54,6 +56,11 @@ public:
 
 			String&				operator=(const String& other);
 			String				operator+(const String& other) const;
+	inline	String				operator+(const StringPart& other) const;
+	friend	String				operator+(const StringPart& string1,
+									const String& string2);
+	friend	String				operator+(const StringPart& string1,
+									const StringPart& string2);
 
 private:
 			friend class StringList;
@@ -102,6 +109,10 @@ private:
 private:
 								String(Buffer* buffer);
 
+	static	String				_Concatenate(const char* string1,
+									size_t length1, const char* string2,
+									size_t length2);
+
 	inline	Buffer*				_CreateBuffer(const char* string,
 									size_t length);
 
@@ -114,6 +125,33 @@ inline int
 String::CompareWith(const String& other) const
 {
 	return strcmp(ToCString(), other.ToCString());
+}
+
+
+inline String
+String::operator+(const StringPart& other) const
+{
+	if (other.IsEmpty())
+		return *this;
+	return _Concatenate(ToCString(), Length(), other.Start(), other.Length());
+}
+
+
+inline String
+operator+(const StringPart& string1, const String& string2)
+{
+	if (string1.IsEmpty())
+		return string2;
+	return String::_Concatenate(string1.Start(), string1.Length(),
+		string2.ToCString(), string2.Length());
+}
+
+
+inline String
+operator+(const StringPart& string1, const StringPart& string2)
+{
+	return String::_Concatenate(string1.Start(), string1.Length(),
+		string2.Start(), string2.Length());
 }
 
 

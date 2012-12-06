@@ -175,17 +175,65 @@ StringTest::Concatenation()
 		const char* testString1 = testData[i].string1;
 		const char* testString2 = testData[i].string2;
 		for (int k = 0; k < 2; k++) {
-			String string1(testString1);
-			String string2(testString2);
-			STRING_EQUAL(string1, testString1)
-			STRING_EQUAL(string2, testString2)
+			std::string stlTestString1 = std::string(testString1) + "xxx";
+			std::string stlTestString2 = std::string(testString2) + "zzz";
+			std::string testString3 = std::string(testString1) + testString2;
 
-			String string3 = string1 + string2;
+			// String + String
+			{
+				String string1(testString1);
+				String string2(testString2);
+				STRING_EQUAL(string1, testString1)
+				STRING_EQUAL(string2, testString2)
 
-			STRING_EQUAL(string1, testString1)
-			STRING_EQUAL(string2, testString2)
-			STRING_EQUAL(string3,
-				(std::string(testString1) + std::string(testString2)).c_str())
+				String string3 = string1 + string2;
+
+				STRING_EQUAL(string1, testString1)
+				STRING_EQUAL(string2, testString2)
+				STRING_EQUAL(string3, testString3.c_str())
+			}
+
+			// String + StringPart
+			{
+				String string1(testString1);
+				StringPart string2(stlTestString2.c_str(), strlen(testString2));
+				STRING_EQUAL(string1, testString1)
+				HAM_TEST_EQUAL(string2.ToStlString(), testString2)
+
+				String string3 = string1 + string2;
+
+				STRING_EQUAL(string1, testString1)
+				HAM_TEST_EQUAL(string2.ToStlString(), testString2)
+				STRING_EQUAL(string3, testString3.c_str())
+			}
+
+			// StringPart + String
+			{
+				StringPart string1(stlTestString1.c_str(), strlen(testString1));
+				String string2(testString2);
+				HAM_TEST_EQUAL(string1.ToStlString(), testString1)
+				STRING_EQUAL(string2, testString2)
+
+				String string3 = string1 + string2;
+
+				HAM_TEST_EQUAL(string1.ToStlString(), testString1)
+				STRING_EQUAL(string2, testString2)
+				STRING_EQUAL(string3, testString3.c_str())
+			}
+
+			// StringPart + StringPart
+			{
+				StringPart string1(stlTestString1.c_str(), strlen(testString1));
+				StringPart string2(stlTestString2.c_str(), strlen(testString2));
+				HAM_TEST_EQUAL(string1.ToStlString(), testString1)
+				HAM_TEST_EQUAL(string2.ToStlString(), testString2)
+
+				String string3 = string1 + string2;
+
+				HAM_TEST_EQUAL(string1.ToStlString(), testString1)
+				HAM_TEST_EQUAL(string2.ToStlString(), testString2)
+				STRING_EQUAL(string3, testString3.c_str())
+			}
 
 			std::swap(testString1, testString2);
 		}
