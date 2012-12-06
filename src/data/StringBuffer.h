@@ -22,12 +22,19 @@ public:
 	inline						~StringBuffer();
 
 	inline	const char*			Data() const;
+	inline	char*				Data();
 	inline	size_t				Length() const;
 
+	inline	StringBuffer&		Append(const char* string, size_t length);
+
 	inline	StringBuffer&		operator=(const StringBuffer& other);
+	inline	StringBuffer&		operator=(const StringPart& string);
+	inline	StringBuffer&		operator=(const String& string);
 
 	inline	StringBuffer&		operator+=(char c);
 	inline	StringBuffer&		operator+=(const StringBuffer& other);
+	inline	StringBuffer&		operator+=(const StringPart& string);
+	inline	StringBuffer&		operator+=(const String& string);
 
 	inline	bool				operator==(const StringBuffer& other) const;
 	inline	bool				operator!=(const StringBuffer& other) const;
@@ -78,6 +85,13 @@ StringBuffer::Data() const
 }
 
 
+char*
+StringBuffer::Data()
+{
+	return &fData[0];
+}
+
+
 size_t
 StringBuffer::Length() const
 {
@@ -86,9 +100,40 @@ StringBuffer::Length() const
 
 
 StringBuffer&
+StringBuffer::Append(const char* string, size_t length)
+{
+	if (length > 0) {
+		size_t newSize = fData.size() + length;
+		if (newSize > fData.capacity())
+			fData.reserve(std::max(newSize * 2, (size_t)MIN_BUFFER_SIZE));
+
+		fData.append(string, string + length);
+	}
+
+	return *this;
+}
+
+
+StringBuffer&
 StringBuffer::operator=(const StringBuffer& other)
 {
 	fData = other.fData;
+	return *this;
+}
+
+
+StringBuffer&
+StringBuffer::operator=(const StringPart& string)
+{
+	fData = string.ToStlString();
+	return *this;
+}
+
+
+StringBuffer&
+StringBuffer::operator=(const String& string)
+{
+	fData = string.ToStlString();
 	return *this;
 }
 
@@ -108,12 +153,21 @@ StringBuffer::operator+=(char c)
 StringBuffer&
 StringBuffer::operator+=(const StringBuffer& other)
 {
-	size_t newSize = fData.size() + other.fData.size();
-	if (newSize > fData.capacity())
-		fData.reserve(std::max(newSize * 2, (size_t)MIN_BUFFER_SIZE));
+	return Append(other.Data(), other.Length());
+}
 
-	fData += other.fData;
-	return *this;
+
+StringBuffer&
+StringBuffer::operator+=(const StringPart& string)
+{
+	return Append(string.Start(), string.Length());
+}
+
+
+StringBuffer&
+StringBuffer::operator+=(const String& string)
+{
+	return Append(string.ToCString(), string.Length());
 }
 
 
@@ -165,6 +219,11 @@ operator<<(Output& out, const StringBuffer& buffer)
 
 
 }	// namespace data
+
+
+using data::StringBuffer;
+
+
 }	// namespace ham
 
 
