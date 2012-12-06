@@ -26,10 +26,11 @@ public:
 			void				None();
 			void				Simple();
 			void				Subscripts();
+			void				Operations();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(VariableExpansionTest, 3,
-		None, Simple, Subscripts)
+	HAM_ADD_TEST_CASES(VariableExpansionTest, 4,
+		None, Simple, Subscripts, Operations)
 
 private:
 			StringList			_Evaluate(const String& string);

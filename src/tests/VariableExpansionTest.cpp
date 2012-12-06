@@ -189,6 +189,23 @@ VariableExpansionTest::Subscripts()
 }
 
 
+void
+VariableExpansionTest::Operations()
+{
+	struct TestData {
+		const char*	string;
+		StringList	result;
+	};
+
+	const TestData testData[] = {
+		{ "$(undefined:E=foo)",			MakeStringList("foo") },
+	};
+
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++)
+		HAM_TEST_EQUAL(_Evaluate(testData[i].string), testData[i].result)
+}
+
+
 StringList
 VariableExpansionTest::_Evaluate(const String& string)
 {
