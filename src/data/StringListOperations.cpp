@@ -57,7 +57,7 @@ StringListOperations::Parse(const char* start, const char* end)
 			return;
 		}
 
-		AddOperations(pendingOperation | NO_PARAMETER_OPERATION_MASK);
+		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 		pendingOperation = 0;
 		pendingParameter = NULL;
 
@@ -97,6 +97,7 @@ StringListOperations::Parse(const char* start, const char* end)
 				break;
 			case 'E':
 				pendingOperation = REPLACE_EMPTY;
+				pendingParameter = &fEmptyParameter;
 				break;
 			case 'J':
 				pendingOperation = JOIN;
