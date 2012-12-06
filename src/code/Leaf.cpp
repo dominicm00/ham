@@ -239,7 +239,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 		if (colon != NULL) {
 			data::StringListOperations operations;
 			for (;;) {
-				const char* colonEnd = std::find(colon, variableEnd, ':');
+				const char* colonEnd = std::find(colon + 1, variableEnd, ':');
 				operations.Parse(colon + 1, colonEnd);
 				if (colonEnd == variableEnd)
 					break;
