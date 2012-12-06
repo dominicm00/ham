@@ -106,6 +106,121 @@ ham::tests::StringPartTest::Constructor()
 
 
 void
+StringPartTest::SetTo()
+{
+	// Unset()
+	{
+		StringPart string;
+		STRING_EQUAL(string, "")
+		string.Unset();
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("foo");
+		STRING_EQUAL(string, "foo")
+		string.Unset();
+		STRING_EQUAL(string, "")
+	}
+
+	// SetTo(const char*)
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		string.SetTo("");
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("foo");
+		STRING_EQUAL(string, "foo")
+		string.SetTo("");
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		string.SetTo("foo");
+		STRING_EQUAL(string, "foo")
+	}
+
+	{
+		StringPart string("bar");
+		STRING_EQUAL(string, "bar")
+		string.SetTo("foo");
+		STRING_EQUAL(string, "foo")
+	}
+
+	// SetTo(const char*, const char*)
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		const char* testString = "foobar";
+		string.SetTo(testString, testString);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("bar");
+		STRING_EQUAL(string, "bar")
+		const char* testString = "foobar";
+		string.SetTo(testString, testString);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		const char* testString = "foobar";
+		string.SetTo(testString, testString + 4);
+		STRING_EQUAL(string, "foob")
+	}
+
+	{
+		StringPart string("bar");
+		STRING_EQUAL(string, "bar")
+		const char* testString = "foobar";
+		string.SetTo(testString, testString + 4);
+		STRING_EQUAL(string, "foob")
+	}
+
+	// SetTo(const char*, size_t)
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		const char* testString = "foobar";
+		string.SetTo(testString, (size_t)0);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("bar");
+		STRING_EQUAL(string, "bar")
+		const char* testString = "foobar";
+		string.SetTo(testString, (size_t)0);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart string("");
+		STRING_EQUAL(string, "")
+		const char* testString = "foobar";
+		string.SetTo(testString, 4);
+		STRING_EQUAL(string, "foob")
+	}
+
+	{
+		StringPart string("bar");
+		STRING_EQUAL(string, "bar")
+		const char* testString = "foobar";
+		string.SetTo(testString, 4);
+		STRING_EQUAL(string, "foob")
+	}
+}
+
+
+void
 StringPartTest::Comparison()
 {
 	struct TestData {

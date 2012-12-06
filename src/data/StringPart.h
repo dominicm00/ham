@@ -19,7 +19,7 @@ namespace data {
 class StringPart {
 public:
 								StringPart()
-									{ SetTo(NULL, (const char*)NULL); }
+									{ Unset(); }
 	explicit					StringPart(const char* string)
 									{ SetTo(string, strlen(string)); }
 								StringPart(const char* start, const char* end)
@@ -29,8 +29,10 @@ public:
 								StringPart(const StringPart& other)
 									{ *this = other; }
 
+			void				SetTo(const char* string);
 			void				SetTo(const char* start, const char* end);
 			void				SetTo(const char* start, size_t length);
+			void				Unset();
 
 			std::string			ToStlString() const;
 
@@ -67,6 +69,13 @@ private:
 
 
 inline void
+StringPart::SetTo(const char* string)
+{
+	SetTo(string, strlen(string));
+}
+
+
+inline void
 StringPart::SetTo(const char* start, const char* end)
 {
 	fStart = start;
@@ -79,6 +88,14 @@ StringPart::SetTo(const char* start, size_t length)
 {
 	fStart = start;
 	fEnd = start + length;
+}
+
+
+inline void
+StringPart::Unset()
+{
+	fStart = NULL;
+	fEnd = NULL;
 }
 
 
