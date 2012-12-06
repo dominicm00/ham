@@ -27,6 +27,7 @@ public:
 								String();
 								String(const char* string);
 								String(const char* string, size_t maxLength);
+	explicit					String(const StringPart& string);
 								String(const String& other);
 								~String();
 
@@ -55,6 +56,8 @@ public:
 									{ return !(*this < other); }
 
 			String&				operator=(const String& other);
+			String&				operator=(const StringPart& string)
+									{ return *this = String(string); }
 			String				operator+(const String& other) const;
 	inline	String				operator+(const StringPart& other) const;
 	friend	String				operator+(const StringPart& string1,

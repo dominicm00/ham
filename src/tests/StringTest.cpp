@@ -76,6 +76,31 @@ ham::tests::StringTest::Constructor()
 		STRING_EQUAL(string, "fooba")
 	}
 
+	// (const StringPart&) constructor
+	{
+		StringPart stringPart;
+		String string(stringPart);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart stringPart("foo", (size_t)0);
+		String string(stringPart);
+		STRING_EQUAL(string, "")
+	}
+
+	{
+		StringPart stringPart("foo");
+		String string(stringPart);
+		STRING_EQUAL(string, "foo")
+	}
+
+	{
+		StringPart stringPart("foobar", (size_t)4);
+		String string(stringPart);
+		STRING_EQUAL(string, "foob")
+	}
+
 	// copy constructor
 	{
 		String string1;
@@ -136,6 +161,7 @@ StringTest::Assignment()
 		{ "foobar",	"foo" }
 	};
 
+	// =(const String&)
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* testString1 = testData[i].string1;
 		const char* testString2 = testData[i].string2;
@@ -148,6 +174,25 @@ StringTest::Assignment()
 			string1 = string2;
 			STRING_EQUAL(string1, testString2)
 			STRING_EQUAL(string2, testString2)
+
+			std::swap(testString1, testString2);
+		}
+	}
+
+	// =(const StringPart&)
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
+		const char* testString1 = testData[i].string1;
+		const char* testString2 = testData[i].string2;
+		for (int k = 0; k < 2; k++) {
+			String string1(testString1);
+			std::string stlTestString2 = std::string(testString2) + "xxx";
+			StringPart string2(stlTestString2.c_str(), strlen(testString2));
+			STRING_EQUAL(string1, testString1)
+			HAM_TEST_EQUAL(string2.ToStlString(), testString2)
+
+			string1 = string2;
+			STRING_EQUAL(string1, testString2)
+			HAM_TEST_EQUAL(string2.ToStlString(), testString2)
 
 			std::swap(testString1, testString2);
 		}

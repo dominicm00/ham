@@ -35,6 +35,12 @@ String::String(const char* string, size_t maxLength)
 {
 }
 
+String::String(const StringPart& string)
+	:
+	fBuffer(_CreateBuffer(string.Start(), string.Length()))
+{
+}
+
 
 String::String(const String& other)
 	:
