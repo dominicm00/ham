@@ -190,7 +190,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 		}
 
 		if ((fOperations & JOIN) != 0) {
-			if (i > 0)
+			if (i + 1 < count)
 				buffer += fJoinParameter;
 		} else {
 			resultList.Append(buffer);
@@ -198,7 +198,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 		}
 	}
 
-	if (buffer.Length() > 0)
+	if ((fOperations & JOIN) != 0 && count > 0)
 		resultList.Append(buffer);
 
 	return resultList;
