@@ -232,7 +232,6 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 
 	// directory path
 	if (const char* lastSlash = strrchr(remainder, '/')) {
-		if (lastSlash == remainder)
 		_parts.fDirectory.SetTo(remainder,
 			lastSlash == remainder ? remainder + 1 : lastSlash);
 		remainder = lastSlash + 1;
