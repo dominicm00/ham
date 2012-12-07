@@ -274,6 +274,7 @@ StringListOperations::_AssemblePath(const PathParts& parts,
 {
 	// TODO: This is platform dependent!
 
+	buffer += parts.fGrist;
 	buffer += parts.fRoot;
 	buffer += parts.fDirectory;
 	if (!parts.fDirectory.IsEmpty() && parts.fDirectory != StringPart("/", 1)
