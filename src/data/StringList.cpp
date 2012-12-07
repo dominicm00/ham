@@ -129,24 +129,25 @@ StringList::CompareWith(const StringList& other) const
 }
 
 
-void
+StringList&
 StringList::Append(const String& string)
 {
 	_Detach(fSize + 1);
 	fData->ConstructElement(fSize, string);
 	fData->fSize = ++fSize;
+	return *this;
 }
 
 
-void
+StringList&
 StringList::Append(const StringList& list)
 {
 	if (list.IsEmpty())
-		return;
+		return *this;
 
 	if (IsEmpty()) {
 		*this = list;
-		return;
+		return *this;
 	}
 
 	// Note: This also works for &list == this, since effectively the list
@@ -157,6 +158,7 @@ StringList::Append(const StringList& list)
 		fData->ConstructElement(fSize + i, list.ElementAt(i));
 	fSize += otherSize;
 	fData->fSize = fSize;
+	return *this;
 }
 
 

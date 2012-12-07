@@ -55,8 +55,8 @@ public:
 
 			int					CompareWith(const StringList& other) const;
 
-			void				Append(const String& string);
-			void				Append(const StringList& list);
+			StringList&			Append(const String& string);
+			StringList&			Append(const StringList& list);
 			void				Clear()
 									{ *this = kFalse; }
 
