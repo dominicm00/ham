@@ -129,10 +129,6 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 	const StringList& list
 		= inputList.IsEmpty() && (fOperations & REPLACE_EMPTY) != 0
 			? StringList(String(fEmptyParameter)) : inputList;
-//	if ((fOperations & REPLACE_EMPTY) != 0) {
-// TODO: Empty first -- even before subscript?
-//REPLACE_EMPTY
-//	}
 
 	size_t count = std::min(list.Size(), maxSize);
 	for (size_t i = 0; i < count; i++) {
