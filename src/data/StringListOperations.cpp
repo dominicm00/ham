@@ -106,11 +106,12 @@ StringListOperations::Parse(const char* start, const char* end)
 		}
 	}
 
-	if (pendingParameter != NULL) {
+	if ((pendingOperation & NO_PARAMETER_OPERATION_MASK) != 0) {
+		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
+	} else if (pendingParameter != NULL) {
 		pendingParameter->SetTo(end, end);
 		AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
-	} else
-		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
+	}
 }
 
 
