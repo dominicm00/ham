@@ -27,10 +27,13 @@ public:
 			void				Simple();
 			void				Subscripts();
 			void				Operations();
+			void				PathOperationsEmpty();
+			void				PathOperationsNoGristNoArchive();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(VariableExpansionTest, 4,
-		None, Simple, Subscripts, Operations)
+	HAM_ADD_TEST_CASES(VariableExpansionTest, 6,
+		None, Simple, Subscripts, Operations, PathOperationsEmpty,
+		PathOperationsNoGristNoArchive)
 
 private:
 			StringList			_Evaluate(const String& string);
