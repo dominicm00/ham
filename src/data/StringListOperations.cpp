@@ -253,9 +253,9 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 	const char* fileNameEnd = archiveMemberStart != NULL
 		? archiveMemberStart : pathEnd;
 	typedef std::reverse_iterator<const char*> ReverseStringIterator;
-	const char* lastDot = std::find(ReverseStringIterator(remainder),
-		ReverseStringIterator(fileNameEnd), '.').base() + 1;
-	if (*lastDot == '.') {
+	const char* lastDot = std::find(ReverseStringIterator(fileNameEnd),
+		ReverseStringIterator(remainder), '.').base() - 1;
+	if (lastDot != remainder - 1) {
 		_parts.fSuffix.SetTo(lastDot, fileNameEnd);
 		fileNameEnd = lastDot;
 	} else
