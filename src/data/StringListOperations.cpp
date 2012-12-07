@@ -154,11 +154,13 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 			else if ((fOperations & SELECT_ROOT) == 0)
 				parts.fRoot.Unset();
 
-// TODO: SELECT_PARENT_DIRECTORY!
+			// TODO: Correct handling of SELECT_PARENT_DIRECTORY!
 			if ((fOperations & REPLACE_DIRECTORY) != 0)
 				parts.fDirectory = fDirectoryParameter;
-			else if ((fOperations & SELECT_DIRECTORY) == 0)
+			else if ((fOperations
+					& (SELECT_DIRECTORY | SELECT_PARENT_DIRECTORY)) == 0) {
 				parts.fDirectory.Unset();
+			}
 
 			if ((fOperations & REPLACE_BASE_NAME) != 0)
 				parts.fBaseName = fBaseNameParameter;
