@@ -35,11 +35,16 @@ value_container_to_string(const Container& value)
 TestFixture::MakeStringList(const char* element1, const char* element2,
 	const char* element3, const char* element4, const char* element5,
 	const char* element6, const char* element7, const char* element8,
-	const char* element9, const char* element10)
+	const char* element9, const char* element10, const char* element11,
+	const char* element12, const char* element13, const char* element14,
+	const char* element15, const char* element16, const char* element17,
+	const char* element18, const char* element19, const char* element20)
 {
 	const char* const elements[] = {
 		element1, element2, element3, element4, element5, element6, element7,
-		element8, element9, element10
+		element8, element9, element10, element11, element12, element13,
+		element14, element15, element16, element17, element18, element19,
+		element20
 	};
 
 	data::StringList list;

@@ -27,7 +27,17 @@ public:
 									const char* element7 = NULL,
 									const char* element8 = NULL,
 									const char* element9 = NULL,
-									const char* element10 = NULL);
+									const char* element10 = NULL,
+									const char* element11 = NULL,
+									const char* element12 = NULL,
+									const char* element13 = NULL,
+									const char* element14 = NULL,
+									const char* element15 = NULL,
+									const char* element16 = NULL,
+									const char* element17 = NULL,
+									const char* element18 = NULL,
+									const char* element19 = NULL,
+									const char* element20 = NULL);
 	static	data::StringList	MakeStringList(
 									const std::vector<std::string>& testList);
 	static	data::StringListList MakeStringListList(
@@ -157,8 +167,8 @@ public:																\
 		const _TestExpectedType& _testExpected = expected;					\
 		if (_testActual != _testExpected) {									\
 			throw test::TestException(__FILE__, __LINE__,					\
-				"Test comparison failed: expected: \"%s\", "				\
-				"actual: \"%s\" (\"%s\")",									\
+				"Test comparison failed:\n  expected: \"%s\"\n"				\
+				"  actual:   \"%s\" (\"%s\")",								\
 				test::TestFixture::ValueToString(_testExpected).c_str(),	\
 				test::TestFixture::ValueToString(_testActual).c_str(),		\
 				#actual);													\
