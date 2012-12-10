@@ -218,12 +218,9 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 	// grist
 	if (*remainder == '<') {
 		const char* gristStart = remainder;
-		for (remainder++; *remainder != '\0'; remainder++) {
-			if (*remainder == '>') {
-				remainder++;
-				break;
-			}
-		}
+		remainder = std::find(remainder + 1, pathEnd, '>');
+		if (remainder != pathEnd)
+			remainder++;
 
 		_parts.fGrist.SetTo(gristStart, remainder);
 	} else
