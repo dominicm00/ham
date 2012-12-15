@@ -1,10 +1,12 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "code/EvaluationContext.h"
+
+#include <iostream>
 
 
 namespace ham {
@@ -19,7 +21,9 @@ EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 	fGlobalScope(&fRootScope),
 	fLocalScope(NULL),
 	fTargets(targets),
-	fJumpCondition(JUMP_CONDITION_NONE)
+	fJumpCondition(JUMP_CONDITION_NONE),
+	fOutput(&std::cout),
+	fErrorOutput(&std::cerr)
 {
 }
 

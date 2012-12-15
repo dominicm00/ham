@@ -1,10 +1,12 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_EVALUATION_CONTEXT_H
 #define HAM_CODE_EVALUATION_CONTEXT_H
 
+
+#include <ostream>
 
 #include "code/Defs.h"
 #include "code/RulePool.h"
@@ -51,6 +53,15 @@ public:
 			void				SetJumpCondition(JumpCondition condition)
 									{ fJumpCondition = condition; }
 
+			std::ostream&		Output() const
+									{ return *fOutput; }
+			void				SetOutput(std::ostream& output)
+									{ fOutput = &output; }
+			std::ostream&		ErrorOutput() const
+									{ return *fErrorOutput; }
+			void				SetErrorOutput(std::ostream& output)
+									{ fErrorOutput = &output; }
+
 private:
 			data::VariableDomain& fGlobalVariables;
 			data::VariableScope	fRootScope;
@@ -59,6 +70,8 @@ private:
 			data::TargetPool&	fTargets;
 			RulePool			fRules;
 			JumpCondition		fJumpCondition;
+			std::ostream*		fOutput;
+			std::ostream*		fErrorOutput;
 };
 
 
