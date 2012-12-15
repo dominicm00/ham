@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,8 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "code/Rule.h"
+#include "code/RuleInstructions.h"
 
 
 namespace ham {
@@ -39,9 +41,36 @@ FunctionCall::~FunctionCall()
 StringList
 FunctionCall::Evaluate(EvaluationContext& context)
 {
-//		StringList functions = fFunction->Evaluate(context);
-// TODO: Call each function. Concatenate the results.
-	return StringList::False();
+	// evaluate arguments
+	StringListList arguments;
+	size_t argumentCount = fArguments.size();
+	arguments.resize(argumentCount);
+
+	size_t argumentIndex = 0;
+	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
+			++it) {
+		arguments[argumentIndex++] = (*it)->Evaluate(context);
+	}
+
+	// Call functions with arguments and concatenate the results.
+	StringList result;
+	StringList functions = fFunction->Evaluate(context);
+	size_t functionCount = functions.Size();
+	RulePool& rulePool = context.Rules();
+
+	for (size_t i = 0; i < functionCount; i++) {
+		Rule* function = rulePool.Lookup(functions.ElementAt(i));
+		if (function == NULL) {
+			context.ErrorOutput() << "warning: unknown rule "
+				<< functions.ElementAt(i) << std::endl;
+			continue;
+		}
+
+		result.Append(function->Instructions()->Evaluate(context, arguments));
+// TODO: Handle the actions!
+	}
+
+	return result;
 }
 
 
