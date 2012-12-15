@@ -17,6 +17,7 @@ SharedLibrary libham.so
 	Assignment.cpp
 	BinaryExpression.cpp
 	Block.cpp
+	BuiltInRules.cpp
 	Case.cpp
 	DumpContext.cpp
 	EvaluationContext.cpp
