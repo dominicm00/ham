@@ -23,8 +23,7 @@ public:
 									Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context,
-									const StringList* parameters,
-									size_t parameterCount);
+									const StringListList& parameters);
 
 private:
 			StringList			fParameterNames;

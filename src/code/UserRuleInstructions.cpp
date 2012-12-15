@@ -31,13 +31,14 @@ UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
 
 StringList
 UserRuleInstructions::Evaluate(EvaluationContext& context,
-	const StringList* parameters, size_t parameterCount)
+	const StringListList& parameters)
 {
 	// prepare the local variable scope
 	data::VariableDomain localVariables;
 	data::VariableScope localScope(localVariables, NULL);
 
 	// set the number parameters ($(1) ... $(n))
+	size_t parameterCount = parameters.size();
 	for (size_t i = 0; i < parameterCount; i++) {
 		if (!parameters[i].IsEmpty()) {
 			char parameterName[16];

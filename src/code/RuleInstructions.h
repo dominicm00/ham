@@ -21,8 +21,7 @@ public:
 	virtual						~RuleInstructions();
 
 	virtual	StringList			Evaluate(EvaluationContext& context,
-									const StringList* parameters,
-									size_t parameterCount) = 0;
+									const StringListList& parameters) = 0;
 };
 
 
