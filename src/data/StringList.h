@@ -10,8 +10,8 @@
 
 #include <stdlib.h>
 
-#include <list>
 #include <new>
+#include <vector>
 
 
 namespace ham {
@@ -19,7 +19,7 @@ namespace data {
 
 
 class StringList;
-typedef std::list<StringList> StringListList;
+typedef std::vector<StringList> StringListList;
 
 
 class StringList {
