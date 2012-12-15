@@ -24,9 +24,12 @@ RunnableTest::TestCaseAt(int index, bool fullyQualified) const
 	if (index < 0 || (size_t)index >= fTestCaseNames.size())
 		return std::string();
 
-	return fullyQualified
-		? FullyQualifiedName() + "::" + fTestCaseNames[index]
-		: fTestCaseNames[index];
+	const std::string& testCaseName = fTestCaseNames[index];
+	if (!fullyQualified)
+		return testCaseName;
+
+	std::string testName = FullyQualifiedName();
+	return testCaseName.empty() ? testName : testName + "::" + testCaseName;
 }
 
 
