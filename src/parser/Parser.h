@@ -34,7 +34,11 @@ public:
 public:
 								Parser();
 
-			code::Block*		Parse(const InputIteratorType& start, const InputIteratorType& end);
+			code::Block*		Parse(const std::string& input);
+			code::Block*		Parse(std::istream& input);
+									// input requires std::noskipws()
+			code::Block*		Parse(const InputIteratorType& start,
+									const InputIteratorType& end);
 
 			void				Test(int argc, const char* const* argv);
 

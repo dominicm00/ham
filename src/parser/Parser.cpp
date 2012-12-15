@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <memory>
 
 #include "code/ActionsDefinition.h"
@@ -184,6 +185,23 @@ Parser::Parser()
 	:
 	fListener(NULL)
 {
+}
+
+
+code::Block*
+Parser::Parse(const std::string& input)
+{
+	std::istringstream stream(input);
+	std::noskipws(stream);
+	return Parse(stream);
+}
+
+
+code::Block*
+Parser::Parse(std::istream& input)
+{
+
+	return Parse(InputIteratorType(input), InputIteratorType());
 }
 
 
