@@ -45,11 +45,16 @@ struct TestSuiteBuilder {
 	{
 	}
 
+	TestSuiteBuilder& Add(Test* test)
+	{
+		fTestSuite.AddTest(test);
+		return *this;
+	}
+
 	template<typename TestFixture>
 	TestSuiteBuilder& Add()
 	{
-		fTestSuite.AddTest(new GenericRunnableTest<TestFixture>());
-		return *this;
+		return Add(new GenericRunnableTest<TestFixture>());
 	}
 
 	TestSuiteBuilder AddSuite(const std::string& name)
