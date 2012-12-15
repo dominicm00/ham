@@ -121,14 +121,20 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 	if (!HasOperations())
 		return inputList;
 
-	bool hasPathPartOperation = (fOperations & PATH_PART_SELECTOR_MASK) != 0
-		|| (fOperations & PATH_PART_REPLACER_MASK) != 0;
+	uint32_t operations = fOperations;
+	bool hasSelectorOperation = (operations & PATH_PART_SELECTOR_MASK) != 0;
+	bool hasPathPartOperation = hasSelectorOperation
+		|| (operations & PATH_PART_REPLACER_MASK) != 0;
+	if (hasPathPartOperation && !hasSelectorOperation) {
+		// Only replacer operations. Continue as if all path parts are selected.
+		operations |= PATH_PART_SELECTOR_MASK;
+	}
 
 	StringList resultList;
 	StringBuffer buffer;
 
 	const StringList& list
-		= inputList.IsEmpty() && (fOperations & REPLACE_EMPTY) != 0
+		= inputList.IsEmpty() && (operations & REPLACE_EMPTY) != 0
 			? StringList(String(fEmptyParameter)) : inputList;
 
 	size_t count = std::min(list.Size(), maxSize);
@@ -144,54 +150,54 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 			PathParts parts;
 			_DisassemblePath(string, parts);
 
-			if ((fOperations & REPLACE_GRIST) != 0)
+			if ((operations & REPLACE_GRIST) != 0)
 				parts.fGrist = fGristParameter;
-			else if ((fOperations & SELECT_GRIST) == 0)
+			else if ((operations & SELECT_GRIST) == 0)
 				parts.fGrist.Unset();
 
-			if ((fOperations & REPLACE_ROOT) != 0)
+			if ((operations & REPLACE_ROOT) != 0)
 				parts.fRoot = fRootParameter;
-			else if ((fOperations & SELECT_ROOT) == 0)
+			else if ((operations & SELECT_ROOT) == 0)
 				parts.fRoot.Unset();
 
 			// TODO: Correct handling of SELECT_PARENT_DIRECTORY!
-			if ((fOperations & REPLACE_DIRECTORY) != 0)
+			if ((operations & REPLACE_DIRECTORY) != 0)
 				parts.fDirectory = fDirectoryParameter;
-			else if ((fOperations
+			else if ((operations
 					& (SELECT_DIRECTORY | SELECT_PARENT_DIRECTORY)) == 0) {
 				parts.fDirectory.Unset();
 			}
 
-			if ((fOperations & REPLACE_BASE_NAME) != 0)
+			if ((operations & REPLACE_BASE_NAME) != 0)
 				parts.fBaseName = fBaseNameParameter;
-			else if ((fOperations & SELECT_BASE_NAME) == 0)
+			else if ((operations & SELECT_BASE_NAME) == 0)
 				parts.fBaseName.Unset();
 
-			if ((fOperations & REPLACE_SUFFIX) != 0)
+			if ((operations & REPLACE_SUFFIX) != 0)
 				parts.fSuffix = fSuffixParameter;
-			else if ((fOperations & SELECT_SUFFIX) == 0)
+			else if ((operations & SELECT_SUFFIX) == 0)
 				parts.fSuffix.Unset();
 
-			if ((fOperations & REPLACE_ARCHIVE_MEMBER) != 0)
+			if ((operations & REPLACE_ARCHIVE_MEMBER) != 0)
 				parts.fArchiveMember = fArchiveMemberParameter;
-			else if ((fOperations & SELECT_ARCHIVE_MEMBER) == 0)
+			else if ((operations & SELECT_ARCHIVE_MEMBER) == 0)
 				parts.fArchiveMember.Unset();
 
 			_AssemblePath(parts, buffer);
 		} else
 			buffer += string;
 
-		if ((fOperations & TO_UPPER) != 0) {
+		if ((operations & TO_UPPER) != 0) {
 			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
 			char* end = buffer.Data() + buffer.Length();
 			std::transform(toConvert, end, toConvert, ::toupper);
-		} else if ((fOperations & TO_LOWER) != 0) {
+		} else if ((operations & TO_LOWER) != 0) {
 			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
 			char* end = buffer.Data() + buffer.Length();
 			std::transform(toConvert, end, toConvert, ::tolower);
 		}
 
-		if ((fOperations & JOIN) != 0) {
+		if ((operations & JOIN) != 0) {
 			if (i + 1 < count)
 				buffer += fJoinParameter;
 		} else {
@@ -200,7 +206,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 		}
 	}
 
-	if ((fOperations & JOIN) != 0 && count > 0)
+	if ((operations & JOIN) != 0 && count > 0)
 		resultList.Append(buffer);
 
 	return resultList;
