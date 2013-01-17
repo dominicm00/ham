@@ -94,5 +94,3 @@ BinCommand ham-tests
 	$(TARGET_LIBSTDC++)
 ;
 
-
-SubInclude HAM_TOP src tests ;
