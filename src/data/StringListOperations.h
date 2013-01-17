@@ -6,6 +6,8 @@
 #define HAM_DATA_STRING_LIST_OPERATIONS_H
 
 
+#include <stdint.h>
+
 #include "data/StringBuffer.h"
 #include "data/StringList.h"
 #include "data/StringPart.h"
