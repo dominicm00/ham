@@ -6,6 +6,9 @@
 #define HAM_TEST_TEST_ENVIRONMENT_H
 
 
+#include <string>
+
+
 namespace ham {
 namespace test {
 
@@ -13,8 +16,23 @@ namespace test {
 class TestEnvironment {
 public:
 	TestEnvironment()
+		:
+		fJamExecutable()
 	{
 	}
+
+	const std::string& JamExecutable() const
+	{
+		return fJamExecutable;
+	}
+
+	void SetJamExecutable(const std::string& executable)
+	{
+		fJamExecutable = executable;
+	}
+
+protected:
+	std::string fJamExecutable;
 };
 
 
