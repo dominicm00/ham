@@ -148,11 +148,14 @@ public:																\
 	HAM_CALL_MACRO1_18(macro, fixArgument, __VA_ARGS__)
 
 
-#define HAM_TEST_VERIFY(condition)								\
-	if (!(condition)) {											\
-		throw test::TestException(__FILE__, __LINE__,			\
-			"Test condition doesn't hold: %s", #condition);		\
+#define HAM_TEST_THROW(...)													\
+	{																		\
+		throw test::TestException(__FILE__, __LINE__, __VA_ARGS__);			\
 	}
+
+#define HAM_TEST_VERIFY(condition)											\
+	if (!(condition))														\
+		HAM_TEST_THROW("Test condition doesn't hold: %s", #condition);
 
 
 #define HAM_TEST_EQUAL(actual, expected)									\
