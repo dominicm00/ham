@@ -74,6 +74,7 @@ private:
 			void*				fCurrentTestFixture;
 			size_t				fPassedTests;
 			size_t				fFailedTests;
+			size_t				fSkippedTests;
 };
 
 

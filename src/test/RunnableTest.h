@@ -19,7 +19,11 @@ namespace test {
 
 class RunnableTest : public Test {
 public:
-								RunnableTest(const std::string& name);
+								RunnableTest(const std::string& name,
+									bool isJammable = false);
+
+			bool				IsJammable() const
+									{ return fIsJammable; }
 
 			int					CountTestCases() const
 									{ return fTestCaseNames.size(); }
@@ -39,6 +43,7 @@ protected:
 
 protected:
 			TestCaseNameList	fTestCaseNames;
+			bool				fIsJammable;
 };
 
 

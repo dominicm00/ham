@@ -11,9 +11,10 @@ namespace ham {
 namespace test {
 
 
-RunnableTest::RunnableTest(const std::string& name)
+RunnableTest::RunnableTest(const std::string& name, bool isJammable)
 	:
-	Test(name)
+	Test(name),
+	fIsJammable(isJammable)
 {
 }
 

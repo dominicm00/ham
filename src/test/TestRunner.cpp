@@ -70,6 +70,7 @@ TestRunner::Run(TestEnvironment* environment)
 	fEnvironment = environment;
 	fPassedTests = 0;
 	fFailedTests = 0;
+	fSkippedTests = 0;
 
 	for (TestIdentifierList::const_iterator it = fTestsToRun.begin();
 		it != fTestsToRun.end(); ++it) {
@@ -82,8 +83,8 @@ TestRunner::Run(TestEnvironment* environment)
 
 	size_t totalTests = fPassedTests + fFailedTests;
 	printf("--------\n");
-	printf("Summary: %zu tests run, %zu passed, %zu failed\n", totalTests,
-		fPassedTests, fFailedTests);
+	printf("Summary: %zu tests run, %zu passed, %zu failed, %zu skipped\n",
+		totalTests, fPassedTests, fFailedTests, fSkippedTests);
 }
 
 
@@ -120,10 +121,15 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 	try {
 		printf("%s: ", test->TestCaseAt(testCase, true).c_str());
 		fflush(stdin);
-		_InitFixture(test);
-		test->RunTestCase(fEnvironment, fCurrentTestFixture, testCase);
-		fPassedTests++;
-		printf("PASSED\n");
+		if (fEnvironment->JamExecutable().empty() || test->IsJammable()) {
+			_InitFixture(test);
+			test->RunTestCase(fEnvironment, fCurrentTestFixture, testCase);
+			fPassedTests++;
+			printf("PASSED\n");
+		} else {
+			fSkippedTests++;
+			printf("SKIPPED\n");
+		}
 	} catch (TestException& exception) {
 		fFailedTests++;
 		printf("FAILED\n");

@@ -8,12 +8,6 @@
 
 #include <sstream>
 
-#include "code/Block.h"
-#include "code/BuiltInRules.h"
-#include "code/EvaluationContext.h"
-#include "data/TargetPool.h"
-#include "data/VariableDomain.h"
-#include "parser/Parser.h"
 #include "test/TestException.h"
 #include "test/TestFixture.h"
 
@@ -24,7 +18,7 @@ namespace test {
 
 DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 	:
-	RunnableTest(name),
+	RunnableTest(name, true),
 	fCode(code)
 {
 	fTestCaseNames.push_back("");
@@ -59,12 +53,13 @@ DataBasedTest::RunTestCase(TestEnvironment* environment, void* fixture,
 {
 	size_t dataSetCount = fDataSets.size();
 	for (size_t i = 0; i < dataSetCount; i++)
-		_RunTest(fDataSets[i]);
+		_RunTest(environment, fDataSets[i]);
 }
 
 
 void
-DataBasedTest::_RunTest(const DataSet& dataSet) const
+DataBasedTest::_RunTest(TestEnvironment* environment,
+	const DataSet& dataSet) const
 {
 	static const char* const kOutputPrefix = "---test-output-start---";
 	static const char* const kOutputSuffix = "---test-output-end---";
@@ -115,22 +110,9 @@ DataBasedTest::_RunTest(const DataSet& dataSet) const
 	// Append code to output the end marker.
 	code += std::string("Echo ") + kOutputSuffix + " ;\n";
 
-	// parse code
-	parser::Parser parser;
-	code::Block* block = parser.Parse(code);
-
-	// prepare evaluation context
-	data::VariableDomain globalVariables;
-	data::TargetPool targets;
-	code::EvaluationContext evaluationContext(globalVariables, targets);
-	code::BuiltInRules::RegisterRules(evaluationContext.Rules());
-
-	std::stringstream outputStream;
-	evaluationContext.SetOutput(outputStream);
-	evaluationContext.SetErrorOutput(outputStream);
-
 	// execute the code
-	block->Evaluate(evaluationContext);
+	std::stringstream outputStream;
+	TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
 
 	// extract the output
 	outputStream.seekg(0, std::ios_base::beg);

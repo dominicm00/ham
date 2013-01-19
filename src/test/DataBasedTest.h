@@ -46,7 +46,8 @@ private:
 			};
 
 private:
-			void				_RunTest(const DataSet& dataSet) const;
+			void				_RunTest(TestEnvironment* environment,
+									const DataSet& dataSet) const;
 
 private:
 			std::string			fCode;

@@ -39,6 +39,9 @@ print_usage(const char* programName, bool error)
 		"working directory.\n");
 	fprintf(out, "  -h, --help\n");
 	fprintf(out, "      Print this usage message.\n");
+	fprintf(out, "  -j <executable>, --jam <executable>\n");
+	fprintf(out, "      Use the jam executable <executable> to run the tests "
+		"supporting it.\n");
 	fprintf(out, "  -l, --list\n");
 	fprintf(out, "      List all available tests and exit.\n");
 }
@@ -180,6 +183,7 @@ main(int argc, const char* const* argv)
 
 	// parse arguments
 	std::string testDataDirectory;
+	std::string jamExecutable;
 	bool listOnly = false;
 
 	int argi = 1;
@@ -196,6 +200,8 @@ main(int argc, const char* const* argv)
 				arg = "d";
 			else if (strcmp(arg, "-help"))
 				arg = "h";
+			else if (strcmp(arg, "-jam"))
+				arg = "j";
 			else if (strcmp(arg, "-list"))
 				arg = "l";
 			else
@@ -212,6 +218,11 @@ main(int argc, const char* const* argv)
 					break;
 				case 'h':
 					print_usage_end_exit(argv[0], false);
+				case 'j':
+					if (argi == argc)
+						print_usage_end_exit(argv[0], true);
+					jamExecutable = argv[argi++];
+					break;
 				case 'l':
 					listOnly = true;
 					break;
@@ -248,6 +259,7 @@ main(int argc, const char* const* argv)
 
 	// run tests
 	test::TestEnvironment environment;
+	environment.SetJamExecutable(jamExecutable);
 	testRunner.Run(&environment);
 
 	return 0;
