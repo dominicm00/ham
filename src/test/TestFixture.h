@@ -6,6 +6,8 @@
 #define HAM_TEST_TEST_FIXTURE_H
 
 
+#include <ostream>
+#include <string>
 #include <vector>
 
 #include "data/StringList.h"
@@ -14,6 +16,9 @@
 
 namespace ham {
 namespace test {
+
+
+class TestEnvironment;
 
 
 class TestFixture {
@@ -46,6 +51,28 @@ public:
 
 	template<typename Type>
 	static	std::string			ValueToString(const Type& value);
+
+	static	void				ExecuteCode(TestEnvironment* environment,
+									const std::string& code,
+									std::ostream& output,
+									std::ostream& errorOutput);
+	static	void				ExecuteCodeHamLibrary(
+									const std::string& code,
+									std::ostream& output,
+									std::ostream& errorOutput);
+	static	void				ExecuteCodeExecutable(
+									const char* jamExecutable,
+									const std::string& code,
+									std::ostream& output,
+									std::ostream& errorOutput);
+
+	static	std::string			CurrentWorkingDirectory();
+	static	void				RemoveRecursively(std::string entry);
+
+	static	std::string			MakePath(const char* head, const char* tail);
+
+private:
+			struct ExecutableExecuter;
 };
 
 

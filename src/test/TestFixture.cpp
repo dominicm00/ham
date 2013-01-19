@@ -5,9 +5,24 @@
 
 
 #include "test/TestFixture.h"
+#include <dirent.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+#include <fstream>
 #include <sstream>
-#include <vector>
+
+#include "code/Block.h"
+#include "code/BuiltInRules.h"
+#include "code/EvaluationContext.h"
+#include "data/TargetPool.h"
+#include "data/VariableDomain.h"
+#include "parser/Parser.h"
+
+#include "test/TestEnvironment.h"
 
 
 namespace ham {
@@ -29,6 +44,110 @@ value_container_to_string(const Container& value)
 	stream << " }";
 	return stream.str();
 }
+
+
+// #pragma mark - ExecutableExecuter
+
+
+struct TestFixture::ExecutableExecuter {
+	void Execute(const char* jamExecutable, const std::string& code,
+		std::ostream& output, std::ostream& errorOutput)
+	{
+		fOldWorkingDirectory.clear();
+		fTemporaryDirectory = NULL;
+		fOutputPipe = NULL;
+
+		try {
+			// get the current working directory
+			fOldWorkingDirectory = CurrentWorkingDirectory();
+
+			// create a temporary test directory
+			char temporaryDirectoryBuffer[L_tmpnam + 1];
+			fTemporaryDirectory = tmpnam(temporaryDirectoryBuffer);
+			if (fTemporaryDirectory == NULL) {
+				HAM_TEST_THROW("tmpnam() didn't return new temporary file "
+					"name.")
+			}
+
+			if (mkdir(fTemporaryDirectory,
+					S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
+				HAM_TEST_THROW("Failed to create temporary directory: %s",
+					strerror(errno))
+			}
+
+			// change the directory to the test directory
+			if (chdir(fTemporaryDirectory) < 0) {
+				fOldWorkingDirectory.clear();
+					// clear, since we don't need to chdir() back
+				HAM_TEST_THROW("Failed to cd into temporary directory: %s",
+					strerror(errno))
+			}
+
+			// write the code to a Jamfile
+			std::string jamfileName = MakePath(fTemporaryDirectory, "Jamfile");
+			std::fstream jamfile(jamfileName.c_str(), std::ios_base::out);
+			if (jamfile.fail())
+				HAM_TEST_THROW("Failed to create temporary Jamfile.")
+
+			std::copy(code.begin(), code.end(),
+				std::ostream_iterator<char>(jamfile));
+
+			if (jamfile.fail())
+				HAM_TEST_THROW("Failed to write test code to temporary Jamfile.")
+			jamfile.close();
+
+			// run the executable
+			fOutputPipe = popen(jamExecutable, "r");
+			if (fOutputPipe == NULL) {
+				HAM_TEST_THROW("Failed to execute \"%s\": %s", jamExecutable,
+					strerror(errno))
+			}
+
+			// read input until done
+			std::ostream_iterator<char> outputIterator(output);
+			char buffer[4096];
+			for (;;) {
+				size_t bytesRead = fread(buffer, 1, sizeof(buffer), fOutputPipe);
+				if (bytesRead > 0) {
+					outputIterator
+						= std::copy(buffer, buffer + bytesRead, outputIterator);
+				}
+
+				if (bytesRead < sizeof(buffer))
+					break;
+			}
+		} catch (...) {
+			_Cleanup();
+			throw;
+		}
+
+		_Cleanup();
+	}
+
+private:
+	void _Cleanup()
+	{
+		// close pipe to jam process
+		if (fOutputPipe != NULL)
+			pclose(fOutputPipe);
+
+		// change the directory back to the original directory
+		if (!fOldWorkingDirectory.empty())
+			chdir(fOldWorkingDirectory.c_str());
+
+		// remove the temporary directory
+		if (fTemporaryDirectory != NULL)
+			RemoveRecursively(fTemporaryDirectory);
+	}
+
+private:
+	std::string	fOldWorkingDirectory;
+	char*		fTemporaryDirectory;
+	FILE*		fOutputPipe;
+};
+
+
+// #pragma mark - TestFixture
 
 
 /*static*/ data::StringList
@@ -81,6 +200,128 @@ TestFixture::MakeStringListList(
 	}
 
 	return listList;
+}
+
+
+/*static*/ void
+TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
+	std::ostream& output, std::ostream& errorOutput)
+{
+	// Depending on whether the environment specifies a jam executable or not,
+	// execute the code via that or via the ham library.
+	std::string jamExecutable = environment->JamExecutable();
+	if (jamExecutable.empty())
+		ExecuteCodeHamLibrary(code, output, errorOutput);
+	else
+		ExecuteCodeExecutable(jamExecutable.c_str(), code, output, errorOutput);
+}
+
+
+/*static*/ void
+TestFixture::ExecuteCodeHamLibrary(const std::string& code,
+	std::ostream& output, std::ostream& errorOutput)
+{
+	// parse code
+	parser::Parser parser;
+	code::Block* block = parser.Parse(code);
+
+	// prepare evaluation context
+	data::VariableDomain globalVariables;
+	data::TargetPool targets;
+	code::EvaluationContext evaluationContext(globalVariables, targets);
+	code::BuiltInRules::RegisterRules(evaluationContext.Rules());
+
+	evaluationContext.SetOutput(output);
+	evaluationContext.SetErrorOutput(errorOutput);
+
+	// execute the code
+	block->Evaluate(evaluationContext);
+}
+
+
+/*static*/ void
+TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
+	const std::string& code, std::ostream& output, std::ostream& errorOutput)
+{
+	return ExecutableExecuter().Execute(jamExecutable, code, output, errorOutput);
+}
+
+
+/*static */ std::string
+TestFixture::CurrentWorkingDirectory()
+{
+	long size = pathconf(".", _PC_PATH_MAX);
+	char* buffer = new char[size];
+
+	try {
+		if (getcwd(buffer, (size_t)size) == NULL) {
+			HAM_TEST_THROW("Failed to get current working directory: %s",
+				strerror(errno))
+		}
+
+		std::string result(buffer);
+		delete[] buffer;
+		buffer = NULL;
+		return result;
+	} catch (...) {
+		delete[] buffer;
+		throw;
+	}
+}
+
+
+/*static*/ void
+TestFixture::RemoveRecursively(std::string entry)
+{
+	struct stat st;
+	if (lstat(entry.c_str(), &st) < 0) {
+		HAM_TEST_THROW("Failed to stat entry \"%s\" for removal: %s",
+			strerror(errno))
+	}
+
+	if (S_ISDIR(st.st_mode)) {
+		// recursively remove all entries in the directory
+		DIR* dir = opendir(entry.c_str());
+		if (dir == NULL) {
+			HAM_TEST_THROW("Failed to open directory \"%s\" for removal: %s",
+				entry.c_str(), strerror(errno))
+		}
+
+		try {
+			while (struct dirent* dirEntry = readdir(dir)) {
+				if (strcmp(dirEntry->d_name, ".") == 0
+					|| strcmp(dirEntry->d_name, "..") == 0) {
+					continue;
+				}
+
+				RemoveRecursively(MakePath(entry.c_str(), dirEntry->d_name));
+			}
+		} catch (...) {
+			closedir(dir);
+			throw;
+		}
+
+		closedir(dir);
+
+		// remove the directory itself
+		if (rmdir(entry.c_str()) < 0) {
+			HAM_TEST_THROW("Failed to remove directory \"%s\": %s",
+				entry.c_str(), strerror(errno))
+		}
+	} else {
+		if (unlink(entry.c_str()) < 0) {
+			HAM_TEST_THROW("Failed to remove entry \"%s\": %s", entry.c_str(),
+				strerror(errno))
+		}
+	}
+}
+
+
+/*static*/ std::string
+TestFixture::MakePath(const char* head, const char* tail)
+{
+	return std::string(head) + '/' + tail;
+// TODO: Path delimiter!
 }
 
 
