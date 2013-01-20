@@ -21,7 +21,6 @@ DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 	RunnableTest(name, true),
 	fCode(code)
 {
-	fTestCaseNames.push_back("");
 }
 
 
@@ -30,6 +29,10 @@ DataBasedTest::AddDataSet(const std::vector<std::string>& input,
 	const std::vector<std::string>& output)
 {
 	fDataSets.push_back(DataSet(input, output));
+
+	std::stringstream testCaseName;
+	testCaseName << fDataSets.size();
+	fTestCaseNames.push_back(testCaseName.str());
 }
 
 
@@ -51,9 +54,7 @@ void
 DataBasedTest::RunTestCase(TestEnvironment* environment, void* fixture,
 	int index)
 {
-	size_t dataSetCount = fDataSets.size();
-	for (size_t i = 0; i < dataSetCount; i++)
-		_RunTest(environment, fDataSets[i]);
+	_RunTest(environment, fDataSets[index]);
 }
 
 
