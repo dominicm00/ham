@@ -65,6 +65,7 @@ public:
 									const std::string& code,
 									std::ostream& output,
 									std::ostream& errorOutput);
+									// Note: errorOutput is ignored.
 
 	static	std::string			CurrentWorkingDirectory();
 	static	void				RemoveRecursively(std::string entry);
