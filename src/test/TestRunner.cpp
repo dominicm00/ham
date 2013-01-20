@@ -60,7 +60,9 @@ TestRunner::AddTest(Test* test, const std::string& testCasePath)
 	if (subTest == NULL)
 		return false;
 
-	return AddTest(subTest, std::string(testCasePath, separatorIndex + 2));
+	return AddTest(subTest,
+		separatorIndex != std::string::npos
+			? std::string(testCasePath, separatorIndex + 2) : std::string());
 }
 
 
