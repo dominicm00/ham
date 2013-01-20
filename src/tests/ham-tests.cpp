@@ -188,10 +188,11 @@ main(int argc, const char* const* argv)
 
 	int argi = 1;
 	while (argi < argc) {
-		const char* arg = argv[argi++];
+		const char* arg = argv[argi];
 		if (arg[0] != '-')
 			break;
 
+		argi++;
 		arg++;
 
 		if (*arg == '-') {
