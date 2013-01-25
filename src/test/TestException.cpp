@@ -20,7 +20,7 @@ TestException::TestException(const char* file, int line,
 	fFile(file),
 	fLine(line)
 {
-	char buffer[1024];
+	char buffer[4096];
 
 	va_list args;
 	va_start(args, message);
@@ -34,7 +34,7 @@ TestException::TestException(const char* file, int line,
 void
 TestException::ThrowWithExtendedMessage(const char* message,...)
 {
-	char buffer[1024];
+	char buffer[4096];
 
 	va_list args;
 	va_start(args, message);
