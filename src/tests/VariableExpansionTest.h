@@ -28,16 +28,10 @@ public:
 			void				Subscripts();
 			void				Operations();
 			void				PathSelectorsEmpty();
-			void				PathSelectorsNoGristNoArchive();
-			void				PathSelectorsGristNoArchive();
-			void				PathSelectorsNoGristArchive();
-			void				PathSelectorsGristArchive();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(VariableExpansionTest, 9,
-		None, Simple, Subscripts, Operations, PathSelectorsEmpty,
-		PathSelectorsNoGristNoArchive, PathSelectorsGristNoArchive,
-		PathSelectorsNoGristArchive, PathSelectorsGristArchive)
+	HAM_ADD_TEST_CASES(VariableExpansionTest, 5,
+		None, Simple, Subscripts, Operations, PathSelectorsEmpty)
 
 private:
 			StringList			_Evaluate(const String& string);
