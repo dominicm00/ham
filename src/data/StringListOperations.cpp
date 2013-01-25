@@ -68,9 +68,10 @@ StringListOperations::Parse(const char* start, const char* end)
 				break;
 			case 'R':
 				pendingOperation = SELECT_ROOT | REPLACE_ROOT;
+				pendingParameter = &fRootParameter;
 				break;
 			case 'P':
-				pendingOperation = SELECT_PARENT_DIRECTORY;
+				pendingOperation = TO_PARENT_DIRECTORY;
 				break;
 			case 'D':
 				pendingOperation = SELECT_DIRECTORY | REPLACE_DIRECTORY;
@@ -160,13 +161,10 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 			else if ((operations & SELECT_ROOT) == 0)
 				parts.fRoot.Unset();
 
-			// TODO: Correct handling of SELECT_PARENT_DIRECTORY!
 			if ((operations & REPLACE_DIRECTORY) != 0)
 				parts.fDirectory = fDirectoryParameter;
-			else if ((operations
-					& (SELECT_DIRECTORY | SELECT_PARENT_DIRECTORY)) == 0) {
+			else if ((operations & SELECT_DIRECTORY) == 0)
 				parts.fDirectory.Unset();
-			}
 
 			if ((operations & REPLACE_BASE_NAME) != 0)
 				parts.fBaseName = fBaseNameParameter;
@@ -182,6 +180,12 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 				parts.fArchiveMember = fArchiveMemberParameter;
 			else if ((operations & SELECT_ARCHIVE_MEMBER) == 0)
 				parts.fArchiveMember.Unset();
+
+			if ((operations & TO_PARENT_DIRECTORY) != 0) {
+				parts.fBaseName.Unset();
+				parts.fSuffix.Unset();
+				parts.fArchiveMember.Unset();
+			}
 
 			_AssemblePath(parts, buffer);
 		} else
@@ -225,10 +229,14 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 	if (*remainder == '<') {
 		const char* gristStart = remainder;
 		remainder = std::find(remainder + 1, pathEnd, '>');
-		if (remainder != pathEnd)
+		if (remainder != pathEnd) {
 			remainder++;
-
-		_parts.fGrist.SetTo(gristStart, remainder);
+			_parts.fGrist.SetTo(gristStart, remainder);
+		} else {
+			// no/broken grist
+			_parts.fGrist.Unset();
+			remainder = gristStart;
+		}
 	} else
 		_parts.fGrist.Unset();
 
@@ -248,7 +256,7 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 	if (remainder != pathEnd && pathEnd[-1] == ')')
 		archiveMemberStart = strchr(remainder, '(');
 	if (archiveMemberStart != NULL)
-		_parts.fArchiveMember.SetTo(archiveMemberStart, pathEnd);
+		_parts.fArchiveMember.SetTo(archiveMemberStart + 1 , pathEnd - 1);
 	else
 		_parts.fArchiveMember.Unset();
 
@@ -275,18 +283,40 @@ StringListOperations::_AssemblePath(const PathParts& parts,
 {
 	// TODO: This is platform dependent!
 
-	buffer += parts.fGrist;
-	buffer += parts.fRoot;
-	buffer += parts.fDirectory;
-	if (!parts.fDirectory.IsEmpty() && parts.fDirectory != StringPart("/", 1)
-		&& (!parts.fBaseName.IsEmpty() || !parts.fSuffix.IsEmpty()
-			|| !parts.fArchiveMember.IsEmpty())) {
-		buffer += '/';
+	if (!parts.fGrist.IsEmpty()) {
+		if (parts.fGrist.Start()[0] != '<')
+			buffer += '<';
+		buffer += parts.fGrist;
+		if (parts.fGrist.End()[-1] != '>')
+			buffer += '>';
+	}
+
+	// Use root only, if the directory part isn't absolute.
+	if (!parts.fRoot.IsEmpty()
+		&& (parts.fDirectory.IsEmpty() || parts.fDirectory.Start()[0] != '/')) {
+		buffer += parts.fRoot;
+		if (!parts.fDirectory.IsEmpty() || !parts.fBaseName.IsEmpty()
+			|| !parts.fSuffix.IsEmpty() || !parts.fArchiveMember.IsEmpty()) {
+			buffer += '/';
+		}
+	}
+
+	if (!parts.fDirectory.IsEmpty()) {
+		buffer += parts.fDirectory;
+		if (parts.fDirectory != StringPart("/", 1)
+			&& (!parts.fBaseName.IsEmpty() || !parts.fSuffix.IsEmpty())) {
+			buffer += '/';
+		}
 	}
 
 	buffer += parts.fBaseName;
 	buffer += parts.fSuffix;
-	buffer += parts.fArchiveMember;
+
+	if (!parts.fArchiveMember.IsEmpty()) {
+		buffer += '(';
+		buffer += parts.fArchiveMember;
+		buffer += ')';
+	}
 }
 
 

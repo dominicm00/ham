@@ -26,12 +26,12 @@ public:
 				REPLACE_BASE_NAME			= 0x00008,
 				REPLACE_SUFFIX				= 0x00010,
 				REPLACE_ARCHIVE_MEMBER		= 0x00020,
-				REPLACE_EMPTY				= 0x00040,
-				JOIN						= 0x00080,
+				TO_PARENT_DIRECTORY			= 0x00040,
+				REPLACE_EMPTY				= 0x00080,
+				JOIN						= 0x00100,
 
-				SELECT_GRIST				= 0x00100,
-				SELECT_ROOT					= 0x00200,
-				SELECT_PARENT_DIRECTORY		= 0x00400,
+				SELECT_GRIST				= 0x00200,
+				SELECT_ROOT					= 0x00400,
 				SELECT_DIRECTORY			= 0x00800,
 				SELECT_BASE_NAME			= 0x01000,
 				SELECT_SUFFIX				= 0x02000,
@@ -40,10 +40,39 @@ public:
 				TO_LOWER					= 0x08000,
 				TO_UPPER					= 0x10000,
 
-				PATH_PART_REPLACER_MASK		= 0x0003f,
-				PATH_PART_SELECTOR_MASK		= 0x07f00,
-				PARAMETER_OPERATION_MASK	= 0x000ff,
-				NO_PARAMETER_OPERATION_MASK	= 0x1ff00
+				PATH_PART_REPLACER_MASK		= REPLACE_GRIST
+											| REPLACE_ROOT
+											| REPLACE_DIRECTORY
+											| REPLACE_BASE_NAME
+											| REPLACE_SUFFIX
+											| REPLACE_ARCHIVE_MEMBER
+											| TO_PARENT_DIRECTORY,
+												// behaves like a (multi) path
+												// part replacer, though it
+												// doesn't have a parameter
+				PATH_PART_SELECTOR_MASK		= SELECT_GRIST
+											| SELECT_ROOT
+											| SELECT_DIRECTORY
+											| SELECT_BASE_NAME
+											| SELECT_SUFFIX
+											| SELECT_ARCHIVE_MEMBER,
+				PARAMETER_OPERATION_MASK	= REPLACE_GRIST
+											| REPLACE_ROOT
+											| REPLACE_DIRECTORY
+											| REPLACE_BASE_NAME
+											| REPLACE_SUFFIX
+											| REPLACE_ARCHIVE_MEMBER
+											| REPLACE_EMPTY
+											| JOIN,
+				NO_PARAMETER_OPERATION_MASK	= TO_PARENT_DIRECTORY
+											| SELECT_GRIST
+											| SELECT_ROOT
+											| SELECT_DIRECTORY
+											| SELECT_BASE_NAME
+											| SELECT_SUFFIX
+											| SELECT_ARCHIVE_MEMBER
+											| TO_LOWER
+											| TO_UPPER
 			};
 
 public:
