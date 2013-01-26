@@ -43,10 +43,16 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::string code;
 	for (;;) {
 		std::string line;
-		if (!_ReadLine(line)) {
+		bool directive;
+		if (!_ReadLine(line, directive)) {
 			_Throw(std::string("Unexpected end of file while reading test "
 				"code, was expecting separator \"") + kTestCaseSeparator
 				+ "\"");
+		}
+
+		if (directive) {
+			_Throw(std::string("Unsupported directive \"#!" + line + "\" in "
+				"test code"));
 		}
 
 		if (line == kTestCaseSeparator)
@@ -64,17 +70,36 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::auto_ptr<DataBasedTest> test(new DataBasedTest(testName, code));
 
 	// read test cases
+	std::vector<std::string> previousInput;
+	std::vector<std::string> previousOutput;
+
 	for (;;) {
 		std::vector<std::string> input;
 		for (;;) {
 			std::string line;
-			if (!_ReadLine(line)) {
+			bool directive;
+			if (!_ReadLine(line, directive)) {
 				if (input.empty())
 					return test.release();
 
 				_Throw(std::string("Unexpected end of file while reading test "
 					"case input, was expecting separator \"")
 					+ kInputOutputSeparator + "\"");
+			}
+
+			if (directive) {
+				if (line == "repeat") {
+					if (input.size() >= previousInput.size()) {
+						_Throw(std::string("Repeat directive in test case "
+							"input doesn't refer to existing previous input"));
+					}
+
+					input.push_back(previousInput.at(input.size()));
+					continue;
+				} else {
+					_Throw(std::string("Unsupported directive \"#!" + line
+						+ "\" in test case input"));
+				}
 			}
 
 			if (line == kInputOutputSeparator)
@@ -93,10 +118,27 @@ DataBasedTestParser::Parse(const char* fileName)
 		std::vector<std::string> output;
 		for (;;) {
 			std::string line;
-			if (!_ReadLine(line)) {
+			bool directive;
+			if (!_ReadLine(line, directive)) {
 				_Throw(std::string("Unexpected end of file while reading test "
 					"case output, was expecting separator \"")
 					+ kTestCaseSeparator + "\"");
+			}
+
+			if (directive) {
+				if (line == "repeat") {
+					if (output.size() >= previousOutput.size()) {
+						_Throw(std::string("Repeat directive in test case "
+							"output doesn't refer to existing previous "
+							"output"));
+					}
+
+					output.push_back(previousOutput.at(output.size()));
+					continue;
+				} else {
+					_Throw(std::string("Unsupported directive \"#!" + line
+						+ "\" in test case output"));
+				}
 			}
 
 			if (line == kTestCaseSeparator)
@@ -105,15 +147,18 @@ DataBasedTestParser::Parse(const char* fileName)
 			output.push_back(line);
 		}
 
+		previousInput = input;
+		previousOutput = output;
 		test->AddDataSet(input, output);
 	}
 }
 
 
 bool
-DataBasedTestParser::_ReadLine(std::string& _line)
+DataBasedTestParser::_ReadLine(std::string& _line, bool& _directive)
 {
 	_line.clear();
+	_directive = false;
 
 	bool multiLine = false;
 	bool comment = false;
@@ -165,8 +210,10 @@ DataBasedTestParser::_ReadLine(std::string& _line)
 					"directive ('#}')"));
 			}
 			multiLine = false;
-		} else
-			_Throw(std::string("Unsupported directive \"" + line + "\""));
+		} else {
+			_directive = true;
+			_line.append(line.c_str() + 2);
+		}
 	} while (multiLine || comment);
 
 	return true;
