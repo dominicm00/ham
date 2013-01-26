@@ -1,0 +1,69 @@
+paths =
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+;
+for result in "$(paths:%1)" {
+	Echo $(result) ;
+}
+---
+B=
+-
+
+.a
+.bee
+path
+path/.a
+some/path/.bee
+/an/absolute/path/.so
+/
+---
+B=base
+-
+base
+base.a
+base.bee
+path/base
+path/base.a
+some/path/base.bee
+/an/absolute/path/base.so
+/base
+---
+B=dir/base
+-
+dir/base
+dir/base.a
+dir/base.bee
+path/dir/base
+path/dir/base.a
+some/path/dir/base.bee
+/an/absolute/path/dir/base.so
+/dir/base
+---
+B=/dir/base
+-
+/dir/base
+/dir/base.a
+/dir/base.bee
+path//dir/base
+path//dir/base.a
+some/path//dir/base.bee
+/an/absolute/path//dir/base.so
+//dir/base
+---
+B=/
+-
+/
+/.a
+/.bee
+path//
+path//.a
+some/path//.bee
+/an/absolute/path//.so
+//
+---

@@ -1,0 +1,47 @@
+paths =
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+;
+for result in "$(paths:%1)" {
+	Echo $(result) ;
+}
+---
+S=
+-
+foo
+bar
+foobar
+path/foo
+path/foo
+some/path/bar
+/an/absolute/path/foobar
+/
+---
+S=.suffix
+-
+foo.suffix
+bar.suffix
+foobar.suffix
+path/foo.suffix
+path/foo.suffix
+some/path/bar.suffix
+/an/absolute/path/foobar.suffix
+/.suffix
+---
+S=suffix
+-
+foosuffix
+barsuffix
+foobarsuffix
+path/foosuffix
+path/foosuffix
+some/path/barsuffix
+/an/absolute/path/foobarsuffix
+/suffix
+---

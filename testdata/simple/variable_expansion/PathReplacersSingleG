@@ -1,0 +1,69 @@
+paths =
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+;
+for result in "$(paths:%1)" {
+	Echo $(result) ;
+}
+---
+G=
+-
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+---
+G=grist
+-
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+---
+G=<grist>
+-
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+---
+G=<grist
+-
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+---
+G=grist>
+-
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+---

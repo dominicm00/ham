@@ -1,0 +1,58 @@
+paths =
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+;
+for result in "$(paths:%1)" {
+	Echo $(result) ;
+}
+---
+M=
+-
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+---
+M=member
+-
+foo(member)
+bar.a(member)
+foobar.bee(member)
+path/foo(member)
+path/foo.a(member)
+some/path/bar.bee(member)
+/an/absolute/path/foobar.so(member)
+/(member)
+---
+M=member.suffix
+-
+foo(member.suffix)
+bar.a(member.suffix)
+foobar.bee(member.suffix)
+path/foo(member.suffix)
+path/foo.a(member.suffix)
+some/path/bar.bee(member.suffix)
+/an/absolute/path/foobar.so(member.suffix)
+/(member.suffix)
+---
+#M=(member)
+#-
+#foo((member))
+#bar.a((member))
+#foobar.bee((member))
+#path/foo((member))
+#path/foo.a((member))
+#some/path/bar.bee((member))
+#/an/absolute/path/foobar.so((member))
+#/((member))
+#---
