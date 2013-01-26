@@ -113,23 +113,63 @@ DataBasedTestParser::Parse(const char* fileName)
 bool
 DataBasedTestParser::_ReadLine(std::string& _line)
 {
-	for (;;) {
-		if (!std::getline(fInput, _line))
+	_line.clear();
+
+	bool multiLine = false;
+	bool comment = false;
+	do {
+		comment = false;
+
+		std::string line;
+		if (!std::getline(fInput, line)) {
+			if (multiLine) {
+				_Throw(std::string("Unexpected end of file while reading "
+					"multi-line argument"));
+			}
 			return false;
+		}
 
 		fLineIndex++;
 
-		// skip comment lines
-		if (_line[0] != '#')
-			return true;
-
-		// If a non-comment line shall starting with "#", it starts with two
-		// "#"s instead. So we need to remove one of those.
-		if (_line[1] == '#') {
-			_line.erase(0, 1);
-			return true;
+		// Comment and directive lines start with '#'. Other lines we copy
+		// verbatim.
+		if (line[0] != '#') {
+			if (!_line.empty())
+				_line += '\n';
+			_line += line;
+			continue;
 		}
-	}
+
+		// If a non-comment line shall start with "#", it starts with two
+		// "#"s instead. So we need to remove one of those.
+		if (line[1] == '#') {
+			if (!_line.empty())
+				_line += '\n';
+			_line.append(line.c_str() + 1);
+			continue;
+		}
+
+		if (line[1] != '!') {
+			comment = true;
+			continue;
+		}
+
+		// It's a directive.
+		if (line[2] == '{') {
+			if (multiLine)
+				_Throw(std::string("Nested multi-line argument not supported"));
+			multiLine = true;
+		} else if (line[2] == '}') {
+			if (!multiLine) {
+				_Throw(std::string("Unmatched end of multi-line argument "
+					"directive ('#}')"));
+			}
+			multiLine = false;
+		} else
+			_Throw(std::string("Unsupported directive \"" + line + "\""));
+	} while (multiLine || comment);
+
+	return true;
 }
 
 
