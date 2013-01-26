@@ -1,0 +1,112 @@
+paths = %1 ;
+for result in "$(paths:%2)" {
+	Echo $(result) ;
+}
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+G=:R=
+-
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+some/path/bar.bee(archive.o)
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+some/path/bar.bee(archive.o)
+---
+#!repeat
+G=grist:R=
+-
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
+---
+#!repeat
+G=:R=root
+-
+root/foo
+root/bar.a
+root/foobar.bee
+root/path/foo
+root/path/foo.a
+root/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+root/some/path/bar.bee(archive.o)
+root/foo
+root/bar.a
+root/foobar.bee
+root/path/foo
+root/path/foo.a
+root/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+root/some/path/bar.bee(archive.o)
+---
+#!repeat
+G=grist:R=root
+-
+<grist>root/foo
+<grist>root/bar.a
+<grist>root/foobar.bee
+<grist>root/path/foo
+<grist>root/path/foo.a
+<grist>root/some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>root/some/path/bar.bee(archive.o)
+<grist>root/foo
+<grist>root/bar.a
+<grist>root/foobar.bee
+<grist>root/path/foo
+<grist>root/path/foo.a
+<grist>root/some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>root/some/path/bar.bee(archive.o)
+---
