@@ -7,6 +7,16 @@ paths =
 	some/path/bar.bee
 	/an/absolute/path/foobar.so
 	/
+	<grist>some/path/bar.bee
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<grist>some/path/bar.bee(archive.o)
 ;
 for result in "$(paths:%1)" {
 	Echo $(result) ;
@@ -22,6 +32,16 @@ path/foo.a
 some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+<grist>some/path/bar.bee
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+<grist>some/path/bar.bee
 ---
 M=member
 -
@@ -33,6 +53,16 @@ path/foo.a(member)
 some/path/bar.bee(member)
 /an/absolute/path/foobar.so(member)
 /(member)
+<grist>some/path/bar.bee(member)
+foo(member)
+bar.a(member)
+foobar.bee(member)
+path/foo(member)
+path/foo.a(member)
+some/path/bar.bee(member)
+/an/absolute/path/foobar.so(member)
+/(member)
+<grist>some/path/bar.bee(member)
 ---
 M=member.suffix
 -
@@ -44,6 +74,16 @@ path/foo.a(member.suffix)
 some/path/bar.bee(member.suffix)
 /an/absolute/path/foobar.so(member.suffix)
 /(member.suffix)
+<grist>some/path/bar.bee(member.suffix)
+foo(member.suffix)
+bar.a(member.suffix)
+foobar.bee(member.suffix)
+path/foo(member.suffix)
+path/foo.a(member.suffix)
+some/path/bar.bee(member.suffix)
+/an/absolute/path/foobar.so(member.suffix)
+/(member.suffix)
+<grist>some/path/bar.bee(member.suffix)
 ---
 #M=(member)
 #-
@@ -55,4 +95,14 @@ some/path/bar.bee(member.suffix)
 #some/path/bar.bee((member))
 #/an/absolute/path/foobar.so((member))
 #/((member))
+#<grist>some/path/bar.bee((member))
+#foo((member))
+#bar.a((member))
+#foobar.bee((member))
+#path/foo((member))
+#path/foo.a((member))
+#some/path/bar.bee((member))
+#/an/absolute/path/foobar.so((member))
+#/((member))
+#<grist>some/path/bar.bee((member))
 #---

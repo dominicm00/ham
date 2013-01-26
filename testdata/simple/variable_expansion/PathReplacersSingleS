@@ -7,6 +7,8 @@ paths =
 	some/path/bar.bee
 	/an/absolute/path/foobar.so
 	/
+	<grist>some/path/bar(archive.o)
+	<grist>some/path/bar.bee(archive.o)
 ;
 for result in "$(paths:%1)" {
 	Echo $(result) ;
@@ -22,6 +24,8 @@ path/foo
 some/path/bar
 /an/absolute/path/foobar
 /
+<grist>some/path/bar(archive.o)
+<grist>some/path/bar(archive.o)
 ---
 S=.suffix
 -
@@ -33,6 +37,8 @@ path/foo.suffix
 some/path/bar.suffix
 /an/absolute/path/foobar.suffix
 /.suffix
+<grist>some/path/bar.suffix(archive.o)
+<grist>some/path/bar.suffix(archive.o)
 ---
 S=suffix
 -
@@ -44,4 +50,6 @@ path/foosuffix
 some/path/barsuffix
 /an/absolute/path/foobarsuffix
 /suffix
+<grist>some/path/barsuffix(archive.o)
+<grist>some/path/barsuffix(archive.o)
 ---

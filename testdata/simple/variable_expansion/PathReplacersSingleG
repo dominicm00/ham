@@ -7,6 +7,16 @@ paths =
 	some/path/bar.bee
 	/an/absolute/path/foobar.so
 	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
 ;
 for result in "$(paths:%1)" {
 	Echo $(result) ;
@@ -22,6 +32,16 @@ path/foo.a
 some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+some/path/bar.bee(archive.o)
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+some/path/bar.bee(archive.o)
 ---
 G=grist
 -
@@ -33,6 +53,16 @@ G=grist
 <grist>some/path/bar.bee
 <grist>/an/absolute/path/foobar.so
 <grist>/
+<grist>some/path/bar.bee(archive.o)
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
 ---
 G=<grist>
 -
@@ -44,6 +74,16 @@ G=<grist>
 <grist>some/path/bar.bee
 <grist>/an/absolute/path/foobar.so
 <grist>/
+<grist>some/path/bar.bee(archive.o)
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
 ---
 G=<grist
 -
@@ -55,6 +95,16 @@ G=<grist
 <grist>some/path/bar.bee
 <grist>/an/absolute/path/foobar.so
 <grist>/
+<grist>some/path/bar.bee(archive.o)
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
 ---
 G=grist>
 -
@@ -66,4 +116,14 @@ G=grist>
 <grist>some/path/bar.bee
 <grist>/an/absolute/path/foobar.so
 <grist>/
+<grist>some/path/bar.bee(archive.o)
+<grist>foo
+<grist>bar.a
+<grist>foobar.bee
+<grist>path/foo
+<grist>path/foo.a
+<grist>some/path/bar.bee
+<grist>/an/absolute/path/foobar.so
+<grist>/
+<grist>some/path/bar.bee(archive.o)
 ---

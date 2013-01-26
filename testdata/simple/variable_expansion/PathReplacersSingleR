@@ -45,3 +45,14 @@ root/beer/some/path/bar.bee
 /an/absolute/path/foobar.so
 /
 ---
+R=/root/beer
+-
+/root/beer/foo
+/root/beer/bar.a
+/root/beer/foobar.bee
+/root/beer/path/foo
+/root/beer/path/foo.a
+/root/beer/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+---

@@ -7,6 +7,7 @@ paths =
 	some/path/bar.bee
 	/an/absolute/path/foobar.so
 	/
+	<grist>some/path/bar.bee(archive.o)
 ;
 for result in "$(paths:%1)" {
 	Echo $(result) ;
@@ -22,6 +23,7 @@ path/.a
 some/path/.bee
 /an/absolute/path/.so
 /
+<grist>some/path/.bee(archive.o)
 ---
 B=base
 -
@@ -33,6 +35,7 @@ path/base.a
 some/path/base.bee
 /an/absolute/path/base.so
 /base
+<grist>some/path/base.bee(archive.o)
 ---
 B=dir/base
 -
@@ -44,6 +47,7 @@ path/dir/base.a
 some/path/dir/base.bee
 /an/absolute/path/dir/base.so
 /dir/base
+<grist>some/path/dir/base.bee(archive.o)
 ---
 B=/dir/base
 -
@@ -55,6 +59,7 @@ path//dir/base.a
 some/path//dir/base.bee
 /an/absolute/path//dir/base.so
 //dir/base
+<grist>some/path//dir/base.bee(archive.o)
 ---
 B=/
 -
@@ -66,4 +71,5 @@ path//.a
 some/path//.bee
 /an/absolute/path//.so
 //
+<grist>some/path//.bee(archive.o)
 ---
