@@ -16,6 +16,7 @@ namespace code {
 EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 	data::TargetPool& targets)
 	:
+	fCompatibility(COMPATIBILITY_HAM),
 	fGlobalVariables(globalVariables),
 	fRootScope(fGlobalVariables, NULL),
 	fGlobalScope(&fRootScope),

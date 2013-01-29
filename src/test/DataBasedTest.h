@@ -22,32 +22,39 @@ public:
 
 			void				AddDataSet(
 									const std::vector<std::string>& input,
-									const std::vector<std::string>& output);
+									const std::vector<std::string>& output,
+									uint32_t compatibilityMask);
 
 	virtual	void*				CreateFixture(TestEnvironment* environment);
 	virtual	void				DeleteFixture(TestEnvironment* environment,
 									void* fixture);
+	virtual	uint32_t			TestCaseCompatibility(int index);
 	virtual	void				RunTestCase(TestEnvironment* environment,
 									void* fixture, int index);
 
 private:
 			struct DataSet {
 				DataSet(const std::vector<std::string>& input,
-					const std::vector<std::string>& output)
+					const std::vector<std::string>& output,
+					uint32_t compatibilityMask)
 					:
 					fInput(input),
-					fOutput(output)
+					fOutput(output),
+					fCompatibilityMask(compatibilityMask)
 				{
 				}
 
 			public:
-				std::vector<std::string> fInput;
-				std::vector<std::string> fOutput;
+				std::vector<std::string>	fInput;
+				std::vector<std::string>	fOutput;
+				uint32_t					fCompatibilityMask;
 			};
 
 private:
 			void				_RunTest(TestEnvironment* environment,
 									const DataSet& dataSet) const;
+	static	bool				_ReadEchoLine(TestEnvironment* environment,
+									std::istream& input, std::string& _line);
 
 private:
 			std::string			fCode;

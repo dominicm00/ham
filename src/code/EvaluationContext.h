@@ -10,6 +10,7 @@
 
 #include "code/Defs.h"
 #include "code/RulePool.h"
+#include "Compatibility.h"
 #include "data/VariableScope.h"
 
 
@@ -29,6 +30,11 @@ public:
 								EvaluationContext(
 									data::VariableDomain& globalVariables,
 									data::TargetPool& targets);
+
+			Compatibility		GetCompatibility() const
+									{ return fCompatibility; }
+			void				SetCompatibility(Compatibility compatibility)
+									{ fCompatibility = compatibility; }
 
 			data::VariableDomain* GlobalVariables()
 									{ return &fGlobalVariables; }
@@ -63,6 +69,7 @@ public:
 									{ fErrorOutput = &output; }
 
 private:
+			Compatibility		fCompatibility;
 			data::VariableDomain& fGlobalVariables;
 			data::VariableScope	fRootScope;
 			data::VariableScope* fGlobalScope;

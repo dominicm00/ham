@@ -47,5 +47,12 @@ RunnableTest::IndexOfTestCase(const std::string& testCase) const
 }
 
 
+uint32_t
+RunnableTest::TestCaseCompatibility(int index)
+{
+	return COMPATIBILITY_MASK_ALL;
+}
+
+
 }	// namespace test
 }	// namespace ham

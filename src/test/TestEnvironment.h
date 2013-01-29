@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "Compatibility.h"
+
 
 namespace ham {
 namespace test {
@@ -17,8 +19,19 @@ class TestEnvironment {
 public:
 	TestEnvironment()
 		:
+		fCompatibility(COMPATIBILITY_HAM),
 		fJamExecutable()
 	{
+	}
+
+	Compatibility GetCompatibility() const
+	{
+		return fCompatibility;
+	}
+
+	void SetCompatibility(Compatibility compatibility)
+	{
+		fCompatibility = compatibility;
 	}
 
 	const std::string& JamExecutable() const
@@ -32,7 +45,8 @@ public:
 	}
 
 protected:
-	std::string fJamExecutable;
+	Compatibility	fCompatibility;
+	std::string		fJamExecutable;
 };
 
 

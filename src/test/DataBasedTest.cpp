@@ -26,9 +26,9 @@ DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 
 void
 DataBasedTest::AddDataSet(const std::vector<std::string>& input,
-	const std::vector<std::string>& output)
+	const std::vector<std::string>& output, uint32_t compatibilityMask)
 {
-	fDataSets.push_back(DataSet(input, output));
+	fDataSets.push_back(DataSet(input, output, compatibilityMask));
 
 	std::stringstream testCaseName;
 	testCaseName << fDataSets.size();
@@ -47,6 +47,13 @@ DataBasedTest::CreateFixture(TestEnvironment* environment)
 void
 DataBasedTest::DeleteFixture(TestEnvironment* environment, void* fixture)
 {
+}
+
+
+uint32_t
+DataBasedTest::TestCaseCompatibility(int index)
+{
+	return fDataSets[index].fCompatibilityMask;
 }
 
 
@@ -120,7 +127,7 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	std::string line;
 	for (;;) {
 		HAM_TEST_ADD_INFO(
-			HAM_TEST_VERIFY(std::getline(outputStream, line)),
+			HAM_TEST_VERIFY(_ReadEchoLine(environment, outputStream, line)),
 			"output: \"%s\"", outputStream.str().c_str())
 		if (line == kOutputPrefix)
 			break;
@@ -129,7 +136,7 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	std::vector<std::string> output;
 	for (;;) {
 		HAM_TEST_ADD_INFO(
-			HAM_TEST_VERIFY(std::getline(outputStream, line)),
+			HAM_TEST_VERIFY(_ReadEchoLine(environment, outputStream, line)),
 			"output: \"%s\"", outputStream.str().c_str())
 		if (line == kOutputSuffix)
 			break;
@@ -139,7 +146,26 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	// and check the output against what's expected
 	HAM_TEST_ADD_INFO(
 		HAM_TEST_EQUAL(output, dataSet.fOutput),
-		"code:\n%s", code.c_str())
+				"code:\n%s", code.c_str())
+}
+
+
+/*static*/ bool
+DataBasedTest::_ReadEchoLine(TestEnvironment* environment, std::istream& input,
+	std::string& _line)
+{
+	if (!std::getline(input, _line))
+		return false;
+
+	// Jam prints a space at the end of each line printed via Echo. Chop it off
+	// to get comparable results.
+	if (environment->GetCompatibility() == COMPATIBILITY_JAM) {
+		size_t length = _line.length();
+		if (length > 0 && _line[length - 1] == ' ')
+			_line.resize(length - 1);
+	}
+
+	return true;
 }
 
 

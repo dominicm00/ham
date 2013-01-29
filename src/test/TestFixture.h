@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "Compatibility.h"
 #include "data/StringList.h"
 #include "test/TestException.h"
 
@@ -59,7 +60,9 @@ public:
 	static	void				ExecuteCodeHamLibrary(
 									const std::string& code,
 									std::ostream& output,
-									std::ostream& errorOutput);
+									std::ostream& errorOutput,
+									Compatibility compatibility
+										= COMPATIBILITY_HAM);
 	static	void				ExecuteCodeExecutable(
 									const char* jamExecutable,
 									const std::string& code,

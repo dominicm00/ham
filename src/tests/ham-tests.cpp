@@ -32,6 +32,11 @@ print_usage(const char* programName, bool error)
 	FILE* out = error ? stderr : stdout;
 	fprintf(out, "Usage: %s [ <options> ] [ <tests> ]\n", programName);
 	fprintf(out, "Options:\n");
+	fprintf(out, "  -c <version>, --compatibility <version>\n");
+	fprintf(out, "      Behave compatible to <version>, which is either of "
+		"\"jam\" (plain jam\n");
+	fprintf(out, "      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
+		"default).\n");
 	fprintf(out, "  -d <directory>, --data <directory>\n");
 	fprintf(out, "      Use test data directory <directory>. By default the "
 		"program tries to\n");
@@ -185,6 +190,8 @@ main(int argc, const char* const* argv)
 	std::string testDataDirectory;
 	std::string jamExecutable;
 	bool listOnly = false;
+	Compatibility compatibility = COMPATIBILITY_HAM;
+	bool explicitCompatibility = false;
 
 	int argi = 1;
 	while (argi < argc) {
@@ -197,13 +204,15 @@ main(int argc, const char* const* argv)
 
 		if (*arg == '-') {
 			// long ("--") option -- map to short option
-			if (strcmp(arg, "-data"))
+			if (strcmp(arg, "-compatibility") == 0)
+				arg = "c";
+			else if (strcmp(arg, "-data") == 0)
 				arg = "d";
-			else if (strcmp(arg, "-help"))
+			else if (strcmp(arg, "-help") == 0)
 				arg = "h";
-			else if (strcmp(arg, "-jam"))
+			else if (strcmp(arg, "-jam") == 0)
 				arg = "j";
-			else if (strcmp(arg, "-list"))
+			else if (strcmp(arg, "-list") == 0)
 				arg = "l";
 			else
 				print_usage_end_exit(argv[0], true);
@@ -212,6 +221,27 @@ main(int argc, const char* const* argv)
 		// short ("-") option(s)
 		for (; *arg != '\0'; arg++) {
 			switch (*arg) {
+				case 'c':
+				{
+					if (argi == argc)
+						print_usage_end_exit(argv[0], true);
+
+					const char* compatibilityString = argv[argi++];
+					if (strcmp(compatibilityString, "jam") == 0) {
+						compatibility = COMPATIBILITY_JAM;
+					} else if (strcmp(compatibilityString, "boost") == 0) {
+						compatibility = COMPATIBILITY_BOOST_JAM;
+					} else if (strcmp(compatibilityString, "ham") == 0) {
+						compatibility = COMPATIBILITY_HAM;
+					} else {
+						fprintf(stderr, "Error: Invalid argument for "
+							"compatibility option: \"%s\"\n",
+							compatibilityString);
+						exit(1);
+					}
+					explicitCompatibility = true;
+					break;
+				}
 				case 'd':
 					if (argi == argc)
 						print_usage_end_exit(argv[0], true);
@@ -223,6 +253,17 @@ main(int argc, const char* const* argv)
 					if (argi == argc)
 						print_usage_end_exit(argv[0], true);
 					jamExecutable = argv[argi++];
+
+					// If not explicitly given, guess the jam version.
+					if (!explicitCompatibility) {
+						const char* slash = strrchr(jamExecutable.c_str(), '/');
+						const char* baseName = slash != NULL
+							? slash + 1 : jamExecutable.c_str();
+						if (strcmp(baseName, "jam") == 0)
+							compatibility = COMPATIBILITY_JAM;
+						else if (strcmp(baseName, "bjam") == 0)
+							compatibility = COMPATIBILITY_BOOST_JAM;
+					}
 					break;
 				case 'l':
 					listOnly = true;
@@ -260,6 +301,7 @@ main(int argc, const char* const* argv)
 
 	// run tests
 	test::TestEnvironment environment;
+	environment.SetCompatibility(compatibility);
 	environment.SetJamExecutable(jamExecutable);
 	testRunner.Run(&environment);
 

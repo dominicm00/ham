@@ -19,6 +19,10 @@ namespace test {
 
 static const std::string kTestCaseSeparator("---");
 static const std::string kInputOutputSeparator("-");
+static const std::string kCompatibilityDirective("compat ");
+static const std::string kCompatibilityJam("jam");
+static const std::string kCompatibilityBoostJam("boost");
+static const std::string kCompatibilityHam("ham");
 
 
 DataBasedTestParser::DataBasedTestParser()
@@ -74,6 +78,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::vector<std::string> previousOutput;
 
 	for (;;) {
+		uint32_t compatibilityMask = COMPATIBILITY_MASK_ALL;
 		std::vector<std::string> input;
 		for (;;) {
 			std::string line;
@@ -96,10 +101,41 @@ DataBasedTestParser::Parse(const char* fileName)
 
 					input.push_back(previousInput.at(input.size()));
 					continue;
-				} else {
-					_Throw(std::string("Unsupported directive \"#!" + line
-						+ "\" in test case input"));
 				}
+
+				if (line.compare(0, kCompatibilityDirective.length(),
+						kCompatibilityDirective) == 0) {
+					compatibilityMask = 0;
+					std::string remainder(line,
+						kCompatibilityDirective.length());
+					size_t index = 0;
+					while ((index = remainder.find_first_not_of(' ', index))
+							!= std::string::npos) {
+						size_t end = remainder.find(' ', index);
+						std::string versionString(remainder, index,
+							end != std::string::npos ?
+								end : remainder.length() - index);
+						Compatibility version;
+						if (versionString == kCompatibilityJam) {
+							version = COMPATIBILITY_JAM;
+						} else if (versionString == kCompatibilityBoostJam) {
+							version = COMPATIBILITY_BOOST_JAM;
+						} else if (versionString == kCompatibilityHam) {
+							version = COMPATIBILITY_HAM;
+						} else {
+							_Throw(std::string("Invalid argument for "
+								"\"#!compat\" directive: \"" + versionString
+								+ "\""));
+						}
+						compatibilityMask |= 1 << version;
+
+						index += versionString.length();
+					}
+					continue;
+				}
+
+				_Throw(std::string("Unsupported directive \"#!" + line
+					+ "\" in test case input"));
 			}
 
 			if (line == kInputOutputSeparator)
@@ -149,7 +185,7 @@ DataBasedTestParser::Parse(const char* fileName)
 
 		previousInput = input;
 		previousOutput = output;
-		test->AddDataSet(input, output);
+		test->AddDataSet(input, output, compatibilityMask);
 	}
 }
 

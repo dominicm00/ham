@@ -210,16 +210,18 @@ TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
 	// Depending on whether the environment specifies a jam executable or not,
 	// execute the code via that or via the ham library.
 	std::string jamExecutable = environment->JamExecutable();
-	if (jamExecutable.empty())
-		ExecuteCodeHamLibrary(code, output, errorOutput);
-	else
+	if (jamExecutable.empty()) {
+		ExecuteCodeHamLibrary(code, output, errorOutput,
+			environment->GetCompatibility());
+	} else
 		ExecuteCodeExecutable(jamExecutable.c_str(), code, output, errorOutput);
 }
 
 
 /*static*/ void
 TestFixture::ExecuteCodeHamLibrary(const std::string& code,
-	std::ostream& output, std::ostream& errorOutput)
+	std::ostream& output, std::ostream& errorOutput,
+	Compatibility compatibility)
 {
 	// parse code
 	parser::Parser parser;
@@ -231,6 +233,7 @@ TestFixture::ExecuteCodeHamLibrary(const std::string& code,
 	code::EvaluationContext evaluationContext(globalVariables, targets);
 	code::BuiltInRules::RegisterRules(evaluationContext.Rules());
 
+	evaluationContext.SetCompatibility(compatibility);
 	evaluationContext.SetOutput(output);
 	evaluationContext.SetErrorOutput(errorOutput);
 
