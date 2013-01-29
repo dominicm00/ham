@@ -7,6 +7,7 @@ paths =
 	some/path/bar.bee
 	/an/absolute/path/foobar.so
 	/
+	""
 ;
 for result in "$(paths:%1)" {
 	Echo $(result) ;
@@ -22,6 +23,7 @@ path/foo.a
 some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+
 ---
 R=root
 -
@@ -33,6 +35,33 @@ root/path/foo.a
 root/some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+root/
+---
+#!compat boost ham
+R=root/
+-
+root/foo
+root/bar.a
+root/foobar.bee
+root/path/foo
+root/path/foo.a
+root/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+root/
+---
+#!compat jam
+R=root/
+-
+root//foo
+root//bar.a
+root//foobar.bee
+root//path/foo
+root//path/foo.a
+root//some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+root//
 ---
 R=root/beer
 -
@@ -44,6 +73,7 @@ root/beer/path/foo.a
 root/beer/some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+root/beer/
 ---
 R=/root/beer
 -
@@ -55,4 +85,69 @@ R=/root/beer
 /root/beer/some/path/bar.bee
 /an/absolute/path/foobar.so
 /
+/root/beer/
+---
+#!compat boost ham
+R=/root/beer/
+-
+/root/beer/foo
+/root/beer/bar.a
+/root/beer/foobar.bee
+/root/beer/path/foo
+/root/beer/path/foo.a
+/root/beer/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+/root/beer/
+---
+#!compat jam
+R=/root/beer/
+-
+/root/beer//foo
+/root/beer//bar.a
+/root/beer//foobar.bee
+/root/beer//path/foo
+/root/beer//path/foo.a
+/root/beer//some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+/root/beer//
+---
+#!compat boost ham
+R=/
+-
+/foo
+/bar.a
+/foobar.bee
+/path/foo
+/path/foo.a
+/some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+/
+---
+#!compat jam
+R=/
+-
+//foo
+//bar.a
+//foobar.bee
+//path/foo
+//path/foo.a
+//some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+//
+---
+R=.
+-
+foo
+bar.a
+foobar.bee
+path/foo
+path/foo.a
+some/path/bar.bee
+/an/absolute/path/foobar.so
+/
+
 ---
