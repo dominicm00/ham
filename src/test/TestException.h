@@ -32,7 +32,6 @@ private:
 			const char*			fFile;
 			int					fLine;
 			std::string			fMessage;
-
 };
 
 
