@@ -8,7 +8,7 @@
 
 #include <ostream>
 
-#include "behavior/Compatibility.h"
+#include "behavior/Behavior.h"
 #include "code/Defs.h"
 #include "code/RulePool.h"
 #include "data/VariableScope.h"
@@ -36,6 +36,11 @@ public:
 			void				SetCompatibility(
 									behavior::Compatibility compatibility)
 									{ fCompatibility = compatibility; }
+
+			behavior::Behavior	GetBehavior() const
+									{ return fBehavior; }
+			void				SetBehavior(behavior::Behavior behavior)
+									{ fBehavior = behavior; }
 
 			data::VariableDomain* GlobalVariables()
 									{ return &fGlobalVariables; }
@@ -71,6 +76,7 @@ public:
 
 private:
 			behavior::Compatibility fCompatibility;
+			behavior::Behavior	fBehavior;
 			data::VariableDomain& fGlobalVariables;
 			data::VariableScope	fRootScope;
 			data::VariableScope* fGlobalScope;
