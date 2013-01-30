@@ -8,7 +8,7 @@ namespace behavior {
 Behavior::Behavior(Compatibility compatibility)
 	:
 	fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
-	fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_IF_NEEDED)
+	fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE)
 {
 	switch (compatibility) {
 		case COMPATIBILITY_JAM:
@@ -16,8 +16,6 @@ Behavior::Behavior(Compatibility compatibility)
 			fPathRootReplacerSlash = PATH_ROOT_REPLACER_SLASH_ALWAYS;
 			break;
 		case COMPATIBILITY_BOOST_JAM:
-			fPathRootReplacerSlash = PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE;
-			break;
 		case COMPATIBILITY_HAM_1:
 			break;
 	}

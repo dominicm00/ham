@@ -27,14 +27,9 @@ public:
 					// If the parameter is not empty, the root replacer always
 					// appends '/' after the root component. Leads to duplicate
 					// '/', when the parameter ends with a slash.
-				PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE,
+				PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE
 					// If the parameter is not empty and doesn't end with a '/',
 					// the root replacer appends a '/' after the root component.
-					// Leads to unnecessary trailing '/', if the other path
-					// components are empty.
-				PATH_ROOT_REPLACER_SLASH_IF_NEEDED
-					// If the parameter is not empty, the root replacer appends
-					// '/' after the root component, only if necessary.
 			};
 
 public:

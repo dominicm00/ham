@@ -117,7 +117,8 @@ StringListOperations::Parse(const char* start, const char* end)
 
 
 StringList
-StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
+StringListOperations::Apply(const StringList& inputList, size_t maxSize,
+	const behavior::Behavior& behavior) const
 {
 	if (!HasOperations())
 		return inputList;
@@ -187,7 +188,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize) const
 				parts.fArchiveMember.Unset();
 			}
 
-			_AssemblePath(parts, buffer);
+			_AssemblePath(parts, buffer, behavior);
 		} else
 			buffer += string;
 
@@ -279,7 +280,7 @@ StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
 
 /*static*/ void
 StringListOperations::_AssemblePath(const PathParts& parts,
-	StringBuffer& buffer)
+	StringBuffer& buffer, const behavior::Behavior& behavior)
 {
 	// TODO: This is platform dependent!
 
@@ -291,12 +292,15 @@ StringListOperations::_AssemblePath(const PathParts& parts,
 			buffer += '>';
 	}
 
-	// Use root only, if the directory part isn't absolute.
+	// Use root only, if the directory part isn't absolute and if the root isn't
+	// ".".
 	if (!parts.fRoot.IsEmpty()
+		&& (parts.fRoot.Length() > 1 || parts.fRoot.Start()[0] != '.')
 		&& (parts.fDirectory.IsEmpty() || parts.fDirectory.Start()[0] != '/')) {
 		buffer += parts.fRoot;
-		if (!parts.fDirectory.IsEmpty() || !parts.fBaseName.IsEmpty()
-			|| !parts.fSuffix.IsEmpty() || !parts.fArchiveMember.IsEmpty()) {
+		if (behavior.GetPathRootReplacerSlash()
+				== behavior::Behavior::PATH_ROOT_REPLACER_SLASH_ALWAYS
+			|| parts.fRoot.End()[-1] != '/') {
 			buffer += '/';
 		}
 	}

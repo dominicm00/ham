@@ -255,8 +255,10 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 				colon = colonEnd;
 			}
 
-			if (operations.HasOperations())
-				variableValue = operations.Apply(variableValue, maxSize);
+			if (operations.HasOperations()) {
+				variableValue = operations.Apply(variableValue, maxSize,
+					context.GetBehavior());
+			}
 		} else if (maxSize < variableValue.Size())
 			variableValue = variableValue.SubList(0, maxSize);
 
