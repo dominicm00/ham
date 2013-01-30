@@ -34,8 +34,7 @@ public:
 			behavior::Compatibility	GetCompatibility() const
 									{ return fCompatibility; }
 			void				SetCompatibility(
-									behavior::Compatibility compatibility)
-									{ fCompatibility = compatibility; }
+									behavior::Compatibility compatibility);
 
 			behavior::Behavior	GetBehavior() const
 									{ return fBehavior; }

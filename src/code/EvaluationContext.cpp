@@ -30,5 +30,13 @@ EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 }
 
 
+void
+EvaluationContext::SetCompatibility(behavior::Compatibility compatibility)
+{
+	fCompatibility = compatibility;
+	fBehavior = behavior::Behavior(fCompatibility);
+}
+
+
 }	// namespace code
 }	// namespace ham
