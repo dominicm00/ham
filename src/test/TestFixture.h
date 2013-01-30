@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "Compatibility.h"
+#include "behavior/Compatibility.h"
 #include "data/StringList.h"
 #include "test/TestException.h"
 
@@ -61,8 +61,8 @@ public:
 									const std::string& code,
 									std::ostream& output,
 									std::ostream& errorOutput,
-									Compatibility compatibility
-										= COMPATIBILITY_HAM);
+									behavior::Compatibility compatibility
+										= behavior::COMPATIBILITY_HAM);
 	static	void				ExecuteCodeExecutable(
 									const char* jamExecutable,
 									const std::string& code,

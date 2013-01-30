@@ -190,7 +190,7 @@ main(int argc, const char* const* argv)
 	std::string testDataDirectory;
 	std::string jamExecutable;
 	bool listOnly = false;
-	Compatibility compatibility = COMPATIBILITY_HAM;
+	behavior::Compatibility compatibility = behavior::COMPATIBILITY_HAM;
 	bool explicitCompatibility = false;
 
 	int argi = 1;
@@ -228,11 +228,11 @@ main(int argc, const char* const* argv)
 
 					const char* compatibilityString = argv[argi++];
 					if (strcmp(compatibilityString, "jam") == 0) {
-						compatibility = COMPATIBILITY_JAM;
+						compatibility = behavior::COMPATIBILITY_JAM;
 					} else if (strcmp(compatibilityString, "boost") == 0) {
-						compatibility = COMPATIBILITY_BOOST_JAM;
+						compatibility = behavior::COMPATIBILITY_BOOST_JAM;
 					} else if (strcmp(compatibilityString, "ham") == 0) {
-						compatibility = COMPATIBILITY_HAM;
+						compatibility = behavior::COMPATIBILITY_HAM;
 					} else {
 						fprintf(stderr, "Error: Invalid argument for "
 							"compatibility option: \"%s\"\n",
@@ -260,9 +260,9 @@ main(int argc, const char* const* argv)
 						const char* baseName = slash != NULL
 							? slash + 1 : jamExecutable.c_str();
 						if (strcmp(baseName, "jam") == 0)
-							compatibility = COMPATIBILITY_JAM;
+							compatibility = behavior::COMPATIBILITY_JAM;
 						else if (strcmp(baseName, "bjam") == 0)
-							compatibility = COMPATIBILITY_BOOST_JAM;
+							compatibility = behavior::COMPATIBILITY_BOOST_JAM;
 					}
 					break;
 				case 'l':

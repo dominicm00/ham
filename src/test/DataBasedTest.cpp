@@ -159,7 +159,7 @@ DataBasedTest::_ReadEchoLine(TestEnvironment* environment, std::istream& input,
 
 	// Jam prints a space at the end of each line printed via Echo. Chop it off
 	// to get comparable results.
-	if (environment->GetCompatibility() == COMPATIBILITY_JAM) {
+	if (environment->GetCompatibility() == behavior::COMPATIBILITY_JAM) {
 		size_t length = _line.length();
 		if (length > 0 && _line[length - 1] == ' ')
 			_line.resize(length - 1);

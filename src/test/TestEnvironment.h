@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "Compatibility.h"
+#include "behavior/Compatibility.h"
 
 
 namespace ham {
@@ -19,17 +19,17 @@ class TestEnvironment {
 public:
 	TestEnvironment()
 		:
-		fCompatibility(COMPATIBILITY_HAM),
+		fCompatibility(behavior::COMPATIBILITY_HAM),
 		fJamExecutable()
 	{
 	}
 
-	Compatibility GetCompatibility() const
+	behavior::Compatibility GetCompatibility() const
 	{
 		return fCompatibility;
 	}
 
-	void SetCompatibility(Compatibility compatibility)
+	void SetCompatibility(behavior::Compatibility compatibility)
 	{
 		fCompatibility = compatibility;
 	}
@@ -45,8 +45,8 @@ public:
 	}
 
 protected:
-	Compatibility	fCompatibility;
-	std::string		fJamExecutable;
+	behavior::Compatibility	fCompatibility;
+	std::string				fJamExecutable;
 };
 
 

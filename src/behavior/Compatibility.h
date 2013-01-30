@@ -2,11 +2,12 @@
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_COMPATIBILITY_H
-#define HAM_COMPATIBILITY_H
+#ifndef HAM_BEHAVIOR_COMPATIBILITY_H
+#define HAM_BEHAVIOR_COMPATIBILITY_H
 
 
 namespace ham {
+namespace behavior {
 
 
 enum Compatibility {
@@ -22,7 +23,8 @@ enum Compatibility {
 };
 
 
+}	// namespace behavior
 }	// namespace ham
 
 
-#endif	// HAM_COMPATIBILITY_H
+#endif	// HAM_BEHAVIOR_COMPATIBILITY_H

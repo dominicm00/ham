@@ -221,7 +221,7 @@ TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
 /*static*/ void
 TestFixture::ExecuteCodeHamLibrary(const std::string& code,
 	std::ostream& output, std::ostream& errorOutput,
-	Compatibility compatibility)
+	behavior::Compatibility compatibility)
 {
 	// parse code
 	parser::Parser parser;

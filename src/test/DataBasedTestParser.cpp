@@ -78,7 +78,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::vector<std::string> previousOutput;
 
 	for (;;) {
-		uint32_t compatibilityMask = COMPATIBILITY_MASK_ALL;
+		uint32_t compatibilityMask = behavior::COMPATIBILITY_MASK_ALL;
 		std::vector<std::string> input;
 		for (;;) {
 			std::string line;
@@ -115,13 +115,13 @@ DataBasedTestParser::Parse(const char* fileName)
 						std::string versionString(remainder, index,
 							end != std::string::npos ?
 								end : remainder.length() - index);
-						Compatibility version;
+						behavior::Compatibility version;
 						if (versionString == kCompatibilityJam) {
-							version = COMPATIBILITY_JAM;
+							version = behavior::COMPATIBILITY_JAM;
 						} else if (versionString == kCompatibilityBoostJam) {
-							version = COMPATIBILITY_BOOST_JAM;
+							version = behavior::COMPATIBILITY_BOOST_JAM;
 						} else if (versionString == kCompatibilityHam) {
-							version = COMPATIBILITY_HAM;
+							version = behavior::COMPATIBILITY_HAM;
 						} else {
 							_Throw(std::string("Invalid argument for "
 								"\"#!compat\" directive: \"" + versionString
