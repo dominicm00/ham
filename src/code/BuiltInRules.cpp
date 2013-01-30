@@ -30,6 +30,11 @@ public:
 					output << ' ';
 				output << list.ElementAt(i);
 			}
+
+			if (context.GetBehavior().GetEchoTrailingSpace()
+					== behavior::Behavior::ECHO_TRAILING_SPACE) {
+				output << ' ';
+			}
 		}
 
 		output << std::endl;
