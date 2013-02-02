@@ -2046,3 +2046,921 @@ some/path/base.suffix(member)
 /base.suffix(member)
 <oldgrist>some/path/base.suffix(member)
 ---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+G=grist:R=root:D=directory:B=base
+-
+<grist>root/directory/base
+<grist>root/directory/base.a
+<grist>root/directory/base.bee
+<grist>root/directory/base
+<grist>root/directory/base.a
+<grist>root/directory/base.bee
+<grist>root/directory/base.so
+<grist>root/directory/base
+<grist>root/directory/base.bee(archive.o)
+<grist>root/directory/base
+<grist>root/directory/base.a
+<grist>root/directory/base.bee
+<grist>root/directory/base
+<grist>root/directory/base.a
+<grist>root/directory/base.bee
+<grist>root/directory/base.so
+<grist>root/directory/base
+<grist>root/directory/base.bee(archive.o)
+---
+#!repeat
+G=grist:R=root:D=directory:S=.suffix
+-
+<grist>root/directory/foo.suffix
+<grist>root/directory/bar.suffix
+<grist>root/directory/foobar.suffix
+<grist>root/directory/foo.suffix
+<grist>root/directory/foo.suffix
+<grist>root/directory/bar.suffix
+<grist>root/directory/foobar.suffix
+<grist>root/directory/.suffix
+<grist>root/directory/bar.suffix(archive.o)
+<grist>root/directory/foo.suffix
+<grist>root/directory/bar.suffix
+<grist>root/directory/foobar.suffix
+<grist>root/directory/foo.suffix
+<grist>root/directory/foo.suffix
+<grist>root/directory/bar.suffix
+<grist>root/directory/foobar.suffix
+<grist>root/directory/.suffix
+<grist>root/directory/bar.suffix(archive.o)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>foo(archive.o)
+	<oldgrist>bar.a(archive.o)
+	<oldgrist>foobar.bee(archive.o)
+	<oldgrist>path/foo(archive.o)
+	<oldgrist>path/foo.a(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+	<oldgrist>/an/absolute/path/foobar.so(archive.o)
+	<oldgrist>/(archive.o)
+#!}
+G=grist:R=root:D=directory:M=member
+-
+<grist>root/directory/foo(member)
+<grist>root/directory/bar.a(member)
+<grist>root/directory/foobar.bee(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/foo.a(member)
+<grist>root/directory/bar.bee(member)
+<grist>root/directory/foobar.so(member)
+<grist>root/directory(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/bar.a(member)
+<grist>root/directory/foobar.bee(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/foo.a(member)
+<grist>root/directory/bar.bee(member)
+<grist>root/directory/foobar.so(member)
+<grist>root/directory(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/bar.a(member)
+<grist>root/directory/foobar.bee(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/foo.a(member)
+<grist>root/directory/bar.bee(member)
+<grist>root/directory/foobar.so(member)
+<grist>root/directory(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/bar.a(member)
+<grist>root/directory/foobar.bee(member)
+<grist>root/directory/foo(member)
+<grist>root/directory/foo.a(member)
+<grist>root/directory/bar.bee(member)
+<grist>root/directory/foobar.so(member)
+<grist>root/directory(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+G=grist:R=root:B=base:S=.suffix
+-
+<grist>root/base.suffix
+<grist>root/base.suffix
+<grist>root/base.suffix
+<grist>root/path/base.suffix
+<grist>root/path/base.suffix
+<grist>root/some/path/base.suffix
+<grist>/an/absolute/path/base.suffix
+<grist>/base.suffix
+<grist>root/some/path/base.suffix(archive.o)
+<grist>root/base.suffix
+<grist>root/base.suffix
+<grist>root/base.suffix
+<grist>root/path/base.suffix
+<grist>root/path/base.suffix
+<grist>root/some/path/base.suffix
+<grist>/an/absolute/path/base.suffix
+<grist>/base.suffix
+<grist>root/some/path/base.suffix(archive.o)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>foo(archive.o)
+	<oldgrist>bar.a(archive.o)
+	<oldgrist>foobar.bee(archive.o)
+	<oldgrist>path/foo(archive.o)
+	<oldgrist>path/foo.a(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+	<oldgrist>/an/absolute/path/foobar.so(archive.o)
+	<oldgrist>/(archive.o)
+#!}
+G=grist:R=root:B=base:M=member
+-
+<grist>root/base(member)
+<grist>root/base.a(member)
+<grist>root/base.bee(member)
+<grist>root/path/base(member)
+<grist>root/path/base.a(member)
+<grist>root/some/path/base.bee(member)
+<grist>/an/absolute/path/base.so(member)
+<grist>/base(member)
+<grist>root/base(member)
+<grist>root/base.a(member)
+<grist>root/base.bee(member)
+<grist>root/path/base(member)
+<grist>root/path/base.a(member)
+<grist>root/some/path/base.bee(member)
+<grist>/an/absolute/path/base.so(member)
+<grist>/base(member)
+<grist>root/base(member)
+<grist>root/base.a(member)
+<grist>root/base.bee(member)
+<grist>root/path/base(member)
+<grist>root/path/base.a(member)
+<grist>root/some/path/base.bee(member)
+<grist>/an/absolute/path/base.so(member)
+<grist>/base(member)
+<grist>root/base(member)
+<grist>root/base.a(member)
+<grist>root/base.bee(member)
+<grist>root/path/base(member)
+<grist>root/path/base.a(member)
+<grist>root/some/path/base.bee(member)
+<grist>/an/absolute/path/base.so(member)
+<grist>/base(member)
+---
+#!repeat
+G=grist:R=root:S=.suffix:M=member
+-
+<grist>root/foo.suffix(member)
+<grist>root/bar.suffix(member)
+<grist>root/foobar.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/some/path/bar.suffix(member)
+<grist>/an/absolute/path/foobar.suffix(member)
+<grist>/.suffix(member)
+<grist>root/foo.suffix(member)
+<grist>root/bar.suffix(member)
+<grist>root/foobar.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/some/path/bar.suffix(member)
+<grist>/an/absolute/path/foobar.suffix(member)
+<grist>/.suffix(member)
+<grist>root/foo.suffix(member)
+<grist>root/bar.suffix(member)
+<grist>root/foobar.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/some/path/bar.suffix(member)
+<grist>/an/absolute/path/foobar.suffix(member)
+<grist>/.suffix(member)
+<grist>root/foo.suffix(member)
+<grist>root/bar.suffix(member)
+<grist>root/foobar.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/path/foo.suffix(member)
+<grist>root/some/path/bar.suffix(member)
+<grist>/an/absolute/path/foobar.suffix(member)
+<grist>/.suffix(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+G=grist:D=directory:B=base:S=.suffix
+-
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix(archive.o)
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix
+<grist>directory/base.suffix(archive.o)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>foo(archive.o)
+	<oldgrist>bar.a(archive.o)
+	<oldgrist>foobar.bee(archive.o)
+	<oldgrist>path/foo(archive.o)
+	<oldgrist>path/foo.a(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+	<oldgrist>/an/absolute/path/foobar.so(archive.o)
+	<oldgrist>/(archive.o)
+#!}
+G=grist:D=directory:B=base:M=member
+-
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base.so(member)
+<grist>directory/base(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base.so(member)
+<grist>directory/base(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base.so(member)
+<grist>directory/base(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base(member)
+<grist>directory/base.a(member)
+<grist>directory/base.bee(member)
+<grist>directory/base.so(member)
+<grist>directory/base(member)
+---
+#!repeat
+G=grist:D=directory:S=.suffix:M=member
+-
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/foo.suffix(member)
+<grist>directory/bar.suffix(member)
+<grist>directory/foobar.suffix(member)
+<grist>directory/.suffix(member)
+---
+#!repeat
+G=grist:B=base:S=.suffix:M=member
+-
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>path/base.suffix(member)
+<grist>some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+R=root:D=directory:B=base:S=.suffix
+-
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+root/directory/base.suffix
+<oldgrist>root/directory/base.suffix(archive.o)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	<oldgrist>some/path/bar.bee
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+R=root:D=directory:B=base:M=member
+-
+root/directory/base(member)
+root/directory/base.a(member)
+root/directory/base.bee(member)
+root/directory/base(member)
+root/directory/base.a(member)
+root/directory/base.bee(member)
+root/directory/base.so(member)
+root/directory/base(member)
+<oldgrist>root/directory/base.bee(member)
+root/directory/base(member)
+root/directory/base.a(member)
+root/directory/base.bee(member)
+root/directory/base(member)
+root/directory/base.a(member)
+root/directory/base.bee(member)
+root/directory/base.so(member)
+root/directory/base(member)
+<oldgrist>root/directory/base.bee(member)
+---
+#!repeat
+R=root:D=directory:S=.suffix:M=member
+-
+root/directory/foo.suffix(member)
+root/directory/bar.suffix(member)
+root/directory/foobar.suffix(member)
+root/directory/foo.suffix(member)
+root/directory/foo.suffix(member)
+root/directory/bar.suffix(member)
+root/directory/foobar.suffix(member)
+root/directory/.suffix(member)
+<oldgrist>root/directory/bar.suffix(member)
+root/directory/foo.suffix(member)
+root/directory/bar.suffix(member)
+root/directory/foobar.suffix(member)
+root/directory/foo.suffix(member)
+root/directory/foo.suffix(member)
+root/directory/bar.suffix(member)
+root/directory/foobar.suffix(member)
+root/directory/.suffix(member)
+<oldgrist>root/directory/bar.suffix(member)
+---
+#!repeat
+R=root:B=base:S=.suffix:M=member
+-
+root/base.suffix(member)
+root/base.suffix(member)
+root/base.suffix(member)
+root/path/base.suffix(member)
+root/path/base.suffix(member)
+root/some/path/base.suffix(member)
+/an/absolute/path/base.suffix(member)
+/base.suffix(member)
+<oldgrist>root/some/path/base.suffix(member)
+root/base.suffix(member)
+root/base.suffix(member)
+root/base.suffix(member)
+root/path/base.suffix(member)
+root/path/base.suffix(member)
+root/some/path/base.suffix(member)
+/an/absolute/path/base.suffix(member)
+/base.suffix(member)
+<oldgrist>root/some/path/base.suffix(member)
+---
+#!repeat
+D=directory:B=base:S=.suffix:M=member
+-
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+<oldgrist>directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+directory/base.suffix(member)
+<oldgrist>directory/base.suffix(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	some/path/bar.bee(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+G=grist:R=root:D=directory:B=base:S=.suffix
+-
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix(archive.o)
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix
+<grist>root/directory/base.suffix(archive.o)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>foo(archive.o)
+	<oldgrist>bar.a(archive.o)
+	<oldgrist>foobar.bee(archive.o)
+	<oldgrist>path/foo(archive.o)
+	<oldgrist>path/foo.a(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+	<oldgrist>/an/absolute/path/foobar.so(archive.o)
+	<oldgrist>/(archive.o)
+#!}
+G=grist:R=root:D=directory:B=base:M=member
+-
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base.so(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base.so(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base.so(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base(member)
+<grist>root/directory/base.a(member)
+<grist>root/directory/base.bee(member)
+<grist>root/directory/base.so(member)
+<grist>root/directory/base(member)
+---
+#!repeat
+G=grist:R=root:D=directory:S=.suffix:M=member
+-
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/foo.suffix(member)
+<grist>root/directory/bar.suffix(member)
+<grist>root/directory/foobar.suffix(member)
+<grist>root/directory/.suffix(member)
+---
+#!repeat
+G=grist:R=root:B=base:S=.suffix:M=member
+-
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/path/base.suffix(member)
+<grist>root/some/path/base.suffix(member)
+<grist>/an/absolute/path/base.suffix(member)
+<grist>/base.suffix(member)
+---
+#!repeat
+G=grist:D=directory:B=base:S=.suffix:M=member
+-
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+<grist>directory/base.suffix(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	<oldgrist>some/path/bar.bee
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+R=root:D=directory:B=base:S=.suffix:M=member
+-
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+<oldgrist>root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+root/directory/base.suffix(member)
+<oldgrist>root/directory/base.suffix(member)
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	foo(archive.o)
+	bar.a(archive.o)
+	foobar.bee(archive.o)
+	path/foo(archive.o)
+	path/foo.a(archive.o)
+	some/path/bar.bee(archive.o)
+	/an/absolute/path/foobar.so(archive.o)
+	/(archive.o)
+	<oldgrist>foo
+	<oldgrist>bar.a
+	<oldgrist>foobar.bee
+	<oldgrist>path/foo
+	<oldgrist>path/foo.a
+	<oldgrist>some/path/bar.bee
+	<oldgrist>/an/absolute/path/foobar.so
+	<oldgrist>/
+	<oldgrist>foo(archive.o)
+	<oldgrist>bar.a(archive.o)
+	<oldgrist>foobar.bee(archive.o)
+	<oldgrist>path/foo(archive.o)
+	<oldgrist>path/foo.a(archive.o)
+	<oldgrist>some/path/bar.bee(archive.o)
+	<oldgrist>/an/absolute/path/foobar.so(archive.o)
+	<oldgrist>/(archive.o)
+#!}
+G=grist:R=root:D=directory:B=base:S=.suffix:M=member
+-
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+<grist>root/directory/base.suffix(member)
+---
