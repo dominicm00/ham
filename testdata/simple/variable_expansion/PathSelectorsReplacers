@@ -1,0 +1,90 @@
+paths = %1 ;
+for result in "$(paths:%2)" {
+	Echo $(result) ;
+}
+---
+#!{
+	foo
+	<oldgrist>foo
+#!}
+GG=grist
+-
+<grist>
+<grist>
+---
+#!{
+	foo
+	<oldgrist>foo
+#!}
+G=grist:G
+-
+
+<oldgrist>
+---
+#!{
+	foo
+	<oldgrist>foo
+#!}
+BG=grist
+-
+<grist>foo
+<grist>foo
+---
+#!{
+	foo
+	<oldgrist>foo
+#!}
+G=grist:B
+-
+foo
+foo
+---
+#!{
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	<oldgrist>some/path/bar.bee(archive.o)
+#!}
+GDSB=base
+-
+base
+base.a
+base.bee
+path/base
+path/base.a
+some/path/base.bee
+/an/absolute/path/base.so
+/base
+<oldgrist>some/path/base.bee
+---
+#!repeat
+BSD=directory
+-
+directory/foo
+directory/bar.a
+directory/foobar.bee
+directory/foo
+directory/foo.a
+directory/bar.bee
+directory/foobar.so
+directory
+directory/bar.bee
+---
+#!repeat
+PD=directory
+-
+directory
+directory
+directory
+directory
+directory
+directory
+directory
+directory
+<oldgrist>directory
+---
