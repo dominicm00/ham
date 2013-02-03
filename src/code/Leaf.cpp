@@ -279,7 +279,8 @@ Leaf::_ParseSubscripts(const char* start, const char* end, size_t& _firstIndex,
 	size_t& _endIndex)
 {
 	// TODO: Since Jam doesn't do much sanity checking of what it parses, its
-	// behavior is weird for invalid input. We don't copy that behavior yet.
+	// behavior is weird for invalid input. We don't copy all of that behavior
+	// yet.
 
 	// Jam subscripts are 1-based and the end subscript is inclusive. We convert
 	// to 0-based indices and an exclusive end index.
@@ -307,6 +308,13 @@ Leaf::_ParseSubscripts(const char* start, const char* end, size_t& _firstIndex,
 	long endIndex = strtol(lastStart, &numberEnd, 10);
 	if (numberEnd == lastStart || numberEnd > end)
 		return false;
+
+	// Emulate Jam behavior: Since jam computes a size from the second subscript
+	// before checking the validity of the first subscript, we are off by as
+	// much as we adjusted the first subscript, if compute the size afterwards.
+	// Compensate for that.
+	if (firstIndex < 1)
+		endIndex += 1 - firstIndex;
 
 	_endIndex = endIndex >= 0 ? endIndex : 0;
 	return true;
