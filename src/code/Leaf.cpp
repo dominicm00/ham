@@ -186,6 +186,10 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// The usual list multiplication rules apply, i.e.:
 	// <variable1 range1 modifiers1> <variable1 range1 modifiers2> ...
 	// <variable1 range2 modifiers1> ... <variable2 range1 modifiers1> ...
+	//
+	// Note: We're more lenient than jam, allowing ':' as a separator after
+	// path part selectors. E.g. we allow "$(foo:G:B)", which jam considers
+	// invalid syntax and ignores ":B".
 
 	const char* variableNameEnd = variableEnd;
 
