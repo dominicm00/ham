@@ -46,11 +46,7 @@ public:
 											| REPLACE_DIRECTORY
 											| REPLACE_BASE_NAME
 											| REPLACE_SUFFIX
-											| REPLACE_ARCHIVE_MEMBER
-											| TO_PARENT_DIRECTORY,
-												// behaves like a (multi) path
-												// part replacer, though it
-												// doesn't have a parameter
+											| REPLACE_ARCHIVE_MEMBER,
 				PATH_PART_SELECTOR_MASK		= SELECT_GRIST
 											| SELECT_ROOT
 											| SELECT_DIRECTORY

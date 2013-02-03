@@ -108,6 +108,20 @@ StringListOperations::Parse(const char* start, const char* end)
 	}
 
 	if ((pendingOperation & NO_PARAMETER_OPERATION_MASK) != 0) {
+		// Emulate Jam behavior: On the first encounter of a path part selector
+		// we forget all path part replacer operations.
+		if ((pendingOperation & PATH_PART_SELECTOR_MASK) != 0
+			&& (fOperations & PATH_PART_SELECTOR_MASK) == 0
+			&& (fOperations & PATH_PART_REPLACER_MASK) != 0) {
+			fGristParameter.Unset();
+			fDirectoryParameter.Unset();
+			fBaseNameParameter.Unset();
+			fSuffixParameter.Unset();
+			fArchiveMemberParameter.Unset();
+			fRootParameter.Unset();
+			fOperations &= ~(uint32_t)PATH_PART_REPLACER_MASK;
+		}
+
 		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 	} else if (pendingParameter != NULL) {
 		pendingParameter->SetTo(end, end);
@@ -126,7 +140,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	uint32_t operations = fOperations;
 	bool hasSelectorOperation = (operations & PATH_PART_SELECTOR_MASK) != 0;
 	bool hasPathPartOperation = hasSelectorOperation
-		|| (operations & PATH_PART_REPLACER_MASK) != 0;
+		|| (operations & (PATH_PART_REPLACER_MASK | TO_PARENT_DIRECTORY)) != 0;
 	if (hasPathPartOperation && !hasSelectorOperation) {
 		// Only replacer operations. Continue as if all path parts are selected.
 		operations |= PATH_PART_SELECTOR_MASK;
