@@ -1,0 +1,115 @@
+empty = ;
+single = Skywalker ;
+double = Darth Vader ;
+triple = a b c ;
+triple2 = x y z ;
+
+result = %1 ;
+if $(result) {
+	Echo $(result) ;
+}
+---
+$(undefined)
+-
+---
+foo$(undefined)
+-
+---
+$(undefined)bar
+-
+---
+foo$(undefined)bar
+-
+---
+$(empty)
+-
+---
+foo$(empty)
+-
+---
+$(empty)bar
+-
+---
+foo$(empty)bar
+-
+---
+$(single)
+-
+Skywalker
+---
+foo$(single)
+-
+fooSkywalker
+---
+$(single)bar
+-
+Skywalkerbar
+---
+foo$(single)bar
+-
+fooSkywalkerbar
+---
+$(double)
+-
+Darth Vader
+---
+foo$(double)
+-
+fooDarth fooVader
+---
+$(double)bar
+-
+Darthbar Vaderbar
+---
+foo$(double)bar
+-
+fooDarthbar fooVaderbar
+---
+$(triple)
+-
+a b c
+---
+foo$(triple)
+-
+fooa foob fooc
+---
+$(triple)bar
+-
+abar bbar cbar
+---
+foo$(triple)bar
+-
+fooabar foobbar foocbar
+---
+$(undefined)(triple)
+-
+---
+$(triple)$(undefined)
+-
+---
+$(empty)$(triple)
+-
+---
+$(triple)$(empty)
+-
+---
+$(single)$(triple)
+-
+Skywalkera Skywalkerb Skywalkerc
+---
+$(triple)$(single)
+-
+aSkywalker bSkywalker cSkywalker
+---
+$(double)$(triple)
+-
+Dartha Darthb Darthc Vadera Vaderb Vaderc
+---
+$(triple)$(double)
+-
+aDarth aVader bDarth bVader cDarth cVader
+---
+1$(double)2$(triple)3
+-
+1Darth2a3 1Darth2b3 1Darth2c3 1Vader2a3 1Vader2b3 1Vader2c3
+---

@@ -24,14 +24,11 @@ public:
 			void				CleanupTestCase();
 
 			void				None();
-			void				Simple();
-			void				Subscripts();
-			void				Operations();
 			void				PathSelectorsEmpty();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(VariableExpansionTest, 5,
-		None, Simple, Subscripts, Operations, PathSelectorsEmpty)
+	HAM_ADD_TEST_CASES(VariableExpansionTest, 2,
+		None, PathSelectorsEmpty)
 
 private:
 			StringList			_Evaluate(const String& string);
