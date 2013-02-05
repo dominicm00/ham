@@ -135,7 +135,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	const behavior::Behavior& behavior) const
 {
 	if (!HasOperations())
-		return inputList;
+		return inputList.SubList(0, maxSize);
 
 	uint32_t operations = fOperations;
 	bool hasSelectorOperation = (operations & PATH_PART_SELECTOR_MASK) != 0;
