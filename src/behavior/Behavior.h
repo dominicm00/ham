@@ -32,6 +32,14 @@ public:
 					// the root replacer appends a '/' after the root component.
 			};
 
+			enum BrokenSubscriptJoin {
+				BROKEN_SUBSCRIPT_JOIN,
+					// A join operation with an end subscript less than the
+					// number of list elements result in an empty list.
+				NO_BROKEN_SUBSCRIPT_JOIN
+					// Joins with subscripts work as expected.
+			};
+
 public:
 								Behavior(Compatibility compatibility);
 
@@ -39,10 +47,13 @@ public:
 									{ return fEchoTrailingSpace; }
 			PathRootReplacerSlash GetPathRootReplacerSlash() const
 									{ return fPathRootReplacerSlash; }
+			BrokenSubscriptJoin	GetBrokenSubscriptJoin() const
+									{ return fBrokenSubscriptJoin; }
 
 private:
 			EchoTrailingSpace	fEchoTrailingSpace;
 			PathRootReplacerSlash fPathRootReplacerSlash;
+			BrokenSubscriptJoin	fBrokenSubscriptJoin;
 };
 
 

@@ -8,14 +8,18 @@ namespace behavior {
 Behavior::Behavior(Compatibility compatibility)
 	:
 	fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
-	fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE)
+	fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE),
+	fBrokenSubscriptJoin(NO_BROKEN_SUBSCRIPT_JOIN)
 {
 	switch (compatibility) {
 		case COMPATIBILITY_JAM:
 			fEchoTrailingSpace = ECHO_TRAILING_SPACE;
 			fPathRootReplacerSlash = PATH_ROOT_REPLACER_SLASH_ALWAYS;
+			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
 			break;
 		case COMPATIBILITY_BOOST_JAM:
+			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
+			break;
 		case COMPATIBILITY_HAM_1:
 			break;
 	}

@@ -240,8 +240,10 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 				return StringList();
 			}
 
-			if (firstIndex > 0)
-				variableValue = variableValue.SubList(firstIndex, endIndex);
+			if (firstIndex > 0) {
+				variableValue = variableValue.SubList(firstIndex,
+					std::numeric_limits<size_t>::max());
+			}
 
 			maxSize = endIndex > firstIndex ? endIndex - firstIndex : 0;
 		} else

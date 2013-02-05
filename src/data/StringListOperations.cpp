@@ -226,8 +226,15 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 		}
 	}
 
-	if ((operations & JOIN) != 0 && count > 0)
-		resultList.Append(buffer);
+	if ((operations & JOIN) != 0 && count > 0) {
+		// Append the joined value, if we're not emulating the broken behavior
+		// of jam.
+		if (behavior.GetBrokenSubscriptJoin()
+				== behavior::Behavior::NO_BROKEN_SUBSCRIPT_JOIN
+			|| count == list.Size()) {
+			resultList.Append(buffer);
+		}
+	}
 
 	return resultList;
 }
