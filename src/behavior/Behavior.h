@@ -40,6 +40,17 @@ public:
 					// Joins with subscripts work as expected.
 			};
 
+			enum JoinCaseOperator {
+				JOIN_BEFORE_CASE_OPERATOR,
+					// The join operator is executed before executing the
+					// to-lower or to-upper operator, i.e. the join parameter
+					// will be affected by the case operator as well.
+				JOIN_AFTER_CASE_OPERATOR
+					// The join operator is executed after executing the
+					// to-lower or to-upper operator, i.e. the join parameter
+					// won't be affected by the case operator.
+			};
+
 public:
 								Behavior(Compatibility compatibility);
 
@@ -49,11 +60,14 @@ public:
 									{ return fPathRootReplacerSlash; }
 			BrokenSubscriptJoin	GetBrokenSubscriptJoin() const
 									{ return fBrokenSubscriptJoin; }
+			JoinCaseOperator	GetJoinCaseOperator() const
+									{ return fJoinCaseOperator; }
 
 private:
 			EchoTrailingSpace	fEchoTrailingSpace;
 			PathRootReplacerSlash fPathRootReplacerSlash;
 			BrokenSubscriptJoin	fBrokenSubscriptJoin;
+			JoinCaseOperator	fJoinCaseOperator;
 };
 
 

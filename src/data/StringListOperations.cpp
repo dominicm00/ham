@@ -146,6 +146,22 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 		operations |= PATH_PART_SELECTOR_MASK;
 	}
 
+	// If a join shall be performed before to-upper/to-lower, we simply convert
+	// the join parameter first and join as usual afterwards.
+	String joinParameterBuffer;
+	StringPart joinParameter = fJoinParameter;
+	if (!joinParameter.IsEmpty()
+		&& (operations & (TO_UPPER | TO_LOWER)) != 0
+		&& behavior.GetJoinCaseOperator()
+			== behavior::Behavior::JOIN_BEFORE_CASE_OPERATOR) {
+		joinParameterBuffer = joinParameter;
+		if ((operations & TO_UPPER) != 0)
+			joinParameterBuffer.ToUpper();
+		else
+			joinParameterBuffer.ToLower();
+		joinParameter = joinParameterBuffer;
+	}
+
 	StringList resultList;
 	StringBuffer buffer;
 
@@ -219,7 +235,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 
 		if ((operations & JOIN) != 0) {
 			if (i + 1 < count)
-				buffer += fJoinParameter;
+				buffer += joinParameter;
 		} else {
 			resultList.Append(buffer);
 			buffer = StringPart();
