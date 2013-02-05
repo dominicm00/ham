@@ -78,6 +78,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::vector<std::string> previousOutput;
 
 	for (;;) {
+		size_t dataSetLineIndex = fLineIndex;
 		uint32_t compatibilityMask = behavior::COMPATIBILITY_MASK_ALL;
 		std::vector<std::string> input;
 		for (;;) {
@@ -185,7 +186,8 @@ DataBasedTestParser::Parse(const char* fileName)
 
 		previousInput = input;
 		previousOutput = output;
-		test->AddDataSet(input, output, compatibilityMask);
+		test->AddDataSet(input, output, compatibilityMask, dataSetLineIndex,
+			fLineIndex - 1);
 	}
 }
 

@@ -23,7 +23,8 @@ public:
 			void				AddDataSet(
 									const std::vector<std::string>& input,
 									const std::vector<std::string>& output,
-									uint32_t compatibilityMask);
+									uint32_t compatibilityMask,
+									size_t startLineIndex, size_t endLineIndex);
 
 	virtual	void*				CreateFixture(TestEnvironment* environment);
 	virtual	void				DeleteFixture(TestEnvironment* environment,
@@ -36,11 +37,14 @@ private:
 			struct DataSet {
 				DataSet(const std::vector<std::string>& input,
 					const std::vector<std::string>& output,
-					uint32_t compatibilityMask)
+					uint32_t compatibilityMask, size_t startLineIndex,
+					size_t endLineIndex)
 					:
 					fInput(input),
 					fOutput(output),
-					fCompatibilityMask(compatibilityMask)
+					fCompatibilityMask(compatibilityMask),
+					fStartLineIndex(startLineIndex),
+					fEndLineIndex(endLineIndex)
 				{
 				}
 
@@ -48,6 +52,8 @@ private:
 				std::vector<std::string>	fInput;
 				std::vector<std::string>	fOutput;
 				uint32_t					fCompatibilityMask;
+				size_t						fStartLineIndex;
+				size_t						fEndLineIndex;
 			};
 
 private:

@@ -27,9 +27,12 @@ DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 
 void
 DataBasedTest::AddDataSet(const std::vector<std::string>& input,
-	const std::vector<std::string>& output, uint32_t compatibilityMask)
+	const std::vector<std::string>& output, uint32_t compatibilityMask,
+	size_t startLineIndex, size_t endLineIndex)
 {
-	fDataSets.push_back(DataSet(input, output, compatibilityMask));
+	fDataSets.push_back(
+		DataSet(input, output, compatibilityMask, startLineIndex,
+			endLineIndex));
 
 	std::stringstream testCaseName;
 	testCaseName << fDataSets.size();
@@ -109,7 +112,9 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 		if (index < 1 || (size_t)index > dataSet.fInput.size()) {
 			throw TestException(__FILE__, __LINE__,
 				"Code template requires input data element at %ld, but got "
-				"only %zu input elements.", index, dataSet.fInput.size());
+				"only %zu input elements (lines %zu-%zu).", index,
+				dataSet.fInput.size(), dataSet.fStartLineIndex + 1,
+				dataSet.fEndLineIndex);
 		}
 
 		code += dataSet.fInput[index - 1];
@@ -129,7 +134,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	for (;;) {
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_VERIFY(_ReadEchoLine(environment, outputStream, line)),
-			"output: \"%s\"", outputStream.str().c_str())
+			"output: \"%s\"\nlines: %zu-%zu", outputStream.str().c_str(),
+			dataSet.fStartLineIndex + 1, dataSet.fEndLineIndex)
 		if (line == kOutputPrefix)
 			break;
 	}
@@ -138,7 +144,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	for (;;) {
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_VERIFY(_ReadEchoLine(environment, outputStream, line)),
-			"output: \"%s\"", outputStream.str().c_str())
+			"output: \"%s\"\nlines: %zu-%zu", outputStream.str().c_str(),
+			dataSet.fStartLineIndex + 1, dataSet.fEndLineIndex)
 		if (line == kOutputSuffix)
 			break;
 		output.push_back(line);
@@ -147,7 +154,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	// and check the output against what's expected
 	HAM_TEST_ADD_INFO(
 		HAM_TEST_EQUAL(output, dataSet.fOutput),
-				"code:\n%s", code.c_str())
+			"code:\n%s\nlines: %zu-%zu", code.c_str(),
+			dataSet.fStartLineIndex + 1, dataSet.fEndLineIndex)
 }
 
 
