@@ -466,6 +466,15 @@ StringListTest::Concatenation()
 			TestList() + "a" + "b" + "c" + "d" + "e" + "a" + "b" + "c" + "d"
 				+ "e")
 	}
+
+	// append sublists with the same buffer
+	{
+		StringList list = MakeStringList("a", "b", "c", "d", "e");
+		StringList subList1 = list.SubList(0, 2);
+		StringList subList2 = list.SubList(1, 3);
+		subList1.Append(subList2);
+		LIST_EQUAL(subList1, TestList() + "a" + "b" + "b" + "c")
+	}
 }
 
 
