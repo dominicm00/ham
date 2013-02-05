@@ -122,8 +122,10 @@ TestRunner::_RunTest(Test* test, int testCase)
 void
 TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 {
-	bool compatible = (test->TestCaseCompatibility(testCase)
-			& (1 << fEnvironment->GetCompatibility())) != 0;
+	bool supportedByHam;
+	bool compatible = (test->TestCaseCompatibility(testCase, supportedByHam)
+			& (1 << fEnvironment->GetCompatibility())) != 0
+		&& (!fEnvironment->JamExecutable().empty() || supportedByHam);
 
 	try {
 		printf("%s: ", test->TestCaseAt(testCase, true).c_str());

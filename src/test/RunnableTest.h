@@ -35,7 +35,8 @@ public:
 	virtual	void*				CreateFixture(TestEnvironment* environment) = 0;
 	virtual	void				DeleteFixture(TestEnvironment* environment,
 									void* fixture) = 0;
-	virtual	uint32_t			TestCaseCompatibility(int index);
+	virtual	uint32_t			TestCaseCompatibility(int index,
+									bool& _supportedByHam);
 	virtual	void				RunTestCase(TestEnvironment* environment,
 									void* fixture, int index) = 0;
 

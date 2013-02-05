@@ -23,6 +23,7 @@ static const std::string kCompatibilityDirective("compat ");
 static const std::string kCompatibilityJam("jam");
 static const std::string kCompatibilityBoostJam("boost");
 static const std::string kCompatibilityHam("ham");
+static const std::string kCompatibilityNotHam("!ham");
 
 
 DataBasedTestParser::DataBasedTestParser()
@@ -86,6 +87,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	for (;;) {
 		size_t dataSetLineIndex = fLineIndex;
 		uint32_t compatibilityMask = behavior::COMPATIBILITY_MASK_ALL;
+		bool supportedByHam = true;
 		std::vector<std::string> input;
 		for (;;) {
 			std::string line;
@@ -122,19 +124,22 @@ DataBasedTestParser::Parse(const char* fileName)
 						std::string versionString(remainder, index,
 							end != std::string::npos ?
 								end : remainder.length() - index);
-						behavior::Compatibility version;
 						if (versionString == kCompatibilityJam) {
-							version = behavior::COMPATIBILITY_JAM;
+							compatibilityMask
+								|= 1 << behavior::COMPATIBILITY_JAM;
 						} else if (versionString == kCompatibilityBoostJam) {
-							version = behavior::COMPATIBILITY_BOOST_JAM;
+							compatibilityMask
+								|= 1 << behavior::COMPATIBILITY_BOOST_JAM;
 						} else if (versionString == kCompatibilityHam) {
-							version = behavior::COMPATIBILITY_HAM;
+							compatibilityMask
+								|= 1 << behavior::COMPATIBILITY_HAM;
+						} else if (versionString == kCompatibilityNotHam) {
+							supportedByHam = false;
 						} else {
 							_Throw(std::string("Invalid argument for "
 								"\"#!compat\" directive: \"" + versionString
 								+ "\""));
 						}
-						compatibilityMask |= 1 << version;
 
 						index += versionString.length();
 					}
@@ -206,8 +211,8 @@ DataBasedTestParser::Parse(const char* fileName)
 
 		previousInput = input;
 		previousOutput = output;
-		test->AddDataSet(input, output, compatibilityMask, dataSetLineIndex,
-			fLineIndex - 1);
+		test->AddDataSet(input, output, compatibilityMask, supportedByHam,
+			dataSetLineIndex, fLineIndex - 1);
 	}
 }
 
