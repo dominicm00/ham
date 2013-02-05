@@ -308,7 +308,7 @@ StringList::_Detach(size_t newSize)
 {
 	// If we're the only user of the data object and the capacity and offset
 	// won't change, just resize.
-	if (fData->fReferenceCount > 1 && fOffset == 0
+	if (fData->fReferenceCount == 1 && fOffset == 0
 		&& _CapacityForSize(newSize) == fData->fCapacity) {
 		if (newSize < fSize) {
 			for (size_t i = newSize; i < fSize; i++)
