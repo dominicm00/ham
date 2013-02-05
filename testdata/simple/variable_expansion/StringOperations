@@ -163,3 +163,51 @@ single:LU
 -
 SKYWALKER
 ---
+empty:J=XYZ:E=empty
+-
+empty
+---
+empty:E=empty:J=XYZ
+-
+empty
+---
+#!compat boost
+double:J=XYZ:L
+-
+darthxyzvader
+---
+#!compat jam ham
+double:J=XYZ:L
+-
+darthXYZvader
+---
+#!compat boost
+double:LJ=XYZ
+-
+darthxyzvader
+---
+#!compat jam ham
+double:LJ=XYZ
+-
+darthXYZvader
+---
+#!compat boost
+double:J=XyZ:U
+-
+DARTHXYZVADER
+---
+#!compat jam ham
+double:J=XyZ:U
+-
+DARTHXyZVADER
+---
+#!compat boost
+double:UJ=XyZ
+-
+DARTHXYZVADER
+---
+#!compat jam ham
+double:UJ=XyZ
+-
+DARTHXyZVADER
+---
