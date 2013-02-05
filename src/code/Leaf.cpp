@@ -313,8 +313,8 @@ Leaf::_ParseSubscripts(const char* start, const char* end, size_t& _firstIndex,
 
 	// Emulate Jam behavior: Since jam computes a size from the second subscript
 	// before checking the validity of the first subscript, we are off by as
-	// much as we adjusted the first subscript, if compute the size afterwards.
-	// Compensate for that.
+	// much as we adjusted the first subscript, if we compute the size
+	// afterwards. Compensate for that.
 	if (firstIndex < 1)
 		endIndex += 1 - firstIndex;
 
