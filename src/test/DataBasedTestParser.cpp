@@ -44,6 +44,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	fLineIndex = 0;
 
 	// read code
+	bool inputIsCode = false;
 	std::string code;
 	for (;;) {
 		std::string line;
@@ -55,6 +56,11 @@ DataBasedTestParser::Parse(const char* fileName)
 		}
 
 		if (directive) {
+			if (line == "inputIsCode") {
+				inputIsCode = true;
+				continue;
+			}
+
 			_Throw(std::string("Unsupported directive \"#!" + line + "\" in "
 				"test code"));
 		}
@@ -150,6 +156,20 @@ DataBasedTestParser::Parse(const char* fileName)
 			}
 
 			input.push_back(line);
+		}
+
+		// If the input is code, join all input lines.
+		if (inputIsCode) {
+			std::string inputCode;
+			for (std::vector<std::string>::iterator it = input.begin();
+				it != input.end(); ++it) {
+				if (it != input.begin())
+					inputCode += '\n';
+				inputCode += *it;
+			}
+
+			input.clear();
+			input.push_back(inputCode);
 		}
 
 		std::vector<std::string> output;
