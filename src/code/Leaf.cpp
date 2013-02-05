@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
@@ -261,18 +262,114 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 				colon = colonEnd;
 			}
 
-			if (operations.HasOperations()) {
-				variableValue = operations.Apply(variableValue, maxSize,
-					context.GetBehavior());
-			}
+			variableValue = operations.Apply(variableValue, maxSize,
+				context.GetBehavior());
 		} else if (maxSize < variableValue.Size())
 			variableValue = variableValue.SubList(0, maxSize);
 
 		return variableValue;
 	}
 
-// TODO:...
-	return StringList();
+	// Handle the general, recursive case.
+
+	// Expand the variable names.
+	StringList variableNames = _EvaluateString(context, variableStart,
+		variableNameEnd, NULL);
+	size_t variableCount = variableNames.Size();
+
+	// Expand and parse the subscripts.
+	std::vector<std::pair<size_t, size_t> > subscripts;
+	if (openingBracket != NULL) {
+		StringList subscriptStrings = _EvaluateString(context,
+			openingBracket + 1, closingBracket, NULL);
+		if (subscriptStrings.IsEmpty())
+			return StringList();
+
+		size_t subscriptsCount = subscriptStrings.Size();
+		for (size_t subscriptsIndex = 0; subscriptsIndex < subscriptsCount;
+			subscriptsIndex++) {
+			size_t firstIndex;
+			size_t endIndex;
+			String subscriptString
+				= subscriptStrings.ElementAt(subscriptsIndex);
+			if (!_ParseSubscripts(subscriptString.ToCString(),
+					subscriptString.ToCString() + subscriptString.Length(),
+					firstIndex, endIndex)) {
+				return StringList();
+			}
+			subscripts.push_back(std::make_pair(firstIndex, endIndex));
+		}
+	} else {
+		subscripts.push_back(std::make_pair(size_t(0),
+			std::numeric_limits<size_t>::max()));
+	}
+	size_t subscriptsCount = subscripts.size();
+
+	// Expand the operations. This is a bit more involved, since we can't just
+	// expand first and parse then, as the expansion might introduce colons
+	// which should not be treated as separator. So we expand each segment
+	// individually. We create a list of expanded segments and then recursively
+	// parse the operations.
+	std::vector<StringList> operationsStringsList;
+		// referenced by operationsList, so it needs to exist at least as long
+	std::vector<data::StringListOperations> operationsList;
+	if (colon != NULL) {
+		const char* segmentStart = colon + 1;
+		for (;;) {
+			const char* segmentEnd = std::find(segmentStart, variableEnd, ':');
+			StringList operationsStrings = _EvaluateString(context,
+				segmentStart, segmentEnd, NULL);
+			if (operationsStrings.IsEmpty())
+				return StringList();
+
+			operationsStringsList.push_back(operationsStrings);
+
+			if (segmentEnd == variableEnd)
+				break;
+			segmentStart = segmentEnd + 1;
+		}
+
+		if (!Leaf::_ParseStringListOperationsRecursive(context,
+				operationsStringsList, 0, data::StringListOperations(),
+				operationsList)) {
+			return StringList();
+		}
+	} else
+		operationsList.push_back(data::StringListOperations());
+	size_t operationsCount = operationsList.size();
+
+	// Iterate through the variable list and for each perform all subscript
+	// and string operations.
+	StringList resultValue;
+	for (size_t variableIndex = 0; variableIndex < variableCount;
+		variableIndex++) {
+		StringList originalVariableValue = context.LookupVariable(
+			variableNames.ElementAt(variableIndex));
+
+		// Iterate through the range subscripts. For each perform all string
+		// operations.
+		for (size_t subscriptsIndex = 0; subscriptsIndex < subscriptsCount;
+			subscriptsIndex++) {
+			std::pair<size_t, size_t> range = subscripts.at(subscriptsIndex);
+			size_t maxSize = range.second > range.first
+				? range.second - range.first : 0;
+
+			StringList variableValue = originalVariableValue.SubList(
+				range.first, std::numeric_limits<size_t>::max());
+
+			// Iterate through the operations.
+			for (size_t operationsIndex = 0; operationsIndex < operationsCount;
+				operationsIndex++) {
+				data::StringListOperations operations
+					= operationsList.at(operationsIndex);
+				resultValue.Append(
+					operations.Apply(variableValue, maxSize,
+						context.GetBehavior()));
+			}
+		}
+	}
+
+	return resultValue;
 }
 
 
@@ -322,6 +419,56 @@ Leaf::_ParseSubscripts(const char* start, const char* end, size_t& _firstIndex,
 	return true;
 }
 
+
+/*static*/ bool
+Leaf::_ParseStringListOperationsRecursive(EvaluationContext& context,
+	const std::vector<StringList>& operationsStringsList,
+	size_t operationsStringsListIndex,
+	data::StringListOperations operations,
+	std::vector<data::StringListOperations>& _operationsList)
+{
+	// Note: operationsStrings.ElementAt() returns a new String object, but due
+	// to copy-on-write it refers to the same underlying buffer. So the
+	// parameters of the operations we create refer to valid string parts.
+	for (;;) {
+		const StringList& operationsStrings
+			= operationsStringsList.at(operationsStringsListIndex);
+
+		size_t count = operationsStrings.Size();
+
+		// common case: only one operations string
+		if (count == 1) {
+			String string = operationsStrings.ElementAt(0);
+			operations.Parse(string.ToCString(),
+				string.ToCString() + string.Length());
+
+			// no need to recurse, just iterate
+			if (++operationsStringsListIndex == operationsStringsList.size()) {
+				_operationsList.push_back(operations);
+				return true;
+			}
+			continue;
+		}
+
+		// more than one operation (or none) -- parse each and recurse
+		for (size_t i = 0; i < count; i++) {
+			String string = operationsStrings.ElementAt(i);
+			data::StringListOperations newOperations = operations;
+			newOperations.Parse(string.ToCString(),
+				string.ToCString() + string.Length());
+
+			if (operationsStringsListIndex + 1
+					== operationsStringsList.size()) {
+				_operationsList.push_back(newOperations);
+			} else {
+				_ParseStringListOperationsRecursive(context,
+					operationsStringsList, operationsStringsListIndex + 1,
+					newOperations, _operationsList);
+			}
+		}
+		return true;
+	}
+}
 
 }	// namespace code
 }	// namespace ham

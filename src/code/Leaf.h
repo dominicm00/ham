@@ -10,6 +10,13 @@
 
 
 namespace ham {
+
+
+namespace data {
+	class StringListOperations;
+}
+
+
 namespace code {
 
 
@@ -38,6 +45,14 @@ private:
 	static	bool				_ParseSubscripts(const char* start,
 									const char* end, size_t& _firstIndex,
 									size_t& _endIndex);
+	static	bool				_ParseStringListOperationsRecursive(
+									EvaluationContext& context,
+									const std::vector<StringList>&
+										operationsStringsList,
+									size_t operationsStringsListIndex,
+									data::StringListOperations operations,
+									std::vector<data::StringListOperations>&
+										_operationsList);
 
 private:
 			String				fString;
