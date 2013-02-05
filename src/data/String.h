@@ -40,6 +40,9 @@ public:
 			bool				IsEmpty() const
 									{ return Length() == 0; }
 
+			String&				ToUpper();
+			String&				ToLower();
+
 	inline	int					CompareWith(const String& other) const;
 
 			bool				operator==(const String& other) const
@@ -64,6 +67,8 @@ public:
 									const String& string2);
 	friend	String				operator+(const StringPart& string1,
 									const StringPart& string2);
+
+	inline	operator			StringPart() const;
 
 private:
 			friend class StringList;
@@ -118,6 +123,7 @@ private:
 
 	inline	Buffer*				_CreateBuffer(const char* string,
 									size_t length);
+	inline	void				_CopyOnWriteBuffer();
 
 private:
 			Buffer*				fBuffer;
@@ -155,6 +161,13 @@ operator+(const StringPart& string1, const StringPart& string2)
 {
 	return String::_Concatenate(string1.Start(), string1.Length(),
 		string2.Start(), string2.Length());
+}
+
+
+inline
+String::operator StringPart() const
+{
+	return StringPart(ToCString(), Length());
 }
 
 

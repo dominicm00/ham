@@ -119,6 +119,25 @@ ham::tests::StringTest::Constructor()
 
 
 void
+StringTest::CastOperator()
+{
+	{
+		String string;
+		StringPart stringPart(string);
+		HAM_TEST_EQUAL(stringPart.Start(), string.ToCString())
+		HAM_TEST_EQUAL(stringPart.Length(), string.Length())
+	}
+
+	{
+		String string("foobar");
+		StringPart stringPart(string);
+		HAM_TEST_EQUAL(stringPart.Start(), string.ToCString())
+		HAM_TEST_EQUAL(stringPart.Length(), string.Length())
+	}
+}
+
+
+void
 StringTest::Comparison()
 {
 	struct TestData {
@@ -282,6 +301,69 @@ StringTest::Concatenation()
 
 			std::swap(testString1, testString2);
 		}
+	}
+}
+
+
+void
+StringTest::ToLowerUpper()
+{
+	// ToLower()
+	{
+		String string;
+		string.ToLower();
+		STRING_EQUAL(string, "");
+	}
+
+	{
+		String string;
+		String string2(string);
+		string.ToLower();
+		STRING_EQUAL(string, "");
+		STRING_EQUAL(string2, "");
+	}
+
+	{
+		String string("FooBar");
+		string.ToLower();
+		STRING_EQUAL(string, "foobar");
+	}
+
+	{
+		String string("FooBar");
+		String string2(string);
+		string.ToLower();
+		STRING_EQUAL(string, "foobar");
+		STRING_EQUAL(string2, "FooBar");
+	}
+
+	// ToUpper()
+	{
+		String string;
+		string.ToUpper();
+		STRING_EQUAL(string, "");
+	}
+
+	{
+		String string;
+		String string2(string);
+		string.ToUpper();
+		STRING_EQUAL(string, "");
+		STRING_EQUAL(string2, "");
+	}
+
+	{
+		String string("FooBar");
+		string.ToUpper();
+		STRING_EQUAL(string, "FOOBAR");
+	}
+
+	{
+		String string("FooBar");
+		String string2(string);
+		string.ToUpper();
+		STRING_EQUAL(string, "FOOBAR");
+		STRING_EQUAL(string2, "FooBar");
 	}
 }
 

@@ -17,14 +17,16 @@ class StringTest : public test::TestFixture {
 public:
 
 			void				Constructor();
+			void				CastOperator();
 			void				Comparison();
 			void				Assignment();
 			void				Concatenation();
+			void				ToLowerUpper();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringTest, 4,
-		Constructor, Comparison, Assignment, Concatenation)
-
+	HAM_ADD_TEST_CASES(StringTest, 6,
+		Constructor, CastOperator, Comparison, Assignment, Concatenation,
+		ToLowerUpper)
 };
 
 

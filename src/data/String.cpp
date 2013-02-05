@@ -57,6 +57,30 @@ String::~String()
 
 
 String&
+String::ToUpper()
+{
+	_CopyOnWriteBuffer();
+
+	char* string = fBuffer->fString;
+	std::transform(string, string + fBuffer->fLength, string, ::toupper);
+
+	return *this;
+}
+
+
+String&
+String::ToLower()
+{
+	_CopyOnWriteBuffer();
+
+	char* string = fBuffer->fString;
+	std::transform(string, string + fBuffer->fLength, string, ::tolower);
+
+	return *this;
+}
+
+
+String&
 String::operator=(const String& other)
 {
 	if (this != &other) {
@@ -120,6 +144,18 @@ String::_CreateBuffer(const char* string, size_t length)
 	Buffer* buffer = Buffer::Create(length);
 	memcpy(buffer->fString, string, length);
 	return buffer;
+}
+
+
+void
+String::_CopyOnWriteBuffer()
+{
+	if (fBuffer->fReferenceCount == 1)
+		return;
+
+	Buffer* buffer = _CreateBuffer(fBuffer->fString, fBuffer->fLength);
+	fBuffer->Release();
+	fBuffer = buffer;
 }
 
 
