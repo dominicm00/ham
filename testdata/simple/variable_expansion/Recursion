@@ -44,7 +44,18 @@ a
 b
 c
 ---
-#!compat jam ham
+#!compat ham
+A = foo bar ;
+B = x y ;
+C = a b c ;
+vars = A B C ;
+result = $($(vars):J=X) ;
+-
+fooXbar
+xXy
+aXbXc
+---
+#!compat jam !ham
 A = foo bar ;
 B = x y ;
 C = a b c ;
@@ -53,7 +64,7 @@ result = $($(vars):J=X) ;
 -
 fooXbarXxXyXaXbXc
 ---
-#!compat boost ham
+#!compat boost !ham
 A = foo bar ;
 B = x y ;
 C = a b c ;
@@ -98,14 +109,22 @@ bar
 bar
 foobar
 ---
-#!compat jam ham
+#!compat ham
+A = foo bar foobar ;
+subscripts = 1 3 ;
+result = $(A[$(subscripts)]:J=X) ;
+-
+foo
+foobar
+---
+#!compat jam !ham
 A = foo bar foobar ;
 subscripts = 1 3 ;
 result = $(A[$(subscripts)]:J=X) ;
 -
 fooXfoobar
 ---
-#!compat boost ham
+#!compat boost !ham
 A = foo bar foobar ;
 subscripts = 1 3 ;
 result = $(A[$(subscripts)]:J=X) ;
@@ -142,21 +161,39 @@ Foo
 Bar
 FooBar
 ---
-#!compat jam ham
+#!compat ham
+A = Foo Bar FooBar ;
+operations = J=x J=y ;
+result = $(A:$(operations)) ;
+-
+FooxBarxFooBar
+FooyBaryFooBar
+---
+#!compat jam !ham
 A = Foo Bar FooBar ;
 operations = J=x J=y ;
 result = $(A:$(operations)) ;
 -
 FooxBarxFooBarxFooyBaryFooBar
 ---
-#!compat boost ham
+#!compat boost !ham
 A = Foo Bar FooBar ;
 operations = J=x J=y ;
 result = $(A:$(operations)) ;
 -
 FooyBaryFooBar
 ---
-#!compat jam ham
+#!compat ham
+A = Foo Bar FooBar ;
+operations = J=x U ;
+result = $(A:$(operations)) ;
+-
+FooxBarxFooBar
+FOO
+BAR
+FOOBAR
+---
+#!compat jam !ham
 A = Foo Bar FooBar ;
 operations = J=x U ;
 result = $(A:$(operations)) ;
@@ -165,7 +202,7 @@ FooxBarxFooBarxFOO
 FooxBarxFooBarxBAR
 FooxBarxFooBarxFOOBAR
 ---
-#!compat boost ham
+#!compat boost !ham
 A = Foo Bar FooBar ;
 operations = J=x U ;
 result = $(A:$(operations)) ;
@@ -248,7 +285,21 @@ c
 a
 b
 ---
-#!compat jam ham
+#!compat ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 3- 2- ;
+result = $($(vars)[$(subscripts)]:J=X) ;
+-
+bar
+zXzz
+yXzXzz
+c
+bXc
+---
+#!compat jam !ham
 A = foo bar ;
 B = x y z zz ;
 C = a b c ;
@@ -258,7 +309,7 @@ result = $($(vars)[$(subscripts)]:J=X) ;
 -
 barXzXzzXyXzXzzXcXbXc
 ---
-#!compat boost ham
+#!compat boost !ham
 A = foo bar ;
 B = x y z zz ;
 C = a b c ;
@@ -350,7 +401,41 @@ B
 directory/a
 directory/b
 ---
-#!compat jam ham
+#!compat ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+operations = J=X D=directory ;
+result = $($(vars)[$(subscripts)]:$(operations)) ;
+-
+bar
+directory/bar
+bar
+directory/bar
+fooXbar
+directory/foo
+directory/bar
+y
+directory/y
+yXzXzz
+directory/y
+directory/z
+directory/zz
+xXy
+directory/x
+directory/y
+b
+directory/b
+bXc
+directory/b
+directory/c
+aXb
+directory/a
+directory/b
+---
+#!compat jam !ham
 A = foo bar ;
 B = x y z zz ;
 C = a b c ;
@@ -375,7 +460,7 @@ barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXdirectory/c
 barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXaXbXdirectory/a
 barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXaXbXdirectory/b
 ---
-#!compat boost ham
+#!compat boost !ham
 A = foo bar ;
 B = x y z zz ;
 C = a b c ;
