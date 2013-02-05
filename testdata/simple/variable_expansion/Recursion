@@ -1,0 +1,420 @@
+#!inputIsCode
+%1
+for element in "$(result)" {
+	Echo $(element) ;
+}
+---
+vars = ;
+result = $($(vars)) ;
+-
+---
+A = ;
+vars = A ;
+result = $($(vars)) ;
+-
+---
+A = foo bar ;
+vars = A ;
+result = $($(vars)) ;
+-
+foo
+bar
+---
+A = foo bar ;
+B = x y ;
+vars = A B ;
+result = $($(vars)) ;
+-
+foo
+bar
+x
+y
+---
+A = foo bar ;
+B = x y ;
+C = a b c ;
+vars = A B C ;
+result = $($(vars)) ;
+-
+foo
+bar
+x
+y
+a
+b
+c
+---
+#!compat jam ham
+A = foo bar ;
+B = x y ;
+C = a b c ;
+vars = A B C ;
+result = $($(vars):J=X) ;
+-
+fooXbarXxXyXaXbXc
+---
+#!compat boost ham
+A = foo bar ;
+B = x y ;
+C = a b c ;
+vars = A B C ;
+result = $($(vars):J=X) ;
+-
+aXbXc
+---
+A = foo bar foobar ;
+subscripts = 1 ;
+result = $(A[$(subscripts)]) ;
+-
+foo
+---
+A = foo bar foobar ;
+subscripts = 2- ;
+result = $(A[$(subscripts)]) ;
+-
+bar
+foobar
+---
+A = foo bar foobar ;
+subscripts = 1-2 ;
+result = $(A[$(subscripts)]) ;
+-
+foo
+bar
+---
+A = foo bar foobar ;
+subscripts = 1 3 ;
+result = $(A[$(subscripts)]) ;
+-
+foo
+foobar
+---
+A = foo bar foobar ;
+subscripts = 1-2 2-3 ;
+result = $(A[$(subscripts)]) ;
+-
+foo
+bar
+bar
+foobar
+---
+#!compat jam ham
+A = foo bar foobar ;
+subscripts = 1 3 ;
+result = $(A[$(subscripts)]:J=X) ;
+-
+fooXfoobar
+---
+#!compat boost ham
+A = foo bar foobar ;
+subscripts = 1 3 ;
+result = $(A[$(subscripts)]:J=X) ;
+-
+foobar
+---
+A = foo bar foobar ;
+operations = U ;
+result = $(A:$(operations)) ;
+-
+FOO
+BAR
+FOOBAR
+---
+A = Foo Bar FooBar ;
+operations = U L ;
+result = $(A:$(operations)) ;
+-
+FOO
+BAR
+FOOBAR
+foo
+bar
+foobar
+---
+A = Foo Bar FooBar ;
+operations = E E ;
+result = $(A:$(operations)) ;
+-
+Foo
+Bar
+FooBar
+Foo
+Bar
+FooBar
+---
+#!compat jam ham
+A = Foo Bar FooBar ;
+operations = J=x J=y ;
+result = $(A:$(operations)) ;
+-
+FooxBarxFooBarxFooyBaryFooBar
+---
+#!compat boost ham
+A = Foo Bar FooBar ;
+operations = J=x J=y ;
+result = $(A:$(operations)) ;
+-
+FooyBaryFooBar
+---
+#!compat jam ham
+A = Foo Bar FooBar ;
+operations = J=x U ;
+result = $(A:$(operations)) ;
+-
+FooxBarxFooBarxFOO
+FooxBarxFooBarxBAR
+FooxBarxFooBarxFOOBAR
+---
+#!compat boost ham
+A = Foo Bar FooBar ;
+operations = J=x U ;
+result = $(A:$(operations)) ;
+-
+FOO
+BAR
+FOOBAR
+---
+A = Foo Bar FooBar ;
+operations = U J=x ;
+result = $(A:$(operations)) ;
+-
+FOO
+BAR
+FOOBAR
+FooxBarxFooBar
+---
+A =
+	foo
+	bar.a
+	foobar.bee
+	path/foo
+	path/foo.a
+	some/path/bar.bee
+	/an/absolute/path/foobar.so
+	/
+	<grist>some/path/bar.bee(archive.o)
+;
+operations = GB S=.suffix MD=directory ;
+result = $(A:$(operations)) ;
+-
+foo
+bar
+foobar
+foo
+foo
+bar
+foobar
+
+<grist>bar
+foo.suffix
+bar.suffix
+foobar.suffix
+path/foo.suffix
+path/foo.suffix
+some/path/bar.suffix
+/an/absolute/path/foobar.suffix
+/.suffix
+<grist>some/path/bar.suffix(archive.o)
+directory
+directory
+directory
+directory
+directory
+directory
+directory
+directory
+directory(archive.o)
+---
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+result = $($(vars)[$(subscripts)]) ;
+-
+bar
+bar
+foo
+bar
+y
+y
+z
+zz
+x
+y
+b
+b
+c
+a
+b
+---
+#!compat jam ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 3- 2- ;
+result = $($(vars)[$(subscripts)]:J=X) ;
+-
+barXzXzzXyXzXzzXcXbXc
+---
+#!compat boost ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 3- 2- ;
+result = $($(vars)[$(subscripts)]:J=X) ;
+-
+bXc
+---
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+operations = U S=.suffix ;
+result = $($(vars):$(operations)) ;
+-
+FOO
+BAR
+foo.suffix
+bar.suffix
+X
+Y
+Z
+ZZ
+x.suffix
+y.suffix
+z.suffix
+zz.suffix
+A
+B
+C
+a.suffix
+b.suffix
+c.suffix
+---
+A = foo bar FooBar ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+operations = U D=directory ;
+result = $(A[$(subscripts)]:$(operations)) ;
+-
+BAR
+directory/bar
+BAR
+FOOBAR
+directory/bar
+directory/FooBar
+FOO
+BAR
+directory/foo
+directory/bar
+---
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+operations = U D=directory ;
+result = $($(vars)[$(subscripts)]:$(operations)) ;
+-
+BAR
+directory/bar
+BAR
+directory/bar
+FOO
+BAR
+directory/foo
+directory/bar
+Y
+directory/y
+Y
+Z
+ZZ
+directory/y
+directory/z
+directory/zz
+X
+Y
+directory/x
+directory/y
+B
+directory/b
+B
+C
+directory/b
+directory/c
+A
+B
+directory/a
+directory/b
+---
+#!compat jam ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+operations = J=X D=directory ;
+result = $($(vars)[$(subscripts)]:$(operations)) ;
+-
+barXdirectory/bar
+barXbarXdirectory/bar
+barXbarXfooXbarXdirectory/foo
+barXbarXfooXbarXdirectory/bar
+barXbarXfooXbarXyXdirectory/y
+barXbarXfooXbarXyXyXzXzzXdirectory/y
+barXbarXfooXbarXyXyXzXzzXdirectory/z
+barXbarXfooXbarXyXyXzXzzXdirectory/zz
+barXbarXfooXbarXyXyXzXzzXxXyXdirectory/x
+barXbarXfooXbarXyXyXzXzzXxXyXdirectory/y
+barXbarXfooXbarXyXyXzXzzXxXyXbXdirectory/b
+barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXdirectory/b
+barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXdirectory/c
+barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXaXbXdirectory/a
+barXbarXfooXbarXyXyXzXzzXxXyXbXbXcXaXbXdirectory/b
+---
+#!compat boost ham
+A = foo bar ;
+B = x y z zz ;
+C = a b c ;
+vars = A B C ;
+subscripts = 2 2- 1-2 ;
+operations = J=X D=directory ;
+result = $($(vars)[$(subscripts)]:$(operations)) ;
+-
+directory/bar
+directory/bar
+directory/foo
+directory/bar
+directory/y
+directory/y
+directory/z
+directory/zz
+directory/x
+directory/y
+directory/b
+directory/b
+directory/c
+directory/a
+directory/b
+---
+A = foo bar ;
+B = x y ;
+C = a b c ;
+vars = A B C ;
+vars2 = B ;
+varsVars = vars vars2 ;
+result = $($($(varsVars))) ;
+-
+foo
+bar
+x
+y
+a
+b
+c
+x
+y
+---
