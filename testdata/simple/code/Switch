@@ -1,0 +1,261 @@
+#!inputIsCode
+%1
+---
+switch foo {
+	case bar :
+		Echo 1 ;
+	case foo :
+		Echo 2 ;
+	case foobar :
+		Echo 3 ;
+}
+-
+2
+---
+switch foo {
+	case bar :
+		Echo 1 ;
+	case foobar :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+3
+---
+switch foe {
+	case bar :
+		Echo 1 ;
+	case fo? :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case fo? :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f* :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[a-d]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[f-n]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[^a-d]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[^f-n]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[a-dl]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[a-dm-x]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[a-dk-r]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[^a-dk-r]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f[a-d^k-r]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch flu {
+	case bar :
+		Echo 1 ;
+	case f\\lu :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch f*l[u {
+	case bar :
+		Echo 1 ;
+	case f\\*l\\[u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch f*l]u {
+	case bar :
+		Echo 1 ;
+	case f\\*l\\]u :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch f?lu {
+	case bar :
+		Echo 1 ;
+	case f\\?lu :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch foo flu {
+	case bar :
+		Echo 1 ;
+	case flu :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+3
+---
+switch fooo flu {
+	case bar :
+		Echo 1 ;
+	case flu :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch {
+	case bar :
+		Echo 1 ;
+	case flu :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+---
+switch {
+	case bar :
+		Echo 1 ;
+	case "" :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+switch "" {
+	case bar :
+		Echo 1 ;
+	case "" :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
+var = ;
+switch $(var) {
+	case bar :
+		Echo 1 ;
+	case "" :
+		Echo 2 ;
+	case foo :
+		Echo 3 ;
+}
+-
+2
+---
