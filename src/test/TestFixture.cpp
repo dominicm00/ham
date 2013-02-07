@@ -429,5 +429,25 @@ TestFixture::ValueToString<data::StringListList>(
 }
 
 
+template<>
+/*static*/ std::string
+TestFixture::ValueToString<std::pair<size_t, size_t> >(
+	const std::pair<size_t, size_t>& value)
+{
+	std::ostringstream stream;
+	stream << "(" << value.first << ", " << value.second << ")";
+	return stream.str();
+}
+
+
+template<>
+/*static*/ std::string
+TestFixture::ValueToString<std::vector<std::pair<size_t, size_t> > >(
+	const std::vector<std::pair<size_t, size_t> >& value)
+{
+	return value_container_to_string(value);
+}
+
+
 } // namespace test
 } // namespace ham
