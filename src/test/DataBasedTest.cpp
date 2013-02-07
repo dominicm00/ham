@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "behavior/Behavior.h"
+#include "parser/ParseException.h"
 #include "test/TestException.h"
 #include "test/TestFixture.h"
 
@@ -128,8 +129,15 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 
 	// execute the code
 	std::stringstream outputStream;
-	TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
-
+	try {
+		TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
+	} catch (parser::ParseException& exception) {
+		HAM_TEST_THROW(
+			"%s.\nat %zu:%zu of code:\n%s\ntest case lines: %zu-%zu",
+			exception.Message(), exception.Position().Line() + 1,
+			exception.Position().Column() + 1, code.c_str(),
+			dataSet.fStartLineIndex + 1, dataSet.fEndLineIndex)
+	}
 	// extract the output
 	outputStream.seekg(0, std::ios_base::beg);
 	std::string line;
