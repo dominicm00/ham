@@ -5,6 +5,7 @@ C++FLAGS += -std=c++0x ;
 #C++FLAGS += -std=c++11 ;
 
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) behavior ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
@@ -15,6 +16,7 @@ SharedLibrary libham.so
 	# code
 	ActionsDefinition.cpp
 	Assignment.cpp
+	Behavior.cpp
 	BinaryExpression.cpp
 	Block.cpp
 	BuiltInRules.cpp
