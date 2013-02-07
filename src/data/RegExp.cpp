@@ -82,6 +82,20 @@ struct RegExp::Data {
 						break;
 					}
 
+					case '\\':
+					{
+						// Quotes the next character. Works the same way for
+						// regular expressions.
+						if (*pattern == '\0') {
+							fError = REG_EESCAPE;
+							return;
+						}
+
+						patternString += '\\';
+						patternString += *pattern++;
+						break;
+					}
+
 					case '^':
 					case '.':
 					case '$':
