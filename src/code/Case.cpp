@@ -8,6 +8,7 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "data/RegExp.h"
 
 
 namespace ham {
@@ -31,8 +32,18 @@ Case::~Case()
 bool
 Case::Matches(EvaluationContext& context, const StringList& value) const
 {
-// TODO: Implement!
-	return false;
+	using data::RegExp;
+
+	RegExp regExp(fPattern.ToCString(), RegExp::PATTERN_TYPE_WILDCARD);
+	if (!regExp.IsValid()) {
+// TODO: Throw exception!
+		return false;
+	}
+
+	String string = value.ElementAt(0);
+	RegExp::MatchResult match = regExp.Match(string.ToCString());
+	return match.HasMatched() && match.StartOffset() == 0
+		&& match.EndOffset() == string.Length();
 }
 
 
