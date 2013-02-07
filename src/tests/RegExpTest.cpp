@@ -125,6 +125,16 @@ RegExpTest::MatchRegularExpression()
 		{ "(foo[^f]*)+",		"foobarfoo",	Matches().Add(0, 9).Add(6, 9) },
 		{ "(fo{3,4}[^f]*)+",	"foobarfoo",	Matches() },
 		{ "(fo{1,3}[^f]*)+",	"foobarfoo",	Matches().Add(0, 9).Add(6, 9) },
+		{ "f\\oo",				"foobarfoo",	Matches().Add(0, 3) },
+		{ "f\\[oo",				"f[oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\*oo",				"f*oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\?oo",				"f?oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\.oo",				"f.oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\{oo",				"f{oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\^oo",				"f^oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\$oo",				"f$oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\(oo",				"f(oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\\\oo",			"f\\oobarfoo",	Matches().Add(0, 4) },
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
@@ -226,6 +236,11 @@ RegExpTest::MatchWildcard()
 		{ "foo[x-z]",					"foobarfoo",	Matches() },
 		{ "foo[^a-c]",					"foobarfoo",	Matches() },
 		{ "foo[^x-z]",					"foobarfoo",	Matches().Add(0, 4) },
+		{ "f\\oo",						"foobarfoo",	Matches().Add(0, 3) },
+		{ "f\\[oo",						"f[oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\*oo",						"f*oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\?oo",						"f?oobarfoo",	Matches().Add(0, 4) },
+		{ "f\\\\oo",					"f\\oobarfoo",	Matches().Add(0, 4) },
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
