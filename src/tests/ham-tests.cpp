@@ -17,6 +17,7 @@
 #include "test/RunnableTest.h"
 #include "test/TestRunner.h"
 #include "test/TestSuite.h"
+#include "tests/RegExpTest.h"
 #include "tests/StringListTest.h"
 #include "tests/StringPartTest.h"
 #include "tests/StringTest.h"
@@ -181,6 +182,7 @@ main(int argc, const char* const* argv)
 			.Add<StringPartTest>()
 			.Add<StringTest>()
 			.Add<StringListTest>()
+			.Add<RegExpTest>()
 		.End()
 		.AddSuite("Code")
 			.Add<VariableExpansionTest>()
