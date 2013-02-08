@@ -37,7 +37,7 @@ If::Evaluate(EvaluationContext& context)
 	return fExpression->Evaluate(context).IsTrue()
 		? fBlock->Evaluate(context)
 		: (fElseBlock != NULL
-			? fBlock->Evaluate(context) : StringList::False());
+			? fElseBlock->Evaluate(context) : StringList::False());
 }
 
 
