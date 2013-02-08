@@ -1,0 +1,53 @@
+#!inputIsCode
+%1
+---
+var = ;
+while $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" ;
+while $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" "" ;
+while $(var) {
+	Echo 1 ;
+}
+-
+---
+var = foo ;
+while $(var) {
+	Echo 1 ;
+	var = ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+while $(var1) {
+	Echo 1 ;
+	if $(var2) {
+		var1 = ;
+	} else {
+		var2 = 1 ;
+	}
+}
+-
+1
+1
+---
+var = foo bar foobar ;
+while $(var) {
+	Echo $(var[1]) ;
+	var = $(var[2-]) ;
+}
+-
+foo
+bar
+foobar
+---
