@@ -56,7 +56,9 @@ public:
 
 			bool				Contains(const String& string) const;
 
-			int					CompareWith(const StringList& other) const;
+			int					CompareWith(const StringList& other,
+									bool ignoreTrailingEmptyStrings = false)
+									const;
 
 			StringList&			Append(const String& string);
 			StringList&			Append(const StringList& list);

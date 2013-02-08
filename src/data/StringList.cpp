@@ -129,16 +129,18 @@ StringList::Contains(const String& string) const
 
 
 int
-StringList::CompareWith(const StringList& other) const
+StringList::CompareWith(const StringList& other,
+	bool ignoreTrailingEmptyStrings) const
 {
-	size_t commonSize = std::min(fSize, other.fSize);
+	size_t commonSize = ignoreTrailingEmptyStrings
+		? std::max(fSize, other.fSize) : std::min(fSize, other.fSize);
 	for (size_t i = 0; i < commonSize; i++) {
 		int compare = ElementAt(i).CompareWith(other.ElementAt(i));
 		if (compare != 0)
 			return compare;
 	}
 
-	return (int)fSize - (int)other.fSize;
+	return ignoreTrailingEmptyStrings ? 0 : (int)fSize - (int)other.fSize;
 }
 
 

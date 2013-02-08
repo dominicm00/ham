@@ -80,8 +80,11 @@ operator+(const TestListList& testListList, const TestList& testList)
 	HAM_TEST_EQUAL(actual, (expected))							\
 	HAM_TEST_EQUAL(actual.IsEmpty(), (expected).empty())
 
-#define LIST_COMPARE_WORK(list1, list2, expected)				\
+#define LIST_COMPARE_WORK(list1, list2, expected,				\
+		expectedIgnoreTrailingEmpty)							\
 	HAM_TEST_EQUAL(sign(list1.CompareWith(list2)), expected)	\
+	HAM_TEST_EQUAL(sign(list1.CompareWith(list2, true)),		\
+		expectedIgnoreTrailingEmpty)							\
 	HAM_TEST_EQUAL(list1 == list2, expected == 0)				\
 	HAM_TEST_EQUAL(list1 != list2, expected != 0)				\
 	HAM_TEST_EQUAL(list1 < list2, expected < 0)					\
@@ -89,9 +92,9 @@ operator+(const TestListList& testListList, const TestList& testList)
 	HAM_TEST_EQUAL(list1 <= list2, expected <= 0)				\
 	HAM_TEST_EQUAL(list1 >= list2, expected >= 0)
 
-#define LIST_COMPARE(list1, list2, expected)					\
-	LIST_COMPARE_WORK(list1, list2, expected)					\
-	LIST_COMPARE_WORK(list2, list1, -expected)
+#define LIST_COMPARE(list1, list2, expected, expectedIgnoreTrailingEmpty)	\
+	LIST_COMPARE_WORK(list1, list2, expected, expectedIgnoreTrailingEmpty)	\
+	LIST_COMPARE_WORK(list2, list1, -expected, -expectedIgnoreTrailingEmpty)
 
 
 void
@@ -343,27 +346,30 @@ StringListTest::Comparison()
 		StringList	list1;
 		StringList	list2;
 		int			compare;
+		int			compareIgnoreTrailingEmpty;
 	};
 
 	const TestData testData[] = {
-		{ StringList(),					StringList(),					0 },
-		{ MakeStringList(""),			StringList(),					1 },
-		{ MakeStringList(""),			MakeStringList(""),				0 },
-		{ MakeStringList("foo"),		StringList(),					1 },
-		{ MakeStringList("foo"),		MakeStringList(""),				1 },
-		{ MakeStringList("foo"),		MakeStringList("foo"),			0 },
-		{ MakeStringList("foobar"),		MakeStringList("foo"),			1 },
-		{ MakeStringList("foobar"),		MakeStringList("foo", "bar"),	1 },
-		{ MakeStringList("foo"),		MakeStringList("bar"),			1 },
-		{ MakeStringList("foo", "bar"),	MakeStringList("foo", "bar"),	0 },
-		{ MakeStringList("foo", "bar"),	MakeStringList("foo"),			1 },
-		{ MakeStringList("foo", "x"),	MakeStringList("foo", "bar"),	1 }
+		{ StringList(),					StringList(),					0, 0 },
+		{ MakeStringList(""),			StringList(),					1, 0 },
+		{ MakeStringList(""),			MakeStringList(""),				0, 0 },
+		{ MakeStringList("foo"),		StringList(),					1, 1 },
+		{ MakeStringList("foo"),		MakeStringList(""),				1, 1 },
+		{ MakeStringList("foo"),		MakeStringList("foo"),			0, 0 },
+		{ MakeStringList("foo", ""),	MakeStringList("foo"),			1, 0 },
+		{ MakeStringList("foo", "", ""), MakeStringList("foo"),			1, 0 },
+		{ MakeStringList("foobar"),		MakeStringList("foo"),			1, 1 },
+		{ MakeStringList("foobar"),		MakeStringList("foo", "bar"),	1, 1 },
+		{ MakeStringList("foo"),		MakeStringList("bar"),			1, 1 },
+		{ MakeStringList("foo", "bar"),	MakeStringList("foo", "bar"),	0, 0 },
+		{ MakeStringList("foo", "bar"),	MakeStringList("foo"),			1, 1 },
+		{ MakeStringList("foo", "x"),	MakeStringList("foo", "bar"),	1, 1 }
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		HAM_TEST_ADD_INFO(
 			LIST_COMPARE(testData[i].list1, testData[i].list2,
-				testData[i].compare),
+				testData[i].compare, testData[i].compareIgnoreTrailingEmpty),
 			"list1: %s\nlist2: %s",
 			ValueToString(testData[i].list1).c_str(),
 			ValueToString(testData[i].list2).c_str()
