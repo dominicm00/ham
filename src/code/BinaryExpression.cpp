@@ -86,19 +86,22 @@ BinaryExpression<Operator>::Dump(DumpContext& context) const
 																		\
 	template class BinaryExpression<name##Operator>;
 
+#define HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(name, symbol,	operator)	\
+	HAM_DEFINE_OPERATOR_EXPRESSION(name, symbol,							\
+		a.CompareWith(b, true) operator 0)
 
-HAM_DEFINE_OPERATOR_EXPRESSION(Equal,			=,	a == b)
-HAM_DEFINE_OPERATOR_EXPRESSION(NotEqual,		!=,	a != b)
-HAM_DEFINE_OPERATOR_EXPRESSION(Less,			<,	a < b)
-HAM_DEFINE_OPERATOR_EXPRESSION(LessOrEqual,		<=,	a <= b)
-HAM_DEFINE_OPERATOR_EXPRESSION(Greater,			>,	a > b)
-HAM_DEFINE_OPERATOR_EXPRESSION(GreaterOrEqual,	>=,	a >= b)
-HAM_DEFINE_OPERATOR_EXPRESSION(And,				&&,
-	!a.IsEmpty() && !b.IsEmpty())
-HAM_DEFINE_OPERATOR_EXPRESSION(Or,				||,
-	!a.IsEmpty() || !b.IsEmpty())
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(Equal,			=,	==)
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(NotEqual,			!=,	!=)
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(Less,				<,	<)
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(LessOrEqual,		<=,	<=)
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(Greater,			>,	>)
+HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(GreaterOrEqual,	>=,	>=)
+
+HAM_DEFINE_OPERATOR_EXPRESSION(And,	&&, a.IsTrue() && b.IsTrue())
+HAM_DEFINE_OPERATOR_EXPRESSION(Or,	||, a.IsTrue() || b.IsTrue())
 
 #undef HAM_DEFINE_OPERATOR_EXPRESSION
+#undef HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION
 
 
 }	// namespace code

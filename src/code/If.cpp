@@ -34,7 +34,7 @@ If::~If()
 StringList
 If::Evaluate(EvaluationContext& context)
 {
-	return !fExpression->Evaluate(context).IsEmpty()
+	return fExpression->Evaluate(context).IsTrue()
 		? fBlock->Evaluate(context)
 		: (fElseBlock != NULL
 			? fBlock->Evaluate(context) : StringList::False());
