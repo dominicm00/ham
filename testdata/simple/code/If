@@ -1,0 +1,1455 @@
+#!inputIsCode
+%1
+---
+var = ;
+if $(var) {
+	Echo 1 ;
+}
+-
+---
+if foo {
+	Echo 1 ;
+}
+-
+1
+---
+var = foo ;
+if $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+var = "" ;
+if $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" foo ;
+if $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+var = "" "" ;
+if $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" "" foo ;
+if $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1)$(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = "" ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo bar ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo bar ;
+var2 = foo bar ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo bar ;
+var2 = foo foo ;
+if $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = "" ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = foo bar ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = foo ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo bar ;
+var2 = foo bar ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo bar ;
+var2 = foo foo ;
+if $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = "" ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = foo ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = bar ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = bar foo ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar foo ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar foo "" ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar fuu ;
+var2 = bar foo ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar fuu ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo foobar ;
+var2 = bar fuu ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar fuu ;
+var2 = bar foo foobar ;
+if $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = "" ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = foo ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = bar ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = bar foo ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar foo ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar foo "" ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar fuu ;
+var2 = bar foo ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar fuu ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo foobar ;
+var2 = bar fuu ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar fuu ;
+var2 = bar foo foobar ;
+if $(var1) > $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = "" ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = foo ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = bar ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = bar foo ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar foo ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar foo "" ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar fuu ;
+var2 = bar foo ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar fuu ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo foobar ;
+var2 = bar fuu ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar fuu ;
+var2 = bar foo foobar ;
+if $(var1) <= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = "" ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" "" ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = foo ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = bar ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = bar foo ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo ;
+var2 = bar foo ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar foo "" ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar fuu ;
+var2 = bar foo ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = bar fuu ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar foo foobar ;
+var2 = bar fuu ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar fuu ;
+var2 = bar foo foobar ;
+if $(var1) >= $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = "" ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = "" ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = foo ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = foo bar ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foo ;
+var2 = foo bar ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar foobar ;
+var2 = foo bar ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar bar ;
+var2 = foo bar ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = f d b ;
+var2 = a b c d e f g ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = f x b ;
+var2 = a b c d e f g ;
+if $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var = ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+if ! foo {
+	Echo 1 ;
+}
+-
+---
+var = foo ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+var = "" foo ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+---
+var = "" "" ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+1
+---
+var = "" "" foo ;
+if ! $(var) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = foo ;
+if ! $(var1)$(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1) & $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1) && $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) && $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+var3 = ;
+if $(var1) && $(var2) && $(var3) {
+	Echo 1 ;
+}
+-
+---
+var1 = bar ;
+var2 = foo ;
+var3 = foobar ;
+if $(var1) && $(var2) && $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1) | $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = "" ;
+var2 = foo ;
+if $(var1) || $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+if $(var1) || $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+var3 = ;
+if $(var1) || $(var2) || $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = bar ;
+var2 = foo ;
+var3 = foobar ;
+if $(var1) || $(var2) || $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = foo ;
+if ! $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+if ! $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = 1 ;
+if ! $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = 1 ;
+if ! $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if ! $(var1) = $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = foo ;
+if ! $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = 1 ;
+if ! $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = 1 ;
+if ! $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if ! $(var1) != $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo ;
+if ! $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = 1 ;
+if ! $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = 1 ;
+if ! $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if ! $(var1) < $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo ;
+if ! ( $(var1) = $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+if ! ( $(var1) = $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = 1 ;
+if ! ( $(var1) = $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = 1 ;
+if ! ( $(var1) = $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if ! ( $(var1) = $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = foo ;
+if ! ( $(var1) != $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! ( $(var1) != $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = 1 ;
+if ! ( $(var1) != $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = 1 ;
+if ! ( $(var1) != $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if ! ( $(var1) != $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = foo ;
+if ! ( $(var1) < $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! ( $(var1) < $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = 1 ;
+if ! ( $(var1) < $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = 1 ;
+if ! ( $(var1) < $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = ;
+if ! ( $(var1) < $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if ! $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+if ! ( $(var1) in $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = foo ;
+if ! $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = foo ;
+if ! ( $(var1) in $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = 1 2 3 ;
+if ! $(var1) in $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = 1 2 3 ;
+if ! ( $(var1) in $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = ;
+if ! $(var1) && $(var2) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = ;
+if ! ( $(var1) && $(var2) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! $(var1) || $(var2) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+if ! ( $(var1) || $(var2) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = bar ;
+var3 = ;
+if $(var1) = $(var2) && $(var3) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = bar ;
+var3 = ;
+if $(var1) = ( $(var2) && $(var3) ) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = bar ;
+var3 = foo ;
+if $(var1) = $(var2) || $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = bar ;
+var3 = foo ;
+if $(var1) = ( $(var2) || $(var3) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = bar ;
+var3 = foo ;
+if $(var1) && $(var2) < $(var3) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = bar ;
+var3 = foo ;
+if ( $(var1) && $(var2) ) < $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+var3 = bar ;
+if $(var1) < $(var2) || $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = ;
+var3 = bar ;
+if $(var1) < ( $(var2) || $(var3) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = ;
+var2 = foo ;
+var3 = bar ;
+if $(var1) && $(var2) || $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = ;
+var2 = foo ;
+var3 = bar ;
+if $(var1) && ( $(var2) || $(var3) ) {
+	Echo 1 ;
+}
+-
+---
+var1 = foo ;
+var2 = bar ;
+var3 = ;
+if $(var1) || $(var2) && $(var3) {
+	Echo 1 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+var3 = ;
+if ( $(var1) || $(var2) ) && $(var3) {
+	Echo 1 ;
+}
+-
+---
+var = ;
+if $(var) {
+	Echo 1 ;
+} else
+	Echo 2 ;
+-
+2
+---
+var = foo ;
+if $(var) {
+	Echo 1 ;
+} else
+	Echo 2 ;
+-
+1
+---
+var = ;
+if $(var) {
+	Echo 1 ;
+} else {
+	Echo 2 ;
+	Echo 3 ;
+}
+-
+2
+3
+---
+var = foo ;
+if $(var) {
+	Echo 1 ;
+} else {
+	Echo 2 ;
+	Echo 3 ;
+}
+-
+1
+---
+var1 = foo ;
+var2 = bar ;
+var3 = foobar ;
+if $(var1) {
+	if $(var2) {
+		Echo 1 ;
+	} else
+		Echo 2 ;
+} else if $(var3) {
+	Echo 3 ;
+} else
+	Echo 4 ;
+-
+1
+---
+var1 = foo ;
+var2 = ;
+var3 = foobar ;
+if $(var1) {
+	if $(var2) {
+		Echo 1 ;
+	} else
+		Echo 2 ;
+} else if $(var3) {
+	Echo 3 ;
+} else
+	Echo 4 ;
+-
+2
+---
+var1 = ;
+var2 = ;
+var3 = foobar ;
+if $(var1) {
+	if $(var2) {
+		Echo 1 ;
+	} else
+		Echo 2 ;
+} else if $(var3) {
+	Echo 3 ;
+} else
+	Echo 4 ;
+-
+3
+---
+var1 = ;
+var2 = ;
+var3 = ;
+if $(var1) {
+	if $(var2) {
+		Echo 1 ;
+	} else
+		Echo 2 ;
+} else if $(var3) {
+	Echo 3 ;
+} else
+	Echo 4 ;
+-
+4
+---
