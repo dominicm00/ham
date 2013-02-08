@@ -61,6 +61,8 @@ private:
 			code::Node*			_TryParseFunctionCall();
 			void				_ParseListOfLists(NodeListContainer& nodes);
 			code::Node*			_ParseExpression();
+			code::Node*			_ParseAndExpression();
+			code::Node*			_ParseComparison();
 			code::Node*			_ParseAtom();
 
 	inline	code::AssignmentOperator _ParseAssignmentOperator();

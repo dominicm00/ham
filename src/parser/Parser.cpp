@@ -873,14 +873,70 @@ Parser::_ParseListOfLists(NodeListContainer& nodes)
 code::Node*
 Parser::_ParseExpression()
 {
-	// atom (<op> atom)*
+	// andExpression (["||" | "|"] andExpression)*
 	PARSER_NONTERMINAL("expression");
+
+	code::Node* result = _ParseAndExpression();
+	code::Node* rhs;
+
+	try {
+		for (;;) {
+			rhs = NULL;
+
+			if (_Token().ID() != TOKEN_OR)
+				return result;
+
+			_NextToken();
+			rhs = _ParseAndExpression();
+			result = new code::OrExpression(result, rhs);
+		}
+	} catch (...) {
+		delete rhs;
+		delete result;
+		throw;
+	}
+}
+
+
+code::Node*
+Parser::_ParseAndExpression()
+{
+	// comparison (["&&" | "&"] comparison)*
+	PARSER_NONTERMINAL("andExpression");
+
+	code::Node* result = _ParseComparison();
+	code::Node* rhs;
+
+	try {
+		for (;;) {
+			rhs = NULL;
+
+			if (_Token().ID() != TOKEN_AND)
+				return result;
+
+			_NextToken();
+			rhs = _ParseComparison();
+			result = new code::AndExpression(result, rhs);
+		}
+	} catch (...) {
+		delete rhs;
+		delete result;
+		throw;
+	}
+}
+
+
+code::Node*
+Parser::_ParseComparison()
+{
+	// atom (<op> atom)*
+	PARSER_NONTERMINAL("comparison");
 
 	code::Node* result = _ParseAtom();
 	code::Node* rhs;
 
 	try {
-		while (true) {
+		for (;;) {
 			rhs = NULL;
 
 			switch (_Token().ID()) {
@@ -918,18 +974,6 @@ Parser::_ParseExpression()
 					_NextToken();
 					rhs = _ParseAtom();
 					result = new code::GreaterExpression(result, rhs);
-					break;
-
-				case TOKEN_AND:
-					_NextToken();
-					rhs = _ParseAtom();
-					result = new code::AndExpression(result, rhs);
-					break;
-
-				case TOKEN_OR:
-					_NextToken();
-					rhs = _ParseAtom();
-					result = new code::OrExpression(result, rhs);
 					break;
 
 				default:
