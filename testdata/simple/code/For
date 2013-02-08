@@ -69,3 +69,232 @@ for element in $(list) {
 1
 1
 ---
+list = foo bar foobar ;
+for element in $(list) {
+	Echo 1 ;
+	continue ;
+	Echo $(element) ;
+}
+-
+1
+1
+1
+---
+list = foo bar foobar ;
+for element in $(list) {
+	Echo $(element) ;
+	continue ;
+}
+-
+foo
+bar
+foobar
+---
+list = foo bar foobar ;
+condition = ;
+for element in $(list) {
+	Echo 1 ;
+	if $(condition) {
+		continue ;
+	}
+	Echo $(element) ;
+}
+-
+1
+foo
+1
+bar
+1
+foobar
+---
+list = foo bar foobar ;
+condition = true ;
+for element in $(list) {
+	Echo 1 ;
+	if $(condition) {
+		continue ;
+	}
+	Echo $(element) ;
+}
+-
+1
+1
+1
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	for element2 in $(list2) {
+		Echo 1 ;
+		if $(condition) {
+			continue ;
+		}
+		Echo $(element2) ;
+	}
+}
+-
+foo
+1
+a
+1
+b
+bar
+1
+a
+1
+b
+foobar
+1
+a
+1
+b
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = true ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	for element2 in $(list2) {
+		Echo 1 ;
+		if $(condition) {
+			continue ;
+		}
+		Echo $(element2) ;
+	}
+}
+-
+foo
+1
+1
+bar
+1
+1
+foobar
+1
+1
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = true ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	if $(condition) {
+		continue ;
+	}
+	for element2 in $(list2) {
+		Echo 1 ;
+		Echo $(element2) ;
+	}
+}
+-
+foo
+bar
+foobar
+---
+list = foo bar foobar ;
+for element in $(list) {
+	Echo 1 ;
+	break ;
+	Echo $(element) ;
+}
+-
+1
+---
+list = foo bar foobar ;
+condition = ;
+for element in $(list) {
+	Echo 1 ;
+	if $(condition) {
+		break ;
+	}
+	Echo $(element) ;
+}
+-
+1
+foo
+1
+bar
+1
+foobar
+---
+list = foo bar foobar ;
+condition = true ;
+for element in $(list) {
+	Echo 1 ;
+	if $(condition) {
+		break ;
+	}
+	Echo $(element) ;
+}
+-
+1
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	for element2 in $(list2) {
+		Echo 1 ;
+		if $(condition) {
+			break ;
+		}
+		Echo $(element2) ;
+	}
+}
+-
+foo
+1
+a
+1
+b
+bar
+1
+a
+1
+b
+foobar
+1
+a
+1
+b
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = true ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	for element2 in $(list2) {
+		Echo 1 ;
+		if $(condition) {
+			break ;
+		}
+		Echo $(element2) ;
+	}
+}
+-
+foo
+1
+bar
+1
+foobar
+1
+---
+list1 = foo bar foobar ;
+list2 = a b ;
+condition = true ;
+for element1 in $(list1) {
+	Echo $(element1) ;
+	if $(condition) {
+		break ;
+	}
+	for element2 in $(list2) {
+		Echo 1 ;
+		Echo $(element2) ;
+	}
+}
+-
+foo
+---
