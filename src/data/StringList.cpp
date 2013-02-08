@@ -104,6 +104,19 @@ StringList::~StringList()
 
 
 bool
+StringList::IsTrue() const
+{
+	size_t count = Size();
+	for (size_t i = 0; i < count; i++) {
+		if (!ElementAt(i).IsEmpty())
+			return true;
+	}
+
+	return false;
+}
+
+
+bool
 StringList::Contains(const String& string) const
 {
 	for (size_t i = 0; i < fSize; i++) {

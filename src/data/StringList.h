@@ -43,6 +43,9 @@ public:
 			bool				IsEmpty() const
 									{ return fSize == 0; }
 
+			bool				IsTrue() const;
+									// any element is non-empty
+
 			String				Head() const
 									{ return ElementAt(0); }
 	inline	String				ElementAt(size_t index) const;

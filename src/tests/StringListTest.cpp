@@ -213,6 +213,24 @@ StringListTest::ElementAccess()
 
 
 void
+StringListTest::IsTrue()
+{
+	HAM_TEST_VERIFY(!StringList().IsTrue());
+	HAM_TEST_VERIFY(!MakeStringList("").IsTrue());
+	HAM_TEST_VERIFY(!MakeStringList("", "").IsTrue());
+	HAM_TEST_VERIFY(!MakeStringList("", "", "").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("foo").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("", "foo").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("", "", "foo").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("foo", "").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("foo", "", "").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("foo", "bar").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("", "foo", "bar").IsTrue());
+	HAM_TEST_VERIFY(MakeStringList("", "", "foo", "bar").IsTrue());
+}
+
+
+void
 StringListTest::SubList()
 {
 	for (size_t size = 0; size < 100; size++) {

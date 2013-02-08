@@ -18,6 +18,7 @@ public:
 
 			void				Constructor();
 			void				ElementAccess();
+			void				IsTrue();
 			void				SubList();
 			void				Contains();
 			void				Constants();
@@ -30,9 +31,9 @@ public:
 			void				Iteration();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringListTest, 12,
-		Constructor, ElementAccess, SubList, Contains, Constants, Comparison,
-		Assignment, Concatenation, Clear, Join, Multiply, Iteration)
+	HAM_ADD_TEST_CASES(StringListTest, 13,
+		Constructor, ElementAccess, IsTrue, SubList, Contains, Constants,
+		Comparison, Assignment, Concatenation, Clear, Join, Multiply, Iteration)
 };
 
 
