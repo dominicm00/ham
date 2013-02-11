@@ -233,3 +233,108 @@ c
 b
 a
 ---
+rule Foo
+{
+	Echo 1 ;
+	Echo 2 ;
+}
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+1
+2
+
+---
+rule Foo
+{
+	Echo 1 ;
+	return ;
+	Echo 2 ;
+}
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+1
+
+---
+rule Foo
+{
+	Echo 1 ;
+	return $(1[2-]) ;
+	Echo 2 ;
+}
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+1
+b c
+---
+#!skip boost
+# Boost.Jam doesn't seem to return immediately from the rule when encountering
+# a "return".
+rule Foo
+{
+	Echo 1 ;
+	while $(condition) {
+		Echo loop ;
+		return $(1[2-]) ;
+		Echo loopBottom ;
+	}
+	Echo 2 ;
+}
+condition = true ;
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+1
+loop
+b c
+---
+#!skip boost
+# Boost.Jam doesn't seem to return immediately from the rule when encountering
+# a "return".
+rule Foo
+{
+	Echo 1 ;
+	while $(condition) {
+		Echo loop ;
+		for element in $(list) {
+			Echo loop2: $(element) ;
+			return $(1[2-]) ;
+			Echo loopBottom2 ;
+		}
+	}
+	Echo 2 ;
+}
+condition = true ;
+list = x y z ;
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+1
+loop
+loop2: x
+b c
+---
+rule Foo
+{
+	Echo Foo 1 ;
+	Bar ;
+	Echo Foo 2 ;
+	return $(1[2-]) ;
+	Echo Foo 3 ;
+}
+rule Bar
+{
+	Echo Bar 1 ;
+	return ;
+	Echo Bar 2 ;
+}
+result = [ Foo a b c ] ;
+Echo $(result) ;
+-
+Foo 1
+Bar 1
+Foo 2
+b c
+---
