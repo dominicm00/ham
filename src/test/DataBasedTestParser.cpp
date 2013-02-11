@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "parser/ParseException.h"
-#include "test/DataBasedTest.h"
+#include "test/TemplateBasedTest.h"
 
 
 namespace ham {
@@ -99,7 +99,8 @@ DataBasedTestParser::Parse(const char* fileName)
 	if (testNameSlash != std::string::npos)
 		testName.erase(0, testNameSlash + 1);
 
-	std::auto_ptr<DataBasedTest> test(new DataBasedTest(testName, code));
+	std::auto_ptr<TemplateBasedTest> test(
+		new TemplateBasedTest(testName, code));
 
 	// read test cases
 	std::vector<std::string> previousInput;

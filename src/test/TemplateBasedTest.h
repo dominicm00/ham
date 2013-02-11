@@ -15,9 +15,9 @@ namespace ham {
 namespace test {
 
 
-class DataBasedTest : public RunnableTest {
+class TemplateBasedTest : public RunnableTest {
 public:
-								DataBasedTest(const std::string& name,
+								TemplateBasedTest(const std::string& name,
 									const std::string& code);
 
 			void				AddDataSet(

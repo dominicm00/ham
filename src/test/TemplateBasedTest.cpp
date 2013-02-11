@@ -4,7 +4,7 @@
  */
 
 
-#include "test/DataBasedTest.h"
+#include "test/TemplateBasedTest.h"
 
 #include <sstream>
 
@@ -18,7 +18,7 @@ namespace ham {
 namespace test {
 
 
-DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
+TemplateBasedTest::TemplateBasedTest(const std::string& name, const std::string& code)
 	:
 	RunnableTest(name, true),
 	fCode(code)
@@ -27,7 +27,7 @@ DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 
 
 void
-DataBasedTest::AddDataSet(const std::vector<std::string>& input,
+TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
 	const std::vector<std::string>& output, uint32_t compatibilityMask,
 	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
 	size_t endLineIndex)
@@ -43,7 +43,7 @@ DataBasedTest::AddDataSet(const std::vector<std::string>& input,
 
 
 void*
-DataBasedTest::CreateFixture(TestEnvironment* environment)
+TemplateBasedTest::CreateFixture(TestEnvironment* environment)
 {
 	// dummy fixture
 	return this;
@@ -51,13 +51,13 @@ DataBasedTest::CreateFixture(TestEnvironment* environment)
 
 
 void
-DataBasedTest::DeleteFixture(TestEnvironment* environment, void* fixture)
+TemplateBasedTest::DeleteFixture(TestEnvironment* environment, void* fixture)
 {
 }
 
 
 uint32_t
-DataBasedTest::TestCaseCompatibility(int index, bool& _supportedByHam,
+TemplateBasedTest::TestCaseCompatibility(int index, bool& _supportedByHam,
 	uint32_t& _skipMask)
 {
 	const DataSet& dataSet = fDataSets[index];
@@ -68,7 +68,7 @@ DataBasedTest::TestCaseCompatibility(int index, bool& _supportedByHam,
 
 
 void
-DataBasedTest::RunTestCase(TestEnvironment* environment, void* fixture,
+TemplateBasedTest::RunTestCase(TestEnvironment* environment, void* fixture,
 	int index)
 {
 	_RunTest(environment, fDataSets[index]);
@@ -76,7 +76,7 @@ DataBasedTest::RunTestCase(TestEnvironment* environment, void* fixture,
 
 
 void
-DataBasedTest::_RunTest(TestEnvironment* environment,
+TemplateBasedTest::_RunTest(TestEnvironment* environment,
 	const DataSet& dataSet) const
 {
 	static const char* const kOutputPrefix = "---test-output-start---";
@@ -173,7 +173,7 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 
 
 /*static*/ bool
-DataBasedTest::_ReadEchoLine(TestEnvironment* environment, std::istream& input,
+TemplateBasedTest::_ReadEchoLine(TestEnvironment* environment, std::istream& input,
 	std::string& _line)
 {
 	if (!std::getline(input, _line))
