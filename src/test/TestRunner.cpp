@@ -123,14 +123,17 @@ void
 TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 {
 	bool supportedByHam;
-	bool compatible = (test->TestCaseCompatibility(testCase, supportedByHam)
+	uint32_t skipMask;
+	bool compatible = (test->TestCaseCompatibility(testCase, supportedByHam,
+				skipMask)
 			& (1 << fEnvironment->GetCompatibility())) != 0
 		&& (!fEnvironment->JamExecutable().empty() || supportedByHam);
 
 	try {
 		printf("%s: ", test->TestCaseAt(testCase, true).c_str());
 		fflush(stdin);
-		if (fEnvironment->JamExecutable().empty() || test->IsJammable()) {
+		if ((skipMask & (1 << fEnvironment->GetCompatibility())) == 0
+			&& (fEnvironment->JamExecutable().empty() || test->IsJammable())) {
 			_InitFixture(test);
 			test->RunTestCase(fEnvironment, fCurrentTestFixture, testCase);
 			fPassedTests++;

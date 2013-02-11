@@ -29,10 +29,11 @@ DataBasedTest::DataBasedTest(const std::string& name, const std::string& code)
 void
 DataBasedTest::AddDataSet(const std::vector<std::string>& input,
 	const std::vector<std::string>& output, uint32_t compatibilityMask,
-	bool supportedByHam, size_t startLineIndex, size_t endLineIndex)
+	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
+	size_t endLineIndex)
 {
 	fDataSets.push_back(
-		DataSet(input, output, compatibilityMask, supportedByHam,
+		DataSet(input, output, compatibilityMask, supportedByHam, skipMask,
 			startLineIndex, endLineIndex));
 
 	std::stringstream testCaseName;
@@ -56,10 +57,12 @@ DataBasedTest::DeleteFixture(TestEnvironment* environment, void* fixture)
 
 
 uint32_t
-DataBasedTest::TestCaseCompatibility(int index, bool& _supportedByHam)
+DataBasedTest::TestCaseCompatibility(int index, bool& _supportedByHam,
+	uint32_t& _skipMask)
 {
 	const DataSet& dataSet = fDataSets[index];
 	_supportedByHam = dataSet.fSupportedByHam;
+	_skipMask = dataSet.fSkipMask;
 	return dataSet.fCompatibilityMask;
 }
 

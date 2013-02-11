@@ -24,14 +24,14 @@ public:
 									const std::vector<std::string>& input,
 									const std::vector<std::string>& output,
 									uint32_t compatibilityMask,
-									bool supportedByHam, size_t startLineIndex,
-									size_t endLineIndex);
+									bool supportedByHam, uint32_t skipMask,
+									size_t startLineIndex, size_t endLineIndex);
 
 	virtual	void*				CreateFixture(TestEnvironment* environment);
 	virtual	void				DeleteFixture(TestEnvironment* environment,
 									void* fixture);
 	virtual	uint32_t			TestCaseCompatibility(int index,
-									bool& _supportedByHam);
+									bool& _supportedByHam, uint32_t& _skipMask);
 	virtual	void				RunTestCase(TestEnvironment* environment,
 									void* fixture, int index);
 
@@ -40,12 +40,14 @@ private:
 				DataSet(const std::vector<std::string>& input,
 					const std::vector<std::string>& output,
 					uint32_t compatibilityMask, bool supportedByHam,
-					size_t startLineIndex, size_t endLineIndex)
+					uint32_t skipMask, size_t startLineIndex,
+					size_t endLineIndex)
 					:
 					fInput(input),
 					fOutput(output),
 					fCompatibilityMask(compatibilityMask),
 					fSupportedByHam(supportedByHam),
+					fSkipMask(skipMask),
 					fStartLineIndex(startLineIndex),
 					fEndLineIndex(endLineIndex)
 				{
@@ -56,6 +58,7 @@ private:
 				std::vector<std::string>	fOutput;
 				uint32_t					fCompatibilityMask;
 				bool						fSupportedByHam;
+				uint32_t					fSkipMask;
 				size_t						fStartLineIndex;
 				size_t						fEndLineIndex;
 			};

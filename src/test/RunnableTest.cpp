@@ -48,9 +48,12 @@ RunnableTest::IndexOfTestCase(const std::string& testCase) const
 
 
 uint32_t
-RunnableTest::TestCaseCompatibility(int index, bool& _supportedByHam)
+RunnableTest::TestCaseCompatibility(int index, bool& _supportedByHam,
+	uint32_t& _skipMask)
 {
 	_supportedByHam = true;
+	_skipMask = 0;
+
 	return behavior::COMPATIBILITY_MASK_ALL;
 }
 

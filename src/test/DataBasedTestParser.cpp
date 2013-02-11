@@ -20,10 +20,31 @@ namespace test {
 static const std::string kTestCaseSeparator("---");
 static const std::string kInputOutputSeparator("-");
 static const std::string kCompatibilityDirective("compat ");
-static const std::string kCompatibilityJam("jam");
-static const std::string kCompatibilityBoostJam("boost");
-static const std::string kCompatibilityHam("ham");
+static const std::string kSkipDirective("skip ");
+static const std::string kVersionJam("jam");
+static const std::string kVersionBoostJam("boost");
+static const std::string kVersionHam("ham");
 static const std::string kCompatibilityNotHam("!ham");
+
+
+static std::vector<std::string>
+split_string(const std::string& string)
+{
+	std::vector<std::string> result;
+
+	std::string remainder(string);
+	size_t index = 0;
+	while ((index = remainder.find_first_not_of(' ', index))
+			!= std::string::npos) {
+		size_t end = remainder.find(' ', index);
+		std::string substring(remainder, index,
+			end != std::string::npos ? end : remainder.length() - index);
+		result.push_back(substring);
+		index += substring.length();
+	}
+
+	return result;
+}
 
 
 DataBasedTestParser::DataBasedTestParser()
@@ -87,6 +108,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	for (;;) {
 		size_t dataSetLineIndex = fLineIndex;
 		uint32_t compatibilityMask = behavior::COMPATIBILITY_MASK_ALL;
+		uint32_t skipMask = 0;
 		bool supportedByHam = true;
 		std::vector<std::string> input;
 		for (;;) {
@@ -115,22 +137,19 @@ DataBasedTestParser::Parse(const char* fileName)
 				if (line.compare(0, kCompatibilityDirective.length(),
 						kCompatibilityDirective) == 0) {
 					compatibilityMask = 0;
-					std::string remainder(line,
-						kCompatibilityDirective.length());
-					size_t index = 0;
-					while ((index = remainder.find_first_not_of(' ', index))
-							!= std::string::npos) {
-						size_t end = remainder.find(' ', index);
-						std::string versionString(remainder, index,
-							end != std::string::npos ?
-								end : remainder.length() - index);
-						if (versionString == kCompatibilityJam) {
+					std::vector<std::string> arguments = split_string(
+						std::string(line, kCompatibilityDirective.length()));
+					for (std::vector<std::string>::iterator it
+							= arguments.begin();
+						it != arguments.end(); ++it) {
+						std::string versionString = *it;
+						if (versionString == kVersionJam) {
 							compatibilityMask
 								|= 1 << behavior::COMPATIBILITY_JAM;
-						} else if (versionString == kCompatibilityBoostJam) {
+						} else if (versionString == kVersionBoostJam) {
 							compatibilityMask
 								|= 1 << behavior::COMPATIBILITY_BOOST_JAM;
-						} else if (versionString == kCompatibilityHam) {
+						} else if (versionString == kVersionHam) {
 							compatibilityMask
 								|= 1 << behavior::COMPATIBILITY_HAM;
 						} else if (versionString == kCompatibilityNotHam) {
@@ -140,8 +159,30 @@ DataBasedTestParser::Parse(const char* fileName)
 								"\"#!compat\" directive: \"" + versionString
 								+ "\""));
 						}
+					}
+					continue;
+				}
 
-						index += versionString.length();
+				if (line.compare(0, kSkipDirective.length(), kSkipDirective)
+						== 0) {
+					skipMask = 0;
+					std::vector<std::string> arguments = split_string(
+						std::string(line, kSkipDirective.length()));
+					for (std::vector<std::string>::iterator it
+							= arguments.begin();
+						it != arguments.end(); ++it) {
+						std::string versionString = *it;
+						if (versionString == kVersionJam) {
+							skipMask |= 1 << behavior::COMPATIBILITY_JAM;
+						} else if (versionString == kVersionBoostJam) {
+							skipMask |= 1 << behavior::COMPATIBILITY_BOOST_JAM;
+						} else if (versionString == kVersionHam) {
+							skipMask |= 1 << behavior::COMPATIBILITY_HAM;
+						} else {
+							_Throw(std::string("Invalid argument for "
+								"\"#!skip\" directive: \"" + versionString
+								+ "\""));
+						}
 					}
 					continue;
 				}
@@ -211,8 +252,8 @@ DataBasedTestParser::Parse(const char* fileName)
 
 		previousInput = input;
 		previousOutput = output;
-		test->AddDataSet(input, output, compatibilityMask, supportedByHam,
-			dataSetLineIndex, fLineIndex - 1);
+		test->AddDataSet(input, output, compatibilityMask & ~skipMask,
+			supportedByHam, skipMask, dataSetLineIndex, fLineIndex - 1);
 	}
 }
 
