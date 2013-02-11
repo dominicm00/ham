@@ -66,6 +66,9 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	// execute the rule block
 	StringList result = fBlock->Evaluate(context);
 
+	if (context.GetJumpCondition() == JUMP_CONDITION_RETURN)
+		context.SetJumpCondition(JUMP_CONDITION_NONE);
+
 	// reinstate the old local variable scope
 	context.SetLocalScope(oldLocalScope);
 
