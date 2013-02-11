@@ -42,10 +42,17 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	for (size_t i = 0; i < parameterCount; i++) {
 		if (!parameters[i].IsEmpty()) {
 			char parameterName[16];
-			snprintf(parameterName, sizeof(parameterName), "%zu", i);
+			snprintf(parameterName, sizeof(parameterName), "%zu", i + 1);
 			localVariables.Set(parameterName, parameters[i]);
 		}
 	}
+
+	// set the '<' and '>' variables
+	if (parameterCount >= 1 && !parameters[0].IsEmpty())
+		localVariables.Set("<", parameters[0]);
+
+	if (parameterCount >= 2 && !parameters[1].IsEmpty())
+		localVariables.Set(">", parameters[1]);
 
 	// set the named parameters
 	StringList::Iterator it = fParameterNames.GetIterator();
