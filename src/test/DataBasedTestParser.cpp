@@ -19,8 +19,6 @@ namespace test {
 
 static const std::string kTestCaseSeparator("---");
 static const std::string kInputOutputSeparator("-");
-static const std::string kCompatibilityDirective("compat ");
-static const std::string kSkipDirective("skip ");
 static const std::string kVersionJam("jam");
 static const std::string kVersionBoostJam("boost");
 static const std::string kVersionHam("ham");
@@ -70,15 +68,15 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::string code;
 	for (;;) {
 		std::string line;
-		bool directive;
+		std::string directive;
 		if (!_ReadLine(line, directive)) {
 			_Throw(std::string("Unexpected end of file while reading test "
 				"code, was expecting separator \"") + kTestCaseSeparator
 				+ "\"");
 		}
 
-		if (directive) {
-			if (line == "inputIsCode") {
+		if (!directive.empty()) {
+			if (directive == "inputIsCode") {
 				inputIsCode = true;
 				continue;
 			}
@@ -114,7 +112,7 @@ DataBasedTestParser::Parse(const char* fileName)
 		std::vector<std::string> input;
 		for (;;) {
 			std::string line;
-			bool directive;
+			std::string directive;
 			if (!_ReadLine(line, directive)) {
 				if (input.empty())
 					return test.release();
@@ -124,8 +122,8 @@ DataBasedTestParser::Parse(const char* fileName)
 					+ kInputOutputSeparator + "\"");
 			}
 
-			if (directive) {
-				if (line == "repeat") {
+			if (!directive.empty()) {
+				if (directive == "repeat") {
 					if (input.size() >= previousInput.size()) {
 						_Throw(std::string("Repeat directive in test case "
 							"input doesn't refer to existing previous input"));
@@ -135,11 +133,9 @@ DataBasedTestParser::Parse(const char* fileName)
 					continue;
 				}
 
-				if (line.compare(0, kCompatibilityDirective.length(),
-						kCompatibilityDirective) == 0) {
+				if (directive == "compat") {
 					compatibilityMask = 0;
-					std::vector<std::string> arguments = split_string(
-						std::string(line, kCompatibilityDirective.length()));
+					std::vector<std::string> arguments = split_string(line);
 					for (std::vector<std::string>::iterator it
 							= arguments.begin();
 						it != arguments.end(); ++it) {
@@ -164,11 +160,9 @@ DataBasedTestParser::Parse(const char* fileName)
 					continue;
 				}
 
-				if (line.compare(0, kSkipDirective.length(), kSkipDirective)
-						== 0) {
+				if (directive == "skip") {
 					skipMask = 0;
-					std::vector<std::string> arguments = split_string(
-						std::string(line, kSkipDirective.length()));
+					std::vector<std::string> arguments = split_string(line);
 					for (std::vector<std::string>::iterator it
 							= arguments.begin();
 						it != arguments.end(); ++it) {
@@ -188,7 +182,7 @@ DataBasedTestParser::Parse(const char* fileName)
 					continue;
 				}
 
-				_Throw(std::string("Unsupported directive \"#!" + line
+				_Throw(std::string("Unsupported directive \"#!" + directive
 					+ "\" in test case input"));
 			}
 
@@ -222,15 +216,15 @@ DataBasedTestParser::Parse(const char* fileName)
 		std::vector<std::string> output;
 		for (;;) {
 			std::string line;
-			bool directive;
+			std::string directive;
 			if (!_ReadLine(line, directive)) {
 				_Throw(std::string("Unexpected end of file while reading test "
 					"case output, was expecting separator \"")
 					+ kTestCaseSeparator + "\"");
 			}
 
-			if (directive) {
-				if (line == "repeat") {
+			if (!directive.empty()) {
+				if (directive == "repeat") {
 					if (output.size() >= previousOutput.size()) {
 						_Throw(std::string("Repeat directive in test case "
 							"output doesn't refer to existing previous "
@@ -240,7 +234,7 @@ DataBasedTestParser::Parse(const char* fileName)
 					output.push_back(previousOutput.at(output.size()));
 					continue;
 				} else {
-					_Throw(std::string("Unsupported directive \"#!" + line
+					_Throw(std::string("Unsupported directive \"#!" + directive
 						+ "\" in test case output"));
 				}
 			}
@@ -260,10 +254,10 @@ DataBasedTestParser::Parse(const char* fileName)
 
 
 bool
-DataBasedTestParser::_ReadLine(std::string& _line, bool& _directive)
+DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
 {
 	_line.clear();
-	_directive = false;
+	_directive.clear();
 
 	bool multiLine = false;
 	bool comment = false;
@@ -316,8 +310,19 @@ DataBasedTestParser::_ReadLine(std::string& _line, bool& _directive)
 			}
 			multiLine = false;
 		} else {
-			_directive = true;
-			_line.append(line.c_str() + 2);
+			size_t directiveEnd = line.find_first_of(' ', 2);
+			if (directiveEnd == std::string::npos)
+				directiveEnd = line.length();
+			if (directiveEnd == 2)
+				_Throw(std::string("Invalid directive line: \"" + line + "\""));
+
+			_directive = std::string(line, 2, directiveEnd - 2);
+
+			size_t argumentsStart = line.find_first_not_of(' ', directiveEnd);
+			if (argumentsStart == std::string::npos)
+				argumentsStart = line.length();
+
+			_line.append(line.c_str() + argumentsStart);
 		}
 	} while (multiLine || comment);
 
