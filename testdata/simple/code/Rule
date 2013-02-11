@@ -1,0 +1,235 @@
+# Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!inputIsCode
+%1
+---
+rule Foo
+{
+	Echo Foo ;
+}
+-
+---
+rule Foo
+{
+	Echo Foo ;
+}
+Foo ;
+-
+Foo
+---
+rule Foo
+{
+	Echo Foo param <: $(<) ;
+	Echo Foo param 1: $(1) ;
+	Echo Foo param >: $(>) ;
+	Echo Foo param 2: $(2) ;
+}
+Foo ;
+Foo ;
+-
+Foo param <:
+Foo param 1:
+Foo param >:
+Foo param 2:
+Foo param <:
+Foo param 1:
+Foo param >:
+Foo param 2:
+---
+rule Foo
+{
+	Echo Foo param <: $(<) ;
+	Echo Foo param 1: $(1) ;
+	Echo Foo param >: $(>) ;
+	Echo Foo param 2: $(2) ;
+}
+Foo a b c : xy z : 1 2 3 ;
+Foo : foo ;
+-
+Foo param <: a b c
+Foo param 1: a b c
+Foo param >: xy z
+Foo param 2: xy z
+Foo param <:
+Foo param 1:
+Foo param >: foo
+Foo param 2: foo
+---
+#!compat jam ham
+# Named parameters seem to be broken/unsupported in Boost.Jam.
+rule Foo namedParameter
+{
+}
+-
+---
+#!compat jam ham
+# Named parameters seem to be broken/unsupported in Boost.Jam.
+rule Foo param1 : param2 : param3
+{
+	Echo Foo param <: $(<) ;
+	Echo Foo param 1: $(1) ;
+	Echo Foo param1: $(param1) ;
+	Echo Foo param >: $(>) ;
+	Echo Foo param 2: $(2) ;
+	Echo Foo param2: $(param2) ;
+	Echo Foo param 3: $(3) ;
+	Echo Foo param3: $(param3) ;
+	Echo Foo param 4: $(4) ;
+}
+Foo a b c : xy z : 1 2 3 ;
+Foo : foo ;
+-
+Foo param <: a b c
+Foo param 1: a b c
+Foo param1: a b c
+Foo param >: xy z
+Foo param 2: xy z
+Foo param2: xy z
+Foo param 3: 1 2 3
+Foo param3: 1 2 3
+Foo param 4:
+Foo param <:
+Foo param 1:
+Foo param1:
+Foo param >: foo
+Foo param 2: foo
+Foo param2: foo
+Foo param 3:
+Foo param3:
+Foo param 4:
+---
+#!compat jam ham
+# Named parameters seem to be broken/unsupported in Boost.Jam.
+rule Foo param1 : param2 : param3 : param4 : param5 : param6 : param7 : param8
+	: param9
+{
+	Echo Foo param1: $(param1) ;
+	Echo Foo param2: $(param2) ;
+	Echo Foo param3: $(param3) ;
+	Echo Foo param4: $(param4) ;
+	Echo Foo param5: $(param5) ;
+	Echo Foo param6: $(param6) ;
+	Echo Foo param7: $(param7) ;
+	Echo Foo param8: $(param8) ;
+	Echo Foo param9: $(param9) ;
+}
+Foo a : b : c : d : e : f : g : h : i ;
+-
+Foo param1: a
+Foo param2: b
+Foo param3: c
+Foo param4: d
+Foo param5: e
+Foo param6: f
+Foo param7: g
+Foo param8: h
+Foo param9: i
+---
+rule Foo
+{
+	Echo Foo param 1: $(1) ;
+	Echo Foo param 2: $(2) ;
+	Echo Foo param 3: $(3) ;
+	Echo Foo param 4: $(4) ;
+	Echo Foo param 5: $(5) ;
+	Echo Foo param 6: $(6) ;
+	Echo Foo param 7: $(7) ;
+	Echo Foo param 8: $(8) ;
+	Echo Foo param 9: $(9) ;
+}
+Foo a : b : c : d : e : f : g : h : i ;
+-
+Foo param 1: a
+Foo param 2: b
+Foo param 3: c
+Foo param 4: d
+Foo param 5: e
+Foo param 6: f
+Foo param 7: g
+Foo param 8: h
+Foo param 9: i
+---
+rule Foo
+{
+	Echo Foo1 $(1) ":" $(2) ":" $(3) ;
+}
+Foo a : b : c ;
+rule Foo
+{
+	Echo Foo2 $(1) ":" $(2) ":" $(3) ;
+}
+Foo a : b : c ;
+-
+Foo1 a : b : c
+Foo2 a : b : c
+---
+#!compat jam ham
+rule Foo
+{
+	Echo Foo $(1) ":" $(2) ":" $(3) ;
+}
+rule Bar
+{
+	Echo Bar $(1) ":" $(2) ":" $(3) ;
+}
+rule FooBar
+{
+	Echo FooBar $(1) ":" $(2) ":" $(3) ;
+}
+rules = Foo Bar FooBar ;
+$(rules) a : b : c ;
+-
+Foo a : b : c
+Bar a : b : c
+FooBar a : b : c
+---
+#!compat boost !ham
+# Calling multiple rules is broken in Boost.Jam.
+rule Foo
+{
+	Echo Foo $(1) ":" $(2) ":" $(3) ;
+}
+rule Bar
+{
+	Echo Bar $(1) ":" $(2) ":" $(3) ;
+}
+rule FooBar
+{
+	Echo FooBar $(1) ":" $(2) ":" $(3) ;
+}
+rules = Foo Bar FooBar ;
+$(rules) a : b : c ;
+-
+Foo Bar FooBar a : b : c
+---
+rule Foo
+{
+	Echo Foo $(1) ;
+	if $(2) {
+		Foo $(2) : $(3) ;
+	}
+}
+Foo a : b : c ;
+-
+Foo a
+Foo b
+Foo c
+---
+rule Foo
+{
+	if $(1[2-]) {
+		Foo $(1[2-]) ;
+	}
+	Echo $(1[1]) ;
+}
+Foo a b c d e f g ;
+-
+g
+f
+e
+d
+c
+b
+a
+---
