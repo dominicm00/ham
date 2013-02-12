@@ -130,3 +130,31 @@ Echo 3: $(element) ;
 3: 4
 2
 ---
+#!file Jamfile
+files = File1 File2 ;
+Echo 1 ;
+include $(files) ;
+Echo 2 ;
+
+#!file File1
+Echo 3 ;
+
+#!file File2
+Echo 4 ;
+-
+1
+3
+2
+---
+#!file Jamfile
+files = ;
+Echo 1 ;
+include $(files) ;
+Echo 2 ;
+
+#!file File1
+Echo 3 ;
+-
+1
+2
+---
