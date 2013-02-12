@@ -83,7 +83,7 @@ public:
 	static	std::string			MakePath(const char* head, const char* tail);
 
 private:
-			struct ExecutableExecuter;
+			struct CodeExecuter;
 };
 
 

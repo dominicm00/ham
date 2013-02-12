@@ -49,7 +49,7 @@ value_container_to_string(const Container& value)
 // #pragma mark - ExecutableExecuter
 
 
-struct TestFixture::ExecutableExecuter {
+struct TestFixture::CodeExecuter {
 	void Execute(const char* jamExecutable,
 		behavior::Compatibility compatibility,
 		const std::map<std::string, std::string>& code, std::ostream& output,
@@ -260,7 +260,7 @@ TestFixture::ExecuteCode(TestEnvironment* environment,
 	std::ostream& errorOutput)
 {
 	std::string jamExecutable = environment->JamExecutable();
-	return ExecutableExecuter().Execute(
+	return CodeExecuter().Execute(
 		jamExecutable.empty() ? NULL : jamExecutable.c_str(),
 		environment->GetCompatibility(), code, output, errorOutput);
 }
@@ -296,8 +296,8 @@ TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
 {
 	std::map<std::string,std::string> codeFiles;
 	codeFiles["Jamfile"] = code;
-	return ExecutableExecuter().Execute(jamExecutable,
-		behavior::COMPATIBILITY_HAM, codeFiles, output, errorOutput);
+	return CodeExecuter().Execute(jamExecutable, behavior::COMPATIBILITY_HAM,
+		codeFiles, output, errorOutput);
 		// compatibility argument is ignored, since an executable is given
 }
 
