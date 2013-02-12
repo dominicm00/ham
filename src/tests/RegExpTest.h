@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_TESTS_REG_EXP_TEST_H
