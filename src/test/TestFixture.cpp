@@ -92,8 +92,10 @@ struct TestFixture::ExecutableExecuter {
 			std::copy(code.begin(), code.end(),
 				std::ostream_iterator<char>(jamfile));
 
-			if (jamfile.fail())
-				HAM_TEST_THROW("Failed to write test code to temporary Jamfile.")
+			if (jamfile.fail()) {
+				HAM_TEST_THROW("Failed to write test code to temporary "
+					"Jamfile.")
+			}
 			jamfile.close();
 
 			// run the executable
@@ -107,7 +109,8 @@ struct TestFixture::ExecutableExecuter {
 			std::ostream_iterator<char> outputIterator(output);
 			char buffer[4096];
 			for (;;) {
-				size_t bytesRead = fread(buffer, 1, sizeof(buffer), fOutputPipe);
+				size_t bytesRead = fread(buffer, 1, sizeof(buffer),
+					fOutputPipe);
 				if (bytesRead > 0) {
 					outputIterator
 						= std::copy(buffer, buffer + bytesRead, outputIterator);
@@ -246,7 +249,8 @@ TestFixture::ExecuteCodeHamLibrary(const std::string& code,
 TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
 	const std::string& code, std::ostream& output, std::ostream& errorOutput)
 {
-	return ExecutableExecuter().Execute(jamExecutable, code, output, errorOutput);
+	return ExecutableExecuter().Execute(jamExecutable, code, output,
+		errorOutput);
 }
 
 
