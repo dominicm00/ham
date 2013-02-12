@@ -1077,7 +1077,7 @@ Parser::_ParseAssignmentOperator()
 void
 Parser::_Throw(const char* message)
 {
-	throw ParseException(message, fLexer.CurrentTokenPosition());
+	throw ParseException(message, fFileName, fLexer.CurrentTokenPosition());
 }
 
 

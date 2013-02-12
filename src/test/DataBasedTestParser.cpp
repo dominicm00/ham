@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -107,6 +107,8 @@ DataBasedTestParser::DataBasedTestParser()
 Test*
 DataBasedTestParser::Parse(const char* fileName)
 {
+	fFileName = fileName;
+
 	fInput.close();
 	fInput.open(fileName, std::ios_base::in);
 	if (fInput.fail())
@@ -451,7 +453,7 @@ DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
 void
 DataBasedTestParser::_Throw(const std::string& message, size_t column)
 {
-	throw parser::ParseException(message,
+	throw parser::ParseException(message, fFileName,
 		parser::ParsePosition(fLineIndex, column));
 }
 

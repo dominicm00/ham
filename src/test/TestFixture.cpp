@@ -136,6 +136,7 @@ struct TestFixture::CodeExecuter {
 
 				// parse code
 				parser::Parser parser;
+				parser.SetFileName("Jamfile");
 				code::Block* block = parser.Parse(jamfile);
 
 				// prepare evaluation context

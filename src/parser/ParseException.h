@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_PARSER_PARSE_EXCEPTION_H
@@ -9,39 +9,24 @@
 #include <string>
 
 #include "parser/ParsePosition.h"
+#include "util/TextFileException.h"
 
 
 namespace ham {
 namespace parser {
 
 
-class ParseException {
+class ParseException : public util::TextFileException {
 public:
-	ParseException()
-	{
-	}
-
-	ParseException(const std::string& message,
+	ParseException(const std::string& message = std::string(),
+		const std::string& fileName = std::string(),
 		const ParsePosition& position = ParsePosition())
 		:
-		fMessage(message),
-		fPosition(position)
+		util::TextFileException(message,
+			util::TextFilePosition(fileName, position.Line(),
+				position.Column()))
 	{
 	}
-
-	const char* Message() const
-	{
-		return fMessage.c_str();
-	}
-
-	const ParsePosition& Position() const
-	{
-		return fPosition;
-	}
-
-private:
-	std::string		fMessage;
-	ParsePosition	fPosition;
 };
 
 

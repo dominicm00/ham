@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_TEST_DATA_BASED_TEST_PARSER_H
@@ -33,6 +33,7 @@ private:
 			struct TestCase;
 
 private:
+			const char*			fFileName;
 			std::fstream		fInput;
 			size_t				fLineIndex;
 };

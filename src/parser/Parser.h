@@ -34,6 +34,10 @@ public:
 public:
 								Parser();
 
+			void				SetFileName(const std::string& fileName)
+									{ fFileName = fileName; }
+									// used for exceptions only
+
 			code::Block*		Parse(const std::string& input);
 			code::Block*		Parse(std::istream& input);
 									// input requires std::noskipws()
@@ -80,8 +84,9 @@ private:
 	inline	NodeType*			_Expect(NodeType* node, const char* expected);
 
 private:
-			LexerType	fLexer;
-			Listener*	fListener;
+			LexerType			fLexer;
+			Listener*			fListener;
+			std::string			fFileName;
 };
 
 
