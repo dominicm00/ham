@@ -54,9 +54,8 @@ join_input_code(std::vector<std::string>& input)
 	for (std::vector<std::string>::iterator it
 			= input.begin();
 		it != input.end(); ++it) {
-		if (it != input.begin())
-			inputCode += '\n';
 		inputCode += *it;
+		inputCode += '\n';
 	}
 
 	input.clear();
