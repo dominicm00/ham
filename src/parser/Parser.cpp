@@ -192,7 +192,6 @@ code::Block*
 Parser::Parse(const std::string& input)
 {
 	std::istringstream stream(input);
-	std::noskipws(stream);
 	return Parse(stream);
 }
 
@@ -200,8 +199,19 @@ Parser::Parse(const std::string& input)
 code::Block*
 Parser::Parse(std::istream& input)
 {
-
-	return Parse(InputIteratorType(input), InputIteratorType());
+	bool skipWhiteSpace = (input.flags() & std::ios_base::skipws) != 0;
+	try {
+		std::noskipws(input);
+		code::Block* result
+			= Parse(InputIteratorType(input), InputIteratorType());
+		if (skipWhiteSpace)
+			std::skipws(input);
+		return result;
+	} catch(...) {
+		if (skipWhiteSpace)
+			std::skipws(input);
+		throw;
+	}
 }
 
 
@@ -222,8 +232,6 @@ Parser::Test(int argc, const char* const* argv)
 	std::ifstream input("testdata/test2");
 #endif
 
-	std::noskipws(input);
-
 	DumpListener dumpListener;
 
 	if (argc > 1 && strcmp(argv[1], "-d") == 0) {
@@ -232,7 +240,7 @@ Parser::Test(int argc, const char* const* argv)
 	}
 
 	try {
-		code::Block* block = Parse(InputIteratorType(input), InputIteratorType());
+		code::Block* block = Parse(input);
 		std::cout << "Parse tree:\n";
 		code::DumpContext dumpContext;
 //		block->Dump(dumpContext);
