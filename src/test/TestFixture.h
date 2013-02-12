@@ -6,6 +6,7 @@
 #define HAM_TEST_TEST_FIXTURE_H
 
 
+#include <map>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -57,6 +58,12 @@ public:
 									const std::string& code,
 									std::ostream& output,
 									std::ostream& errorOutput);
+	static	void				ExecuteCode(TestEnvironment* environment,
+									const std::map<std::string, std::string>&
+										code,
+									std::ostream& output,
+									std::ostream& errorOutput);
+									// code: file name -> file content
 	static	void				ExecuteCodeHamLibrary(
 									const std::string& code,
 									std::ostream& output,

@@ -50,8 +50,10 @@ value_container_to_string(const Container& value)
 
 
 struct TestFixture::ExecutableExecuter {
-	void Execute(const char* jamExecutable, const std::string& code,
-		std::ostream& output, std::ostream& errorOutput)
+	void Execute(const char* jamExecutable,
+		behavior::Compatibility compatibility,
+		const std::map<std::string, std::string>& code, std::ostream& output,
+		std::ostream& errorOutput)
 	{
 		fOldWorkingDirectory.clear();
 		fTemporaryDirectory = NULL;
@@ -83,41 +85,72 @@ struct TestFixture::ExecutableExecuter {
 					strerror(errno))
 			}
 
-			// write the code to a Jamfile
-			std::string jamfileName = MakePath(fTemporaryDirectory, "Jamfile");
-			std::fstream jamfile(jamfileName.c_str(), std::ios_base::out);
-			if (jamfile.fail())
-				HAM_TEST_THROW("Failed to create temporary Jamfile.")
+			// write the code to the Jamfiles
+			for (std::map<std::string, std::string>::const_iterator it
+					= code.begin();
+				it != code.end(); ++it) {
+				std::string jamfileName = MakePath(fTemporaryDirectory,
+					it->first.c_str());
+// TODO: Replace path delimiters with platform specific ones!
+				std::fstream jamfile(jamfileName.c_str(), std::ios_base::out);
+				if (jamfile.fail())
+					HAM_TEST_THROW("Failed to create temporary Jamfile.")
 
-			std::copy(code.begin(), code.end(),
-				std::ostream_iterator<char>(jamfile));
+				std::copy(it->second.begin(), it->second.end(),
+					std::ostream_iterator<char>(jamfile));
 
-			if (jamfile.fail()) {
-				HAM_TEST_THROW("Failed to write test code to temporary "
-					"Jamfile.")
+				if (jamfile.fail()) {
+					HAM_TEST_THROW("Failed to write test code to temporary "
+						"Jamfile.")
+				}
+				jamfile.close();
 			}
-			jamfile.close();
 
-			// run the executable
-			fOutputPipe = popen(jamExecutable, "r");
-			if (fOutputPipe == NULL) {
-				HAM_TEST_THROW("Failed to execute \"%s\": %s", jamExecutable,
-					strerror(errno))
-			}
-
-			// read input until done
-			std::ostream_iterator<char> outputIterator(output);
-			char buffer[4096];
-			for (;;) {
-				size_t bytesRead = fread(buffer, 1, sizeof(buffer),
-					fOutputPipe);
-				if (bytesRead > 0) {
-					outputIterator
-						= std::copy(buffer, buffer + bytesRead, outputIterator);
+			if (jamExecutable != NULL) {
+				// run the executable
+				fOutputPipe = popen(jamExecutable, "r");
+				if (fOutputPipe == NULL) {
+					HAM_TEST_THROW("Failed to execute \"%s\": %s",
+						jamExecutable, strerror(errno))
 				}
 
-				if (bytesRead < sizeof(buffer))
-					break;
+				// read input until done
+				std::ostream_iterator<char> outputIterator(output);
+				char buffer[4096];
+				for (;;) {
+					size_t bytesRead = fread(buffer, 1, sizeof(buffer),
+						fOutputPipe);
+					if (bytesRead > 0) {
+						outputIterator = std::copy(buffer, buffer + bytesRead,
+							outputIterator);
+					}
+
+					if (bytesRead < sizeof(buffer))
+						break;
+				}
+			} else {
+				// open Jamfile
+				std::ifstream jamfile("Jamfile");
+				if (jamfile.fail())
+					HAM_TEST_THROW("Failed to open Jamfile.")
+
+				// parse code
+				parser::Parser parser;
+				code::Block* block = parser.Parse(jamfile);
+
+				// prepare evaluation context
+				data::VariableDomain globalVariables;
+				data::TargetPool targets;
+				code::EvaluationContext evaluationContext(globalVariables,
+					targets);
+				code::BuiltInRules::RegisterRules(evaluationContext.Rules());
+
+				evaluationContext.SetCompatibility(compatibility);
+				evaluationContext.SetOutput(output);
+				evaluationContext.SetErrorOutput(errorOutput);
+
+				// execute the code
+				block->Evaluate(evaluationContext);
 			}
 		} catch (...) {
 			_Cleanup();
@@ -222,6 +255,18 @@ TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
 
 
 /*static*/ void
+TestFixture::ExecuteCode(TestEnvironment* environment,
+	const std::map<std::string, std::string>& code, std::ostream& output,
+	std::ostream& errorOutput)
+{
+	std::string jamExecutable = environment->JamExecutable();
+	return ExecutableExecuter().Execute(
+		jamExecutable.empty() ? NULL : jamExecutable.c_str(),
+		environment->GetCompatibility(), code, output, errorOutput);
+}
+
+
+/*static*/ void
 TestFixture::ExecuteCodeHamLibrary(const std::string& code,
 	std::ostream& output, std::ostream& errorOutput,
 	behavior::Compatibility compatibility)
@@ -249,8 +294,11 @@ TestFixture::ExecuteCodeHamLibrary(const std::string& code,
 TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
 	const std::string& code, std::ostream& output, std::ostream& errorOutput)
 {
-	return ExecutableExecuter().Execute(jamExecutable, code, output,
-		errorOutput);
+	std::map<std::string,std::string> codeFiles;
+	codeFiles["Jamfile"] = code;
+	return ExecutableExecuter().Execute(jamExecutable,
+		behavior::COMPATIBILITY_HAM, codeFiles, output, errorOutput);
+		// compatibility argument is ignored, since an executable is given
 }
 
 
