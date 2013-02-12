@@ -84,6 +84,7 @@ BinCommand ham-tests
 	VariableExpansionTest.cpp
 
 	# test
+	DataBasedTest.cpp
 	DataBasedTestParser.cpp
 	RunnableTest.cpp
 	TemplateBasedTest.cpp

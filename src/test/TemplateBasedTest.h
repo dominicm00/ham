@@ -6,16 +6,14 @@
 #define HAM_TEST_TEMPLATE_BASED_TEST_H
 
 
-#include <vector>
-
-#include "test/RunnableTest.h"
+#include "test/DataBasedTest.h"
 
 
 namespace ham {
 namespace test {
 
 
-class TemplateBasedTest : public RunnableTest {
+class TemplateBasedTest : public DataBasedTest {
 public:
 								TemplateBasedTest(const std::string& name,
 									const std::string& code);
@@ -27,51 +25,33 @@ public:
 									bool supportedByHam, uint32_t skipMask,
 									size_t startLineIndex, size_t endLineIndex);
 
-	virtual	void*				CreateFixture(TestEnvironment* environment);
-	virtual	void				DeleteFixture(TestEnvironment* environment,
-									void* fixture);
-	virtual	uint32_t			TestCaseCompatibility(int index,
-									bool& _supportedByHam, uint32_t& _skipMask);
-	virtual	void				RunTestCase(TestEnvironment* environment,
-									void* fixture, int index);
+protected:
+	virtual	void				PrepareCode(const DataSetBase* dataSet,
+									const std::string& outputPrefix,
+									const std::string& outputSuffix,
+									std::map<std::string, std::string>& _code)
+									const;
 
 private:
-			struct DataSet {
+			struct DataSet : public DataSetBase {
 				DataSet(const std::vector<std::string>& input,
 					const std::vector<std::string>& output,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
-					fInput(input),
-					fOutput(output),
-					fCompatibilityMask(compatibilityMask),
-					fSupportedByHam(supportedByHam),
-					fSkipMask(skipMask),
-					fStartLineIndex(startLineIndex),
-					fEndLineIndex(endLineIndex)
+					DataSetBase(output, compatibilityMask, supportedByHam,
+						skipMask, startLineIndex, endLineIndex),
+					fInput(input)
 				{
 				}
 
 			public:
 				std::vector<std::string>	fInput;
-				std::vector<std::string>	fOutput;
-				uint32_t					fCompatibilityMask;
-				bool						fSupportedByHam;
-				uint32_t					fSkipMask;
-				size_t						fStartLineIndex;
-				size_t						fEndLineIndex;
 			};
 
 private:
-			void				_RunTest(TestEnvironment* environment,
-									const DataSet& dataSet) const;
-	static	bool				_ReadEchoLine(TestEnvironment* environment,
-									std::istream& input, std::string& _line);
-
-private:
 			std::string			fCode;
-			std::vector<DataSet> fDataSets;
 };
 
 
