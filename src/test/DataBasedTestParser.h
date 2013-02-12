@@ -29,6 +29,10 @@ private:
 									size_t column = 0);
 
 private:
+			struct TestInput;
+			struct TestCase;
+
+private:
 			std::fstream		fInput;
 			size_t				fLineIndex;
 };

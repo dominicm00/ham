@@ -86,6 +86,7 @@ BinCommand ham-tests
 	# test
 	DataBasedTest.cpp
 	DataBasedTestParser.cpp
+	MultipleFilesDataBasedTest.cpp
 	RunnableTest.cpp
 	TemplateBasedTest.cpp
 	Test.cpp
