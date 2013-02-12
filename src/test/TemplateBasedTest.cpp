@@ -18,7 +18,8 @@ namespace ham {
 namespace test {
 
 
-TemplateBasedTest::TemplateBasedTest(const std::string& name, const std::string& code)
+TemplateBasedTest::TemplateBasedTest(const std::string& name,
+	const std::string& code)
 	:
 	RunnableTest(name, true),
 	fCode(code)
@@ -173,8 +174,8 @@ TemplateBasedTest::_RunTest(TestEnvironment* environment,
 
 
 /*static*/ bool
-TemplateBasedTest::_ReadEchoLine(TestEnvironment* environment, std::istream& input,
-	std::string& _line)
+TemplateBasedTest::_ReadEchoLine(TestEnvironment* environment,
+	std::istream& input, std::string& _line)
 {
 	if (!std::getline(input, _line))
 		return false;
