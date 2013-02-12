@@ -12,6 +12,7 @@
 #include "parser/ParseException.h"
 #include "test/TestException.h"
 #include "test/TestFixture.h"
+#include "util/Constants.h"
 
 
 namespace ham {
@@ -46,10 +47,12 @@ MultipleFilesDataBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 
 	_code = dataSet.fInputFiles;
 
-	std::map<std::string, std::string>::iterator it = _code.find("Jamfile");
+	std::map<std::string, std::string>::iterator it
+		= _code.find(util::kJamfileName);
 	if (it == _code.end()) {
-		HAM_TEST_THROW("No Jamfile among test files\ntest case lines: %zu-%zu",
-			dataSet.fStartLineIndex + 1, dataSet.fEndLineIndex)
+		HAM_TEST_THROW("No %s among test files\ntest case lines: %zu-%zu",
+			util::kJamfileName, dataSet.fStartLineIndex + 1,
+			dataSet.fEndLineIndex)
 	}
 
 	it->second = outputPrefix + it->second + outputSuffix;

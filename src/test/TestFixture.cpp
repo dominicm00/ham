@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,8 +21,8 @@
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
 #include "parser/Parser.h"
-
 #include "test/TestEnvironment.h"
+#include "util/Constants.h"
 
 
 namespace ham {
@@ -93,15 +93,17 @@ struct TestFixture::CodeExecuter {
 					it->first.c_str());
 // TODO: Replace path delimiters with platform specific ones!
 				std::fstream jamfile(jamfileName.c_str(), std::ios_base::out);
-				if (jamfile.fail())
-					HAM_TEST_THROW("Failed to create temporary Jamfile.")
+				if (jamfile.fail()) {
+					HAM_TEST_THROW("Failed to create temporary file \"%s\".",
+						jamfileName.c_str())
+				}
 
 				std::copy(it->second.begin(), it->second.end(),
 					std::ostream_iterator<char>(jamfile));
 
 				if (jamfile.fail()) {
 					HAM_TEST_THROW("Failed to write test code to temporary "
-						"Jamfile.")
+						"file \"%s\".", jamfileName.c_str())
 				}
 				jamfile.close();
 			}
@@ -130,13 +132,13 @@ struct TestFixture::CodeExecuter {
 				}
 			} else {
 				// open Jamfile
-				std::ifstream jamfile("Jamfile");
+				std::ifstream jamfile(util::kJamfileName);
 				if (jamfile.fail())
-					HAM_TEST_THROW("Failed to open Jamfile.")
+					HAM_TEST_THROW("Failed to open %s.", util::kJamfileName)
 
 				// parse code
 				parser::Parser parser;
-				parser.SetFileName("Jamfile");
+				parser.SetFileName(util::kJamfileName);
 				code::Block* block = parser.Parse(jamfile);
 
 				// prepare evaluation context
@@ -296,7 +298,7 @@ TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
 	const std::string& code, std::ostream& output, std::ostream& errorOutput)
 {
 	std::map<std::string,std::string> codeFiles;
-	codeFiles["Jamfile"] = code;
+	codeFiles[util::kJamfileName] = code;
 	return CodeExecuter().Execute(jamExecutable, behavior::COMPATIBILITY_HAM,
 		codeFiles, output, errorOutput);
 		// compatibility argument is ignored, since an executable is given

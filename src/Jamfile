@@ -53,6 +53,9 @@ SharedLibrary libham.so
 	# parser
 	Parser.cpp
 
+	# util
+	Constants.cpp
+
 	:
 	$(TARGET_LIBSTDC++)
 ;

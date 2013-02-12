@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 #include "parser/ParseException.h"
 #include "test/TestException.h"
 #include "test/TestFixture.h"
+#include "util/Constants.h"
 
 
 namespace ham {
@@ -94,7 +95,7 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 	code += outputSuffix;
 
 	_code.clear();
-	_code["Jamfile"] = code;
+	_code[util::kJamfileName] = code;
 }
 
 
