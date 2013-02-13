@@ -2,7 +2,6 @@
 # Distributed under the terms of the MIT License.
 
 #!multipleJamfiles
-%1
 ---
 #!file Jamfile
 Echo 1 ;
