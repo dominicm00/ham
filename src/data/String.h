@@ -13,6 +13,7 @@
 #include <string>
 
 #include "data/StringPart.h"
+#include "util/Referenceable.h"
 
 
 namespace ham {
@@ -84,12 +85,12 @@ private:
 
 				void Acquire()
 				{
-					__sync_fetch_and_add(&fReferenceCount, 1);
+					util::increment_reference_count(fReferenceCount);
 				}
 
 				void Release()
 				{
-					if (__sync_fetch_and_sub(&fReferenceCount, 1) == 1)
+					if (util::decrement_reference_count(fReferenceCount) == 1)
 						free(this);
 				}
 
@@ -107,7 +108,7 @@ private:
 				}
 
 			public:
-				int		fReferenceCount;
+				int32_t	fReferenceCount;
 				size_t	fLength;
 				char	fString[1];
 

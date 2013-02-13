@@ -13,6 +13,8 @@
 #include <new>
 #include <vector>
 
+#include "util/Referenceable.h"
+
 
 namespace ham {
 namespace data {
@@ -101,12 +103,12 @@ private:
 
 				void Acquire()
 				{
-					__sync_fetch_and_add(&fReferenceCount, 1);
+					util::increment_reference_count(fReferenceCount);
 				}
 
 				void Release()
 				{
-					if (__sync_fetch_and_sub(&fReferenceCount, 1) == 1) {
+					if (util::decrement_reference_count(fReferenceCount) == 1) {
 						for (size_t i = 0; i < fSize; i++)
 							DestroyElement(i);
 						free(this);
@@ -137,7 +139,7 @@ private:
 				}
 
 			public:
-				int			fReferenceCount;
+				int32_t		fReferenceCount;
 				size_t		fSize;
 				size_t		fCapacity;
 				String		fElements[0];

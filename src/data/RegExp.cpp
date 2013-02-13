@@ -7,6 +7,7 @@
 #include "data/RegExp.h"
 
 #include "data/StringBuffer.h"
+#include "util/Referenceable.h"
 
 #include <regex.h>
 
@@ -127,12 +128,12 @@ struct RegExp::Data {
 
 	void Acquire()
 	{
-		__sync_fetch_and_add(&fReferenceCount, 1);
+		util::increment_reference_count(fReferenceCount);
 	}
 
 	void Release()
 	{
-		if (__sync_fetch_and_sub(&fReferenceCount, 1) == 1)
+		if (util::decrement_reference_count(fReferenceCount) == 1)
 			delete this;
 	}
 
@@ -147,7 +148,7 @@ struct RegExp::Data {
 	}
 
 private:
-	int		fReferenceCount;
+	int32_t	fReferenceCount;
 	int		fError;
 	regex_t	fCompiledExpression;
 };
@@ -207,12 +208,12 @@ struct RegExp::MatchResultData {
 
 	void Acquire()
 	{
-		__sync_fetch_and_add(&fReferenceCount, 1);
+		util::increment_reference_count(fReferenceCount);
 	}
 
 	void Release()
 	{
-		if (__sync_fetch_and_sub(&fReferenceCount, 1) == 1)
+		if (util::decrement_reference_count(fReferenceCount) == 1)
 			delete this;
 	}
 
@@ -227,7 +228,7 @@ struct RegExp::MatchResultData {
 	}
 
 private:
-	int			fReferenceCount;
+	int32_t		fReferenceCount;
 	size_t		fMatchCount;
 	regmatch_t*	fMatches;
 };
