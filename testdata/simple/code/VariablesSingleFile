@@ -1,0 +1,233 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!inputIsCode
+%1
+---
+Echo $(var) ;
+-
+
+---
+var = foo ;
+Echo $(var) ;
+-
+foo
+---
+var = foo ;
+{
+	Echo $(var) ;
+}
+-
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+}
+var = foo ;
+Foo ;
+-
+foo
+---
+{
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+
+bar
+
+---
+var = foo ;
+{
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar
+foo
+---
+var = foo ;
+{
+	Echo $(var) ;
+	local var ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+
+foo
+---
+var = foo ;
+{
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+	{
+		local var = foobar ;
+		Echo $(var) ;
+	}
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar
+foobar
+bar
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+}
+local var = foo ;
+Foo ;
+-
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+	var = bar ;
+}
+local var = foo ;
+Foo ;
+Echo $(var) ;
+-
+foo
+bar
+---
+rule Foo
+{
+	Echo $(var) ;
+	var = bar ;
+	Foo2 ;
+	Echo $(var) ;
+}
+rule Foo2
+{
+	Echo $(var) ;
+	var = foobar ;
+}
+local var = foo ;
+Foo ;
+Echo $(var) ;
+-
+foo
+bar
+foobar
+foobar
+---
+rule Foo
+{
+	Echo $(var) ;
+	local var = bar ;
+	Foo2 ;
+	Echo $(var) ;
+}
+rule Foo2
+{
+	Echo $(var) ;
+	local var = foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Foo ;
+Echo $(var) ;
+-
+foo
+bar
+foobar
+bar
+foo
+---
+rule Foo var
+{
+	Echo $(var) ;
+	Foo2 foobar ;
+	Echo $(var) ;
+}
+rule Foo2 var
+{
+	Echo $(var) ;
+}
+local var = foo ;
+Foo bar ;
+Echo $(var) ;
+-
+bar
+foobar
+bar
+foo
+---
+var = foo ;
+Echo $(var) ;
+var on target = bar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+-
+foo
+foo
+bar
+---
+var = foo ;
+Echo $(var) ;
+var on target = bar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var = foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar
+foobar
+foo
+bar
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+	var = foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Echo $(var) ;
+var on target = bar ;
+on target {
+	Echo $(var) ;
+	Foo ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar
+bar
+foobar
+foobar
+foo
+bar
+foo
+---

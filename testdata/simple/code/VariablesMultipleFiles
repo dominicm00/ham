@@ -1,0 +1,105 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleJamfiles
+---
+#!file Jamfile
+var = foo ;
+include File1 ;
+
+#!file File1
+Echo $(var) ;
+-
+foo
+---
+#!file Jamfile
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+var = foo ;
+-
+foo
+---
+#!file Jamfile
+var = foo ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+Echo $(var) ;
+var = bar ;
+Echo $(var) ;
+-
+foo
+bar
+bar
+---
+#!file Jamfile
+var = foo ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+Echo $(var) ;
+local var = bar ;
+Echo $(var) ;
+-
+foo
+bar
+foo
+---
+#!file Jamfile
+local var = foo ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+Echo $(var) ;
+var = bar ;
+Echo $(var) ;
+-
+foo
+bar
+bar
+---
+#!file Jamfile
+var = foobar ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+local var = foo ;
+include File2 ;
+Echo $(var) ;
+
+#!file File2
+Echo $(var) ;
+var = bar ;
+Echo $(var) ;
+-
+foo
+bar
+bar
+foobar
+---
+#!file Jamfile
+var = foobar ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+local var = foo ;
+include File2 ;
+Echo $(var) ;
+
+#!file File2
+Echo $(var) ;
+local var = bar ;
+Echo $(var) ;
+-
+foo
+bar
+foo
+foobar
+---
