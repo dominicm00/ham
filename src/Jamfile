@@ -55,6 +55,7 @@ SharedLibrary libham.so
 
 	# util
 	Constants.cpp
+	Referenceable.cpp
 
 	:
 	$(TARGET_LIBSTDC++)

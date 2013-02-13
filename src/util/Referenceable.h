@@ -1,28 +1,51 @@
 /*
- * Copyright 2004-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2004-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _REFERENCEABLE_H
-#define _REFERENCEABLE_H
+#ifndef HAM_UTIL_REFERENCEABLE_H
+#define HAM_UTIL_REFERENCEABLE_H
 
 
-#include <SupportDefs.h>
+#include <stddef.h>
+#include <stdint.h>
 
 
-// #pragma mark - BReferenceable
+namespace ham {
+namespace util {
 
 
-class BReferenceable {
+// #pragma mark - support functions
+
+
+static inline int32_t
+increment_reference_count(int32_t& referenceCount)
+{
+	return __sync_fetch_and_add(&referenceCount, 1);
+
+}
+
+
+static inline int32_t
+decrement_reference_count(int32_t& referenceCount)
+{
+	return __sync_fetch_and_sub(&referenceCount, 1);
+}
+
+
+// #pragma mark - Referenceable
+
+
+class Referenceable {
 public:
-								BReferenceable();
-	virtual						~BReferenceable();
+								Referenceable();
+	virtual						~Referenceable();
 
 								// acquire and release return
 								// the previous ref count
-			int32				AcquireReference();
-			int32				ReleaseReference();
+			int32_t				AcquireReference();
+			int32_t				ReleaseReference();
 
-			int32				CountReferences() const
+			int32_t				CountReferences() const
 									{ return fReferenceCount; }
 
 protected:
@@ -30,30 +53,30 @@ protected:
 	virtual	void				LastReferenceReleased();
 
 protected:
-			vint32				fReferenceCount;
+			int32_t				fReferenceCount;
 };
 
 
-// #pragma mark - BReference
+// #pragma mark - Reference
 
 
-template<typename Type = BReferenceable>
-class BReference {
+template<typename Type = Referenceable>
+class Reference {
 public:
-	BReference()
+	Reference()
 		:
 		fObject(NULL)
 	{
 	}
 
-	BReference(Type* object, bool alreadyHasReference = false)
+	Reference(Type* object, bool alreadyHasReference = false)
 		:
 		fObject(NULL)
 	{
 		SetTo(object, alreadyHasReference);
 	}
 
-	BReference(const BReference<Type>& other)
+	Reference(const Reference<Type>& other)
 		:
 		fObject(NULL)
 	{
@@ -62,14 +85,14 @@ public:
 
 	
 	template<typename OtherType>
-	BReference(const BReference<OtherType>& other)
+	Reference(const Reference<OtherType>& other)
 		:
 		fObject(NULL)
 	{
 		SetTo(other.Get());
 	}
 
-	~BReference()
+	~Reference()
 	{
 		Unset();
 	}
@@ -119,26 +142,26 @@ public:
 		return fObject;
 	}
 
-	BReference& operator=(const BReference<Type>& other)
+	Reference& operator=(const Reference<Type>& other)
 	{
 		SetTo(other.fObject);
 		return *this;
 	}
 
-	BReference& operator=(Type* other)
+	Reference& operator=(Type* other)
 	{
 		SetTo(other);
 		return *this;
 	}
 
 	template<typename OtherType>
-	BReference& operator=(const BReference<OtherType>& other)
+	Reference& operator=(const Reference<OtherType>& other)
 	{
 		SetTo(other.Get());
 		return *this;
 	}
 
-	bool operator==(const BReference<Type>& other) const
+	bool operator==(const Reference<Type>& other) const
 	{
 		return fObject == other.fObject;
 	}
@@ -148,7 +171,7 @@ public:
 		return fObject == other;
 	}
 
-	bool operator!=(const BReference<Type>& other) const
+	bool operator!=(const Reference<Type>& other) const
 	{
 		return fObject != other.fObject;
 	}
@@ -163,4 +186,8 @@ private:
 };
 
 
-#endif	// _REFERENCEABLE_H
+}	// namespace util
+}	// namespace ham
+
+
+#endif	// HAM_UTIL_REFERENCEABLE_H
