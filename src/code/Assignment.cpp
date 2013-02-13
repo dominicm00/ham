@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,14 +23,19 @@ Assignment::Assignment(Node* left, AssignmentOperator operatorType, Node* right,
 	fOnTargets(onTargets),
 	fOperator(operatorType)
 {
+	fLeft->AcquireReference();
+	fRight->AcquireReference();
+	if (fOnTargets != NULL)
+		fOnTargets->AcquireReference();
 }
 
 
 Assignment::~Assignment()
 {
-	delete fLeft;
-	delete fRight;
-	delete fOnTargets;
+	fLeft->ReleaseReference();
+	fRight->ReleaseReference();
+	if (fOnTargets != NULL)
+		fOnTargets->ReleaseReference();
 }
 
 

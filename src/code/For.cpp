@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,14 +20,17 @@ For::For(Node* variable, Node* list, Node* block)
 	fList(list),
 	fBlock(block)
 {
+	fVariable->AcquireReference();
+	fList->AcquireReference();
+	fBlock->AcquireReference();
 }
 
 
 For::~For()
 {
-	delete fVariable;
-	delete fList;
-	delete fBlock;
+	fVariable->ReleaseReference();
+	fList->ReleaseReference();
+	fBlock->ReleaseReference();
 }
 
 

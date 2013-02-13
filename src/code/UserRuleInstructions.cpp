@@ -26,6 +26,13 @@ UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
 	fParameterNames(parameterNames),
 	fBlock(block)
 {
+	fBlock->AcquireReference();
+}
+
+
+UserRuleInstructions::~UserRuleInstructions()
+{
+	fBlock->ReleaseReference();
 }
 
 

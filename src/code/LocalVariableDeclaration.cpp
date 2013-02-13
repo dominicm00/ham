@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,13 +20,15 @@ LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
 	fVariables(variables),
 	fInitializer(initializer)
 {
+	fVariables->AcquireReference();
+	fInitializer->AcquireReference();
 }
 
 
 LocalVariableDeclaration::~LocalVariableDeclaration()
 {
-	delete fVariables;
-	delete fInitializer;
+	fVariables->ReleaseReference();
+	fInitializer->ReleaseReference();
 }
 
 

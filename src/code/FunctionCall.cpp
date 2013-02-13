@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,7 @@ FunctionCall::FunctionCall(Node* function)
 	fFunction(function),
 	fArguments()
 {
+	fFunction->AcquireReference();
 }
 
 
@@ -29,12 +30,23 @@ FunctionCall::FunctionCall(Node* function, const NodeList& arguments)
 	fFunction(function),
 	fArguments(arguments)
 {
+	fFunction->AcquireReference();
+
+	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
+		++it) {
+		(*it)->AcquireReference();
+	}
 }
 
 
 FunctionCall::~FunctionCall()
 {
-	delete fFunction;
+	fFunction->ReleaseReference();
+
+	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
+		++it) {
+		(*it)->ReleaseReference();
+	}
 }
 
 
@@ -48,7 +60,7 @@ FunctionCall::Evaluate(EvaluationContext& context)
 
 	size_t argumentIndex = 0;
 	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
-			++it) {
+		++it) {
 		arguments[argumentIndex++] = (*it)->Evaluate(context);
 	}
 

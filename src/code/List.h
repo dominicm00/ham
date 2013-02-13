@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_LIST_H
@@ -20,7 +20,7 @@ public:
 								List();
 	virtual						~List();
 
-	inline	List&				operator+=(Node* child);
+	inline	void				AppendKeepReference(Node* child);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -31,15 +31,13 @@ private:
 };
 
 
-List&
-List::operator+=(Node* child)
+void
+List::AppendKeepReference(Node* child)
 {
 	try {
 		fChildren.push_back(child);
-		return *this;
 	} catch (...) {
-		delete child;
-		throw;
+		child->ReleaseReference();
 	}
 }
 

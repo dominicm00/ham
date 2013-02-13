@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,13 +21,15 @@ InListExpression::InListExpression(Node* left, Node* right)
 	fLeft(left),
 	fRight(right)
 {
+	fLeft->AcquireReference();
+	fRight->AcquireReference();
 }
 
 
 InListExpression::~InListExpression()
 {
-	delete fLeft;
-	delete fRight;
+	fLeft->ReleaseReference();
+	fRight->ReleaseReference();
 }
 
 

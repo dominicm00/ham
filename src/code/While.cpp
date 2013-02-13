@@ -19,13 +19,15 @@ While::While(Node* expression, Node* block)
 	fExpression(expression),
 	fBlock(block)
 {
+	fExpression->AcquireReference();
+	fBlock->AcquireReference();
 }
 
 
 While::~While()
 {
-	delete fExpression;
-	delete fBlock;
+	fExpression->ReleaseReference();
+	fBlock->ReleaseReference();
 }
 
 

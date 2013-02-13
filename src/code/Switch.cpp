@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,16 +19,17 @@ Switch::Switch(Node* argument)
 	fArgument(argument),
 	fCases()
 {
+	fArgument->AcquireReference();
 }
 
 
 Switch::~Switch()
 {
-	delete fArgument;
+	fArgument->ReleaseReference();
 
 	for (CaseList::const_iterator it = fCases.begin();
 			it != fCases.end(); ++it) {
-		delete *it;
+		(*it)->ReleaseReference();
 	}
 }
 

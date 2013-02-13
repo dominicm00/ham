@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_RULE_DEFINITION_H
@@ -15,11 +15,10 @@ namespace code {
 
 class RuleDefinition : public Node {
 public:
-								RuleDefinition(const String& ruleName);
+								RuleDefinition(const String& ruleName,
+									const StringList& parameterNames,
+									Node* block);
 	virtual						~RuleDefinition();
-
-	inline	void				AddParameterName(const String& parameterName);
-	inline	void				SetBlock(Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -30,20 +29,6 @@ private:
 			StringList			fParameterNames;
 			Node*				fBlock;
 };
-
-
-void
-RuleDefinition::AddParameterName(const String& parameterName)
-{
-	fParameterNames.Append(parameterName);
-}
-
-
-void
-RuleDefinition::SetBlock(Node* block)
-{
-	fBlock = block;
-}
 
 
 }	// namespace code

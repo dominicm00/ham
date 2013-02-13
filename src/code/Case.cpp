@@ -20,12 +20,13 @@ Case::Case(const String& pattern, Node* block)
 	fPattern(pattern),
 	fBlock(block)
 {
+	fBlock->AcquireReference();
 }
 
 
 Case::~Case()
 {
-	delete fBlock;
+	fBlock->ReleaseReference();
 }
 
 

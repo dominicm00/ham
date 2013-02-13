@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,18 +16,20 @@ namespace ham {
 namespace code {
 
 
-RuleDefinition::RuleDefinition(const String& ruleName)
+RuleDefinition::RuleDefinition(const String& ruleName,
+	const StringList& parameterNames, Node* block)
 	:
 	fRuleName(ruleName),
-	fParameterNames(),
-	fBlock(NULL)
+	fParameterNames(parameterNames),
+	fBlock(block)
 {
+	fBlock->AcquireReference();
 }
 
 
 RuleDefinition::~RuleDefinition()
 {
-	delete fBlock;
+	fBlock->ReleaseReference();
 }
 
 
@@ -36,9 +38,6 @@ RuleDefinition::Evaluate(EvaluationContext& context)
 {
 	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
 	rule.SetInstructions(new UserRuleInstructions(fParameterNames, fBlock));
-		// TODO: Unless all node trees shall be kept in memory, we should use
-		// reference counting for the block.
-
 	return StringList::False();
 }
 

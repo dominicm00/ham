@@ -20,14 +20,16 @@ BinaryExpression<Operator>::BinaryExpression(Node* left, Node* right)
 	fLeft(left),
 	fRight(right)
 {
+	fLeft->AcquireReference();
+	fRight->AcquireReference();
 }
 
 
 template<typename Operator>
 BinaryExpression<Operator>::~BinaryExpression()
 {
-	delete fLeft;
-	delete fRight;
+	fLeft->ReleaseReference();
+	fRight->ReleaseReference();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,12 +22,13 @@ ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
 	fActions(actions),
 	fFlags(flags)
 {
+	fVariables->AcquireReference();
 }
 
 
 ActionsDefinition::~ActionsDefinition()
 {
-	delete fVariables;
+	fVariables->ReleaseReference();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_RULE_H
@@ -32,10 +32,12 @@ public:
 			RuleInstructions*	Instructions() const
 									{ return fInstructions; }
 	inline	void				SetInstructions(RuleInstructions* instructions);
+									// takes over ownership
 
 			RuleActions*		Actions() const
 									{ return fActions; }
 	inline	void				SetActions(RuleActions* actions);
+									// takes over ownership
 
 private:
 			String				fName;

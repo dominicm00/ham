@@ -23,7 +23,7 @@ List::~List()
 {
 	size_t childCount = fChildren.size();
 	for (size_t i = 0; i < childCount; i++)
-		delete fChildren[i];
+		fChildren[i]->ReleaseReference();
 }
 
 

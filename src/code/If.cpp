@@ -20,14 +20,19 @@ If::If(Node* expression, Node* block, Node* elseBlock)
 	fBlock(block),
 	fElseBlock(elseBlock)
 {
+	fExpression->AcquireReference();
+	fBlock->AcquireReference();
+	if (fElseBlock != NULL)
+		fElseBlock->AcquireReference();
 }
 
 
 If::~If()
 {
-	delete fExpression;
-	delete fBlock;
-	delete fElseBlock;
+	fExpression->ReleaseReference();
+	fBlock->ReleaseReference();
+	if (fElseBlock != NULL)
+		fElseBlock->ReleaseReference();
 }
 
 

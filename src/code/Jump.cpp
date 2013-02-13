@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,13 +19,14 @@ Jump<JumpType>::Jump(Node* result)
 	:
 	fResult(result)
 {
+	fResult->AcquireReference();
 }
 
 
 template<typename JumpType>
 Jump<JumpType>::~Jump()
 {
-	delete fResult;
+	fResult->ReleaseReference();
 }
 
 

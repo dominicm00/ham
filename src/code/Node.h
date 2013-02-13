@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_CODE_H
@@ -9,6 +9,7 @@
 #include <list>
 
 #include "data/StringList.h"
+#include "util/Referenceable.h"
 
 
 namespace ham {
@@ -20,6 +21,10 @@ class EvaluationContext;
 class Node;
 
 
+using util::Referenceable;
+using util::Reference;
+
+
 class NodeVisitor {
 public:
 	virtual						~NodeVisitor();
@@ -29,7 +34,7 @@ public:
 };
 
 
-class Node {
+class Node : public Referenceable {
 public:
 	virtual						~Node();
 
@@ -40,6 +45,7 @@ public:
 
 
 typedef std::list<Node*> NodeList;
+typedef Reference<Node> NodeReference;
 
 
 }	// namespace code

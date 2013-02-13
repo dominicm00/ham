@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,13 +20,15 @@ OnExpression::OnExpression(Node* object, Node* expression)
 	fObject(object),
 	fExpression(expression)
 {
+	fObject->AcquireReference();
+	fExpression->AcquireReference();
 }
 
 
 OnExpression::~OnExpression()
 {
-	delete fObject;
-	delete fExpression;
+	fObject->ReleaseReference();
+	fExpression->ReleaseReference();
 }
 
 

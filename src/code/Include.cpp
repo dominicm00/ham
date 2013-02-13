@@ -24,12 +24,13 @@ Include::Include(Node* fileNames)
 	:
 	fFileNames(fileNames)
 {
+	fFileNames->AcquireReference();
 }
 
 
 Include::~Include()
 {
-	delete fFileNames;
+	fFileNames->ReleaseReference();
 }
 
 
@@ -50,9 +51,7 @@ Include::Evaluate(EvaluationContext& context)
 
 		parser::Parser parser;
 		parser.SetFileName(fileName.ToStlString());
-		std::auto_ptr<code::Block> block(parser.Parse(file));
-// TODO: Once it goes out of scope, it will also take rules defined there down
-// with it!
+		util::Reference<code::Block> block(parser.Parse(file), true);
 
 // TODO: New variable scope?
 		block->Evaluate(context);

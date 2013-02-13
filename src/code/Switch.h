@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_SWITCH_H
@@ -20,7 +20,7 @@ public:
 								Switch(Node* argument);
 	virtual						~Switch();
 
-	inline	void				AddCase(Case* caseStatement);
+	inline	void				AddCase(const String& pattern, Node* block);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
 	virtual	Node*				Visit(NodeVisitor& visitor);
@@ -35,8 +35,9 @@ private:
 
 
 void
-Switch::AddCase(Case* caseStatement)
+Switch::AddCase(const String& pattern, Node* block)
 {
+	Case* caseStatement = new Case(pattern, block);
 	try {
 		fCases.push_back(caseStatement);
 	} catch (...) {

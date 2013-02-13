@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HAM_CODE_FUNCTION_CALL_H
@@ -38,6 +38,7 @@ void
 FunctionCall::AddArgument(Node* argument)
 {
 	fArguments.push_back(argument);
+	argument->AcquireReference();
 }
 
 

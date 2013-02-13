@@ -18,12 +18,13 @@ NotExpression::NotExpression(Node* child)
 	:
 	fChild(child)
 {
+	fChild->AcquireReference();
 }
 
 
 NotExpression::~NotExpression()
 {
-	delete fChild;
+	fChild->ReleaseReference();
 }
 
 
