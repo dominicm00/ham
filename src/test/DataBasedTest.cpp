@@ -9,7 +9,7 @@
 #include <sstream>
 
 #include "behavior/Behavior.h"
-#include "parser/ParseException.h"
+#include "util/TextFileException.h"
 #include "test/TestException.h"
 #include "test/TestFixture.h"
 
@@ -98,12 +98,13 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	std::stringstream outputStream;
 	try {
 		TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
-	} catch (parser::ParseException& exception) {
+	} catch (util::TextFileException& exception) {
 		HAM_TEST_THROW(
-			"%s.\nat %zu:%zu of code:\n%s\ntest case lines: %zu-%zu",
+			"%s.\nat %zu:%zu of file \"%s\":\n%s\ntest case lines: %zu-%zu",
 			exception.Message(), exception.Position().Line() + 1,
-			exception.Position().Column() + 1, _CodeToString(code).c_str(),
-			dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+			exception.Position().Column() + 1, exception.Position().FileName(),
+			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex)
 	}
 
 	// extract the output
