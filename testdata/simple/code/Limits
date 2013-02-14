@@ -1,0 +1,54 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleJamfiles
+---
+#!skip jam boost
+#!file Jamfile
+include File1 ;
+
+#!file File1
+include File1 ;
+-
+#!exception
+Reached include depth limit (256)
+---
+#!skip jam boost
+#!file Jamfile
+include File1 ;
+
+#!file File1
+include File2 ;
+
+#!file File2
+include File1 ;
+-
+#!exception
+Reached include depth limit (256)
+---
+#!skip jam boost
+#!file Jamfile
+rule Foo
+{
+	Foo ;
+}
+Foo ;
+-
+#!exception
+Reached rule call depth limit (1024)
+---
+#!skip jam boost
+#!file Jamfile
+rule Foo
+{
+	Foo2 ;
+}
+rule Foo2
+{
+	Foo ;
+}
+Foo ;
+-
+#!exception
+Reached rule call depth limit (1024)
+---
