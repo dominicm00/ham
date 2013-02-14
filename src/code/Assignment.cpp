@@ -80,12 +80,9 @@ Assignment::Evaluate(EvaluationContext& context)
 			// look for a local variable
 			StringList* data = context.LocalScope()->Lookup(variable);
 			if (data == NULL) {
-				// no local variable -- check for a global one
-				data = context.GlobalScope()->Lookup(variable);
-				if (data == NULL) {
-					// no existing global variable either -- create one
-					data = &context.GlobalVariables()->LookupOrCreate(variable);
-				}
+				// no local variable -- check for a global one and create, if
+				// there isn't one yet either.
+				data = &context.GlobalVariables()->LookupOrCreate(variable);
 			}
 
 			switch (fOperator) {

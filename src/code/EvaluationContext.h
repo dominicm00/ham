@@ -43,8 +43,6 @@ public:
 
 			data::VariableDomain* GlobalVariables()
 									{ return &fGlobalVariables; }
-			data::VariableScope* GlobalScope()
-									{ return &fGlobalScope; }
 
 			data::VariableScope* LocalScope() const
 									{ return fLocalScope; }
@@ -57,7 +55,7 @@ public:
 									data::VariableDomain* variables)
 									{ fBuiltInVariables = variables; }
 
-	inline	StringList*			LookupVariable(const String& variable) const;
+	inline	const StringList*	LookupVariable(const String& variable) const;
 
 			data::TargetPool&	Targets() const	{ return fTargets; }
 
@@ -81,7 +79,6 @@ private:
 			behavior::Compatibility fCompatibility;
 			behavior::Behavior	fBehavior;
 			data::VariableDomain& fGlobalVariables;
-			data::VariableScope	fGlobalScope;
 			data::VariableScope* fLocalScope;
 			data::VariableDomain* fBuiltInVariables;
 			data::TargetPool&	fTargets;
@@ -92,20 +89,20 @@ private:
 };
 
 
-inline StringList*
+inline const StringList*
 EvaluationContext::LookupVariable(const String& variable) const
 {
 	if (fBuiltInVariables != NULL) {
-		if (StringList* result = fBuiltInVariables->Lookup(variable))
+		if (const StringList* result = fBuiltInVariables->Lookup(variable))
 			return result;
 	}
 
 	if (fLocalScope != NULL) {
-		if (StringList* result = fLocalScope->Lookup(variable))
+		if (const StringList* result = fLocalScope->Lookup(variable))
 			return result;
 	}
 
-	return fGlobalScope.Lookup(variable);
+	return fGlobalVariables.Lookup(variable);
 }
 
 
