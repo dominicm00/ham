@@ -1,0 +1,94 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleJamfiles
+---
+#!file Jamfile
+Exit ;
+-
+#!earlyExit
+
+---
+#!file Jamfile
+Echo 1 ;
+Exit Hello World! ;
+Echo 2 ;
+-
+#!earlyExit
+1
+Hello World!
+---
+#!file Jamfile
+Echo 1 ;
+include File1
+Echo 2 ;
+
+#!file File1
+Echo 3 ;
+Exit Hello World! ;
+Echo 4 ;
+-
+#!earlyExit
+1
+3
+Hello World!
+---
+#!file Jamfile
+Echo 1 ;
+include File1
+Echo 2 ;
+
+#!file File1
+Echo 3 ;
+include File2
+Echo 4 ;
+
+#!file File2
+Echo 5 ;
+Exit Hello World! ;
+Echo 6 ;
+-
+#!earlyExit
+1
+3
+5
+Hello World!
+---
+#!file Jamfile
+for var in 1 2 3 {
+	Echo 1 ;
+	Exit Hello World! ;
+	Echo 2 ;
+}
+Echo 3 ;
+-
+#!earlyExit
+1
+Hello World!
+---
+#!file Jamfile
+while true {
+	Echo 1 ;
+	Exit Hello World! ;
+	Echo 2 ;
+}
+Echo 3 ;
+-
+#!earlyExit
+1
+Hello World!
+---
+#!file Jamfile
+rule Foo
+{
+	Echo 1 ;
+	Exit Hello World! ;
+	Echo 2 ;
+}
+Foo ;
+Echo 3 ;
+-
+#!earlyExit
+1
+Hello World!
+---
