@@ -338,3 +338,18 @@ Bar 1
 Foo 2
 b c
 ---
+rule Foo
+{
+	Echo Foo 1 ;
+	local foo = [ on target return foobar ] ;
+	Echo Foo 2: $(foo) ;
+}
+Echo main 1 ;
+Foo a b c ;
+Echo main 2 ;
+-
+main 1
+Foo 1
+Foo 2: foobar
+main 2
+---
