@@ -103,3 +103,59 @@ bar
 foo
 foobar
 ---
+#!file Jamfile
+var = foo ;
+Echo $(var) ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+local var = foo2 ;
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo2 bar foobar
+foo
+---
+#!file Jamfile
+local var = foo ;
+Echo $(var) ;
+include File1 ;
+Echo $(var) ;
+
+#!file File1
+local var = foo2 ;
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo2 bar foobar
+foo
+---
+#!file Jamfile
+var = foo ;
+Echo $(var) ;
+include File1 ;
+var += bar foobar ;
+Echo $(var) ;
+
+#!file File1
+local var = foo2 ;
+-
+foo
+foo bar foobar
+---
+#!file Jamfile
+local var = foo ;
+Echo $(var) ;
+include File1 ;
+var += bar foobar ;
+Echo $(var) ;
+
+#!file File1
+local var = foo2 ;
+-
+foo
+foo bar foobar
+---

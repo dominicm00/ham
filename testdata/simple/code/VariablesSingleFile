@@ -40,6 +40,56 @@ Echo $(var) ;
 bar
 
 ---
+for element in 1 {
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+
+bar
+
+---
+#!compat jam ham
+# No "break" in Boost.Jam.
+while 1 {
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+	break ;
+}
+Echo $(var) ;
+-
+
+bar
+
+---
+if 1 {
+	Echo $(var) ;
+	local var = bar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+
+bar
+
+---
+switch y {
+	case x :
+	case y :
+		Echo $(var) ;
+		local var = bar ;
+		Echo $(var) ;
+	case z :
+}
+Echo $(var) ;
+-
+
+bar
+
+---
 var = foo ;
 {
 	Echo $(var) ;
@@ -148,6 +198,8 @@ foobar
 bar
 foo
 ---
+#!compat jam ham
+# No named rule parameters in Boost.Jam.
 rule Foo var
 {
 	Echo $(var) ;
@@ -169,6 +221,24 @@ foo
 ---
 var = foo ;
 Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+-
+foo
+foo
+---
+local var = foo ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+-
+foo
+foo
+---
+var = foo ;
+Echo $(var) ;
 var on target = bar ;
 Echo $(var) ;
 on target {
@@ -179,6 +249,7 @@ foo
 foo
 bar
 ---
+#!compat jam ham
 var = foo ;
 Echo $(var) ;
 var on target = bar ;
@@ -202,6 +273,31 @@ foo
 bar
 foo
 ---
+#!compat boost !ham
+var = foo ;
+Echo $(var) ;
+var on target = bar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var = foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar
+foobar
+foo
+foobar
+foo
+---
+#!compat jam ham
 rule Foo
 {
 	Echo $(var) ;
@@ -230,4 +326,586 @@ foobar
 foo
 bar
 foo
+---
+#!compat boost !ham
+rule Foo
+{
+	Echo $(var) ;
+	var = foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Echo $(var) ;
+var on target = bar ;
+on target {
+	Echo $(var) ;
+	Foo ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar
+bar
+foobar
+foobar
+foo
+foobar
+foo
+---
+Echo $(var) ;
+var += bar foobar ;
+Echo $(var) ;
+-
+
+bar foobar
+---
+var = foo ;
+Echo $(var) ;
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo bar foobar
+---
+local var = foo ;
+Echo $(var) ;
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo bar foobar
+---
+var = foo ;
+Echo $(var) ;
+{
+	local var = foo2 ;
+	var += bar foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo2 bar foobar
+foo
+---
+local var = foo ;
+Echo $(var) ;
+{
+	local var = foo2 ;
+	var += bar foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo2 bar foobar
+foo
+---
+var = foo ;
+Echo $(var) ;
+{
+	local var = foo2 ;
+}
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo bar foobar
+---
+local var = foo ;
+Echo $(var) ;
+{
+	local var = foo2 ;
+}
+var += bar foobar ;
+Echo $(var) ;
+-
+foo
+foo bar foobar
+---
+rule Foo
+{
+	Echo $(var) ;
+	var += bar foobar ;
+	Echo $(var) ;
+}
+var = foo ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+foo
+foo
+foo bar foobar
+foo bar foobar
+---
+rule Foo
+{
+	Echo $(var) ;
+	var += bar foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+foo
+foo
+foo bar foobar
+foo bar foobar
+---
+rule Foo
+{
+	Echo $(var) ;
+	local var ;
+	var += bar foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+foo
+foo
+bar foobar
+foo
+---
+#!compat jam ham
+local var = foo ;
+Echo $(var) ;
+var on target += bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var on target += a b c ;
+	Echo $(var) ;
+}
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar foobar
+bar foobar
+bar foobar a b c
+foo
+---
+#!compat boost !ham
+local var = foo ;
+Echo $(var) ;
+var on target += bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var on target += a b c ;
+	Echo $(var) ;
+}
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar foobar
+bar foobar
+bar foobar
+foo a b c
+---
+#!compat jam ham
+var = foo ;
+Echo $(var) ;
+var on target += bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var on target += a b c ;
+	Echo $(var) ;
+}
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar foobar
+bar foobar
+bar foobar a b c
+foo
+---
+#!compat boost !ham
+var = foo ;
+Echo $(var) ;
+var on target += bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+	var on target += a b c ;
+	Echo $(var) ;
+}
+on target {
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+foo
+bar foobar
+bar foobar
+bar foobar
+foo a b c
+---
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+
+bar foobar
+---
+var = foo ;
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+foo
+foo
+---
+var = "" ;
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+
+
+---
+local var ;
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+
+bar foobar
+---
+local var = foo ;
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+foo
+foo
+---
+local var = "" ;
+Echo $(var) ;
+var ?= bar foobar ;
+Echo $(var) ;
+-
+
+
+---
+var = foo ;
+Echo $(var) ;
+{
+	local var ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar foobar
+foo
+---
+local var = foo ;
+Echo $(var) ;
+{
+	local var ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+-
+foo
+bar foobar
+foo
+---
+Echo $(var) ;
+{
+	local var = foo2 ;
+}
+var ?= bar foobar ;
+Echo $(var) ;
+-
+
+bar foobar
+---
+var = foo ;
+Echo $(var) ;
+{
+	local var = foo2 ;
+}
+var ?= bar foobar ;
+Echo $(var) ;
+-
+foo
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+var = foo ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+foo
+foo
+foo
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+
+
+bar foobar
+bar foobar
+---
+rule Foo
+{
+	Echo $(var) ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+local var = foo ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+foo
+foo
+foo
+foo
+---
+rule Foo
+{
+	Echo $(var) ;
+	var ?= bar foobar ;
+	Echo $(var) ;
+}
+local var ;
+Echo $(var) ;
+Foo ;
+Echo $(var) ;
+-
+
+
+bar foobar
+bar foobar
+---
+local var = foo ;
+Echo $(var) ;
+var on target ?= bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+-
+foo
+foo
+bar foobar
+---
+var = foo ;
+Echo $(var) ;
+var on target ?= bar foobar ;
+Echo $(var) ;
+on target {
+	Echo $(var) ;
+}
+-
+foo
+foo
+bar foobar
+---
+local var1 ;
+vars = var1 var2 var3 ;
+$(vars) = foo bar ;
+Echo $(var1) ;
+Echo $(var2) ;
+Echo $(var3) ;
+-
+foo bar
+foo bar
+foo bar
+---
+local var1 = a b c ;
+var2 = x y z ;
+vars = var1 var2 var3 ;
+$(vars) += foo bar ;
+Echo $(var1) ;
+Echo $(var2) ;
+Echo $(var3) ;
+-
+a b c foo bar
+x y z foo bar
+foo bar
+---
+local var1 = a b c ;
+var2 = x y z ;
+vars = var1 var2 var3 ;
+$(vars) ?= foo bar ;
+Echo $(var1) ;
+Echo $(var2) ;
+Echo $(var3) ;
+-
+a b c
+x y z
+foo bar
+---
+local var1 ;
+var4 on target1 = foobar ;
+vars = var1 var2 var3 var4 ;
+targets = target1 target2 ;
+$(vars) on $(targets) = foo bar ;
+Echo $(var1) ;
+Echo $(var2) ;
+Echo $(var3) ;
+Echo $(var4) ;
+on target1 {
+	Echo $(var1) ;
+	Echo $(var2) ;
+	Echo $(var3) ;
+	Echo $(var4) ;
+}
+on target2 {
+	Echo $(var1) ;
+	Echo $(var2) ;
+	Echo $(var3) ;
+	Echo $(var4) ;
+}
+-
+
+
+
+
+foo bar
+foo bar
+foo bar
+foo bar
+foo bar
+foo bar
+foo bar
+foo bar
+---
+local var1 = a b c ;
+var2 = x y z ;
+var4 on target1 = foobar ;
+vars = var1 var2 var3 var4 ;
+targets = target1 target2 ;
+$(vars) on $(targets) ?= foo bar ;
+Echo $(var1) ;
+Echo $(var2) ;
+Echo $(var3) ;
+Echo $(var4) ;
+on target1 {
+	Echo $(var1) ;
+	Echo $(var2) ;
+	Echo $(var3) ;
+	Echo $(var4) ;
+}
+on target2 {
+	Echo $(var1) ;
+	Echo $(var2) ;
+	Echo $(var3) ;
+	Echo $(var4) ;
+}
+-
+a b c
+x y z
+
+
+foo bar
+foo bar
+foo bar
+foobar
+foo bar
+foo bar
+foo bar
+foo bar
+---
+var1 on target1 = a b c ;
+var2 on target2 = x y z ;
+targets = target1 target2 ;
+on $(targets) {
+	Echo $(var1) ;
+	Echo $(var2) ;
+}
+-
+a b c
+
+---
+var1 on target1 = a b c ;
+var2 on target2 = x y z ;
+Echo [ on target1 return $(var1) ] ;
+Echo [ on target2 return $(var2) ] ;
+-
+a b c
+x y z
+---
+vars = var1 var2 ;
+local $(vars) = foo ;
+Echo $(var1) ;
+Echo $(var2) ;
+-
+foo
+foo
+---
+var1 = a b c ;
+vars = var1 var2 ;
+{
+	local $(vars) ;
+	Echo $(var1) ;
+	Echo $(var2) ;
+}
+Echo $(var1) ;
+Echo $(var2) ;
+-
+
+
+a b c
+
+---
+var1 = a b c ;
+vars = var1 var2 ;
+{
+	local $(vars) = foo ;
+	Echo $(var1) ;
+	Echo $(var2) ;
+}
+Echo $(var1) ;
+Echo $(var2) ;
+-
+foo
+foo
+a b c
+
 ---
