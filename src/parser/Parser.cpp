@@ -514,7 +514,7 @@ Parser::_TryParseStatement()
 
 			// parse block
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'while' head");
-			code::NodeReference block(_ParseBlock(), true);
+			util::Reference<code::Block> block(_ParseBlock(), true);
 			_SkipToken(TOKEN_RIGHT_BRACE, "Expected '}' after 'while' block");
 
 			// create node

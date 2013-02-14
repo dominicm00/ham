@@ -43,15 +43,19 @@ public:
 
 			data::VariableDomain* GlobalVariables()
 									{ return &fGlobalVariables; }
-			data::VariableScope* GlobalScope() const
-									{ return fGlobalScope; }
-			void				SetGlobalScope(data::VariableScope* scope)
-									{ fGlobalScope = scope; }
+			data::VariableScope* GlobalScope()
+									{ return &fGlobalScope; }
 
 			data::VariableScope* LocalScope() const
 									{ return fLocalScope; }
 			void				SetLocalScope(data::VariableScope* scope)
 									{ fLocalScope = scope; }
+
+			data::VariableDomain* BuiltInVariables() const
+									{ return fBuiltInVariables; }
+			void				SetBuiltInVariables(
+									data::VariableDomain* variables)
+									{ fBuiltInVariables = variables; }
 
 	inline	StringList*			LookupVariable(const String& variable) const;
 
@@ -77,9 +81,9 @@ private:
 			behavior::Compatibility fCompatibility;
 			behavior::Behavior	fBehavior;
 			data::VariableDomain& fGlobalVariables;
-			data::VariableScope	fRootScope;
-			data::VariableScope* fGlobalScope;
+			data::VariableScope	fGlobalScope;
 			data::VariableScope* fLocalScope;
+			data::VariableDomain* fBuiltInVariables;
 			data::TargetPool&	fTargets;
 			RulePool			fRules;
 			JumpCondition		fJumpCondition;
@@ -91,12 +95,17 @@ private:
 inline StringList*
 EvaluationContext::LookupVariable(const String& variable) const
 {
-	StringList* result = NULL;
-	if (fLocalScope != NULL)
-		result = fLocalScope->Lookup(variable);
-	if (result == NULL)
-		result = fGlobalScope->Lookup(variable);
-	return result;
+	if (fBuiltInVariables != NULL) {
+		if (StringList* result = fBuiltInVariables->Lookup(variable))
+			return result;
+	}
+
+	if (fLocalScope != NULL) {
+		if (StringList* result = fLocalScope->Lookup(variable))
+			return result;
+	}
+
+	return fGlobalScope.Lookup(variable);
 }
 
 

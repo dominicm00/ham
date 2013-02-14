@@ -40,17 +40,18 @@ OnExpression::Evaluate(EvaluationContext& context)
 	if (objects.IsEmpty())
 		return StringList::False();
 
-	// get the first of the targets and push its variable domain as a new scope
+	// get the first of the targets and push a copy of its variable domain as a
+	// new local scope
 	data::Target* target = context.Targets().LookupOrCreate(objects.Head());
-
-	data::VariableScope scope(*target->Variables(true), context.GlobalScope());
-	context.SetGlobalScope(&scope);
+	data::VariableDomain localVariables(*target->Variables(true));
+	data::VariableScope localScope(localVariables, context.LocalScope());
+	context.SetLocalScope(&localScope);
 
 	// execute the expression
 	const StringList& result = fExpression->Evaluate(context);
 
 	// pop the scope
-	context.SetGlobalScope(scope.Parent());
+	context.SetLocalScope(localScope.Parent());
 
 	return result;
 }

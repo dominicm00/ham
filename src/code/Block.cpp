@@ -16,7 +16,8 @@ namespace code {
 
 Block::Block()
 	:
-	fStatements()
+	fStatements(),
+	fLocalVariableScopeNeeded(true)
 {
 }
 
@@ -33,17 +34,22 @@ Block::~Block()
 StringList
 Block::Evaluate(EvaluationContext& context)
 {
-// TODO: We need to set up a local variable scope, if our parent hasn't done
-// that yet (e.g. in case of UserRuleInstructions).
-	StringList result;
-	for (StatementList::const_iterator it = fStatements.begin();
-			it != fStatements.end(); ++it) {
-		result = (*it)->Evaluate(context);
+	if (!fLocalVariableScopeNeeded)
+		return _Evaluate(context);
 
-		// terminate the block early, if a jump condition is set
-		if (context.GetJumpCondition() != JUMP_CONDITION_NONE)
-			break;
-	}
+	// Push a fresh local variable scope. It inherits the old one, so, unless
+	// shadowed, already defined local variables can still be seen.
+	data::VariableScope* oldLocalScope = context.LocalScope();
+	data::VariableDomain localVariables;
+	data::VariableScope localScope(localVariables, oldLocalScope);
+	if (fLocalVariableScopeNeeded)
+		context.SetLocalScope(&localScope);
+
+	StringList result = _Evaluate(context);
+
+	// reinstate the old local variable scope
+	if (fLocalVariableScopeNeeded)
+		context.SetLocalScope(oldLocalScope);
 
 	return result;
 }
@@ -78,6 +84,23 @@ Block::Dump(DumpContext& context) const
 
 	context.EndChildren();
 	context << ")\n";
+}
+
+
+StringList
+Block::_Evaluate(EvaluationContext& context)
+{
+	StringList result;
+	for (StatementList::const_iterator it = fStatements.begin();
+			it != fStatements.end(); ++it) {
+		result = (*it)->Evaluate(context);
+
+		// terminate the block early, if a jump condition is set
+		if (context.GetJumpCondition() != JUMP_CONDITION_NONE)
+			break;
+	}
+
+	return result;
 }
 
 

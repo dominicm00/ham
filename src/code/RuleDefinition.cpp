@@ -6,6 +6,7 @@
 
 #include "code/RuleDefinition.h"
 
+#include "code/Block.h"
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "code/RulePool.h"
@@ -17,13 +18,17 @@ namespace code {
 
 
 RuleDefinition::RuleDefinition(const String& ruleName,
-	const StringList& parameterNames, Node* block)
+	const StringList& parameterNames, Block* block)
 	:
 	fRuleName(ruleName),
 	fParameterNames(parameterNames),
 	fBlock(block)
 {
 	fBlock->AcquireReference();
+
+	// UserRuleInstructions::Evaluate() already sets up a new local variable
+	// scope, so the block doesn't need to do that.
+	fBlock->SetLocalVariableScopeNeeded(false);
 }
 
 

@@ -79,14 +79,12 @@ Assignment::Evaluate(EvaluationContext& context)
 
 			// look for a local variable
 			StringList* data = context.LocalScope()->Lookup(variable);
-			bool created = false;
 			if (data == NULL) {
 				// no local variable -- check for a global one
 				data = context.GlobalScope()->Lookup(variable);
 				if (data == NULL) {
 					// no existing global variable either -- create one
 					data = &context.GlobalVariables()->LookupOrCreate(variable);
-					created = true;
 				}
 			}
 
@@ -98,7 +96,7 @@ Assignment::Evaluate(EvaluationContext& context)
 					data->Append(rhs);
 					break;
 				case ASSIGNMENT_OPERATOR_DEFAULT:
-					if (created)
+					if (data->IsEmpty())
 						*data = rhs;
 					break;
 			}

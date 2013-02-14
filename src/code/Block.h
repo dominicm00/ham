@@ -20,6 +20,9 @@ public:
 								Block();
 	virtual						~Block();
 
+	inline	void				SetLocalVariableScopeNeeded(
+									bool localVariableScopeNeeded);
+
 	inline	void				AppendKeepReference(Node* statement);
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
@@ -27,10 +30,21 @@ public:
 	virtual	void				Dump(DumpContext& context) const;
 
 private:
+			StringList			_Evaluate(EvaluationContext& context);
+
+private:
 			typedef std::list<Node*> StatementList;
 
 			StatementList		fStatements;
+			bool				fLocalVariableScopeNeeded;
 };
+
+
+void
+Block::SetLocalVariableScopeNeeded(bool localVariableScopeNeeded)
+{
+	fLocalVariableScopeNeeded = localVariableScopeNeeded;
+}
 
 
 void

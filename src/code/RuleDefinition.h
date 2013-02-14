@@ -13,11 +13,14 @@ namespace ham {
 namespace code {
 
 
+class Block;
+
+
 class RuleDefinition : public Node {
 public:
 								RuleDefinition(const String& ruleName,
 									const StringList& parameterNames,
-									Node* block);
+									Block* block);
 	virtual						~RuleDefinition();
 
 	virtual	StringList			Evaluate(EvaluationContext& context);
@@ -27,7 +30,7 @@ public:
 private:
 			String				fRuleName;
 			StringList			fParameterNames;
-			Node*				fBlock;
+			Block*				fBlock;
 };
 
 
