@@ -6,11 +6,17 @@
 #define HAM_UTIL_CONSTANTS_H
 
 
+#include <stddef.h>
+
+
 namespace ham {
 namespace util {
 
 
 extern const char* const kJamfileName;
+
+static const size_t kIncludeDepthLimit = 256;
+static const size_t kRuleCallDepthLimit = 1024;
 
 
 }	// namespace util

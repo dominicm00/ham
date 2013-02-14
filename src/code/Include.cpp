@@ -8,12 +8,14 @@
 
 #include <fstream>
 #include <memory>
+#include <sstream>
 
 #include "code/Block.h"
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "code/EvaluationException.h"
 #include "parser/Parser.h"
+#include "util/Constants.h"
 
 
 namespace ham {
@@ -37,6 +39,16 @@ Include::~Include()
 StringList
 Include::Evaluate(EvaluationContext& context)
 {
+	// check include depth
+	size_t includeDepth = context.IncludeDepth();
+	if (includeDepth >= util::kIncludeDepthLimit) {
+		std::stringstream message;
+		message << "Reached include depth limit ("
+			<< util::kIncludeDepthLimit << ")";
+		throw EvaluationException(message.str());
+	}
+	context.SetIncludeDepth(includeDepth + 1);
+
 	StringList fileNames = fFileNames->Evaluate(context);
 	if (!fileNames.IsEmpty()) {
 		// Only the file referred to by the first element is included.
@@ -59,6 +71,9 @@ Include::Evaluate(EvaluationContext& context)
 		if (context.GetJumpCondition() == JUMP_CONDITION_JUMP_TO_EOF)
 			context.SetJumpCondition(JUMP_CONDITION_NONE);
 	}
+
+	// reset include depth
+	context.SetIncludeDepth(includeDepth);
 
 	return StringList::False();
 }

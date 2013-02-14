@@ -66,6 +66,16 @@ public:
 			void				SetJumpCondition(JumpCondition condition)
 									{ fJumpCondition = condition; }
 
+			size_t				IncludeDepth() const
+									{ return fIncludeDepth; }
+			void				SetIncludeDepth(size_t depth)
+									{ fIncludeDepth = depth; }
+
+			size_t				RuleCallDepth() const
+									{ return fRuleCallDepth; }
+			void				SetRuleCallDepth(size_t depth)
+									{ fRuleCallDepth = depth; }
+
 			std::ostream&		Output() const
 									{ return *fOutput; }
 			void				SetOutput(std::ostream& output)
@@ -84,6 +94,8 @@ private:
 			data::TargetPool&	fTargets;
 			RulePool			fRules;
 			JumpCondition		fJumpCondition;
+			size_t				fIncludeDepth;
+			size_t				fRuleCallDepth;
 			std::ostream*		fOutput;
 			std::ostream*		fErrorOutput;
 };

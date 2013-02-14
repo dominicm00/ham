@@ -8,8 +8,10 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "code/EvaluationException.h"
 #include "code/Rule.h"
 #include "code/RuleInstructions.h"
+#include "util/Constants.h"
 
 
 namespace ham {
@@ -53,6 +55,16 @@ FunctionCall::~FunctionCall()
 StringList
 FunctionCall::Evaluate(EvaluationContext& context)
 {
+	// check call depth
+	size_t callDepth = context.RuleCallDepth();
+	if (callDepth >= util::kRuleCallDepthLimit) {
+		std::stringstream message;
+		message << "Reached rule call depth limit ("
+			<< util::kRuleCallDepthLimit << ")";
+		throw EvaluationException(message.str());
+	}
+	context.SetRuleCallDepth(callDepth + 1);
+
 	// evaluate arguments
 	StringListList arguments;
 	size_t argumentCount = fArguments.size();
@@ -81,6 +93,9 @@ FunctionCall::Evaluate(EvaluationContext& context)
 		result.Append(function->Instructions()->Evaluate(context, arguments));
 // TODO: Handle the actions!
 	}
+
+	// reset call depth
+	context.SetRuleCallDepth(callDepth);
 
 	return result;
 }

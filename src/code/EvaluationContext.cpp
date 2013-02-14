@@ -23,6 +23,8 @@ EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
 	fBuiltInVariables(NULL),
 	fTargets(targets),
 	fJumpCondition(JUMP_CONDITION_NONE),
+	fIncludeDepth(0),
+	fRuleCallDepth(0),
 	fOutput(&std::cout),
 	fErrorOutput(&std::cerr)
 {
