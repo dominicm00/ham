@@ -78,6 +78,7 @@ For::Evaluate(EvaluationContext& context)
 				break;
 			case JUMP_CONDITION_RETURN:
 			case JUMP_CONDITION_JUMP_TO_EOF:
+			case JUMP_CONDITION_EXIT:
 				return result;
 		}
 	}
