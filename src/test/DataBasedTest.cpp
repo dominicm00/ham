@@ -99,12 +99,31 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	try {
 		TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
 	} catch (util::TextFileException& exception) {
+		if (dataSet->fOutputIsException) {
+			// and check the exception message against what's expected
+			std::vector<std::string> output;
+			output.push_back(exception.Message());
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(output, dataSet->fOutput),
+					"code:\n%s\nlines: %zu-%zu", _CodeToString(code).c_str(),
+					dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+			return;
+		}
+
 		HAM_TEST_THROW(
 			"%s.\nat %zu:%zu of file \"%s\":\n%s\ntest case lines: %zu-%zu",
 			exception.Message(), exception.Position().Line() + 1,
 			exception.Position().Column() + 1, exception.Position().FileName(),
 			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
 			dataSet->fEndLineIndex)
+	}
+
+	if (dataSet->fOutputIsException) {
+		HAM_TEST_THROW("Expected exception: \"%s\"\nActual output: \"%s\"\n"
+			"code:\n%s\nlines: %zu-%zu",
+			TestFixture::ValueToString(dataSet->fOutput).c_str(),
+			outputStream.str().c_str(), _CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
 	}
 
 	// extract the output

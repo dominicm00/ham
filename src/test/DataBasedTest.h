@@ -32,11 +32,12 @@ public:
 protected:
 			struct DataSetBase {
 				DataSetBase(const std::vector<std::string>& output,
-					uint32_t compatibilityMask, bool supportedByHam,
-					uint32_t skipMask, size_t startLineIndex,
-					size_t endLineIndex)
+					bool outputIsException, uint32_t compatibilityMask,
+					bool supportedByHam, uint32_t skipMask,
+					size_t startLineIndex, size_t endLineIndex)
 					:
 					fOutput(output),
+					fOutputIsException(outputIsException),
 					fCompatibilityMask(compatibilityMask),
 					fSupportedByHam(supportedByHam),
 					fSkipMask(skipMask),
@@ -51,6 +52,7 @@ protected:
 
 			public:
 				std::vector<std::string>	fOutput;
+				bool						fOutputIsException;
 				uint32_t					fCompatibilityMask;
 				bool						fSupportedByHam;
 				uint32_t					fSkipMask;

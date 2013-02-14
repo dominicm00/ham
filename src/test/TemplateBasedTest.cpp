@@ -30,12 +30,13 @@ TemplateBasedTest::TemplateBasedTest(const std::string& name,
 
 void
 TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
-	const std::vector<std::string>& output, uint32_t compatibilityMask,
-	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
-	size_t endLineIndex)
+	const std::vector<std::string>& output, bool outputIsException,
+	uint32_t compatibilityMask, bool supportedByHam, uint32_t skipMask,
+	size_t startLineIndex, size_t endLineIndex)
 {
-	DataBasedTest::AddDataSet(new DataSet(input, output, compatibilityMask,
-		supportedByHam, skipMask, startLineIndex, endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(input, output, outputIsException,
+		compatibilityMask, supportedByHam, skipMask, startLineIndex,
+		endLineIndex));
 }
 
 
