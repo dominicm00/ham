@@ -21,14 +21,16 @@ LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
 	fInitializer(initializer)
 {
 	fVariables->AcquireReference();
-	fInitializer->AcquireReference();
+	if (fInitializer != NULL)
+		fInitializer->AcquireReference();
 }
 
 
 LocalVariableDeclaration::~LocalVariableDeclaration()
 {
 	fVariables->ReleaseReference();
-	fInitializer->ReleaseReference();
+	if (fInitializer != NULL)
+		fInitializer->ReleaseReference();
 }
 
 
