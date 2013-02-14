@@ -72,8 +72,8 @@ struct DataBasedTestParser::TestInput {
 struct DataBasedTestParser::TestCase {
 	TestCase(const std::vector<TestInput>& inputFiles,
 		const std::vector<std::string>& output, bool outputIsException,
-		uint32_t compatibilityMask, bool supportedByHam, uint32_t skipMask,
-		size_t startLineIndex, size_t endLineIndex)
+		bool earlyExit, uint32_t compatibilityMask, bool supportedByHam,
+		uint32_t skipMask, size_t startLineIndex, size_t endLineIndex)
 		:
 		fCompatibilityMask(compatibilityMask),
 		fSupportedByHam(supportedByHam),
@@ -81,6 +81,7 @@ struct DataBasedTestParser::TestCase {
 		fInputFiles(inputFiles),
 		fOutput(output),
 		fOutputIsException(outputIsException),
+		fEarlyExit(earlyExit),
 		fStartLineIndex(startLineIndex),
 		fEndLineIndex(endLineIndex)
 	{
@@ -93,6 +94,7 @@ public:
 	std::vector<TestInput>		fInputFiles;
 	std::vector<std::string>	fOutput;
 	bool						fOutputIsException;
+	bool						fEarlyExit;
 	size_t						fStartLineIndex;
 	size_t						fEndLineIndex;
 };
@@ -165,6 +167,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::vector<std::string> previousInput;
 	std::vector<std::string> previousOutput;
 	bool previousOutputIsException = false;
+	bool previousEarlyExit = false;
 
 	bool done = false;
 
@@ -301,6 +304,7 @@ DataBasedTestParser::Parse(const char* fileName)
 
 		std::vector<std::string> output;
 		bool outputIsException = false;
+		bool earlyExit = false;
 		for (;;) {
 			std::string line;
 			std::string directive;
@@ -320,11 +324,17 @@ DataBasedTestParser::Parse(const char* fileName)
 
 					output.push_back(previousOutput.at(output.size()));
 					outputIsException = previousOutputIsException;
+					earlyExit = previousEarlyExit;
 					continue;
 				}
 
 				if (directive == "exception") {
 					outputIsException = true;
+					continue;
+				}
+
+				if (directive == "earlyExit") {
+					earlyExit = true;
 					continue;
 				}
 
@@ -341,9 +351,10 @@ DataBasedTestParser::Parse(const char* fileName)
 		previousInput = input.fInput;
 		previousOutput = output;
 		previousOutputIsException = outputIsException;
+		previousEarlyExit = earlyExit;
 
 		testCases.push_back(TestCase(inputFiles, output, outputIsException,
-			compatibilityMask & ~skipMask, supportedByHam, skipMask,
+			earlyExit, compatibilityMask & ~skipMask, supportedByHam, skipMask,
 			dataSetLineIndex, fLineIndex - 1));
 	}
 
@@ -361,9 +372,10 @@ DataBasedTestParser::Parse(const char* fileName)
 			}
 
 			test->AddDataSet(inputFiles, testCase.fOutput,
-				testCase.fOutputIsException, testCase.fCompatibilityMask,
-				testCase.fSupportedByHam, testCase.fSkipMask,
-				testCase.fStartLineIndex, testCase.fEndLineIndex);
+				testCase.fOutputIsException, testCase.fEarlyExit,
+				testCase.fCompatibilityMask, testCase.fSupportedByHam,
+				testCase.fSkipMask, testCase.fStartLineIndex,
+				testCase.fEndLineIndex);
 		}
 
 		return test.release();
@@ -375,9 +387,10 @@ DataBasedTestParser::Parse(const char* fileName)
 		it != testCases.end(); ++it) {
 		const TestCase& testCase = *it;
 		test->AddDataSet(testCase.fInputFiles.at(0).fInput, testCase.fOutput,
-			testCase.fOutputIsException, testCase.fCompatibilityMask,
-			testCase.fSupportedByHam, testCase.fSkipMask,
-			testCase.fStartLineIndex, testCase.fEndLineIndex);
+			testCase.fOutputIsException, testCase.fEarlyExit,
+			testCase.fCompatibilityMask, testCase.fSupportedByHam,
+			testCase.fSkipMask, testCase.fStartLineIndex,
+			testCase.fEndLineIndex);
 	}
 
 	return test.release();

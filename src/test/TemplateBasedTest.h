@@ -21,7 +21,7 @@ public:
 			void				AddDataSet(
 									const std::vector<std::string>& input,
 									const std::vector<std::string>& output,
-									bool outputIsException,
+									bool outputIsException, bool earlyExit,
 									uint32_t compatibilityMask,
 									bool supportedByHam, uint32_t skipMask,
 									size_t startLineIndex, size_t endLineIndex);
@@ -37,12 +37,14 @@ private:
 			struct DataSet : public DataSetBase {
 				DataSet(const std::vector<std::string>& input,
 					const std::vector<std::string>& output,
-					bool outputIsException, uint32_t compatibilityMask,
-					bool supportedByHam, uint32_t skipMask,
-					size_t startLineIndex, size_t endLineIndex)
+					bool outputIsException, bool earlyExit,
+					uint32_t compatibilityMask, bool supportedByHam,
+					uint32_t skipMask, size_t startLineIndex,
+					size_t endLineIndex)
 					:
-					DataSetBase(output, outputIsException, compatibilityMask,
-						supportedByHam, skipMask, startLineIndex, endLineIndex),
+					DataSetBase(output, outputIsException, earlyExit,
+						compatibilityMask, supportedByHam, skipMask,
+						startLineIndex, endLineIndex),
 					fInput(input)
 				{
 				}

@@ -140,10 +140,14 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 
 	std::vector<std::string> output;
 	for (;;) {
-		HAM_TEST_ADD_INFO(
-			HAM_TEST_VERIFY(_ReadEchoLine(environment, outputStream, line)),
-			"output: \"%s\"\nlines: %zu-%zu", outputStream.str().c_str(),
-			dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+		if (!_ReadEchoLine(environment, outputStream, line)) {
+			if (dataSet->fEarlyExit)
+				break;
+			HAM_TEST_THROW("Unexpected end of output (looking for end of "
+				"output marker).\noutput: \"%s\"\nlines: %zu-%zu",
+				outputStream.str().c_str(), dataSet->fStartLineIndex + 1,
+				dataSet->fEndLineIndex)
+		}
 		if (line == kOutputSuffix)
 			break;
 		output.push_back(line);

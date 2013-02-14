@@ -30,11 +30,11 @@ void
 MultipleFilesDataBasedTest::AddDataSet(
 	const std::map<std::string, std::string>& inputFiles,
 	const std::vector<std::string>& output, bool outputIsException,
-	uint32_t compatibilityMask, bool supportedByHam, uint32_t skipMask,
-	size_t startLineIndex, size_t endLineIndex)
+	bool earlyExit, uint32_t compatibilityMask, bool supportedByHam,
+	uint32_t skipMask, size_t startLineIndex, size_t endLineIndex)
 {
 	DataBasedTest::AddDataSet(new DataSet(inputFiles, output, outputIsException,
-		compatibilityMask, supportedByHam, skipMask, startLineIndex,
+		earlyExit, compatibilityMask, supportedByHam, skipMask, startLineIndex,
 		endLineIndex));
 }
 
