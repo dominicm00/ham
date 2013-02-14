@@ -9,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) behavior ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
 
 SharedLibrary libham.so
