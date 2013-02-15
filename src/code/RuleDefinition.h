@@ -14,6 +14,7 @@ namespace code {
 
 
 class Block;
+class RuleInstructions;
 
 
 class RuleDefinition : public Node {
@@ -31,6 +32,7 @@ private:
 			String				fRuleName;
 			StringList			fParameterNames;
 			Block*				fBlock;
+			RuleInstructions*	fInstructions;
 };
 
 

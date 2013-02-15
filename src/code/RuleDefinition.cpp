@@ -22,18 +22,22 @@ RuleDefinition::RuleDefinition(const String& ruleName,
 	:
 	fRuleName(ruleName),
 	fParameterNames(parameterNames),
-	fBlock(block)
+	fBlock(block),
+	fInstructions(NULL)
 {
 	fBlock->AcquireReference();
 
 	// UserRuleInstructions::Evaluate() already sets up a new local variable
 	// scope, so the block doesn't need to do that.
 	fBlock->SetLocalVariableScopeNeeded(false);
+
+	fInstructions = new UserRuleInstructions(fParameterNames, fBlock);
 }
 
 
 RuleDefinition::~RuleDefinition()
 {
+	fInstructions->ReleaseReference();
 	fBlock->ReleaseReference();
 }
 
@@ -42,7 +46,7 @@ StringList
 RuleDefinition::Evaluate(EvaluationContext& context)
 {
 	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
-	rule.SetInstructions(new UserRuleInstructions(fParameterNames, fBlock));
+	rule.SetInstructions(fInstructions);
 	return StringList::False();
 }
 

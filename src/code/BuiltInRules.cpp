@@ -107,22 +107,34 @@ public:
 };
 
 
-void
+/*static*/ void
 BuiltInRules::RegisterRules(RulePool& rulePool)
 {
-	_AddRule(rulePool, "echo", new EchoInstructions);
-	_AddRule(rulePool, "Echo", new EchoInstructions);
-	_AddRule(rulePool, "ECHO", new EchoInstructions);
-	_AddRule(rulePool, "exit", new ExitInstructions);
-	_AddRule(rulePool, "Exit", new ExitInstructions);
-	_AddRule(rulePool, "EXIT", new ExitInstructions);
-	_AddRule(rulePool, "match", new MatchInstructions);
-	_AddRule(rulePool, "Match", new MatchInstructions);
-	_AddRule(rulePool, "MATCH", new MatchInstructions);
+	_AddRuleConsumeReference(rulePool, "echo", new EchoInstructions, "Echo",
+		"ECHO");
+	_AddRuleConsumeReference(rulePool, "exit", new ExitInstructions, "Exit",
+		"EXIT");
+	_AddRuleConsumeReference(rulePool, "match", new MatchInstructions, "Match",
+		"MATCH");
 }
 
 
-void
+/*static*/ void
+BuiltInRules::_AddRuleConsumeReference(RulePool& rulePool, const char* name,
+	RuleInstructions* instructions, const char* alias1, const char* alias2)
+{
+	util::Reference<RuleInstructions> instructionsReference(instructions, true);
+	_AddRule(rulePool, name, instructions);
+
+	if (alias1 != NULL)
+		_AddRule(rulePool, alias1, instructions);
+
+	if (alias2 != NULL)
+		_AddRule(rulePool, alias2, instructions);
+}
+
+
+/*static*/ void
 BuiltInRules::_AddRule(RulePool& rulePool, const char* name,
 	RuleInstructions* instructions)
 {

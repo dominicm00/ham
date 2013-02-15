@@ -7,6 +7,7 @@
 
 
 #include "data/StringList.h"
+#include "util/Referenceable.h"
 
 
 namespace ham {
@@ -16,7 +17,7 @@ namespace code {
 class EvaluationContext;
 
 
-class RuleInstructions {
+class RuleInstructions : public util::Referenceable {
 public:
 	virtual						~RuleInstructions();
 

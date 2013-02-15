@@ -32,7 +32,6 @@ public:
 			RuleInstructions*	Instructions() const
 									{ return fInstructions; }
 	inline	void				SetInstructions(RuleInstructions* instructions);
-									// takes over ownership
 
 			RuleActions*		Actions() const
 									{ return fActions; }
@@ -57,7 +56,8 @@ Rule::Rule()
 
 Rule::~Rule()
 {
-	delete fInstructions;
+	if (fInstructions != NULL)
+		fInstructions->ReleaseReference();
 // TODO:
 //	delete fActions;
 }
@@ -66,8 +66,13 @@ Rule::~Rule()
 void
 Rule::SetInstructions(RuleInstructions* instructions)
 {
-	delete fInstructions;
+	if (fInstructions != NULL)
+		fInstructions->ReleaseReference();
+
 	fInstructions = instructions;
+
+	if (fInstructions != NULL)
+		fInstructions->AcquireReference();
 }
 
 
