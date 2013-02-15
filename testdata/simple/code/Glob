@@ -1,0 +1,154 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleJamfiles
+---
+#!file Jamfile
+result = [ Glob : * ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob . : ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob subdir : * ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob . : File* ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+./File1
+./File2
+---
+#!file Jamfile
+result = [ Glob . : *File* ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+./File1
+./File2
+./OtherFile3
+---
+#!file Jamfile
+result = [ Glob . : *Foo* ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file File1
+#!file File2
+#!file OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob . : */*File? ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file subdir1/File1
+#!file subdir1/File2
+#!file subdir1/OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob . : subdir1/* ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file subdir1/File1
+#!file subdir1/File2
+#!file subdir1/OtherFile3
+-
+---
+#!file Jamfile
+result = [ Glob subdir1 : * ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file subdir1/File1
+#!file subdir1/File2
+#!file subdir1/OtherFile3
+-
+subdir1/.
+subdir1/..
+subdir1/File1
+subdir1/File2
+subdir1/OtherFile3
+---
+#!file Jamfile
+result = [ Glob subdir1 subdir2 : [^O]* ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file subdir1/File1
+#!file subdir1/File2
+#!file subdir1/OtherFile3
+#!file subdir2/File4
+#!file subdir2/File5
+#!file subdir2/OtherFile6
+-
+subdir1/.
+subdir1/..
+subdir1/File1
+subdir1/File2
+subdir2/.
+subdir2/..
+subdir2/File4
+subdir2/File5
+---
+#!file Jamfile
+result = [ Glob subdir1 subdir2 : F* *2 ] ;
+for file in $(result) {
+	Echo $(file) ;
+}
+
+#!file subdir1/File1
+#!file subdir1/File2
+#!file subdir1/OtherFile3
+#!file subdir2/File4
+#!file subdir2/File5
+#!file subdir2/OtherFile6
+-
+subdir1/File1
+subdir1/File2
+subdir2/File4
+subdir2/File5
+---
