@@ -74,6 +74,7 @@ TestRunner::Run(TestEnvironment* environment)
 	fFailedTests = 0;
 	fSkippedTests = 0;
 	fExpectedlyFailedTests = 0;
+	fUnexpectedlyPassedTests = 0;
 
 	for (TestIdentifierList::const_iterator it = fTestsToRun.begin();
 		it != fTestsToRun.end(); ++it) {
@@ -86,8 +87,10 @@ TestRunner::Run(TestEnvironment* environment)
 
 	size_t totalTests = fPassedTests + fFailedTests + fExpectedlyFailedTests;
 	printf("--------\n");
-	printf("Summary: %zu tests run, %zu passed, %zu failed, %zu failed "
-		"expectedly, %zu skipped\n", totalTests, fPassedTests, fFailedTests,
+	printf("Summary: %zu tests run, %zu passed", totalTests, fPassedTests);
+	if (fUnexpectedlyPassedTests > 0)
+		printf(" (%zu unexpectedly)", fUnexpectedlyPassedTests);
+	printf(", %zu failed, %zu failed expectedly, %zu skipped\n", fFailedTests,
 		fExpectedlyFailedTests, fSkippedTests);
 }
 
@@ -137,10 +140,12 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 			_InitFixture(test);
 			test->RunTestCase(fEnvironment, fCurrentTestFixture, testCase);
 			fPassedTests++;
-			if (compatible)
+			if (compatible) {
 				printf("PASSED\n");
-			else
+			} else {
+				fUnexpectedlyPassedTests++;
 				printf("PASSED (unexpected)\n");
+			}
 		} else {
 			fSkippedTests++;
 			printf("SKIPPED\n");

@@ -76,6 +76,7 @@ private:
 			size_t				fFailedTests;
 			size_t				fSkippedTests;
 			size_t				fExpectedlyFailedTests;
+			size_t				fUnexpectedlyPassedTests;
 };
 
 
