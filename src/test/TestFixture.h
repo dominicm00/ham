@@ -78,6 +78,10 @@ public:
 									// Note: errorOutput is ignored.
 
 	static	std::string			CurrentWorkingDirectory();
+	static	void				CreateParentDirectory(const char* path,
+									bool createAncestors = true);
+	static	void				CreateDirectory(const char* path,
+									bool createAncestors = true);
 	static	void				RemoveRecursively(std::string entry);
 
 	static	std::string			MakePath(const char* head, const char* tail);

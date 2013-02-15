@@ -71,11 +71,7 @@ struct TestFixture::CodeExecuter {
 					"name.")
 			}
 
-			if (mkdir(fTemporaryDirectory,
-					S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
-				HAM_TEST_THROW("Failed to create temporary directory: %s",
-					strerror(errno))
-			}
+			CreateDirectory(fTemporaryDirectory, false);
 
 			// change the directory to the test directory
 			if (chdir(fTemporaryDirectory) < 0) {
@@ -89,13 +85,14 @@ struct TestFixture::CodeExecuter {
 			for (std::map<std::string, std::string>::const_iterator it
 					= code.begin();
 				it != code.end(); ++it) {
-				std::string jamfileName = MakePath(fTemporaryDirectory,
+				std::string jamfilePath = MakePath(fTemporaryDirectory,
 					it->first.c_str());
+				CreateParentDirectory(jamfilePath.c_str());
 // TODO: Replace path delimiters with platform specific ones!
-				std::fstream jamfile(jamfileName.c_str(), std::ios_base::out);
+				std::fstream jamfile(jamfilePath.c_str(), std::ios_base::out);
 				if (jamfile.fail()) {
 					HAM_TEST_THROW("Failed to create temporary file \"%s\".",
-						jamfileName.c_str())
+						jamfilePath.c_str())
 				}
 
 				std::copy(it->second.begin(), it->second.end(),
@@ -103,7 +100,7 @@ struct TestFixture::CodeExecuter {
 
 				if (jamfile.fail()) {
 					HAM_TEST_THROW("Failed to write test code to temporary "
-						"file \"%s\".", jamfileName.c_str())
+						"file \"%s\".", jamfilePath.c_str())
 				}
 				jamfile.close();
 			}
@@ -324,6 +321,44 @@ TestFixture::CurrentWorkingDirectory()
 	} catch (...) {
 		delete[] buffer;
 		throw;
+	}
+}
+
+
+/*static*/ void
+TestFixture::CreateParentDirectory(const char* path, bool createAncestors)
+{
+// TODO: Path delimiter!
+	const char* lastSlash = strrchr(path, '/');
+// TODO: Platform specific (root path).
+	if (lastSlash == NULL || lastSlash == path)
+		return;
+
+	std::string parentPath(path, lastSlash - path);
+	CreateDirectory(parentPath.c_str(), createAncestors);
+}
+
+
+/*static*/ void
+TestFixture::CreateDirectory(const char* path, bool createAncestors)
+{
+// TODO: Platform specific.
+	struct stat st;
+	if (lstat(path, &st) == 0) {
+		// already exists?
+		if (S_ISDIR(st.st_mode))
+			return;
+
+		HAM_TEST_THROW("Can't create directory \"%s\", a file is in the way",
+			path)
+	}
+
+	if (createAncestors)
+		CreateParentDirectory(path, true);
+
+	if (mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
+		HAM_TEST_THROW("Failed to create directory \"%s\": %s", path,
+			strerror(errno))
 	}
 }
 
