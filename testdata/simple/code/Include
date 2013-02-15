@@ -17,6 +17,37 @@ Echo 3 ;
 ---
 #!file Jamfile
 Echo 1 ;
+include subdir1/subdir2/File1 ;
+Echo 2 ;
+
+#!file subdir1/subdir2/File1
+Echo 3 ;
+-
+1
+3
+2
+---
+#!file Jamfile
+Echo 1 ;
+include subdir1/subdir2/File1 ;
+Echo 2 ;
+
+#!file subdir1/subdir2/File1
+Echo 3 ;
+include otherdir/File2 ;
+Echo 4 ;
+
+#!file otherdir/File2
+Echo 5 ;
+-
+1
+3
+5
+4
+2
+---
+#!file Jamfile
+Echo 1 ;
 include File1 ;
 Echo 2 ;
 include File2 ;
