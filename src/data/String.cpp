@@ -133,7 +133,7 @@ String::_Concatenate(const char* string1, size_t length1, const char* string2,
 }
 
 
-String::Buffer*
+/*static*/ String::Buffer*
 String::_CreateBuffer(const char* string, size_t length)
 {
 	if (length == 0) {

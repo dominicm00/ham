@@ -122,7 +122,7 @@ private:
 									size_t length1, const char* string2,
 									size_t length2);
 
-	inline	Buffer*				_CreateBuffer(const char* string,
+	static inline Buffer*		_CreateBuffer(const char* string,
 									size_t length);
 	inline	void				_CopyOnWriteBuffer();
 
