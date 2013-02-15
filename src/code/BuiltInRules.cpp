@@ -13,6 +13,7 @@
 #include "code/RuleInstructions.h"
 #include "data/RegExp.h"
 #include "data/StringBuffer.h"
+#include "data/TargetPool.h"
 
 
 namespace ham {
@@ -190,6 +191,25 @@ public:
 };
 
 
+template<uint32_t kFlags>
+struct AddTargetFlagsRule : public RuleInstructions {
+	virtual StringList Evaluate(EvaluationContext& context,
+		const StringListList& parameters)
+	{
+		if (!parameters.empty()) {
+			const StringList& targetNames = parameters[0];
+			size_t targetCount = targetNames.Size();
+			for (size_t i = 0; i < targetCount; i++) {
+				data::Target* target = context.Targets().LookupOrCreate(
+					targetNames.ElementAt(i));
+				target->AddFlags(kFlags);
+			}
+		}
+		return StringList::False();
+	}
+};
+
+
 /*static*/ void
 BuiltInRules::RegisterRules(RulePool& rulePool)
 {
@@ -201,6 +221,19 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 		"GLOB");
 	_AddRuleConsumeReference(rulePool, "match", new MatchInstructions, "Match",
 		"MATCH");
+
+	#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag)		\
+		_AddRuleConsumeReference(rulePool, name,						\
+			new AddTargetFlagsRule<data::Target::flag>, alias1, alias2)
+
+	HAM_ADD_TARGET_FLAG_RULE("always", "Always", "ALWAYS", BUILD_ALWAYS);
+	HAM_ADD_TARGET_FLAG_RULE("leaves", "Leaves", "LEAVES", DEPENDS_ON_LEAVES);
+	HAM_ADD_TARGET_FLAG_RULE("nocare", "NoCare", "NOCARE", IGNORE_IF_MISSING);
+	HAM_ADD_TARGET_FLAG_RULE("notfile", "NotFile", "NOTFILE", NOT_A_FILE);
+	HAM_ADD_TARGET_FLAG_RULE("noupdate", "NoUpdate", "NOUPDATE", DONT_UPDATE);
+	HAM_ADD_TARGET_FLAG_RULE("temporary", "Temporary", "TEMPORARY", TEMPORARY);
+
+	#undef HAM_ADD_TARGET_FLAG_RULE
 }
 
 
