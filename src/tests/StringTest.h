@@ -22,11 +22,12 @@ public:
 			void				Assignment();
 			void				Concatenation();
 			void				ToLowerUpper();
+			void				SubString();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringTest, 6,
+	HAM_ADD_TEST_CASES(StringTest, 7,
 		Constructor, CastOperator, Comparison, Assignment, Concatenation,
-		ToLowerUpper)
+		ToLowerUpper, SubString)
 };
 
 

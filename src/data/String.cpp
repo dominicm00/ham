@@ -56,6 +56,23 @@ String::~String()
 }
 
 
+String
+String::SubString(size_t startOffset, size_t endOffset) const
+{
+	if (endOffset >= Length()) {
+		if (startOffset == 0)
+			return *this;
+		endOffset = Length();
+	}
+
+	if (startOffset >= Length() || startOffset >= endOffset)
+		return String();
+
+	return String(
+		_CreateBuffer(ToCString() + startOffset, endOffset - startOffset));
+}
+
+
 String&
 String::ToUpper()
 {

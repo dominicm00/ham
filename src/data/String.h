@@ -41,6 +41,9 @@ public:
 			bool				IsEmpty() const
 									{ return Length() == 0; }
 
+			String				SubString(size_t startOffset,
+									size_t endOffset) const;
+
 			String&				ToUpper();
 			String&				ToLower();
 

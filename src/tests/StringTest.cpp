@@ -368,5 +368,42 @@ StringTest::ToLowerUpper()
 }
 
 
+void
+StringTest::SubString()
+{
+	struct TestData {
+		const char*	string;
+		size_t		startOffset;
+		size_t		endOffset;
+		const char*	result;
+	};
+
+	const TestData testData[] = {
+		{ "",			0, 0, "" },
+		{ "foobar",		0, 0, "" },
+		{ "foobar",		3, 3, "" },
+		{ "foobar",		4, 2, "" },
+		{ "foobar",		6, 7, "" },
+		{ "foobar",		0, 6, "foobar" },
+		{ "foobar",		0, 8, "foobar" },
+		{ "foobar",		0, 4, "foob" },
+		{ "foobar",		2, 4, "ob" },
+		{ "foobar",		2, 6, "obar" },
+		{ "foobar",		2, 9, "obar" },
+	};
+
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
+		String string(testData[i].string);
+		String subString = string.SubString(testData[i].startOffset,
+			testData[i].endOffset);
+		HAM_TEST_ADD_INFO(
+			STRING_EQUAL(subString, testData[i].result),
+			"string: \"%s\", offsets: %zu - %zu", testData[i].string,
+			testData[i].startOffset, testData[i].endOffset
+		)
+	}
+}
+
+
 } // namespace tests
 } // namespace ham
