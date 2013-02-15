@@ -191,6 +191,42 @@ public:
 };
 
 
+template<bool kIncludes>
+struct DependsInstructions : RuleInstructions {
+public:
+	virtual StringList Evaluate(EvaluationContext& context,
+		const StringListList& parameters)
+	{
+		if (parameters.size() < 2)
+			return StringList::False();
+
+		// resolve the dependencies
+		data::TargetSet dependencies;
+		const StringList& dependencyNames = parameters[1];
+		size_t dependencyCount = dependencyNames.Size();
+		for (size_t i = 0; i < dependencyCount; i++) {
+			data::Target* target = context.Targets().LookupOrCreate(
+				dependencyNames.ElementAt(i));
+			dependencies.insert(target);
+		}
+
+		// add the dependencies to the targets
+		const StringList& targetNames = parameters[0];
+		size_t targetCount = targetNames.Size();
+		for (size_t i = 0; i < targetCount; i++) {
+			data::Target* target = context.Targets().LookupOrCreate(
+				targetNames.ElementAt(i));
+			if (kIncludes)
+				target->AddIncludes(dependencies);
+			else
+				target->AddDependencies(dependencies);
+		}
+
+		return StringList::False();
+	}
+};
+
+
 template<uint32_t kFlags>
 struct AddTargetFlagsRule : public RuleInstructions {
 	virtual StringList Evaluate(EvaluationContext& context,
@@ -221,6 +257,10 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 		"GLOB");
 	_AddRuleConsumeReference(rulePool, "match", new MatchInstructions, "Match",
 		"MATCH");
+	_AddRuleConsumeReference(rulePool, "depends",
+		new DependsInstructions<false>, "Depends", "DEPENDS");
+	_AddRuleConsumeReference(rulePool, "includes",
+		new DependsInstructions<true>, "Includes", "INCLUDES");
 
 	#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag)		\
 		_AddRuleConsumeReference(rulePool, name,						\
