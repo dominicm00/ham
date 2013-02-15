@@ -9,6 +9,7 @@
 #include "code/EvaluationContext.h"
 #include "code/Rule.h"
 #include "code/RuleInstructions.h"
+#include "data/RegExp.h"
 
 
 namespace ham {
@@ -63,6 +64,49 @@ public:
 };
 
 
+struct MatchInstructions : RuleInstructions {
+public:
+	virtual StringList Evaluate(EvaluationContext& context,
+		const StringListList& parameters)
+	{
+		using data::RegExp;
+
+		if (parameters.size() < 2)
+			return StringList::False();
+
+		StringList expressions = parameters[0];
+		size_t expressionCount = expressions.Size();
+		StringList strings = parameters[1];
+		size_t stringCount = strings.Size();
+
+		StringList result;
+		for (size_t i = 0; i < expressionCount; i++) {
+			RegExp regExp(expressions.ElementAt(i).ToCString());
+			if (!regExp.IsValid()) {
+// TODO: Throw exception!
+				continue;
+			}
+
+			for (size_t k = 0; k < stringCount; k++) {
+				String string = strings.ElementAt(k);
+				RegExp::MatchResult match = regExp.Match(string.ToCString());
+				if (!match.HasMatched())
+					continue;
+
+				size_t matchCount = match.GroupCount();
+				for (size_t l = 0; l < matchCount; l++) {
+					result.Append(
+						string.SubString(match.GroupStartOffsetAt(l),
+							match.GroupEndOffsetAt(l)));
+				}
+			}
+		}
+
+		return result;
+	}
+};
+
+
 void
 BuiltInRules::RegisterRules(RulePool& rulePool)
 {
@@ -72,6 +116,9 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 	_AddRule(rulePool, "exit", new ExitInstructions);
 	_AddRule(rulePool, "Exit", new ExitInstructions);
 	_AddRule(rulePool, "EXIT", new ExitInstructions);
+	_AddRule(rulePool, "match", new MatchInstructions);
+	_AddRule(rulePool, "Match", new MatchInstructions);
+	_AddRule(rulePool, "MATCH", new MatchInstructions);
 }
 
 
