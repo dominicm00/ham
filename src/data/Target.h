@@ -6,11 +6,18 @@
 #define HAM_DATA_TARGET_H
 
 
+#include <set>
+
 #include "data/VariableDomain.h"
 
 
 namespace ham {
 namespace data {
+
+
+class Target;
+
+typedef std::set<Target*> TargetSet;
 
 
 class Target {
@@ -48,10 +55,24 @@ public:
 			void				AddFlags(uint32_t flags)
 									{ fFlags |= flags; }
 
+			const TargetSet&	Dependencies() const
+									{ return fDependencies; }
+			void				AddDependency(Target* dependency)
+									{ fDependencies.insert(dependency); }
+	inline	void				AddDependencies(const TargetSet& dependencies);
+
+			const TargetSet&	Includes() const
+									{ return fIncludes; }
+			void				AddInclude(Target* include)
+									{ fIncludes.insert(include); }
+	inline	void				AddIncludes(const TargetSet& includes);
+
 private:
 			String				fName;
 			VariableDomain*		fVariables;
 			uint32_t			fFlags;
+			TargetSet			fDependencies;
+			TargetSet			fIncludes;
 };
 
 
@@ -62,6 +83,26 @@ Target::Variables(bool create)
 		fVariables = new VariableDomain;
 
 	return fVariables;
+}
+
+
+void
+Target::AddDependencies(const TargetSet& dependencies)
+{
+	for (TargetSet::const_iterator it = dependencies.begin();
+		it != dependencies.end(); ++it) {
+		AddDependency(*it);
+	}
+}
+
+
+void
+Target::AddIncludes(const TargetSet& includes)
+{
+	for (TargetSet::const_iterator it = includes.begin();
+		it != includes.end(); ++it) {
+		AddInclude(*it);
+	}
 }
 
 

@@ -15,7 +15,9 @@ Target::Target()
 	:
 	fName(),
 	fVariables(NULL),
-	fFlags(0)
+	fFlags(0),
+	fDependencies(),
+	fIncludes()
 {
 }
 
@@ -24,7 +26,9 @@ Target::Target(const String& name)
 	:
 	fName(name),
 	fVariables(NULL),
-	fFlags(0)
+	fFlags(0),
+	fDependencies(),
+	fIncludes()
 {
 }
 
