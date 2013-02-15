@@ -125,6 +125,17 @@ public:
 		StringList patterns = parameters[1];
 		size_t patternCount = patterns.Size();
 
+		// prepare the regexp up front
+		std::vector<RegExp> regExps;
+
+		for (size_t k = 0; k < patternCount; k++) {
+			RegExp regExp(patterns.ElementAt(k).ToCString(),
+				RegExp::PATTERN_TYPE_WILDCARD);
+			if (regExp.IsValid())
+				regExps.push_back(regExp);
+		}
+		size_t regExpCount = regExps.size();
+
 		// iterate through all directories
 		StringList result;
 		for (size_t i = 0; i < directoryCount; i++) {
@@ -143,15 +154,9 @@ public:
 					size_t entryNameLength = strlen(entryName);
 
 					// check, if any of the patterns matches
-// TODO: We should prepare the regexp outside of the loop.
 					bool matches = false;
-					for (size_t k = 0; k < patternCount; k++) {
-						RegExp regExp(patterns.ElementAt(k).ToCString(),
-							RegExp::PATTERN_TYPE_WILDCARD);
-						if (!regExp.IsValid())
-							continue;
-
-						RegExp::MatchResult match = regExp.Match(entryName);
+					for (size_t k = 0; k < regExpCount; k++) {
+						RegExp::MatchResult match = regExps[k].Match(entryName);
 						if (!match.HasMatched() || match.StartOffset() != 0
 							|| match.EndOffset() != entryNameLength) {
 							continue;
