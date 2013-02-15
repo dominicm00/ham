@@ -6,10 +6,13 @@
 
 #include "code/BuiltInRules.h"
 
+#include <dirent.h>
+
 #include "code/EvaluationContext.h"
 #include "code/Rule.h"
 #include "code/RuleInstructions.h"
 #include "data/RegExp.h"
+#include "data/StringBuffer.h"
 
 
 namespace ham {
@@ -107,6 +110,81 @@ public:
 };
 
 
+struct GlobInstructions : RuleInstructions {
+public:
+	virtual StringList Evaluate(EvaluationContext& context,
+		const StringListList& parameters)
+	{
+		using data::RegExp;
+
+		if (parameters.size() < 2)
+			return StringList::False();
+
+		StringList directories = parameters[0];
+		size_t directoryCount = directories.Size();
+		StringList patterns = parameters[1];
+		size_t patternCount = patterns.Size();
+
+		// iterate through all directories
+		StringList result;
+		for (size_t i = 0; i < directoryCount; i++) {
+			// open the directory and iterate through all directory entries
+			String directory = directories.ElementAt(i);
+			if (directory.IsEmpty())
+				continue;
+
+			DIR* dir = opendir(directory.ToCString());
+			if (dir == NULL)
+				continue;
+
+			try {
+				while (struct dirent* dirEntry = readdir(dir)) {
+					const char* entryName = dirEntry->d_name;
+					size_t entryNameLength = strlen(entryName);
+
+					// check, if any of the patterns matches
+// TODO: We should prepare the regexp outside of the loop.
+					bool matches = false;
+					for (size_t k = 0; k < patternCount; k++) {
+						RegExp regExp(patterns.ElementAt(k).ToCString(),
+							RegExp::PATTERN_TYPE_WILDCARD);
+						if (!regExp.IsValid())
+							continue;
+
+						RegExp::MatchResult match = regExp.Match(entryName);
+						if (!match.HasMatched() || match.StartOffset() != 0
+							|| match.EndOffset() != entryNameLength) {
+							continue;
+						}
+
+						matches = true;
+						break;
+					}
+
+					// Append the entry's path to the result list, if it matches
+					// any pattern.
+					if (matches) {
+						data::StringBuffer path;
+						path += directory;
+// TODO: path delimiter!
+						path += '/';
+						path += entryName;
+						result.Append(path);
+					}
+				}
+			} catch (...) {
+				closedir(dir);
+				throw;
+			}
+
+			closedir(dir);
+		}
+
+		return result;
+	}
+};
+
+
 /*static*/ void
 BuiltInRules::RegisterRules(RulePool& rulePool)
 {
@@ -114,6 +192,8 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 		"ECHO");
 	_AddRuleConsumeReference(rulePool, "exit", new ExitInstructions, "Exit",
 		"EXIT");
+	_AddRuleConsumeReference(rulePool, "glob", new GlobInstructions, "Glob",
+		"GLOB");
 	_AddRuleConsumeReference(rulePool, "match", new MatchInstructions, "Match",
 		"MATCH");
 }
