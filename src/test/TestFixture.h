@@ -64,18 +64,6 @@ public:
 									std::ostream& output,
 									std::ostream& errorOutput);
 									// code: file name -> file content
-	static	void				ExecuteCodeHamLibrary(
-									const std::string& code,
-									std::ostream& output,
-									std::ostream& errorOutput,
-									behavior::Compatibility compatibility
-										= behavior::COMPATIBILITY_HAM);
-	static	void				ExecuteCodeExecutable(
-									const char* jamExecutable,
-									const std::string& code,
-									std::ostream& output,
-									std::ostream& errorOutput);
-									// Note: errorOutput is ignored.
 
 	static	std::string			CurrentWorkingDirectory();
 	static	void				CreateParentDirectory(const char* path,

@@ -13,14 +13,10 @@
 #include <unistd.h>
 
 #include <fstream>
+#include <iterator>
 #include <sstream>
 
-#include "code/Block.h"
-#include "code/BuiltInRules.h"
-#include "code/EvaluationContext.h"
-#include "data/TargetPool.h"
-#include "data/VariableDomain.h"
-#include "parser/Parser.h"
+#include "code/Processor.h"
 #include "test/TestEnvironment.h"
 #include "util/Constants.h"
 
@@ -128,29 +124,11 @@ struct TestFixture::CodeExecuter {
 						break;
 				}
 			} else {
-				// open Jamfile
-				std::ifstream jamfile(util::kJamfileName);
-				if (jamfile.fail())
-					HAM_TEST_THROW("Failed to open %s.", util::kJamfileName)
-
-				// parse code
-				parser::Parser parser;
-				parser.SetFileName(util::kJamfileName);
-				code::Block* block = parser.Parse(jamfile);
-
-				// prepare evaluation context
-				data::VariableDomain globalVariables;
-				data::TargetPool targets;
-				code::EvaluationContext evaluationContext(globalVariables,
-					targets);
-				code::BuiltInRules::RegisterRules(evaluationContext.Rules());
-
-				evaluationContext.SetCompatibility(compatibility);
-				evaluationContext.SetOutput(output);
-				evaluationContext.SetErrorOutput(errorOutput);
-
-				// execute the code
-				block->Evaluate(evaluationContext);
+				code::Processor processor;
+				processor.SetCompatibility(compatibility);
+				processor.SetOutput(output);
+				processor.SetErrorOutput(errorOutput);
+				processor.ProcessJambase();
 			}
 		} catch (...) {
 			_Cleanup();
@@ -243,14 +221,10 @@ TestFixture::MakeStringListList(
 TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
 	std::ostream& output, std::ostream& errorOutput)
 {
-	// Depending on whether the environment specifies a jam executable or not,
-	// execute the code via that or via the ham library.
 	std::string jamExecutable = environment->JamExecutable();
-	if (jamExecutable.empty()) {
-		ExecuteCodeHamLibrary(code, output, errorOutput,
-			environment->GetCompatibility());
-	} else
-		ExecuteCodeExecutable(jamExecutable.c_str(), code, output, errorOutput);
+	std::map<std::string,std::string> codeFiles;
+	codeFiles[util::kJamfileName] = code;
+	return ExecuteCode(environment, codeFiles, output, errorOutput);
 }
 
 
@@ -263,42 +237,6 @@ TestFixture::ExecuteCode(TestEnvironment* environment,
 	return CodeExecuter().Execute(
 		jamExecutable.empty() ? NULL : jamExecutable.c_str(),
 		environment->GetCompatibility(), code, output, errorOutput);
-}
-
-
-/*static*/ void
-TestFixture::ExecuteCodeHamLibrary(const std::string& code,
-	std::ostream& output, std::ostream& errorOutput,
-	behavior::Compatibility compatibility)
-{
-	// parse code
-	parser::Parser parser;
-	code::Block* block = parser.Parse(code);
-
-	// prepare evaluation context
-	data::VariableDomain globalVariables;
-	data::TargetPool targets;
-	code::EvaluationContext evaluationContext(globalVariables, targets);
-	code::BuiltInRules::RegisterRules(evaluationContext.Rules());
-
-	evaluationContext.SetCompatibility(compatibility);
-	evaluationContext.SetOutput(output);
-	evaluationContext.SetErrorOutput(errorOutput);
-
-	// execute the code
-	block->Evaluate(evaluationContext);
-}
-
-
-/*static*/ void
-TestFixture::ExecuteCodeExecutable(const char* jamExecutable,
-	const std::string& code, std::ostream& output, std::ostream& errorOutput)
-{
-	std::map<std::string,std::string> codeFiles;
-	codeFiles[util::kJamfileName] = code;
-	return CodeExecuter().Execute(jamExecutable, behavior::COMPATIBILITY_HAM,
-		codeFiles, output, errorOutput);
-		// compatibility argument is ignored, since an executable is given
 }
 
 
