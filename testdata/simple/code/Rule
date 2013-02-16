@@ -245,6 +245,8 @@ Echo $(result) ;
 2
 
 ---
+#!compat jam ham
+# Boost.Jam doesn't return immediately from the rule on "return".
 rule Foo
 {
 	Echo 1 ;
@@ -257,6 +259,8 @@ Echo $(result) ;
 1
 
 ---
+#!compat jam ham
+# Boost.Jam doesn't return immediately from the rule on "return".
 rule Foo
 {
 	Echo 1 ;
@@ -270,8 +274,7 @@ Echo $(result) ;
 b c
 ---
 #!skip boost
-# Boost.Jam doesn't seem to return immediately from the rule when encountering
-# a "return".
+# Boost.Jam doesn't return immediately from the rule on "return".
 rule Foo
 {
 	Echo 1 ;
@@ -291,8 +294,7 @@ loop
 b c
 ---
 #!skip boost
-# Boost.Jam doesn't seem to return immediately from the rule when encountering
-# a "return".
+# Boost.Jam doesn't return immediately from the rule on "return".
 rule Foo
 {
 	Echo 1 ;
@@ -316,6 +318,8 @@ loop
 loop2: x
 b c
 ---
+#!compat jam ham
+# Boost.Jam doesn't return immediately from the rule on "return".
 rule Foo
 {
 	Echo Foo 1 ;

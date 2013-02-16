@@ -54,6 +54,8 @@ foo
 bar
 foobar
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 var = foo bar foobar ;
 while $(var) {
 	Echo $(var[1]) ;
@@ -65,6 +67,8 @@ foo
 bar
 foobar
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 var = foo bar foobar ;
 while $(var) {
 	Echo $(var[1]) ;
@@ -95,6 +99,8 @@ bar
 foobar
 1
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 var = foo bar foobar ;
 condition = true ;
 while $(var) {
@@ -146,6 +152,8 @@ b
 1
 2
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 var1 = foo bar foobar ;
 condition = true ;
 while $(var1) {
@@ -176,6 +184,8 @@ a
 b
 2
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 var1 = foo bar foobar ;
 condition = true ;
 while $(var1) {
@@ -196,6 +206,8 @@ foo
 bar
 foobar
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 var = foo bar foobar ;
 while $(var) {
 	Echo $(var[1]) ;
@@ -224,6 +236,8 @@ bar
 foobar
 1
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 var = foo bar foobar ;
 condition = true ;
 while $(var) {
@@ -273,6 +287,8 @@ b
 1
 2
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 var1 = foo bar foobar ;
 condition = true ;
 while $(var1) {
@@ -300,6 +316,8 @@ foobar
 a
 2
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 var1 = foo bar foobar ;
 condition = true ;
 while $(var1) {

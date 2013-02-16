@@ -69,6 +69,8 @@ for element in $(list) {
 1
 1
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 list = foo bar foobar ;
 for element in $(list) {
 	Echo 1 ;
@@ -80,6 +82,8 @@ for element in $(list) {
 1
 1
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 list = foo bar foobar ;
 for element in $(list) {
 	Echo $(element) ;
@@ -107,6 +111,8 @@ bar
 1
 foobar
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 list = foo bar foobar ;
 condition = true ;
 for element in $(list) {
@@ -151,6 +157,8 @@ a
 1
 b
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 list1 = foo bar foobar ;
 list2 = a b ;
 condition = true ;
@@ -175,6 +183,8 @@ foobar
 1
 1
 ---
+#!compat jam ham
+# No "continue" in Boost.Jam.
 list1 = foo bar foobar ;
 list2 = a b ;
 condition = true ;
@@ -193,6 +203,8 @@ foo
 bar
 foobar
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 list = foo bar foobar ;
 for element in $(list) {
 	Echo 1 ;
@@ -219,6 +231,8 @@ bar
 1
 foobar
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 list = foo bar foobar ;
 condition = true ;
 for element in $(list) {
@@ -261,6 +275,8 @@ a
 1
 b
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 list1 = foo bar foobar ;
 list2 = a b ;
 condition = true ;
@@ -282,6 +298,8 @@ bar
 foobar
 1
 ---
+#!compat jam ham
+# No "break" in Boost.Jam.
 list1 = foo bar foobar ;
 list2 = a b ;
 condition = true ;
