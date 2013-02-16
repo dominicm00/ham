@@ -71,10 +71,10 @@ TestRunner::Run(TestEnvironment* environment)
 {
 	fEnvironment = environment;
 	fPassedTests = 0;
-	fFailedTests = 0;
+	fFailedTests.clear();
 	fSkippedTests = 0;
 	fExpectedlyFailedTests = 0;
-	fUnexpectedlyPassedTests = 0;
+	fUnexpectedlyPassedTests.clear();
 
 	for (TestIdentifierList::const_iterator it = fTestsToRun.begin();
 		it != fTestsToRun.end(); ++it) {
@@ -85,13 +85,34 @@ TestRunner::Run(TestEnvironment* environment)
 
 	fEnvironment = NULL;
 
-	size_t totalTests = fPassedTests + fFailedTests + fExpectedlyFailedTests;
+	size_t totalTests = fPassedTests + fFailedTests.size()
+		+ fExpectedlyFailedTests;
 	printf("--------\n");
 	printf("Summary: %zu tests run, %zu passed", totalTests, fPassedTests);
-	if (fUnexpectedlyPassedTests > 0)
-		printf(" (%zu unexpectedly)", fUnexpectedlyPassedTests);
-	printf(", %zu failed, %zu failed expectedly, %zu skipped\n", fFailedTests,
-		fExpectedlyFailedTests, fSkippedTests);
+	if (fUnexpectedlyPassedTests.size() > 0)
+		printf(" (%zu unexpectedly)", fUnexpectedlyPassedTests.size());
+	printf(", %zu failed, %zu failed expectedly, %zu skipped\n",
+		fFailedTests.size(), fExpectedlyFailedTests, fSkippedTests);
+
+	if (!fFailedTests.empty()) {
+		printf("Failed tests:\n");
+		for (TestIdentifierList::iterator it = fFailedTests.begin();
+			it != fFailedTests.end(); ++it) {
+			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
+			printf("  %s\n",
+				test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+		}
+	}
+
+	if (!fUnexpectedlyPassedTests.empty()) {
+		printf("Tests passed unexpectedly:\n");
+		for (TestIdentifierList::iterator it = fUnexpectedlyPassedTests.begin();
+			it != fUnexpectedlyPassedTests.end(); ++it) {
+			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
+			printf("  %s\n",
+				test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+		}
+	}
 }
 
 
@@ -143,7 +164,8 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 			if (compatible) {
 				printf("PASSED\n");
 			} else {
-				fUnexpectedlyPassedTests++;
+				fUnexpectedlyPassedTests.push_back(
+					TestIdentifier(test, testCase));
 				printf("PASSED (unexpected)\n");
 			}
 		} else {
@@ -152,7 +174,7 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 		}
 	} catch (TestException& exception) {
 		if (compatible) {
-			fFailedTests++;
+			fFailedTests.push_back(TestIdentifier(test, testCase));
 			printf("FAILED\n");
 			printf("%s:%d:\n  %s\n", exception.File(), exception.Line(),
 				exception.Message().c_str());

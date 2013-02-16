@@ -73,10 +73,10 @@ private:
 			RunnableTest*		fCurrentTest;
 			void*				fCurrentTestFixture;
 			size_t				fPassedTests;
-			size_t				fFailedTests;
+			TestIdentifierList	fFailedTests;
 			size_t				fSkippedTests;
 			size_t				fExpectedlyFailedTests;
-			size_t				fUnexpectedlyPassedTests;
+			TestIdentifierList	fUnexpectedlyPassedTests;
 };
 
 
