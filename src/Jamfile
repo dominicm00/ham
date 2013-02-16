@@ -26,6 +26,7 @@ SharedLibrary libham.so
 	EvaluationContext.cpp
 	If.cpp
 	Include.cpp
+	Jambase.cpp
 	For.cpp
 	FunctionCall.cpp
 	InListExpression.cpp
