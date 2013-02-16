@@ -35,6 +35,7 @@ public:
 									{ return fCompatibility; }
 			void				SetCompatibility(
 									behavior::Compatibility compatibility);
+									// resets behavior as well
 
 			behavior::Behavior	GetBehavior() const
 									{ return fBehavior; }
