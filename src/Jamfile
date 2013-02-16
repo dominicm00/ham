@@ -37,6 +37,7 @@ SharedLibrary libham.so
 	Node.cpp
 	NotExpression.cpp
 	OnExpression.cpp
+	Processor.cpp
 	RuleDefinition.cpp
 	RuleInstructions.cpp
 	UserRuleInstructions.cpp
