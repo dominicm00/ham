@@ -25,6 +25,9 @@ class TestEnvironment;
 
 class TestFixture {
 public:
+			class TemporaryDirectoryCreator;
+
+public:
 	static	data::StringList	MakeStringList(const char* element1,
 									const char* element2 = NULL,
 									const char* element3 = NULL,
@@ -66,16 +69,36 @@ public:
 									// code: file name -> file content
 
 	static	std::string			CurrentWorkingDirectory();
+	static	void				CreateTemporaryDirectory(std::string& _path);
 	static	void				CreateParentDirectory(const char* path,
 									bool createAncestors = true);
 	static	void				CreateDirectory(const char* path,
 									bool createAncestors = true);
+	static	void				CreateFile(const char* path,
+									const char* content);
 	static	void				RemoveRecursively(std::string entry);
 
 	static	std::string			MakePath(const char* head, const char* tail);
 
 private:
 			struct CodeExecuter;
+};
+
+
+class TestFixture::TemporaryDirectoryCreator {
+public:
+								TemporaryDirectoryCreator();
+								~TemporaryDirectoryCreator();
+
+			const char*			Create(bool changeDirectory);
+			void				Delete();
+
+			const char*			Directory() const
+									{ return fTemporaryDirectory.c_str(); }
+
+private:
+			std::string			fOldWorkingDirectory;
+			std::string			fTemporaryDirectory;
 };
 
 

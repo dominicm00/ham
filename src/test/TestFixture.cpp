@@ -42,6 +42,67 @@ value_container_to_string(const Container& value)
 }
 
 
+// #pragma mark - TemporaryDirectoryCreator
+
+
+TestFixture::TemporaryDirectoryCreator::TemporaryDirectoryCreator()
+{
+}
+
+
+TestFixture::TemporaryDirectoryCreator::~TemporaryDirectoryCreator()
+{
+	Delete();
+}
+
+
+const char*
+TestFixture::TemporaryDirectoryCreator::Create(bool changeDirectory)
+{
+	Delete();
+
+	try {
+		// get the current working directory
+		if (changeDirectory)
+			fOldWorkingDirectory = CurrentWorkingDirectory();
+
+		// create a temporary test directory
+		CreateTemporaryDirectory(fTemporaryDirectory);
+
+		// change the directory to the test directory
+		if (changeDirectory && chdir(fTemporaryDirectory.c_str()) < 0) {
+			fOldWorkingDirectory.clear();
+				// clear, since we don't need to chdir() back
+			HAM_TEST_THROW("Failed to cd into temporary directory: %s",
+				strerror(errno))
+		}
+	} catch (...) {
+		Delete();
+		throw;
+	}
+
+	return fTemporaryDirectory.c_str();
+}
+
+
+void
+TestFixture::TemporaryDirectoryCreator::Delete()
+{
+	// change the directory back to the original directory
+	if (!fOldWorkingDirectory.empty()) {
+		chdir(fOldWorkingDirectory.c_str());
+		fOldWorkingDirectory.clear();
+	}
+
+	// remove the temporary directory
+	if (!fTemporaryDirectory.empty()) {
+		std::string directory = fTemporaryDirectory;
+		fTemporaryDirectory.clear();
+		RemoveRecursively(directory);
+	}
+}
+
+
 // #pragma mark - ExecutableExecuter
 
 
@@ -51,54 +112,20 @@ struct TestFixture::CodeExecuter {
 		const std::map<std::string, std::string>& code, std::ostream& output,
 		std::ostream& errorOutput)
 	{
-		fOldWorkingDirectory.clear();
-		fTemporaryDirectory = NULL;
+		fTemporaryDirectoryCreator.Delete();
 		fOutputPipe = NULL;
 
 		try {
-			// get the current working directory
-			fOldWorkingDirectory = CurrentWorkingDirectory();
-
-			// create a temporary test directory
-			char temporaryDirectoryBuffer[L_tmpnam + 1];
-			fTemporaryDirectory = tmpnam(temporaryDirectoryBuffer);
-			if (fTemporaryDirectory == NULL) {
-				HAM_TEST_THROW("tmpnam() didn't return new temporary file "
-					"name.")
-			}
-
-			CreateDirectory(fTemporaryDirectory, false);
-
-			// change the directory to the test directory
-			if (chdir(fTemporaryDirectory) < 0) {
-				fOldWorkingDirectory.clear();
-					// clear, since we don't need to chdir() back
-				HAM_TEST_THROW("Failed to cd into temporary directory: %s",
-					strerror(errno))
-			}
+			// create a temporary test directory and change into it
+			fTemporaryDirectoryCreator.Create(true);
 
 			// write the code to the Jamfiles
 			for (std::map<std::string, std::string>::const_iterator it
 					= code.begin();
 				it != code.end(); ++it) {
-				std::string jamfilePath = MakePath(fTemporaryDirectory,
-					it->first.c_str());
-				CreateParentDirectory(jamfilePath.c_str());
-// TODO: Replace path delimiters with platform specific ones!
-				std::fstream jamfile(jamfilePath.c_str(), std::ios_base::out);
-				if (jamfile.fail()) {
-					HAM_TEST_THROW("Failed to create temporary file \"%s\".",
-						jamfilePath.c_str())
-				}
-
-				std::copy(it->second.begin(), it->second.end(),
-					std::ostream_iterator<char>(jamfile));
-
-				if (jamfile.fail()) {
-					HAM_TEST_THROW("Failed to write test code to temporary "
-						"file \"%s\".", jamfilePath.c_str())
-				}
-				jamfile.close();
+				std::string jamfilePath = MakePath(
+					fTemporaryDirectoryCreator.Directory(), it->first.c_str());
+				CreateFile(jamfilePath.c_str(), it->second.c_str());
 			}
 
 			if (jamExecutable != NULL) {
@@ -145,19 +172,14 @@ private:
 		if (fOutputPipe != NULL)
 			pclose(fOutputPipe);
 
-		// change the directory back to the original directory
-		if (!fOldWorkingDirectory.empty())
-			chdir(fOldWorkingDirectory.c_str());
-
-		// remove the temporary directory
-		if (fTemporaryDirectory != NULL)
-			RemoveRecursively(fTemporaryDirectory);
+		// change the directory back to the original directory and delete the
+		// temporary directory
+		fTemporaryDirectoryCreator.Delete();
 	}
 
 private:
-	std::string	fOldWorkingDirectory;
-	char*		fTemporaryDirectory;
-	FILE*		fOutputPipe;
+	TemporaryDirectoryCreator	fTemporaryDirectoryCreator;
+	FILE*						fOutputPipe;
 };
 
 
@@ -264,6 +286,22 @@ TestFixture::CurrentWorkingDirectory()
 
 
 /*static*/ void
+TestFixture::CreateTemporaryDirectory(std::string& _path)
+{
+	// get a name for the temporary directory
+	char temporaryDirectoryBuffer[L_tmpnam + 1];
+	char* temporaryDirectory = tmpnam(temporaryDirectoryBuffer);
+	if (temporaryDirectory == NULL)
+		HAM_TEST_THROW("tmpnam() didn't return new temporary file name.")
+
+	_path = temporaryDirectory;
+
+	// create it
+	CreateDirectory(temporaryDirectory, false);
+}
+
+
+/*static*/ void
 TestFixture::CreateParentDirectory(const char* path, bool createAncestors)
 {
 // TODO: Path delimiter!
@@ -297,6 +335,24 @@ TestFixture::CreateDirectory(const char* path, bool createAncestors)
 	if (mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
 		HAM_TEST_THROW("Failed to create directory \"%s\": %s", path,
 			strerror(errno))
+	}
+}
+
+void TestFixture::CreateFile(const char* path, const char* content)
+{
+	CreateParentDirectory(path);
+// TODO: Replace path delimiters with platform specific ones!
+	std::fstream file(path, std::ios_base::out);
+	if (file.fail()) {
+		HAM_TEST_THROW("Failed to create temporary file \"%s\".", path)
+	}
+
+	std::copy(content, content + strlen(content),
+		std::ostream_iterator<char>(file));
+
+	if (file.fail()) {
+		HAM_TEST_THROW("Failed to write content to temporary file \"%s\".",
+			path)
 	}
 }
 
