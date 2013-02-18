@@ -17,6 +17,7 @@
 #include "test/RunnableTest.h"
 #include "test/TestRunner.h"
 #include "test/TestSuite.h"
+#include "tests/PathTest.h"
 #include "tests/RegExpTest.h"
 #include "tests/StringListTest.h"
 #include "tests/StringPartTest.h"
@@ -179,10 +180,11 @@ main(int argc, const char* const* argv)
 	test::TestSuite testSuite;
 	test::TestSuiteBuilder(testSuite)
 		.AddSuite("Data")
+			.Add<PathTest>()
+			.Add<RegExpTest>()
+			.Add<StringListTest>()
 			.Add<StringPartTest>()
 			.Add<StringTest>()
-			.Add<StringListTest>()
-			.Add<RegExpTest>()
 		.End()
 		.AddSuite("Code")
 			.Add<VariableExpansionTest>()

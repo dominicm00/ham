@@ -45,6 +45,7 @@ SharedLibrary libham.so
 	While.cpp
 
 	# data
+	Path.cpp
 	RegExp.cpp
 	String.cpp
 	StringList.cpp
@@ -84,6 +85,7 @@ BinCommand ham-tests
 	# tests
 	ham-tests.cpp
 
+	PathTest.cpp
 	RegExpTest.cpp
 	StringListTest.cpp
 	StringPartTest.cpp

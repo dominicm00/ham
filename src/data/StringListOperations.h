@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "behavior/Behavior.h"
+#include "data/Path.h"
 #include "data/StringBuffer.h"
 #include "data/StringList.h"
 #include "data/StringPart.h"
@@ -88,16 +89,6 @@ public:
 
 			StringList			Apply(const StringList& list, size_t maxSize,
 									const behavior::Behavior& behavior) const;
-
-private:
-			struct PathParts;
-
-private:
-	static	void				_DisassemblePath(const String& path,
-									PathParts& _parts);
-	static	void				_AssemblePath(const PathParts& parts,
-									StringBuffer& buffer,
-									const behavior::Behavior& behavior);
 
 private:
 			uint32_t			fOperations;

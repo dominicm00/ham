@@ -6,22 +6,11 @@
 
 #include "data/StringListOperations.h"
 
+#include "data/Path.h"
+
 
 namespace ham {
 namespace data {
-
-
-// #pragma mark - PathParts
-
-
-struct StringListOperations::PathParts {
-	StringPart	fGrist;
-	StringPart	fRoot;
-	StringPart	fDirectory;
-	StringPart	fBaseName;
-	StringPart	fSuffix;
-	StringPart	fArchiveMember;
-};
 
 
 // #pragma mark - StringListOperations
@@ -180,46 +169,45 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 		// applied, we disassemble the string, make the modifications, and
 		// reassemble it.
 		if (hasPathPartOperation) {
-			PathParts parts;
-			_DisassemblePath(string, parts);
+			Path::Parts parts(string);
 
 			if ((operations & REPLACE_GRIST) != 0)
-				parts.fGrist = fGristParameter;
+				parts.SetGrist(fGristParameter);
 			else if ((operations & SELECT_GRIST) == 0)
-				parts.fGrist.Unset();
+				parts.UnsetGrist();
 
 			if ((operations & REPLACE_ROOT) != 0)
-				parts.fRoot = fRootParameter;
+				parts.SetRoot(fRootParameter);
 			else if ((operations & SELECT_ROOT) == 0)
-				parts.fRoot.Unset();
+				parts.UnsetRoot();
 
 			if ((operations & REPLACE_DIRECTORY) != 0)
-				parts.fDirectory = fDirectoryParameter;
+				parts.SetDirectory(fDirectoryParameter);
 			else if ((operations & SELECT_DIRECTORY) == 0)
-				parts.fDirectory.Unset();
+				parts.UnsetDirectory();
 
 			if ((operations & REPLACE_BASE_NAME) != 0)
-				parts.fBaseName = fBaseNameParameter;
+				parts.SetBaseName(fBaseNameParameter);
 			else if ((operations & SELECT_BASE_NAME) == 0)
-				parts.fBaseName.Unset();
+				parts.UnsetBaseName();
 
 			if ((operations & REPLACE_SUFFIX) != 0)
-				parts.fSuffix = fSuffixParameter;
+				parts.SetSuffix(fSuffixParameter);
 			else if ((operations & SELECT_SUFFIX) == 0)
-				parts.fSuffix.Unset();
+				parts.UnsetSuffix();
 
 			if ((operations & REPLACE_ARCHIVE_MEMBER) != 0)
-				parts.fArchiveMember = fArchiveMemberParameter;
+				parts.SetArchiveMember(fArchiveMemberParameter);
 			else if ((operations & SELECT_ARCHIVE_MEMBER) == 0)
-				parts.fArchiveMember.Unset();
+				parts.UnsetArchiveMember();
 
 			if ((operations & TO_PARENT_DIRECTORY) != 0) {
-				parts.fBaseName.Unset();
-				parts.fSuffix.Unset();
-				parts.fArchiveMember.Unset();
+				parts.UnsetBaseName();
+				parts.UnsetSuffix();
+				parts.UnsetArchiveMember();
 			}
 
-			_AssemblePath(parts, buffer, behavior);
+			parts.GetPath(buffer, behavior);
 		} else
 			buffer += string;
 
@@ -253,112 +241,6 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	}
 
 	return resultList;
-}
-
-
-/*static*/ void
-StringListOperations::_DisassemblePath(const String& path, PathParts& _parts)
-{
-	// TODO: This is platform dependent!
-
-	const char* remainder = path.ToCString();
-	const char* pathEnd = remainder + path.Length();
-
-	// grist
-	if (*remainder == '<') {
-		const char* gristStart = remainder;
-		remainder = std::find(remainder + 1, pathEnd, '>');
-		if (remainder != pathEnd) {
-			remainder++;
-			_parts.fGrist.SetTo(gristStart, remainder);
-		} else {
-			// no/broken grist
-			_parts.fGrist.Unset();
-			remainder = gristStart;
-		}
-	} else
-		_parts.fGrist.Unset();
-
-	// root
-	_parts.fRoot.Unset();
-
-	// directory path
-	if (const char* lastSlash = strrchr(remainder, '/')) {
-		_parts.fDirectory.SetTo(remainder,
-			lastSlash == remainder ? remainder + 1 : lastSlash);
-		remainder = lastSlash + 1;
-	} else
-		_parts.fDirectory.Unset();
-
-	// archive member
-	const char* archiveMemberStart = NULL;
-	if (remainder != pathEnd && pathEnd[-1] == ')')
-		archiveMemberStart = strchr(remainder, '(');
-	if (archiveMemberStart != NULL)
-		_parts.fArchiveMember.SetTo(archiveMemberStart + 1 , pathEnd - 1);
-	else
-		_parts.fArchiveMember.Unset();
-
-	// suffix
-	const char* fileNameEnd = archiveMemberStart != NULL
-		? archiveMemberStart : pathEnd;
-	typedef std::reverse_iterator<const char*> ReverseStringIterator;
-	const char* lastDot = std::find(ReverseStringIterator(fileNameEnd),
-		ReverseStringIterator(remainder), '.').base() - 1;
-	if (lastDot != remainder - 1) {
-		_parts.fSuffix.SetTo(lastDot, fileNameEnd);
-		fileNameEnd = lastDot;
-	} else
-		_parts.fSuffix.Unset();
-
-	// base name
-	_parts.fBaseName.SetTo(remainder, fileNameEnd);
-}
-
-
-/*static*/ void
-StringListOperations::_AssemblePath(const PathParts& parts,
-	StringBuffer& buffer, const behavior::Behavior& behavior)
-{
-	// TODO: This is platform dependent!
-
-	if (!parts.fGrist.IsEmpty()) {
-		if (parts.fGrist.Start()[0] != '<')
-			buffer += '<';
-		buffer += parts.fGrist;
-		if (parts.fGrist.End()[-1] != '>')
-			buffer += '>';
-	}
-
-	// Use root only, if the directory part isn't absolute and if the root isn't
-	// ".".
-	if (!parts.fRoot.IsEmpty()
-		&& (parts.fRoot.Length() > 1 || parts.fRoot.Start()[0] != '.')
-		&& (parts.fDirectory.IsEmpty() || parts.fDirectory.Start()[0] != '/')) {
-		buffer += parts.fRoot;
-		if (behavior.GetPathRootReplacerSlash()
-				== behavior::Behavior::PATH_ROOT_REPLACER_SLASH_ALWAYS
-			|| parts.fRoot.End()[-1] != '/') {
-			buffer += '/';
-		}
-	}
-
-	if (!parts.fDirectory.IsEmpty()) {
-		buffer += parts.fDirectory;
-		if (parts.fDirectory != StringPart("/", 1)
-			&& (!parts.fBaseName.IsEmpty() || !parts.fSuffix.IsEmpty())) {
-			buffer += '/';
-		}
-	}
-
-	buffer += parts.fBaseName;
-	buffer += parts.fSuffix;
-
-	if (!parts.fArchiveMember.IsEmpty()) {
-		buffer += '(';
-		buffer += parts.fArchiveMember;
-		buffer += ')';
-	}
 }
 
 
