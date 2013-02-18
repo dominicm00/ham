@@ -46,7 +46,7 @@ sign(int number)
 
 
 void
-ham::tests::StringTest::Constructor()
+StringTest::Constructor()
 {
 	// default constructor
 	{

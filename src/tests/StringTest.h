@@ -15,7 +15,6 @@ namespace tests {
 
 class StringTest : public test::TestFixture {
 public:
-
 			void				Constructor();
 			void				CastOperator();
 			void				Comparison();
