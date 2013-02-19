@@ -37,7 +37,6 @@ SharedLibrary libham.so
 	Node.cpp
 	NotExpression.cpp
 	OnExpression.cpp
-	Processor.cpp
 	RuleDefinition.cpp
 	RuleInstructions.cpp
 	UserRuleInstructions.cpp
@@ -55,6 +54,9 @@ SharedLibrary libham.so
 	TargetBinder.cpp
 	TargetPool.cpp
 	VariableScope.cpp
+
+	# make
+	Processor.cpp
 
 	# parser
 	Parser.cpp

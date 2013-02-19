@@ -16,7 +16,7 @@
 #include <iterator>
 #include <sstream>
 
-#include "code/Processor.h"
+#include "make/Processor.h"
 #include "test/TestEnvironment.h"
 #include "util/Constants.h"
 
@@ -151,7 +151,7 @@ struct TestFixture::CodeExecuter {
 						break;
 				}
 			} else {
-				code::Processor processor;
+				make::Processor processor;
 				processor.SetCompatibility(compatibility);
 				processor.SetOutput(output);
 				processor.SetErrorOutput(errorOutput);
