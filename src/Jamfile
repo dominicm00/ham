@@ -44,6 +44,7 @@ SharedLibrary libham.so
 	While.cpp
 
 	# data
+	FileStatus.cpp
 	MakeTarget.cpp
 	Path.cpp
 	RegExp.cpp
