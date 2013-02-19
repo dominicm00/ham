@@ -23,6 +23,7 @@
 #include "tests/StringPartTest.h"
 #include "tests/StringTest.h"
 #include "tests/TargetBinderTest.h"
+#include "tests/TimeTest.h"
 #include "tests/VariableExpansionTest.h"
 
 
@@ -187,6 +188,7 @@ main(int argc, const char* const* argv)
 			.Add<StringPartTest>()
 			.Add<StringTest>()
 			.Add<TargetBinderTest>()
+			.Add<TimeTest>()
 		.End()
 		.AddSuite("Code")
 			.Add<VariableExpansionTest>()

@@ -53,6 +53,7 @@ SharedLibrary libham.so
 	Target.cpp
 	TargetBinder.cpp
 	TargetPool.cpp
+	Time.cpp
 	VariableScope.cpp
 
 	# make
@@ -95,6 +96,7 @@ BinCommand ham-tests
 	StringPartTest.cpp
 	StringTest.cpp
 	TargetBinderTest.cpp
+	TimeTest.cpp
 	VariableExpansionTest.cpp
 
 	# test
