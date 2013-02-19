@@ -49,6 +49,8 @@ public:
 									// conceptually package private
 
 	inline	VariableDomain*		Variables(bool create);
+	inline	const VariableDomain* Variables() const
+									{ return fVariables; }
 
 			uint32_t			Flags() const
 									{ return fFlags; }
@@ -69,20 +71,12 @@ public:
 									{ fIncludes.insert(include); }
 	inline	void				AddIncludes(const TargetSet& includes);
 
-			bool				IsBound() const
-									{ return !fBoundPath.IsEmpty(); }
-			String				BoundPath() const
-									{ return fBoundPath; }
-			void				SetBoundPath(const String& path)
-									{ fBoundPath = path; }
-
 private:
 			String				fName;
 			VariableDomain*		fVariables;
 			uint32_t			fFlags;
 			TargetSet			fDependencies;
 			TargetSet			fIncludes;
-			String				fBoundPath;
 };
 
 

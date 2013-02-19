@@ -6,10 +6,14 @@
 #define HAM_CODE_TARGET_BINDER_H
 
 
+#include "data/String.h"
+
+
 namespace ham {
 
 
 namespace data {
+	class MakeTarget;
 	class Target;
 }
 
@@ -23,7 +27,10 @@ class EvaluationContext;
 class TargetBinder {
 public:
 	static	void				Bind(EvaluationContext& context,
-									data::Target* target);
+									const data::Target* target,
+									String& _boundPath);
+	static	void				Bind(EvaluationContext& context,
+									data::MakeTarget* target);
 };
 
 

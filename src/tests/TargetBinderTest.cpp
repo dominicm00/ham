@@ -8,6 +8,7 @@
 
 #include "code/EvaluationContext.h"
 #include "code/TargetBinder.h"
+#include "data/MakeTarget.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
 
@@ -248,11 +249,25 @@ TargetBinderTest::Bind()
 
 			code::EvaluationContext evalutationContext(globalVariables,
 				targets);
-			TargetBinder::Bind(evalutationContext, target);
+
+			String boundPath;
+			TargetBinder::Bind(evalutationContext, target, boundPath);
 
 			HAM_TEST_ADD_INFO(
-				HAM_TEST_VERIFY(target->IsBound())
-				HAM_TEST_EQUAL(target->BoundPath(),
+				HAM_TEST_EQUAL(boundPath, testData[i].boundPath.c_str()),
+				"target: \"%s\", target locate: %s, target search: %s, "
+				"global locate: %s, global search: %s", targetName.c_str(),
+				ValueToString(testData[i].targetLocate).c_str(),
+				ValueToString(testData[i].targetSearch).c_str(),
+				ValueToString(testData[i].globalLocate).c_str(),
+				ValueToString(testData[i].globalSearch).c_str())
+
+			data::MakeTarget makeTarget(target);
+			TargetBinder::Bind(evalutationContext, &makeTarget);
+
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(makeTarget.IsBound())
+				HAM_TEST_EQUAL(makeTarget.BoundPath(),
 					testData[i].boundPath.c_str()),
 				"target: \"%s\", target locate: %s, target search: %s, "
 				"global locate: %s, global search: %s", targetName.c_str(),

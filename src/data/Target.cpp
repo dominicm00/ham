@@ -17,8 +17,7 @@ Target::Target()
 	fVariables(NULL),
 	fFlags(0),
 	fDependencies(),
-	fIncludes(),
-	fBoundPath()
+	fIncludes()
 {
 }
 
@@ -29,8 +28,7 @@ Target::Target(const String& name)
 	fVariables(NULL),
 	fFlags(0),
 	fDependencies(),
-	fIncludes(),
-	fBoundPath()
+	fIncludes()
 {
 }
 

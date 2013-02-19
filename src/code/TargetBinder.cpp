@@ -7,8 +7,8 @@
 #include "code/TargetBinder.h"
 
 #include "code/EvaluationContext.h"
+#include "data/MakeTarget.h"
 #include "data/Path.h"
-#include "data/Target.h"
 
 
 namespace ham {
@@ -20,24 +20,22 @@ static const String kSearchVariableName("SEARCH");
 
 
 /*static*/ void
-TargetBinder::Bind(EvaluationContext& context, data::Target* target)
+TargetBinder::Bind(EvaluationContext& context, const data::Target* target,
+	String& _boundPath)
 {
 	using data::Path;
-
-	if (target->IsBound())
-		return;
 
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).
 	data::StringPart targetPath(Path::RemoveGrist(target->Name()));
 	if (Path::IsAbsolute(targetPath)) {
-		target->SetBoundPath(String(targetPath));
+		_boundPath = targetPath;
 		return;
 	}
 
 	// If the LOCATE variable is set on the target or globally, we prepend it to
 	// the target name.
-	data::VariableDomain* variables = target->Variables(false);
+	const data::VariableDomain* variables = target->Variables();
 
 	const StringList* locatePaths = NULL;
 
@@ -49,7 +47,7 @@ TargetBinder::Bind(EvaluationContext& context, data::Target* target)
 
 	if (locatePaths != NULL && !locatePaths->IsEmpty()) {
 		// prepend the LOCATE path
-		target->SetBoundPath(Path::Make(locatePaths->Head(), targetPath));
+		_boundPath = Path::Make(locatePaths->Head(), targetPath);
 		return;
 	}
 
@@ -70,14 +68,27 @@ TargetBinder::Bind(EvaluationContext& context, data::Target* target)
 			// prepend the LOCATE path
 			String path = Path::Make(searchPaths->ElementAt(i), targetPath);
 			if (Path::Exists(path.ToCString())) {
-				target->SetBoundPath(path);
+				_boundPath = path;
 				return;
 			}
 		}
 	}
 
 	// Not found -- use the target name.
-	target->SetBoundPath(String(targetPath));
+
+	_boundPath = targetPath;
+}
+
+
+/*static*/ void
+TargetBinder::Bind(EvaluationContext& context, data::MakeTarget* target)
+{
+	if (target->IsBound())
+		return;
+
+	String boundPath;
+	Bind(context, target->GetTarget(), boundPath);
+	target->SetBoundPath(boundPath);
 }
 
 
