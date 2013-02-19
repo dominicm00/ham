@@ -15,21 +15,21 @@ namespace ham {
 namespace data {
 	class MakeTarget;
 	class Target;
+	class VariableDomain;
 }
 
 
 namespace code {
 
 
-class EvaluationContext;
-
-
 class TargetBinder {
 public:
-	static	void				Bind(EvaluationContext& context,
+	static	void				Bind(const data::VariableDomain&
+										globalVariables,
 									const data::Target* target,
 									String& _boundPath);
-	static	void				Bind(EvaluationContext& context,
+	static	void				Bind(const data::VariableDomain&
+										globalVariables,
 									data::MakeTarget* target);
 };
 

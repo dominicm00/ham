@@ -247,11 +247,8 @@ TargetBinderTest::Bind()
 			if (!testData[i].globalSearch.IsEmpty())
 				globalVariables.Set("SEARCH", testData[i].globalSearch);
 
-			code::EvaluationContext evalutationContext(globalVariables,
-				targets);
-
 			String boundPath;
-			TargetBinder::Bind(evalutationContext, target, boundPath);
+			TargetBinder::Bind(globalVariables, target, boundPath);
 
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_EQUAL(boundPath, testData[i].boundPath.c_str()),
@@ -263,7 +260,7 @@ TargetBinderTest::Bind()
 				ValueToString(testData[i].globalSearch).c_str())
 
 			data::MakeTarget makeTarget(target);
-			TargetBinder::Bind(evalutationContext, &makeTarget);
+			TargetBinder::Bind(globalVariables, &makeTarget);
 
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_VERIFY(makeTarget.IsBound())

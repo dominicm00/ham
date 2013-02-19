@@ -6,9 +6,9 @@
 
 #include "code/TargetBinder.h"
 
-#include "code/EvaluationContext.h"
 #include "data/MakeTarget.h"
 #include "data/Path.h"
+#include "data/VariableDomain.h"
 
 
 namespace ham {
@@ -20,8 +20,8 @@ static const String kSearchVariableName("SEARCH");
 
 
 /*static*/ void
-TargetBinder::Bind(EvaluationContext& context, const data::Target* target,
-	String& _boundPath)
+TargetBinder::Bind(const data::VariableDomain& globalVariables,
+	const data::Target* target, String& _boundPath)
 {
 	using data::Path;
 
@@ -43,7 +43,7 @@ TargetBinder::Bind(EvaluationContext& context, const data::Target* target,
 		locatePaths = variables->Lookup(kLocateVariableName);
 
 	if (locatePaths == NULL || locatePaths->IsEmpty())
-		locatePaths = context.LookupVariable(kLocateVariableName);
+		locatePaths = globalVariables.Lookup(kLocateVariableName);
 
 	if (locatePaths != NULL && !locatePaths->IsEmpty()) {
 		// prepend the LOCATE path
@@ -60,7 +60,7 @@ TargetBinder::Bind(EvaluationContext& context, const data::Target* target,
 		searchPaths = variables->Lookup(kSearchVariableName);
 
 	if (searchPaths == NULL || searchPaths->IsEmpty())
-		searchPaths = context.LookupVariable(kSearchVariableName);
+		searchPaths = globalVariables.Lookup(kSearchVariableName);
 
 	if (searchPaths != NULL && !searchPaths->IsEmpty()) {
 		size_t pathCount = searchPaths->Size();
@@ -81,13 +81,14 @@ TargetBinder::Bind(EvaluationContext& context, const data::Target* target,
 
 
 /*static*/ void
-TargetBinder::Bind(EvaluationContext& context, data::MakeTarget* target)
+TargetBinder::Bind(const data::VariableDomain& globalVariables,
+	data::MakeTarget* target)
 {
 	if (target->IsBound())
 		return;
 
 	String boundPath;
-	Bind(context, target->GetTarget(), boundPath);
+	Bind(globalVariables, target->GetTarget(), boundPath);
 	target->SetBoundPath(boundPath);
 }
 
