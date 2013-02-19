@@ -18,7 +18,7 @@ public:
 			void				IsAbsolute();
 			void				RemoveGrist();
 			void				Make();
-			void				Exists();
+			void				GetFileStatus();
 			void				PartsConstructor();
 			void				PartsSetters();
 			void				PartsPath();
@@ -26,8 +26,8 @@ public:
 
 	// declare tests
 	HAM_ADD_TEST_CASES(PathTest, 8,
-		IsAbsolute, RemoveGrist, Make, Exists, PartsConstructor, PartsSetters,
-		PartsPath, PartsIsAbsolute)
+		IsAbsolute, RemoveGrist, Make, GetFileStatus, PartsConstructor,
+		PartsSetters, PartsPath, PartsIsAbsolute)
 };
 
 

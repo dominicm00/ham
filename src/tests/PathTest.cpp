@@ -6,6 +6,7 @@
 
 #include "tests/PathTest.h"
 
+#include "data/FileStatus.h"
 #include "data/Path.h"
 #include "data/String.h"
 
@@ -178,8 +179,13 @@ PathTest::Make()
 
 
 void
-PathTest::Exists()
+PathTest::GetFileStatus()
 {
+	using data::FileStatus;
+	using data::Time;
+
+	Time startTime = Time::Now();
+
 	// create a temporary directory where we can play
 	TestFixture::TemporaryDirectoryCreator temporaryDirectoryCreator;
 	std::string baseDirectory = temporaryDirectoryCreator.Create(true);
@@ -189,45 +195,98 @@ PathTest::Exists()
 	CreateFile((baseDirectory + "/subdir1/bar").c_str(), "");
 	CreateFile((baseDirectory + "/subdir2/subdir3/foobar").c_str(), "");
 
+	Time endTime = Time::Now();
+
 	struct TestData {
-		std::string	path;
-		bool		exists;
+		std::string			path;
+		FileStatus::Type	type;
+		bool				checkTime;
 	};
 
 	const TestData testData[] = {
-		{ "",											false },
-		{ ".",											true },
-		{ "..",											true },
-		{ "foo",										true },
-		{ "bar",										false },
-		{ "subdir1/foo",								false },
-		{ "subdir3/foo",								false },
-		{ "subdir1/bar",								true },
-		{ "subdir2/subdir3/foobar",						true },
-		{ "subdir1/.",									true },
-		{ "subdir1/..",									true },
-		{ "subdir2/../subdir1/bar",						true },
-		{ "subdir2/../subdir1/foo",						false },
-		{ baseDirectory,								true },
-		{ baseDirectory + "/.",							true },
-		{ baseDirectory + "/..",						true },
-		{ baseDirectory + "/foo",						true },
-		{ baseDirectory + "/bar",						false },
-		{ baseDirectory + "/subdir1/foo",				false },
-		{ baseDirectory + "/subdir3/foo",				false },
-		{ baseDirectory + "/subdir1/bar",				true },
-		{ baseDirectory + "/subdir2/subdir3/foobar",	true },
-		{ baseDirectory + "/subdir1/.",					true },
-		{ baseDirectory + "/subdir1/..",				true },
-		{ baseDirectory + "/subdir2/../subdir1/bar",	true },
-		{ "baseDirectory + /subdir2/../subdir1/foo",	false },
+		{ "",											FileStatus::NONE,
+			true },
+		{ ".",											FileStatus::DIRECTORY,
+			true },
+		{ "..",											FileStatus::DIRECTORY,
+			false },
+		{ "foo",										FileStatus::FILE,
+			true },
+		{ "bar",										FileStatus::NONE,
+			true },
+		{ "subdir1/foo",								FileStatus::NONE,
+			true },
+		{ "subdir3/foo",								FileStatus::NONE,
+			true },
+		{ "subdir1/bar",								FileStatus::FILE,
+			true },
+		{ "subdir2/subdir3/foobar",						FileStatus::FILE,
+			true },
+		{ "subdir1/.",									FileStatus::DIRECTORY,
+			true },
+		{ "subdir1/..",									FileStatus::DIRECTORY,
+			true },
+		{ "subdir2/../subdir1/bar",						FileStatus::FILE,
+			true },
+		{ "subdir2/../subdir1/foo",						FileStatus::NONE,
+			true },
+		{ baseDirectory,								FileStatus::DIRECTORY,
+			true },
+		{ baseDirectory + "/.",							FileStatus::DIRECTORY,
+			true },
+		{ baseDirectory + "/..",						FileStatus::DIRECTORY,
+			false },
+		{ baseDirectory + "/foo",						FileStatus::FILE,
+			true },
+		{ baseDirectory + "/bar",						FileStatus::NONE,
+			true },
+		{ baseDirectory + "/subdir1/foo",				FileStatus::NONE,
+			true },
+		{ baseDirectory + "/subdir3/foo",				FileStatus::NONE,
+			true },
+		{ baseDirectory + "/subdir1/bar",				FileStatus::FILE,
+			true },
+		{ baseDirectory + "/subdir2/subdir3/foobar",	FileStatus::FILE,
+			true },
+		{ baseDirectory + "/subdir1/.",					FileStatus::DIRECTORY,
+			true },
+		{ baseDirectory + "/subdir1/..",				FileStatus::DIRECTORY,
+			true },
+		{ baseDirectory + "/subdir2/../subdir1/bar",	FileStatus::FILE,
+			true },
+		{ "baseDirectory + /subdir2/../subdir1/foo",	FileStatus::NONE,
+			true },
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* path = testData[i].path.c_str();
+
+		FileStatus fileStatus;
 		HAM_TEST_ADD_INFO(
-			HAM_TEST_EQUAL(Path::Exists(path), testData[i].exists),
+			HAM_TEST_EQUAL(Path::Exists(path),
+				testData[i].type != FileStatus::NONE)
+			HAM_TEST_EQUAL(Path::GetFileStatus(path, fileStatus),
+				testData[i].type != FileStatus::NONE)
+			HAM_TEST_EQUAL(fileStatus.GetType(), testData[i].type),
 			"path: \"%s\"", path)
+
+		if (testData[i].type != FileStatus::NONE && testData[i].checkTime) {
+			HAM_TEST_ADD_INFO(
+// The FS might not store the nanoseconds, so we only compare the seconds.
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >= startTime)
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <= endTime),
+				HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
+					>= startTime.Seconds())
+				HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
+					<= endTime.Seconds()),
+				"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
+				"end time: (%u, %u)", path,
+				(unsigned)fileStatus.LastModifiedTime().Seconds(),
+				(unsigned)fileStatus.LastModifiedTime().NanoSeconds(),
+				(unsigned)startTime.Seconds(),
+				(unsigned)startTime.NanoSeconds(), (unsigned)endTime.Seconds(),
+				(unsigned)endTime.NanoSeconds())
+		}
 	}
 }
 

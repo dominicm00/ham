@@ -15,6 +15,9 @@ namespace ham {
 namespace data {
 
 
+class FileStatus;
+
+
 class Path {
 public:
 			class Parts;
@@ -25,6 +28,8 @@ public:
 	static	String				Make(const StringPart& head,
 									const StringPart& tail);
 	static	bool				Exists(const char* path);
+	static	bool				GetFileStatus(const char* path,
+									FileStatus& _status);
 };
 
 

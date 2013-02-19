@@ -16,6 +16,7 @@
 #include <iterator>
 #include <sstream>
 
+#include "data/FileStatus.h"
 #include "make/Processor.h"
 #include "test/TestEnvironment.h"
 #include "util/Constants.h"
@@ -530,6 +531,28 @@ TestFixture::ValueToString<std::vector<std::pair<size_t, size_t> > >(
 	const std::vector<std::pair<size_t, size_t> >& value)
 {
 	return value_container_to_string(value);
+}
+
+
+template<>
+/*static*/ std::string
+TestFixture::ValueToString<data::FileStatus::Type>(
+	const data::FileStatus::Type& value)
+{
+	switch (value) {
+		case data::FileStatus::NONE:
+			return "none";
+		case data::FileStatus::FILE:
+			return "file";
+		case data::FileStatus::DIRECTORY:
+			return "directory";
+		case data::FileStatus::SYMLINK:
+			return "simlink";
+		case data::FileStatus::OTHER:
+			return "other";
+	}
+
+	return "invalid";
 }
 
 

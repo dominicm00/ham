@@ -8,6 +8,8 @@
 
 #include <sys/stat.h>
 
+#include "data/FileStatus.h"
+
 
 namespace ham {
 namespace data {
@@ -62,12 +64,36 @@ Path::Make(const StringPart& head, const StringPart& tail)
 }
 
 
-bool
+/*static*/ bool
 Path::Exists(const char* path)
+{
+	FileStatus status;
+	return GetFileStatus(path, status);
+}
+
+
+/*static*/ bool
+Path::GetFileStatus(const char* path, FileStatus& _status)
 {
 // TODO: Platform specific!
 	struct stat st;
-	return lstat(path, &st) == 0;
+	if (lstat(path, &st) != 0) {
+		_status = FileStatus();
+		return false;
+	}
+
+	FileStatus::Type type;
+	if (S_ISREG(st.st_mode))
+		type = FileStatus::FILE;
+	else if (S_ISDIR(st.st_mode))
+		type = FileStatus::DIRECTORY;
+	else if (S_ISLNK(st.st_mode))
+		type = FileStatus::SYMLINK;
+	else
+		type = FileStatus::OTHER;
+
+	_status = FileStatus(type, Time(st.st_mtim.tv_sec, st.st_mtim.tv_nsec));
+	return true;
 }
 
 
