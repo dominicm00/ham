@@ -40,6 +40,7 @@ SharedLibrary libham.so
 	Processor.cpp
 	RuleDefinition.cpp
 	RuleInstructions.cpp
+	TargetBinder.cpp
 	UserRuleInstructions.cpp
 	Switch.cpp
 	While.cpp
@@ -90,6 +91,7 @@ BinCommand ham-tests
 	StringListTest.cpp
 	StringPartTest.cpp
 	StringTest.cpp
+	TargetBinderTest.cpp
 	VariableExpansionTest.cpp
 
 	# test
