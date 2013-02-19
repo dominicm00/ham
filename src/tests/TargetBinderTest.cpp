@@ -6,8 +6,7 @@
 
 #include "tests/TargetBinderTest.h"
 
-#include "code/EvaluationContext.h"
-#include "code/TargetBinder.h"
+#include "data/TargetBinder.h"
 #include "data/MakeTarget.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
@@ -17,10 +16,10 @@ namespace ham {
 namespace tests {
 
 
-using code::TargetBinder;
 using data::String;
 using data::StringList;
 using data::StringPart;
+using data::TargetBinder;
 
 
 void

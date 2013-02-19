@@ -4,7 +4,7 @@
  */
 
 
-#include "code/TargetBinder.h"
+#include "data/TargetBinder.h"
 
 #include "data/MakeTarget.h"
 #include "data/Path.h"
@@ -12,7 +12,7 @@
 
 
 namespace ham {
-namespace code {
+namespace data {
 
 
 static const String kLocateVariableName("LOCATE");
@@ -20,14 +20,12 @@ static const String kSearchVariableName("SEARCH");
 
 
 /*static*/ void
-TargetBinder::Bind(const data::VariableDomain& globalVariables,
-	const data::Target* target, String& _boundPath)
+TargetBinder::Bind(const VariableDomain& globalVariables,
+	const Target* target, String& _boundPath)
 {
-	using data::Path;
-
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).
-	data::StringPart targetPath(Path::RemoveGrist(target->Name()));
+	StringPart targetPath(Path::RemoveGrist(target->Name()));
 	if (Path::IsAbsolute(targetPath)) {
 		_boundPath = targetPath;
 		return;
@@ -35,7 +33,7 @@ TargetBinder::Bind(const data::VariableDomain& globalVariables,
 
 	// If the LOCATE variable is set on the target or globally, we prepend it to
 	// the target name.
-	const data::VariableDomain* variables = target->Variables();
+	const VariableDomain* variables = target->Variables();
 
 	const StringList* locatePaths = NULL;
 
@@ -81,8 +79,7 @@ TargetBinder::Bind(const data::VariableDomain& globalVariables,
 
 
 /*static*/ void
-TargetBinder::Bind(const data::VariableDomain& globalVariables,
-	data::MakeTarget* target)
+TargetBinder::Bind(const VariableDomain& globalVariables, MakeTarget* target)
 {
 	if (target->IsBound())
 		return;
@@ -93,5 +90,5 @@ TargetBinder::Bind(const data::VariableDomain& globalVariables,
 }
 
 
-}	// namespace code
+}	// namespace data
 }	// namespace ham

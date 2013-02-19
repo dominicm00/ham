@@ -40,7 +40,6 @@ SharedLibrary libham.so
 	Processor.cpp
 	RuleDefinition.cpp
 	RuleInstructions.cpp
-	TargetBinder.cpp
 	UserRuleInstructions.cpp
 	Switch.cpp
 	While.cpp
@@ -53,6 +52,7 @@ SharedLibrary libham.so
 	StringList.cpp
 	StringListOperations.cpp
 	Target.cpp
+	TargetBinder.cpp
 	TargetPool.cpp
 	VariableScope.cpp
 

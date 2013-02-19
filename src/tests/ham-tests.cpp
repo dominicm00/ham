@@ -186,9 +186,9 @@ main(int argc, const char* const* argv)
 			.Add<StringListTest>()
 			.Add<StringPartTest>()
 			.Add<StringTest>()
+			.Add<TargetBinderTest>()
 		.End()
 		.AddSuite("Code")
-			.Add<TargetBinderTest>()
 			.Add<VariableExpansionTest>()
 		.End();
 
