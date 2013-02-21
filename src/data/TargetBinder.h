@@ -13,6 +13,7 @@ namespace ham {
 namespace data {
 
 
+class FileStatus;
 class MakeTarget;
 class Target;
 class VariableDomain;
@@ -21,7 +22,8 @@ class VariableDomain;
 class TargetBinder {
 public:
 	static	void				Bind(const VariableDomain& globalVariables,
-									const Target* target, String& _boundPath);
+									const Target* target, String& _boundPath,
+									FileStatus& _fileStatus);
 	static	void				Bind(const VariableDomain& globalVariables,
 									data::MakeTarget* target);
 };

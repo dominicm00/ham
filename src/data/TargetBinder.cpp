@@ -6,6 +6,7 @@
 
 #include "data/TargetBinder.h"
 
+#include "data/FileStatus.h"
 #include "data/MakeTarget.h"
 #include "data/Path.h"
 #include "data/VariableDomain.h"
@@ -21,13 +22,14 @@ static const String kSearchVariableName("SEARCH");
 
 /*static*/ void
 TargetBinder::Bind(const VariableDomain& globalVariables,
-	const Target* target, String& _boundPath)
+	const Target* target, String& _boundPath, FileStatus& _fileStatus)
 {
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).
 	StringPart targetPath(Path::RemoveGrist(target->Name()));
 	if (Path::IsAbsolute(targetPath)) {
 		_boundPath = targetPath;
+		Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
 		return;
 	}
 
@@ -46,6 +48,7 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	if (locatePaths != NULL && !locatePaths->IsEmpty()) {
 		// prepend the LOCATE path
 		_boundPath = Path::Make(locatePaths->Head(), targetPath);
+		Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
 		return;
 	}
 
@@ -65,7 +68,7 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 		for (size_t i = 0; i < pathCount; i++) {
 			// prepend the LOCATE path
 			String path = Path::Make(searchPaths->ElementAt(i), targetPath);
-			if (Path::Exists(path.ToCString())) {
+			if (Path::GetFileStatus(path.ToCString(), _fileStatus)) {
 				_boundPath = path;
 				return;
 			}
@@ -73,8 +76,8 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	}
 
 	// Not found -- use the target name.
-
 	_boundPath = targetPath;
+	Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
 }
 
 
@@ -85,8 +88,10 @@ TargetBinder::Bind(const VariableDomain& globalVariables, MakeTarget* target)
 		return;
 
 	String boundPath;
-	Bind(globalVariables, target->GetTarget(), boundPath);
+	FileStatus fileStatus;
+	Bind(globalVariables, target->GetTarget(), boundPath, fileStatus);
 	target->SetBoundPath(boundPath);
+	target->SetFileStatus(fileStatus);
 }
 
 

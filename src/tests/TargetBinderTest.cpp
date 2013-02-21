@@ -6,6 +6,7 @@
 
 #include "tests/TargetBinderTest.h"
 
+#include "data/FileStatus.h"
 #include "data/TargetBinder.h"
 #include "data/MakeTarget.h"
 #include "data/TargetPool.h"
@@ -16,15 +17,19 @@ namespace ham {
 namespace tests {
 
 
+using data::FileStatus;
 using data::String;
 using data::StringList;
 using data::StringPart;
 using data::TargetBinder;
+using data::Time;
 
 
 void
 TargetBinderTest::Bind()
 {
+	Time startTime = Time::Now();
+
 	// create a temporary directory where we can play
 	TestFixture::TemporaryDirectoryCreator temporaryDirectoryCreator;
 	std::string baseDirectory = temporaryDirectoryCreator.Create(true);
@@ -34,13 +39,16 @@ TargetBinderTest::Bind()
 	CreateFile((baseDirectory + "/subdir1/bar").c_str(), "");
 	CreateFile((baseDirectory + "/subdir2/subdir3/foo").c_str(), "");
 
+	Time endTime = Time::Now();
+
 	struct TestData {
-		const char*	target;
-		StringList	targetLocate;
-		StringList	targetSearch;
-		StringList	globalLocate;
-		StringList	globalSearch;
-		std::string	boundPath;
+		const char*			target;
+		StringList			targetLocate;
+		StringList			targetSearch;
+		StringList			globalLocate;
+		StringList			globalSearch;
+		std::string			boundPath;
+		FileStatus::Type	type;
 	};
 
 	const TestData testData[] = {
@@ -50,7 +58,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			"foo"
+			"foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -58,7 +66,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			"./foo"
+			"./foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -66,7 +74,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			"../foo"
+			"../foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -74,7 +82,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			baseDirectory + "/subdir1/foo"
+			baseDirectory + "/subdir1/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -82,7 +90,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			baseDirectory + "/subdir2/subdir3/foo"
+			baseDirectory + "/subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -91,7 +99,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			StringList(),
-			baseDirectory + "/subdir1/foo"
+			baseDirectory + "/subdir1/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -99,7 +107,7 @@ TargetBinderTest::Bind()
 			MakeStringList((baseDirectory + "/subdir1").c_str()),
 			StringList(),
 			StringList(),
-			"foo"
+			"foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -108,7 +116,7 @@ TargetBinderTest::Bind()
 				(baseDirectory + "/subdir2/subdir3").c_str()),
 			StringList(),
 			StringList(),
-			baseDirectory + "/subdir2/subdir3/foo"
+			baseDirectory + "/subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -116,7 +124,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			MakeStringList("."),
 			StringList(),
-			"./foo"
+			"./foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -124,7 +132,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			MakeStringList(".."),
 			StringList(),
-			"../foo"
+			"../foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -132,7 +140,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			MakeStringList((baseDirectory + "/subdir1").c_str()),
 			StringList(),
-			baseDirectory + "/subdir1/foo"
+			baseDirectory + "/subdir1/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -140,7 +148,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			MakeStringList((baseDirectory + "/subdir2/subdir3").c_str()),
 			StringList(),
-			baseDirectory + "/subdir2/subdir3/foo"
+			baseDirectory + "/subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -149,7 +157,7 @@ TargetBinderTest::Bind()
 			MakeStringList((baseDirectory + "/subdir1").c_str(),
 				(baseDirectory + "/subdir2/subdir3").c_str()),
 			StringList(),
-			baseDirectory + "/subdir1/foo"
+			baseDirectory + "/subdir1/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -157,7 +165,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			MakeStringList((baseDirectory + "/subdir1").c_str()),
-			"foo"
+			"foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -166,7 +174,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			MakeStringList((baseDirectory + "/subdir1").c_str(),
 				(baseDirectory + "/subdir2/subdir3").c_str()),
-			baseDirectory + "/subdir2/subdir3/foo"
+			baseDirectory + "/subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -174,7 +182,7 @@ TargetBinderTest::Bind()
 			MakeStringList("."),
 			MakeStringList("elsewhere"),
 			MakeStringList("subdir2/subdir3"),
-			"somewhere/foo"
+			"somewhere/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -182,7 +190,7 @@ TargetBinderTest::Bind()
 			MakeStringList("."),
 			MakeStringList("elsewhere"),
 			MakeStringList("subdir2/subdir3"),
-			"elsewhere/foo"
+			"elsewhere/foo", FileStatus::NONE
 		},
 		{
 			"foo",
@@ -190,7 +198,7 @@ TargetBinderTest::Bind()
 			MakeStringList("."),
 			StringList(),
 			MakeStringList("subdir2/subdir3"),
-			"./foo"
+			"./foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -198,7 +206,7 @@ TargetBinderTest::Bind()
 			MakeStringList("subdir1"),
 			StringList(),
 			MakeStringList("subdir2/subdir3"),
-			"foo"
+			"foo", FileStatus::FILE
 		},
 		{
 			"foo",
@@ -206,7 +214,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			MakeStringList("subdir2/subdir3"),
-			"subdir2/subdir3/foo"
+			"subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"subdir3/foo",
@@ -214,7 +222,7 @@ TargetBinderTest::Bind()
 			StringList(),
 			StringList(),
 			MakeStringList("subdir2"),
-			"subdir2/subdir3/foo"
+			"subdir2/subdir3/foo", FileStatus::FILE
 		},
 		{
 			"/absolute/path/foo",
@@ -222,7 +230,23 @@ TargetBinderTest::Bind()
 			MakeStringList("."),
 			MakeStringList("elsewhere"),
 			MakeStringList("subdir2/subdir3"),
-			"/absolute/path/foo"
+			"/absolute/path/foo", FileStatus::NONE
+		},
+		{
+			"subdir3",
+			StringList(),
+			StringList(),
+			StringList(),
+			MakeStringList("subdir2"),
+			"subdir2/subdir3", FileStatus::DIRECTORY
+		},
+		{
+			"subdir3",
+			StringList(),
+			StringList(),
+			StringList(),
+			MakeStringList((baseDirectory + "/subdir2").c_str()),
+			baseDirectory + "/subdir2/subdir3", FileStatus::DIRECTORY
 		},
 	};
 
@@ -247,16 +271,37 @@ TargetBinderTest::Bind()
 				globalVariables.Set("SEARCH", testData[i].globalSearch);
 
 			String boundPath;
-			TargetBinder::Bind(globalVariables, target, boundPath);
+			FileStatus fileStatus;
+			TargetBinder::Bind(globalVariables, target, boundPath, fileStatus);
 
 			HAM_TEST_ADD_INFO(
-				HAM_TEST_EQUAL(boundPath, testData[i].boundPath.c_str()),
+				HAM_TEST_EQUAL(boundPath, testData[i].boundPath.c_str())
+				HAM_TEST_EQUAL(fileStatus.GetType(), testData[i].type),
 				"target: \"%s\", target locate: %s, target search: %s, "
 				"global locate: %s, global search: %s", targetName.c_str(),
 				ValueToString(testData[i].targetLocate).c_str(),
 				ValueToString(testData[i].targetSearch).c_str(),
 				ValueToString(testData[i].globalLocate).c_str(),
 				ValueToString(testData[i].globalSearch).c_str())
+
+			if (testData[i].type != FileStatus::NONE) {
+				HAM_TEST_ADD_INFO(
+// The FS might not store the nanoseconds, so we only compare the seconds.
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >= startTime)
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <= endTime),
+					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
+						>= startTime.Seconds())
+					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
+						<= endTime.Seconds()),
+					"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
+					"end time: (%u, %u)", boundPath.ToCString(),
+					(unsigned)fileStatus.LastModifiedTime().Seconds(),
+					(unsigned)fileStatus.LastModifiedTime().NanoSeconds(),
+					(unsigned)startTime.Seconds(),
+					(unsigned)startTime.NanoSeconds(),
+					(unsigned)endTime.Seconds(),
+					(unsigned)endTime.NanoSeconds())
+			}
 
 			data::MakeTarget makeTarget(target);
 			TargetBinder::Bind(globalVariables, &makeTarget);
@@ -271,6 +316,29 @@ TargetBinderTest::Bind()
 				ValueToString(testData[i].targetSearch).c_str(),
 				ValueToString(testData[i].globalLocate).c_str(),
 				ValueToString(testData[i].globalSearch).c_str())
+
+			if (testData[i].type != FileStatus::NONE) {
+				HAM_TEST_ADD_INFO(
+// The FS might not store the nanoseconds, so we only compare the seconds.
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >= startTime)
+//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <= endTime),
+					HAM_TEST_VERIFY(
+						makeTarget.GetFileStatus().LastModifiedTime().Seconds()
+							>= startTime.Seconds())
+					HAM_TEST_VERIFY(
+						makeTarget.GetFileStatus().LastModifiedTime().Seconds()
+							<= endTime.Seconds()),
+					"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
+					"end time: (%u, %u)", boundPath.ToCString(),
+					(unsigned)makeTarget.GetFileStatus().LastModifiedTime()
+						.Seconds(),
+					(unsigned)makeTarget.GetFileStatus().LastModifiedTime()
+						.NanoSeconds(),
+					(unsigned)startTime.Seconds(),
+					(unsigned)startTime.NanoSeconds(),
+					(unsigned)endTime.Seconds(),
+					(unsigned)endTime.NanoSeconds())
+			}
 		}
 	}
 }
