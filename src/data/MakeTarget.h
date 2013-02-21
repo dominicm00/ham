@@ -6,6 +6,7 @@
 #define HAM_DATA_MAKE_TARGET_H
 
 
+#include "data/FileStatus.h"
 #include "data/Target.h"
 
 
@@ -33,9 +34,15 @@ public:
 			void				SetBoundPath(const String& path)
 									{ fBoundPath = path; }
 
+			const FileStatus&	GetFileStatus() const
+									{ return fFileStatus; }
+			void				SetFileStatus(const FileStatus& fileStatus)
+									{ fFileStatus = fileStatus; }
+
 private:
 			Target*				fTarget;
 			String				fBoundPath;
+			FileStatus			fFileStatus;
 };
 
 
