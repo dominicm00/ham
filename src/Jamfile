@@ -8,6 +8,7 @@ C++FLAGS += -std=c++0x ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) behavior ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) make ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
