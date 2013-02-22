@@ -22,13 +22,15 @@ ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
 	fActions(actions),
 	fFlags(flags)
 {
-	fVariables->AcquireReference();
+	if (fVariables != NULL)
+		fVariables->AcquireReference();
 }
 
 
 ActionsDefinition::~ActionsDefinition()
 {
-	fVariables->ReleaseReference();
+	if (fVariables != NULL)
+		fVariables->ReleaseReference();
 }
 
 
