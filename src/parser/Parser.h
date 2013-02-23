@@ -40,9 +40,9 @@ public:
 
 			code::Block*		Parse(const std::string& input);
 			code::Block*		Parse(std::istream& input);
-									// input requires std::noskipws()
 			code::Block*		Parse(const InputIteratorType& start,
 									const InputIteratorType& end);
+			code::Block*		ParseFile(const char* fileName);
 
 			void				Test(int argc, const char* const* argv);
 

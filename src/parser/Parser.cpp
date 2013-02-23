@@ -219,6 +219,19 @@ Parser::Parse(const InputIteratorType& start, const InputIteratorType& end)
 }
 
 
+code::Block*
+Parser::ParseFile(const char* fileName)
+{
+	std::ifstream input(fileName);
+	if (input.fail()) {
+		_Throw((std::string("Failed to open file \"") + fileName + "\"")
+			.c_str());
+	}
+
+	return Parse(input);
+}
+
+
 void
 Parser::Test(int argc, const char* const* argv)
 {
