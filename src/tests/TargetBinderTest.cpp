@@ -323,17 +323,13 @@ TargetBinderTest::Bind()
 //				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >= startTime)
 //				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <= endTime),
 					HAM_TEST_VERIFY(
-						makeTarget.GetFileStatus().LastModifiedTime().Seconds()
-							>= startTime.Seconds())
+						makeTarget.GetTime().Seconds() >= startTime.Seconds())
 					HAM_TEST_VERIFY(
-						makeTarget.GetFileStatus().LastModifiedTime().Seconds()
-							<= endTime.Seconds()),
+						makeTarget.GetTime().Seconds() <= endTime.Seconds()),
 					"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
 					"end time: (%u, %u)", boundPath.ToCString(),
-					(unsigned)makeTarget.GetFileStatus().LastModifiedTime()
-						.Seconds(),
-					(unsigned)makeTarget.GetFileStatus().LastModifiedTime()
-						.NanoSeconds(),
+					(unsigned)makeTarget.GetTime().Seconds(),
+					(unsigned)makeTarget.GetTime().NanoSeconds(),
 					(unsigned)startTime.Seconds(),
 					(unsigned)startTime.NanoSeconds(),
 					(unsigned)endTime.Seconds(),

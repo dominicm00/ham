@@ -14,13 +14,27 @@ namespace data {
 MakeTarget::MakeTarget(Target* target)
 	:
 	fTarget(target),
-	fBoundPath()
+	fBoundPath(),
+	fTime(),
+	fLeafTime(),
+	fFileExists(false),
+	fDependencies(),
+	fIncludes(),
+	fState(UNPROCESSED)
 {
 }
 
 
 MakeTarget::~MakeTarget()
 {
+}
+
+
+void
+MakeTarget::SetFileStatus(const FileStatus& fileStatus)
+{
+	fFileExists = fileStatus.GetType() != FileStatus::NONE;
+	fTime = fFileExists ? fileStatus.LastModifiedTime() : Time();
 }
 
 

@@ -21,8 +21,21 @@ typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 
 class MakeTarget {
 public:
+			enum State {
+				UNPROCESSED,
+				PROCESSING,
+				UP_TO_DATE,
+				NEEDS_UPDATE,
+				MISSING,
+				SKIPPING
+			};
+
+public:
 								MakeTarget(Target* target);
 								~MakeTarget();
+
+			String				Name() const
+									{ return fTarget->Name(); }
 
 			Target*				GetTarget() const
 									{ return fTarget; }
@@ -34,16 +47,70 @@ public:
 			void				SetBoundPath(const String& path)
 									{ fBoundPath = path; }
 
-			const FileStatus&	GetFileStatus() const
-									{ return fFileStatus; }
-			void				SetFileStatus(const FileStatus& fileStatus)
-									{ fFileStatus = fileStatus; }
+			Time				GetTime() const
+									{ return fTime; }
+			void				SetTime(const Time& time)
+									{ fTime = time; }
+
+			Time				LeafTime() const
+									{ return fLeafTime; }
+			void				SetLeafTime(const Time& time)
+									{ fLeafTime = time; }
+
+			bool				FileExists() const
+									{ return fFileExists; }
+			void				SetFileStatus(const FileStatus& fileStatus);
+
+			const MakeTargetSet& Dependencies() const
+									{ return fDependencies; }
+			void				AddDependency(MakeTarget* dependency)
+									{ fDependencies.insert(dependency); }
+	inline	void				AddDependencies(
+									const MakeTargetSet& dependencies);
+			bool				IsLeaf() const
+									{ return fDependencies.size() == 0; }
+
+			const MakeTargetSet& Includes() const
+									{ return fIncludes; }
+			void				AddInclude(MakeTarget* include)
+									{ fIncludes.insert(include); }
+	inline	void				AddIncludes(const MakeTargetSet& includes);
+
+			State				GetState() const
+									{ return fState; }
+			void				SetState(State state)
+									{ fState = state; }
 
 private:
 			Target*				fTarget;
 			String				fBoundPath;
-			FileStatus			fFileStatus;
+			Time				fTime;
+			Time				fLeafTime;
+			bool				fFileExists;
+			MakeTargetSet		fDependencies;
+			MakeTargetSet		fIncludes;
+			State				fState;
 };
+
+
+void
+MakeTarget::AddDependencies(const MakeTargetSet& dependencies)
+{
+	for (MakeTargetSet::const_iterator it = dependencies.begin();
+		it != dependencies.end(); ++it) {
+		AddDependency(*it);
+	}
+}
+
+
+void
+MakeTarget::AddIncludes(const MakeTargetSet& includes)
+{
+	for (MakeTargetSet::const_iterator it = includes.begin();
+		it != includes.end(); ++it) {
+		AddInclude(*it);
+	}
+}
 
 
 } // namespace data
