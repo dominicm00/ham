@@ -6,16 +6,13 @@
 #define HAM_CODE_RULE_H
 
 
+#include "code/RuleActions.h"
 #include "code/RuleInstructions.h"
 #include "data/String.h"
 
 
 namespace ham {
 namespace code {
-
-
-class RuleInstructions;
-class RuleActions;
 
 
 using data::String;
@@ -58,8 +55,7 @@ Rule::~Rule()
 {
 	if (fInstructions != NULL)
 		fInstructions->ReleaseReference();
-// TODO:
-//	delete fActions;
+	delete fActions;
 }
 
 
@@ -79,8 +75,7 @@ Rule::SetInstructions(RuleInstructions* instructions)
 void
 Rule::SetActions(RuleActions* actions)
 {
-// TODO:
-//	delete fActions;
+	delete fActions;
 	fActions = actions;
 }
 

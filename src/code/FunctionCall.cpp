@@ -90,8 +90,11 @@ FunctionCall::Evaluate(EvaluationContext& context)
 			continue;
 		}
 
-		result.Append(function->Instructions()->Evaluate(context, arguments));
+		if (RuleInstructions* instructions = function->Instructions())
+			result.Append(instructions->Evaluate(context, arguments));
 // TODO: Handle the actions!
+//		if (RuleActions* actions = function->Actions()) {
+//		}
 	}
 
 	// reset call depth

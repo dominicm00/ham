@@ -8,16 +8,17 @@
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
+#include "code/Rule.h"
 
 
 namespace ham {
 namespace code {
 
 
-ActionsDefinition::ActionsDefinition(uint32_t flags, const String& identifier,
+ActionsDefinition::ActionsDefinition(uint32_t flags, const String& ruleName,
 	Node* variables, const String& actions)
 	:
-	fIdentifier(identifier),
+	fRuleName(ruleName),
 	fVariables(variables),
 	fActions(actions),
 	fFlags(flags)
@@ -37,7 +38,14 @@ ActionsDefinition::~ActionsDefinition()
 StringList
 ActionsDefinition::Evaluate(EvaluationContext& context)
 {
-	// TODO: Implement!
+	// get the variables
+	StringList variables;
+	if (fVariables != NULL)
+		variables = fVariables->Evaluate(context);
+
+	// create and add the actions to the rule
+	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
+	rule.SetActions(new RuleActions(variables, fActions, fFlags));
 	return StringList::False();
 }
 
@@ -55,7 +63,7 @@ ActionsDefinition::Visit(NodeVisitor& visitor)
 void
 ActionsDefinition::Dump(DumpContext& context) const
 {
-	context << "ActionsDefinition(\"" << fIdentifier << ", " << fFlags
+	context << "ActionsDefinition(\"" << fRuleName << ", " << fFlags
 		<< ",\n";
 	context.BeginChildren();
 

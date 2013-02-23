@@ -31,6 +31,7 @@
 #include "code/LocalVariableDeclaration.h"
 #include "code/NotExpression.h"
 #include "code/OnExpression.h"
+#include "code/RuleActions.h"
 #include "code/RuleDefinition.h"
 #include "code/Switch.h"
 #include "code/While.h"
@@ -45,13 +46,13 @@ namespace {
 	struct ActionsFlagMap : std::map<data::String, uint32_t> {
 		ActionsFlagMap()
 		{
-			(*this)["updated"] = code::kActionFlagUpdated;
-			(*this)["together"] = code::kActionFlagTogether;
-			(*this)["ignore"] = code::kActionFlagIgnore;
-			(*this)["quietly"] = code::kActionFlagQuietly;
-			(*this)["piecemeal"] = code::kActionFlagPiecemeal;
-			(*this)["existing"] = code::kActionFlagExisting;
-			(*this)["maxline"] = code::kActionFlagMaxLineFactor;
+			(*this)["updated"] = code::RuleActions::UPDATED;
+			(*this)["together"] = code::RuleActions::TOGETHER;
+			(*this)["ignore"] = code::RuleActions::IGNORE;
+			(*this)["quietly"] = code::RuleActions::QUIETLY;
+			(*this)["piecemeal"] = code::RuleActions::PIECEMEAL;
+			(*this)["existing"] = code::RuleActions::EXISTING;
+			(*this)["maxline"] = code::RuleActions::MAX_LINE_FACTOR;
 		}
 	};
 
@@ -554,15 +555,15 @@ Parser::_TryParseStatement()
 				_NextToken();
 
 				uint32_t flag = it->second;
-				if (flag == code::kActionFlagMaxLineFactor) {
+				if (flag == code::RuleActions::MAX_LINE_FACTOR) {
 					if (_Token() != TOKEN_STRING) {
 						_ThrowExpected(
 							"Expected number after 'actions' flag 'maxline'");
 					}
 
-					actionsFlags = (actionsFlags & code::kActionFlagMask)
+					actionsFlags = (actionsFlags & code::RuleActions::FLAG_MASK)
 						| (uint32_t)atoi(_Token().ToStlString().c_str())
-							* code::kActionFlagMaxLineFactor;
+							* code::RuleActions::MAX_LINE_FACTOR;
 					_NextToken();
 				} else
 					actionsFlags |= flag;
