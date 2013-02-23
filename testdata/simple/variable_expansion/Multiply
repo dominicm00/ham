@@ -8,7 +8,7 @@ triple = a b c ;
 triple2 = x y z ;
 
 result = %1 ;
-if $(result) {
+for _resultElement in $(result[1]) {
 	Echo $(result) ;
 }
 ---

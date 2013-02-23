@@ -8,15 +8,17 @@ triple = a b c ;
 triple2 = x y z ;
 
 result = $(%1) ;
-if $(result) {
+for _resultElement in $(result[1]) {
 	Echo $(result) ;
 }
 ---
 undefined:E
 -
+
 ---
 undefined:E=
 -
+
 ---
 undefined:E=foo
 -
@@ -24,9 +26,15 @@ foo
 ---
 empty:E
 -
+
 ---
 empty:E=
 -
+
+---
+empty:E=""
+-
+
 ---
 empty:E=foo
 -
