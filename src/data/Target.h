@@ -58,6 +58,16 @@ public:
 									{ fFlags = flags; }
 			void				AddFlags(uint32_t flags)
 									{ fFlags |= flags; }
+			bool				IsBuildAlways() const
+									{ return (fFlags & BUILD_ALWAYS) != 0; }
+			bool				IsDontUpdate() const
+									{ return (fFlags & DONT_UPDATE) != 0; }
+	inline	bool				IsIgnoreIfMissing() const;
+			bool				IsNotAFile() const
+									{ return (fFlags & NOT_A_FILE) != 0; }
+			bool				IsTemporary() const
+									{ return (fFlags & TEMPORARY) != 0; }
+	inline	bool				DependsOnLeaves() const;
 
 			const TargetSet&	Dependencies() const
 									{ return fDependencies; }
@@ -87,6 +97,20 @@ Target::Variables(bool create)
 		fVariables = new VariableDomain;
 
 	return fVariables;
+}
+
+
+bool
+Target::IsIgnoreIfMissing() const
+{
+	return (fFlags & IGNORE_IF_MISSING) != 0;
+}
+
+
+bool
+Target::DependsOnLeaves() const
+{
+	return (fFlags & DEPENDS_ON_LEAVES) != 0;
 }
 
 
