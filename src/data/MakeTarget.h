@@ -16,7 +16,7 @@ namespace data {
 
 class MakeTarget;
 
-typedef std::set<MakeTarget*> MakeTargetSet;
+typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 
 
 class MakeTarget {

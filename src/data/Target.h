@@ -6,9 +6,8 @@
 #define HAM_DATA_TARGET_H
 
 
-#include <set>
-
 #include "data/VariableDomain.h"
+#include "util/SequentialSet.h"
 
 
 namespace ham {
@@ -17,7 +16,8 @@ namespace data {
 
 class Target;
 
-typedef std::set<Target*> TargetSet;
+
+typedef util::SequentialSet<Target*> TargetSet;
 
 
 class Target {
