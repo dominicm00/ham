@@ -156,7 +156,6 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 
 	const StringList& list
 		= inputList.IsEmpty() && (operations & REPLACE_EMPTY) != 0
-				&& !fEmptyParameter.IsEmpty()
 			? StringList(String(fEmptyParameter)) : inputList;
 
 	size_t count = std::min(list.Size(), maxSize);
