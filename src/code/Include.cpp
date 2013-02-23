@@ -14,6 +14,9 @@
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "code/EvaluationException.h"
+#include "data/FileStatus.h"
+#include "data/TargetBinder.h"
+#include "data/TargetPool.h"
 #include "parser/Parser.h"
 #include "util/Constants.h"
 
@@ -52,20 +55,30 @@ Include::Evaluate(EvaluationContext& context)
 	StringList fileNames = fFileNames->Evaluate(context);
 	if (!fileNames.IsEmpty()) {
 		// Only the file referred to by the first element is included.
-		String fileName = fileNames.ElementAt(0);
-// TODO: Bind target!
-		std::ifstream file(fileName.ToCString());
+
+		// bind the target
+		data::Target* target
+			= context.Targets().LookupOrCreate(fileNames.ElementAt(0));
+		String filePath;
+		data::FileStatus fileStatus;
+		data::TargetBinder::Bind(*context.GlobalVariables(), target, filePath,
+			fileStatus);
+
+		// open the file
+		std::ifstream file(filePath.ToCString());
 		if (file.fail()) {
+			if (target->IsIgnoreIfMissing())
+				return StringList::False();
 			throw EvaluationException(
 				std::string("include: Failed to open file \"")
-					+ fileName.ToCString() + "\"");
+					+ filePath.ToCString() + "\"");
 		}
 
+		// parse and evaluate it
 		parser::Parser parser;
-		parser.SetFileName(fileName.ToStlString());
+		parser.SetFileName(filePath.ToStlString());
 		util::Reference<code::Block> block(parser.Parse(file), true);
 
-// TODO: New variable scope?
 		block->Evaluate(context);
 
 		if (context.GetJumpCondition() == JUMP_CONDITION_JUMP_TO_EOF)
