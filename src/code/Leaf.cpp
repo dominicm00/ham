@@ -98,23 +98,26 @@ Leaf::_EvaluateString(EvaluationContext& context, const char* stringStart,
 
 		// Find the matching closing ")". While at it also find the containing
 		// special characters (":", "[", "]") at the top level.
-		const char* colon = NULL;
+		std::vector<const char*> colons;
 		const char* openingBracket = NULL;
 		const char* closingBracket = NULL;
 		bool recursive = false;
 		int matchCount = 1;
 		while (matchCount != 0 && stringRemainder != stringEnd) {
 			switch (*stringRemainder) {
-				case '(':
-					matchCount++;
-					recursive = true;
+				case '$':
+					if (stringRemainder + 1 != stringEnd
+						&& stringRemainder[1] == '(') {
+						matchCount++;
+						recursive = true;
+					}
 					break;
 				case ')':
 					matchCount--;
 					break;
 				case ':':
-					if (matchCount == 1 && colon == NULL)
-						colon = stringRemainder;
+					if (matchCount == 1)
+						colons.push_back(stringRemainder);
 					break;
 				case '[':
 					if (matchCount == 1 && openingBracket == NULL)
@@ -138,7 +141,7 @@ Leaf::_EvaluateString(EvaluationContext& context, const char* stringStart,
 		// Evaluate the variable. If its value is empty, the end result will be
 		// empty, too.
 		StringList variableValue = _EvaluateVariableExpression(context,
-			variableStart, stringRemainder - 1, colon, openingBracket,
+			variableStart, stringRemainder - 1, colons, openingBracket,
 			closingBracket, recursive);
 		if (variableValue.IsEmpty())
 			return variableValue;
@@ -169,8 +172,9 @@ Leaf::_EvaluateString(EvaluationContext& context, const char* stringStart,
 
 /*static*/ StringList
 Leaf::_EvaluateVariableExpression(EvaluationContext& context,
-	const char* variableStart, const char* variableEnd, const char* colon,
-	const char* openingBracket, const char* closingBracket, bool recursive)
+	const char* variableStart, const char* variableEnd,
+	const std::vector<const char*>& colons, const char* openingBracket,
+	const char* closingBracket, bool recursive)
 {
 	// The syntax is:
 	//
@@ -193,15 +197,16 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// invalid syntax and ignores ":B".
 
 	const char* variableNameEnd = variableEnd;
+	const char* firstColon = colons.empty() ? NULL : colons[0];
 
-	if (colon != NULL) {
-		// Ignore brackets after the colon.
-		if (openingBracket != NULL && colon < openingBracket)
+	if (firstColon != NULL) {
+		// Ignore brackets after the first colon.
+		if (openingBracket != NULL && firstColon < openingBracket)
 			openingBracket = NULL;
-		if (closingBracket != NULL && colon < closingBracket)
+		if (closingBracket != NULL && firstColon < closingBracket)
 			closingBracket = NULL;
 
-		variableNameEnd = colon;
+		variableNameEnd = firstColon;
 	}
 
 	if (openingBracket != NULL || closingBracket != NULL) {
@@ -211,9 +216,9 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			return StringList();
 
 		// If the closing bracket is missing, we use the next "natural
-		// boundary", i.e. the colon or the variable end.
+		// boundary", i.e. the first colon or the variable end.
 		if (closingBracket == NULL)
-			closingBracket = colon != NULL ? colon : variableEnd;
+			closingBracket = firstColon != NULL ? firstColon : variableEnd;
 
 		variableNameEnd = openingBracket;
 	}
@@ -251,10 +256,14 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			maxSize = std::numeric_limits<size_t>::max();
 
 		// colon
-		if (colon != NULL) {
+		if (firstColon != NULL) {
 			data::StringListOperations operations;
+			const char* colon = firstColon;
+			std::vector<const char*>::const_iterator colonIt = colons.begin();
 			for (;;) {
-				const char* colonEnd = std::find(colon + 1, variableEnd, ':');
+				++colonIt;
+				const char* colonEnd = colonIt != colons.end()
+					? *colonIt : variableEnd;
 				operations.Parse(colon + 1, colonEnd);
 				if (colonEnd == variableEnd)
 					break;
@@ -313,10 +322,13 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	std::vector<StringList> operationsStringsList;
 		// referenced by operationsList, so it needs to exist at least as long
 	std::vector<data::StringListOperations> operationsList;
-	if (colon != NULL) {
-		const char* segmentStart = colon + 1;
+	if (firstColon != NULL) {
+		const char* segmentStart = firstColon + 1;
+		std::vector<const char*>::const_iterator colonIt = colons.begin();
 		for (;;) {
-			const char* segmentEnd = std::find(segmentStart, variableEnd, ':');
+			++colonIt;
+			const char* segmentEnd = colonIt != colons.end()
+				? *colonIt : variableEnd;
 			StringList operationsStrings = _EvaluateString(context,
 				segmentStart, segmentEnd, NULL);
 			if (operationsStrings.IsEmpty())

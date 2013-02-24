@@ -38,7 +38,7 @@ private:
 									EvaluationContext& context,
 									const char* variableStart,
 									const char* variableEnd,
-									const char* colon,
+									const std::vector<const char*>& colon,
 									const char* openingBracket,
 									const char* closingBracket,
 									bool recursive);
