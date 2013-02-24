@@ -506,3 +506,15 @@ c
 x
 y
 ---
+SOURCE_GRIST = src ;
+A = foobar ;
+result = $(A:G=$(SOURCE_GRIST:E)) ;
+-
+<src>foobar
+---
+SOURCE_GRIST = src bin ;
+A = foobar ;
+result = $(A[1]:G=$(SOURCE_GRIST[2]:E)) ;
+-
+<bin>foobar
+---
