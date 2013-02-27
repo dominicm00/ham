@@ -64,16 +64,8 @@ RuleDefinition::Visit(NodeVisitor& visitor)
 void
 RuleDefinition::Dump(DumpContext& context) const
 {
-	context << "RuleDefinition(\"" << fRuleName << "\", (";
-
-	for (StringList::Iterator it = fParameterNames.GetIterator();
-			it.HasNext();) {
-		if (it != fParameterNames.GetIterator())
-			context << ", ";
-		context << it.Next();
-	}
-
-	context << ")\n";
+	context << "RuleDefinition(\"" << fRuleName << "\", " << fParameterNames
+		<< ")\n";
 
 	context.BeginChildren();
 
