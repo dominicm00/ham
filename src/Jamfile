@@ -23,6 +23,7 @@ SharedLibrary libham.so
 	Block.cpp
 	BuiltInRules.cpp
 	Case.cpp
+	Constant.cpp
 	DumpContext.cpp
 	EvaluationContext.cpp
 	If.cpp
