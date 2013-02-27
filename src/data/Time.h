@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "String.h"
+
 
 namespace ham {
 namespace data {
@@ -31,6 +33,8 @@ public:
 									{ return fNanoSeconds / kNanoFactor; }
 			uint32_t			NanoSeconds() const
 									{ return fNanoSeconds % kNanoFactor; }
+
+			String				ToString(bool includeNanoSeconds = true) const;
 
 	static	Time				Now();
 
