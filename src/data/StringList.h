@@ -247,4 +247,21 @@ using data::StringListList;
 }	// namespace ham
 
 
+inline
+std::ostream& operator<<(std::ostream& stream,
+	const ham::data::StringList& stringList)
+{
+	stream << "{";
+
+	for (ham::data::StringList::Iterator it = stringList.GetIterator();
+		it.HasNext();) {
+		if (it != stringList.GetIterator())
+			stream << ", ";
+		stream << it.Next();
+	}
+
+	return stream << "}";
+}
+
+
 #endif // HAM_DATA_STRING_LIST_H
