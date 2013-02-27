@@ -25,6 +25,7 @@ Leaf::Leaf(const String& string)
 {
 }
 
+
 Leaf::~Leaf()
 {
 }
