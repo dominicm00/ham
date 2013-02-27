@@ -6,12 +6,17 @@
 
 #include "make/Processor.h"
 
+#include <stdarg.h>
 #include <fstream>
 #include <memory>
 
 #include "code/Block.h"
 #include "code/BuiltInRules.h"
+#include "code/Constant.h"
+#include "code/FunctionCall.h"
 #include "code/Jambase.h"
+#include "code/OnExpression.h"
+#include "data/RegExp.h"
 #include "data/TargetBinder.h"
 #include "make/MakeException.h"
 #include "parser/Parser.h"
@@ -22,6 +27,10 @@ namespace make {
 
 
 using data::Time;
+
+
+static const String kHeaderScanVariableName("HDRSCAN");
+static const String kHeaderRuleVariableName("HDRRULE");
 
 
 Processor::Processor()
@@ -249,8 +258,6 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	else
 		data::TargetBinder::Bind(fGlobalVariables, makeTarget);
 
-	// header scanning
-// TODO:...
 	Time time = makeTarget->GetTime();
 	if (!time.IsValid())
 		time = Time(0);
@@ -303,6 +310,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 				break;
 		}
 	}
+
+	// header scanning
+	if (makeTarget->FileExists())
+		_ScanForHeaders(makeTarget);
 
 	// add make targets for includes
 	const TargetSet& includes = target->Includes();
@@ -359,6 +370,77 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 }
 
 
+void
+Processor::_ScanForHeaders(MakeTarget* makeTarget)
+{
+	// Get the on-target HDRSCAN and HDRRULE variables.
+	// Note: We're not getting the global variables, if the on-target ones
+	// aren't defined, since it really doesn't make much sense to define them
+	// globally.
+	const Target* target = makeTarget->GetTarget();
+	const data::VariableDomain* variables = target->Variables();
+	if (variables == NULL)
+		return;
+
+	const StringList* scanPattern = variables->Lookup(kHeaderScanVariableName);
+	const StringList* scanRule = variables->Lookup(kHeaderRuleVariableName);
+	if (scanPattern == NULL || scanRule == NULL || scanPattern->IsEmpty()
+		|| scanRule->IsEmpty()) {
+		return;
+	}
+
+	// prepare the grep regular expression
+	data::RegExp regExp(scanPattern->ElementAt(0).ToCString());
+	if (!regExp.IsValid())
+		return;
+
+	// open the file
+	std::ifstream file(makeTarget->BoundPath().ToCString());
+	if (file.fail()) {
+// TODO: Error/warning!
+		return;
+	}
+
+	// scan it
+	StringList headersFound;
+	std::string line;
+	while (std::getline(file, line)) {
+		data::RegExp::MatchResult result = regExp.Match(line.c_str());
+		if (result.HasMatched()) {
+			size_t groupCount = result.GroupCount();
+			for (size_t i = 0; i < groupCount; i++) {
+				size_t startOffset = result.GroupStartOffsetAt(i);
+				size_t endOffset = result.GroupEndOffsetAt(i);
+				String headerName(line.c_str() + startOffset,
+					endOffset - startOffset);
+				if (!headerName.IsEmpty())
+					headersFound.Append(headerName);
+			}
+		}
+	}
+
+	file.close();
+
+	// If anything was found, call the HDRRULE.
+	if (!headersFound.IsEmpty()) {
+		// Construct the code to evaluate the rule under the influence of the
+		// influence of the target.
+		code::NodeReference targetNameNode(new code::Constant(target->Name()),
+			true);
+		code::NodeReference headersNode(new code::Constant(headersFound), true);
+		code::NodeReference callFunction(new code::Constant(scanRule), true);
+		util::Reference<code::FunctionCall> call(
+			new code::FunctionCall(callFunction.Get()), true);
+		call->AddArgument(targetNameNode.Get());
+		call->AddArgument(headersNode.Get());
+		code::NodeReference onExpression(
+			new code::OnExpression(targetNameNode.Get(), call.Get()), true);
+		onExpression->Evaluate(fEvaluationContext);
+	}
+}
+
+
+void
 Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 {
 	const Target* target = makeTarget->GetTarget();

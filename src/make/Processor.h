@@ -67,6 +67,7 @@ private:
 			void				_PrepareTargetRecursively(
 									MakeTarget* makeTarget,
 									data::Time parentTime);
+			void				_ScanForHeaders(MakeTarget* makeTarget);
 
 			void				_PrintMakeTreeBinding(
 									const MakeTarget* makeTarget);
