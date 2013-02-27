@@ -35,8 +35,10 @@ Processor::Processor()
 	fBuildFromNewest(false),
 	fDryRun(false),
 	fQuitOnError(false),
+	fPrintMakeTree(false),
 	fPrimaryTargetNames(),
-	fMakeTargets()
+	fMakeTargets(),
+	fMakeLevel(0)
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
@@ -104,6 +106,13 @@ void
 Processor::SetQuitOnError(bool quitOnError)
 {
 	fQuitOnError = quitOnError;
+}
+
+
+void
+Processor::SetPrintMakeTree(bool printMakeTree)
+{
+	fPrintMakeTree = printMakeTree;
 }
 
 
@@ -178,10 +187,12 @@ Processor::PrepareTargets()
 	}
 
 	// Bind the targets and their dependencies recursively.
+	fMakeLevel = 0;
+
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
 		Target* target = fTargets.Lookup(targetName);
-		_PrepareTargetRecursively(_GetMakeTarget(target, false));
+		_PrepareTargetRecursively(_GetMakeTarget(target, false), Time(0));
 	}
 }
 
@@ -210,12 +221,13 @@ Processor::_GetMakeTarget(Target* target, bool create)
 
 
 void
-Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
+Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
+	data::Time parentTime)
 {
 	// Check whether the target has already been processed (also detect cycles)
 	// and mark in-progress.
-	if (makeTarget->GetState() != MakeTarget::UNPROCESSED) {
-		if (makeTarget->GetState() == MakeTarget::PROCESSING) {
+	if (makeTarget->GetFate() != MakeTarget::UNPROCESSED) {
+		if (makeTarget->GetFate() == MakeTarget::PROCESSING) {
 			throw MakeException(std::string("Target \"")
 				+ makeTarget->Name().ToCString() + "\" depends on itself");
 		}
@@ -224,7 +236,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		return;
 	}
 
-	makeTarget->SetState(MakeTarget::PROCESSING);
+	if (fPrintMakeTree)
+		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
+
+	makeTarget->SetFate(MakeTarget::PROCESSING);
 
 	// bind the target
 	Target* target = makeTarget->GetTarget();
@@ -236,18 +251,17 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 
 	// header scanning
 // TODO:...
+	Time time = makeTarget->GetTime();
+	if (!time.IsValid())
+		time = Time(0);
+
+	if (fPrintMakeTree)
+		_PrintMakeTreeBinding(makeTarget);
 
 	// add make targets for dependencies
-	const TargetSet& dependencies = makeTarget->GetTarget()->Dependencies();
+	const TargetSet& dependencies = target->Dependencies();
 	for (TargetSet::iterator it = dependencies.begin();
 		it != dependencies.end(); ++it) {
-		makeTarget->AddDependency(_GetMakeTarget(*it, true));
-	}
-
-	// add make targets for includes
-	const TargetSet& includes = makeTarget->GetTarget()->Includes();
-	for (TargetSet::iterator it = includes.begin();
-		it != includes.end(); ++it) {
 		makeTarget->AddDependency(_GetMakeTarget(*it, true));
 	}
 
@@ -255,12 +269,18 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	Time newestDependencyTime(0);
 	Time newestLeafTime(0);
 	bool dependencyUpdated = false;
-	bool cantBuild = false;
+	bool cantMake = false;
 	for (size_t i = 0; i < makeTarget->Dependencies().size(); i++) {
 		MakeTarget* dependency = makeTarget->Dependencies().at(i);
-		_PrepareTargetRecursively(dependency);
 
-		// add the dependency's includes as the target's dependencies
+		fMakeLevel++;
+		_PrepareTargetRecursively(dependency, time);
+		fMakeLevel--;
+
+		// Add the dependency's includes as the target's dependencies. This
+		// will also take care of recursive includes in a breadth first manner
+		// as we keep appending the newly found includes at the end of our
+		// dependency list.
 		makeTarget->AddDependencies(dependency->Includes());
 
 		// track times
@@ -268,60 +288,154 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			dependency->GetTime());
 		newestLeafTime = std::max(newestLeafTime, dependency->LeafTime());
 
-		switch (dependency->GetState()) {
+		switch (dependency->GetFate()) {
 			case MakeTarget::UNPROCESSED:
 			case MakeTarget::PROCESSING:
 				// cannot happen
 				break;
-			case MakeTarget::UP_TO_DATE:
+			case MakeTarget::KEEP:
 				break;
-			case MakeTarget::NEEDS_UPDATE:
+			case MakeTarget::MAKE:
 				dependencyUpdated = true;
 				break;
-			case MakeTarget::MISSING:
-			case MakeTarget::SKIPPING:
-				if (!dependency->GetTarget()->IsIgnoreIfMissing())
-					cantBuild = true;
+			case MakeTarget::CANT_MAKE:
+				cantMake = true;
 				break;
 		}
+	}
+
+	// add make targets for includes
+	const TargetSet& includes = target->Includes();
+	for (TargetSet::iterator it = includes.begin();
+		it != includes.end(); ++it) {
+		makeTarget->AddInclude(_GetMakeTarget(*it, true));
 	}
 
 	// For depends-on-leaves targets consider only the leaf times.
 	if (target->DependsOnLeaves())
 		newestDependencyTime = newestLeafTime;
 
-	// decide what to do with the target
-	Time time = makeTarget->GetTime();
+	// determine the target's state
 	MakeTarget::State state;
-
-	if (cantBuild) {
-		state = MakeTarget::SKIPPING;
-		if (!time.IsValid())
-			time = Time(0);
-	} else if (!isPseudoTarget && makeTarget->FileExists()) {
-		if (!target->IsDontUpdate()
-			&& (dependencyUpdated || newestDependencyTime > time)) {
-			state = MakeTarget::NEEDS_UPDATE;
-			time = std::max(time, newestDependencyTime);
-		} else
-			state = MakeTarget::UP_TO_DATE;
-	} else {
-		state = MakeTarget::NEEDS_UPDATE;
-// TODO: Set to NEEDS_UPDATE also for pseudo-targets without actions?
-		if (isPseudoTarget)
-			time = newestDependencyTime;
+	MakeTarget::Fate fate = MakeTarget::KEEP;
+	if (isPseudoTarget || !makeTarget->FileExists()) {
+		state = MakeTarget::MISSING;
+		if (cantMake)
+			fate = MakeTarget::CANT_MAKE;
 		else
-			time = fNow;
+			fate = MakeTarget::MAKE;
+	} else if (newestDependencyTime > time) {
+		state = MakeTarget::OUT_OF_DATE;
+		if (cantMake)
+			fate = MakeTarget::CANT_MAKE;
+		else if (!target->IsDontUpdate())
+			fate = MakeTarget::MAKE;
+	} else {
+		state = MakeTarget::UP_TO_DATE;
+		if (dependencyUpdated)
+			fate = MakeTarget::MAKE;
 	}
 
+	if (fate == MakeTarget::MAKE && false/*has no actions*/) {
+		if (!isPseudoTarget) {
+			if (target->IsIgnoreIfMissing())
+				fate = MakeTarget::KEEP;
+			else
+				fate = MakeTarget::CANT_MAKE;
+		}
+	}
+
+	time = std::max(time, newestDependencyTime);
 	makeTarget->SetState(state);
+	makeTarget->SetFate(fate);
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 
+	_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS
 // - IGNORE_IF_MISSING
 // - TEMPORARY
+}
+
+
+Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
+{
+	const Target* target = makeTarget->GetTarget();
+	const char* timeString;
+	if (makeTarget->FileExists()) {
+		_PrintMakeTreeStep(makeTarget, "bind", NULL, ": %s",
+			makeTarget->BoundPath().ToCString());
+		timeString = makeTarget->GetTime().ToString().ToCString();
+	} else {
+		if (target->IsNotAFile())
+			timeString = "unbound";
+		else
+			timeString = "missing";
+	}
+
+// TODO: Binding might also be "parent".
+	_PrintMakeTreeStep(makeTarget, "time", NULL, ": %s", timeString);
+}
+
+
+void
+Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
+	data::Time parentTime)
+{
+	const Target* target = makeTarget->GetTarget();
+	const char* stateString;
+	char madeString[6] = "made ";
+	char& flag = madeString[4];
+
+	switch (makeTarget->GetFate()) {
+		case MakeTarget::UNPROCESSED:
+			stateString = "unprocessed";
+			break;
+		case MakeTarget::PROCESSING:
+			stateString = "processing";
+			break;
+		case MakeTarget::MAKE:
+			stateString = makeTarget->FileExists() || target->IsNotAFile()
+				? "update" : "missing";
+			if (!target->IsNotAFile())
+				flag = '+';
+			break;
+		case MakeTarget::KEEP:
+			if (makeTarget->GetTime() > parentTime) {
+				flag = '*';
+				stateString = "newer";
+			} else
+				stateString = "stable";
+			break;
+		case MakeTarget::CANT_MAKE:
+			stateString = "missing";
+			break;
+		default:
+			stateString = "unknown";
+			break;
+	}
+
+	_PrintMakeTreeStep(makeTarget, madeString, stateString, NULL);
+}
+
+
+void
+Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget, const char* step,
+	const char* state, const char* pattern, ...)
+{
+	printf("%-7s %-10s %*s%s", step, state != NULL ? state : "--", fMakeLevel,
+		"", makeTarget->Name().ToCString());
+	if (pattern != NULL) {
+		char buffer[1024];
+		va_list args;
+		va_start(args, pattern);
+		vsnprintf(buffer, sizeof(buffer), pattern, args);
+		va_end(args);
+		printf("%s", buffer);
+	}
+
+	printf("\n");
 }
 
 

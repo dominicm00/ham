@@ -40,6 +40,7 @@ public:
 			void				SetBuildFromNewest(bool buildFromNewest);
 			void				SetDryRun(bool dryRun);
 			void				SetQuitOnError(bool quitOnError);
+			void				SetPrintMakeTree(bool printMakeTree);
 
 			void				SetOutput(std::ostream& output);
 			void				SetErrorOutput(std::ostream& output);
@@ -64,7 +65,17 @@ private:
 private:
 			MakeTarget*			_GetMakeTarget(Target* target, bool create);
 			void				_PrepareTargetRecursively(
-									MakeTarget* makeTarget);
+									MakeTarget* makeTarget,
+									data::Time parentTime);
+
+			void				_PrintMakeTreeBinding(
+									const MakeTarget* makeTarget);
+			void				_PrintMakeTreeState(
+									const MakeTarget* makeTarget,
+									data::Time parentTime);
+			void				_PrintMakeTreeStep(const MakeTarget* makeTarget,
+									const char* step, const char* state,
+									const char* pattern, ...);
 
 private:
 			data::VariableDomain fGlobalVariables;
@@ -76,9 +87,11 @@ private:
 			bool				fBuildFromNewest;
 			bool				fDryRun;
 			bool				fQuitOnError;
+			bool				fPrintMakeTree;
 			StringList			fPrimaryTargetNames;
 			MakeTargetMap		fMakeTargets;
 			data::Time			fNow;
+			int					fMakeLevel;
 };
 
 

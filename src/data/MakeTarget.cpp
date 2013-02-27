@@ -20,7 +20,8 @@ MakeTarget::MakeTarget(Target* target)
 	fFileExists(false),
 	fDependencies(),
 	fIncludes(),
-	fState(UNPROCESSED)
+	fState(UP_TO_DATE),
+	fFate(UNPROCESSED)
 {
 }
 

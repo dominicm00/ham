@@ -22,12 +22,17 @@ typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 class MakeTarget {
 public:
 			enum State {
+				UP_TO_DATE,
+				OUT_OF_DATE,
+				MISSING
+			};
+
+			enum Fate {
 				UNPROCESSED,
 				PROCESSING,
-				UP_TO_DATE,
-				NEEDS_UPDATE,
-				MISSING,
-				SKIPPING
+				MAKE,
+				KEEP,
+				CANT_MAKE
 			};
 
 public:
@@ -81,6 +86,11 @@ public:
 			void				SetState(State state)
 									{ fState = state; }
 
+			Fate				GetFate() const
+									{ return fFate; }
+			void				SetFate(Fate fate)
+									{ fFate = fate; }
+
 private:
 			Target*				fTarget;
 			String				fBoundPath;
@@ -90,6 +100,7 @@ private:
 			MakeTargetSet		fDependencies;
 			MakeTargetSet		fIncludes;
 			State				fState;
+			Fate				fFate;
 };
 
 
