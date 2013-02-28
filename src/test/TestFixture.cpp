@@ -289,16 +289,16 @@ TestFixture::CurrentWorkingDirectory()
 /*static*/ void
 TestFixture::CreateTemporaryDirectory(std::string& _path)
 {
-	// get a name for the temporary directory
-	char temporaryDirectoryBuffer[L_tmpnam + 1];
-	char* temporaryDirectory = tmpnam(temporaryDirectoryBuffer);
-	if (temporaryDirectory == NULL)
-		HAM_TEST_THROW("tmpnam() didn't return new temporary file name.")
+	static const char kDirectoryNameTemplate[] = "/tmp/ham-tests-XXXXXX";
+	char temporaryDirectoryBuffer[sizeof(kDirectoryNameTemplate)];
+	strcpy(temporaryDirectoryBuffer, kDirectoryNameTemplate);
+	char* temporaryDirectory = mkdtemp(temporaryDirectoryBuffer);
+	if (temporaryDirectory == NULL) {
+		HAM_TEST_THROW("mkdtemp() failed to create a new temporary directory: "
+			"%s", strerror(errno))
+	}
 
 	_path = temporaryDirectory;
-
-	// create it
-	CreateDirectory(temporaryDirectory, false);
 }
 
 
