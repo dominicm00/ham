@@ -11,6 +11,7 @@
 #include "code/EvaluationException.h"
 #include "code/Rule.h"
 #include "code/RuleInstructions.h"
+#include "data/TargetPool.h"
 #include "util/Constants.h"
 
 
@@ -81,6 +82,8 @@ FunctionCall::Evaluate(EvaluationContext& context)
 	StringList functions = fFunction->Evaluate(context);
 	size_t functionCount = functions.Size();
 	RulePool& rulePool = context.Rules();
+	data::TargetList sourceTargets;
+		// lazily initialized when needed
 
 	for (size_t i = 0; i < functionCount; i++) {
 		Rule* function = rulePool.Lookup(functions.ElementAt(i));
@@ -92,9 +95,27 @@ FunctionCall::Evaluate(EvaluationContext& context)
 
 		if (RuleInstructions* instructions = function->Instructions())
 			result.Append(instructions->Evaluate(context, arguments));
-// TODO: Handle the actions!
-//		if (RuleActions* actions = function->Actions()) {
-//		}
+
+		// If the rule has actions, add respective action calls to the targets.
+		if (data::RuleActions* actions = function->Actions()) {
+			// lazily resolve the source targets
+			if (sourceTargets.empty() && argumentCount > 1
+				&& !arguments[1].IsEmpty()) {
+				for (StringList::Iterator it = arguments[0].GetIterator();
+					it.HasNext();) {
+					sourceTargets.push_back(
+						context.Targets().LookupOrCreate(it.Next()));
+				}
+			}
+
+			data::RuleActionsCall actionsCall(actions, sourceTargets);
+			for (StringList::Iterator it = arguments[0].GetIterator();
+				it.HasNext();) {
+				data::Target* target
+					= context.Targets().LookupOrCreate(it.Next());
+				target->AddActionsCall(actionsCall);
+			}
+		}
 	}
 
 	// reset call depth

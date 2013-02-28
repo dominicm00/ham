@@ -6,8 +6,8 @@
 #define HAM_CODE_RULE_H
 
 
-#include "code/RuleActions.h"
 #include "code/RuleInstructions.h"
+#include "data/RuleActions.h"
 #include "data/String.h"
 
 
@@ -30,15 +30,15 @@ public:
 									{ return fInstructions; }
 	inline	void				SetInstructions(RuleInstructions* instructions);
 
-			RuleActions*		Actions() const
+			data::RuleActions*		Actions() const
 									{ return fActions; }
-	inline	void				SetActions(RuleActions* actions);
+	inline	void				SetActions(data::RuleActions* actions);
 									// takes over ownership
 
 private:
 			String				fName;
 			RuleInstructions*	fInstructions;
-			RuleActions*		fActions;
+			data::RuleActions*	fActions;
 };
 
 
@@ -55,7 +55,8 @@ Rule::~Rule()
 {
 	if (fInstructions != NULL)
 		fInstructions->ReleaseReference();
-	delete fActions;
+	if (fActions != NULL)
+		fActions->ReleaseReference();
 }
 
 
@@ -73,10 +74,15 @@ Rule::SetInstructions(RuleInstructions* instructions)
 
 
 void
-Rule::SetActions(RuleActions* actions)
+Rule::SetActions(data::RuleActions* actions)
 {
-	delete fActions;
+	if (fActions != NULL)
+		fActions->ReleaseReference();
+
 	fActions = actions;
+
+	if (fActions != NULL)
+		fActions->AcquireReference();
 }
 
 

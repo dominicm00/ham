@@ -347,7 +347,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 			fate = MakeTarget::MAKE;
 	}
 
-	if (fate == MakeTarget::MAKE && false/*has no actions*/) {
+	if (fate == MakeTarget::MAKE && !target->HasActionsCalls()) {
 		if (!isPseudoTarget) {
 			if (target->IsIgnoreIfMissing())
 				fate = MakeTarget::KEEP;

@@ -4,16 +4,18 @@
  */
 
 
-#include "code/RuleActions.h"
+#include "data/RuleActions.h"
 
 
 namespace ham {
-namespace code {
+namespace data {
 
 
-RuleActions::RuleActions(const StringList& variables, const String& actions,
-	uint32_t flags)
+RuleActions::RuleActions(const String& ruleName, const StringList& variables,
+	const String& actions, uint32_t flags)
 	:
+	util::Referenceable(),
+	fRuleName(ruleName),
 	fVariables(variables),
 	fActions(actions),
 	fFlags(flags)
@@ -26,5 +28,5 @@ RuleActions::~RuleActions()
 }
 
 
-}	// namespace code
+}	// namespace data
 }	// namespace ham

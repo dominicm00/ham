@@ -39,7 +39,6 @@ SharedLibrary libham.so
 	Node.cpp
 	NotExpression.cpp
 	OnExpression.cpp
-	RuleActions.cpp
 	RuleDefinition.cpp
 	RuleInstructions.cpp
 	UserRuleInstructions.cpp
@@ -51,6 +50,7 @@ SharedLibrary libham.so
 	MakeTarget.cpp
 	Path.cpp
 	RegExp.cpp
+	RuleActions.cpp
 	String.cpp
 	StringList.cpp
 	StringListOperations.cpp

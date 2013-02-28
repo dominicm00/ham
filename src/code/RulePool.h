@@ -15,10 +15,6 @@ namespace ham {
 namespace code {
 
 
-class RuleInstructions;
-class RuleActions;
-
-
 class RulePool {
 public:
 								RulePool()	{}

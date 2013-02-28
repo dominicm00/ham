@@ -9,6 +9,7 @@
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "code/Rule.h"
+#include "data/RuleActions.h"
 
 
 namespace ham {
@@ -45,7 +46,9 @@ ActionsDefinition::Evaluate(EvaluationContext& context)
 
 	// create and add the actions to the rule
 	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
-	rule.SetActions(new RuleActions(variables, fActions, fFlags));
+	util::Reference<data::RuleActions> actions(
+		new data::RuleActions(fRuleName, variables, fActions, fFlags), true);
+	rule.SetActions(actions.Get());
 	return StringList::False();
 }
 

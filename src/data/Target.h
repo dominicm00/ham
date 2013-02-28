@@ -6,18 +6,13 @@
 #define HAM_DATA_TARGET_H
 
 
+#include "data/RuleActions.h"
+#include "data/TargetContainers.h"
 #include "data/VariableDomain.h"
-#include "util/SequentialSet.h"
 
 
 namespace ham {
 namespace data {
-
-
-class Target;
-
-
-typedef util::SequentialSet<Target*> TargetSet;
 
 
 class Target {
@@ -81,12 +76,20 @@ public:
 									{ fIncludes.insert(include); }
 	inline	void				AddIncludes(const TargetSet& includes);
 
+			const std::vector<RuleActionsCall>& ActionsCalls() const
+									{ return fActionsCalls; }
+			bool				HasActionsCalls() const
+									{ return !fActionsCalls.empty(); }
+	inline	void				AddActionsCall(
+									const RuleActionsCall& actionsCall);
+
 private:
 			String				fName;
 			VariableDomain*		fVariables;
 			uint32_t			fFlags;
 			TargetSet			fDependencies;
 			TargetSet			fIncludes;
+			std::vector<RuleActionsCall> fActionsCalls;
 };
 
 
@@ -131,6 +134,13 @@ Target::AddIncludes(const TargetSet& includes)
 		it != includes.end(); ++it) {
 		AddInclude(*it);
 	}
+}
+
+
+void
+Target::AddActionsCall(const RuleActionsCall& actionsCall)
+{
+	fActionsCalls.push_back(actionsCall);
 }
 
 
