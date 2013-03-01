@@ -11,6 +11,7 @@
 
 #include "make/MakeException.h"
 #include "make/Processor.h"
+#include "util/OptionIterator.h"
 #include "util/TextFileException.h"
 
 
@@ -31,7 +32,7 @@ print_usage(const char* programName, bool error)
 		"\"jam\" (plain Jam\n");
 	fprintf(out, "      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
 		"default).\n");
-	fprintf(out, "  -d <option>\n");
+	fprintf(out, "  -d <option>, --debug <option>\n");
 	fprintf(out, "      Enable/set a debug option. Options are:\n");
 	fprintf(out, "      a     -  Print the actions\n");
 	fprintf(out, "      c     -  Print the causes\n");
@@ -104,157 +105,161 @@ main(int argc, const char* const* argv)
 		set_variable(variables, environ[i]);
 
 	// parse arguments
-	const char* jambaseFile = NULL;
-	const char* actionsOutputFile = NULL;
+	std::string jambaseFile;
+	bool jambaseFileSpecified = false;
+	std::string actionsOutputFile;
+	bool actionsOutputFileSpecified = false;
 	behavior::Compatibility compatibility = behavior::COMPATIBILITY_HAM;
-	bool explicitCompatibility = false;
+	bool compatibilitySpecified = false;
 	bool buildFromNewest = false;
 	int jobCount = 1;
 	bool dryRun = false;
 	bool quitOnError = false;
+	bool printMakeTree = false;
+	bool printActions = false;
+	bool printCommands = false;
 	data::StringList forceUpdateTargets;
 
-	int argi = 1;
-	while (argi < argc) {
-		const char* arg = argv[argi];
-		if (arg[0] != '-')
-			break;
+	util::OptionIterator optionIterator(argc, argv,
+		util::OptionSpecification()
+			.Add('a', "--all")
+			.Add('c', "--compatibility", true)
+			.Add('d', "--debug", true)
+			.Add('f', "--jambase", true)
+			.Add('g', "--from-newest")
+			.Add('h', "--help")
+			.Add('j', "--jobs", true)
+			.Add('n', "--dry-run")
+			.Add('o', "--actions", true)
+			.Add('q', "--quit-on-error")
+			.Add('s', "--set", true)
+			.Add('t', "--target", true)
+			.Add('v', "--version")
+	);
 
-		argi++;
-		arg++;
-
-		if (*arg == '-') {
-			// long ("--") option -- map to short option
-			if (strcmp(arg, "-all") == 0)
-				arg = "a";
-			if (strcmp(arg, "-compatibility") == 0)
-				arg = "c";
-			else if (strcmp(arg, "-jambase") == 0)
-				arg = "f";
-			else if (strcmp(arg, "-from-newest") == 0)
-				arg = "g";
-			else if (strcmp(arg, "-help") == 0)
-				arg = "h";
-			else if (strcmp(arg, "-jobs") == 0)
-				arg = "j";
-			else if (strcmp(arg, "-dry-run") == 0)
-				arg = "n";
-			else if (strcmp(arg, "-actions") == 0)
-				arg = "o";
-			else if (strcmp(arg, "-quit-on-error") == 0)
-				arg = "q";
-			else if (strcmp(arg, "-set") == 0)
-				arg = "s";
-			else if (strcmp(arg, "-target") == 0)
-				arg = "t";
-			else if (strcmp(arg, "-version") == 0)
-				arg = "v";
-			else
-				print_usage_end_exit(programName, true);
-		}
-
+	while (optionIterator.HasNext()) {
 		// short ("-") option(s)
-		for (; *arg != '\0'; arg++) {
-			switch (*arg) {
-				case 'c':
-				{
-					if (argi == argc)
-						print_usage_end_exit(programName, true);
-
-					const char* compatibilityString = argv[argi++];
-					if (strcmp(compatibilityString, "jam") == 0) {
-						compatibility = behavior::COMPATIBILITY_JAM;
-					} else if (strcmp(compatibilityString, "boost") == 0) {
-						compatibility = behavior::COMPATIBILITY_BOOST_JAM;
-					} else if (strcmp(compatibilityString, "ham") == 0) {
-						compatibility = behavior::COMPATIBILITY_HAM;
-					} else {
-						fprintf(stderr, "Error: Invalid argument for "
-							"compatibility option: \"%s\"\n",
-							compatibilityString);
-						exit(1);
-					}
-					explicitCompatibility = true;
-					break;
+		std::string argument;
+		switch (optionIterator.Next(argument)) {
+			case 'c':
+			{
+				if (argument == "jam") {
+					compatibility = behavior::COMPATIBILITY_JAM;
+				} else if (argument == "boost") {
+					compatibility = behavior::COMPATIBILITY_BOOST_JAM;
+				} else if (argument == "ham") {
+					compatibility = behavior::COMPATIBILITY_HAM;
+				} else {
+					fprintf(stderr, "Error: Invalid argument for "
+						"compatibility option: \"%s\"\n", argument.c_str());
+					exit(1);
 				}
-
-				case 'd':
-// TODO: Debug options!
-//					if (argi == argc)
-//						print_usage_end_exit(programName, true);
-//					testDataDirectory = argv[argi++];
-//					break;
-
-				case 'f':
-					if (argi == argc)
-						print_usage_end_exit(programName, true);
-					jambaseFile = argv[argi++];
-					break;
-
-				case 'g':
-					buildFromNewest = true;
-					break;
-
-				case 'h':
-					print_usage_end_exit(programName, false);
-
-				case 'j':
-				{
-					if (argi == argc)
-						print_usage_end_exit(programName, true);
-					char* end;
-					jobCount = strtol(argv[argi++], &end, 0);
-					if (*end != '\0')
-						print_usage_end_exit(programName, true);
-					break;
-				}
-
-				case 'n':
-					dryRun = true;
-					break;
-
-				case 'o':
-					if (argi == argc)
-						print_usage_end_exit(programName, true);
-					actionsOutputFile = argv[argi++];
-					break;
-
-				case 'q':
-					quitOnError = true;
-					break;
-
-				case 's':
-				{
-					if (argi == argc || !set_variable(variables, argv[argi++]))
-						print_usage_end_exit(programName, true);
-					break;
-				}
-
-				case 't':
-					if (argi == argc)
-						print_usage_end_exit(programName, true);
-
-					forceUpdateTargets.Append(String(argv[argi++]));
-					break;
-
-				case 'v':
-					printf("Ham 0.1, Copyright 2010-2013 Ingo Weinhold.");
-					exit(0);
-
-				default:
-					print_usage_end_exit(programName, true);
+				compatibilitySpecified = true;
+				break;
 			}
+
+			case 'd':
+			{
+				if (argument.empty())
+					print_usage_end_exit(programName, true);
+				for (size_t i = 0; i < argument.length(); i++) {
+					switch (argument[i]) {
+						case 'a':
+							printActions = true;
+							break;
+// TODO:...
+//						case 'c':
+//							printCauses = true;
+//							break;
+//						case 'd':
+//							printDependencies = true;
+//							break;
+						case 'm':
+							printMakeTree = true;
+							break;
+						case 'x':
+							printCommands = true;
+							break;
+						default:
+// TODO: 0-9
+							print_usage_end_exit(programName, true);
+					}
+				}
+				break;
+			}
+
+			case 'f':
+				jambaseFile = argument;
+				jambaseFileSpecified = true;
+				break;
+
+			case 'g':
+				buildFromNewest = true;
+				break;
+
+			case 'h':
+				print_usage_end_exit(programName, false);
+
+			case 'j':
+			{
+				char* end;
+				jobCount = strtol(argument.c_str(), &end, 0);
+				if (*end != '\0')
+					print_usage_end_exit(programName, true);
+				break;
+			}
+
+			case 'n':
+				dryRun = true;
+				break;
+
+			case 'o':
+				actionsOutputFile = argument;
+				actionsOutputFileSpecified = true;
+				break;
+
+			case 'q':
+				quitOnError = true;
+				break;
+
+			case 's':
+			{
+				if (!set_variable(variables, argument.c_str()))
+					print_usage_end_exit(programName, true);
+				break;
+			}
+
+			case 't':
+				forceUpdateTargets.Append(String(argument.c_str()));
+				break;
+
+			case 'v':
+				printf("Ham 0.1, Copyright 2010-2013 Ingo Weinhold.");
+				exit(0);
+
+			default:
+				print_usage_end_exit(programName, true);
 		}
 	}
 
+	if (optionIterator.ErrorOccurred())
+		print_usage_end_exit(programName, true);
+
 	// get targets to be made
 	StringList primaryTargets;
-	for (; argi < argc; argi++)
-		primaryTargets.Append(String(argv[argi]));
+	for (int i = optionIterator.Index(); i < argc; i++)
+		primaryTargets.Append(String(argv[i]));
 
 	// "all" is the default target, if none is given.
 	if (primaryTargets.IsEmpty())
 		primaryTargets.Append("all");
+
+	// dry-run implies printing actions and command, unless one or both of
+	// those have been specified explicitly.
+	if (dryRun && !printActions && ! printCommands) {
+		printActions = true;
+		printCommands = true;
+	}
 
 	make::Processor processor;
 // TODO: Add environmental variables!
@@ -269,7 +274,7 @@ main(int argc, const char* const* argv)
 
 	// Set compatibility. If not specified explicitly, infer from the program
 	// name.
-	if (!explicitCompatibility) {
+	if (!compatibilitySpecified) {
 		const char* slash = strrchr(programName, '/');
 		const char* baseName = slash != NULL ? slash + 1 : programName;
 		if (strcmp(baseName, "jam") == 0)
@@ -282,13 +287,16 @@ main(int argc, const char* const* argv)
 
 	// set other options
 	processor.SetPrimaryTargets(primaryTargets);
-	if (jambaseFile != NULL)
-		processor.SetJambaseFile(jambaseFile);
+	if (jambaseFileSpecified)
+		processor.SetJambaseFile(jambaseFile.c_str());
 	processor.SetBuildFromNewest(buildFromNewest);
 	processor.SetJobCount(jobCount);
 	processor.SetDryRun(dryRun);
-	if (actionsOutputFile != NULL)
-		processor.SetActionsOutputFile(actionsOutputFile);
+	processor.SetPrintMakeTree(printMakeTree);
+	processor.SetPrintActions(printActions);
+	processor.SetPrintCommands(printCommands);
+	if (actionsOutputFileSpecified)
+		processor.SetActionsOutputFile(actionsOutputFile.c_str());
 	processor.SetQuitOnError(quitOnError);
 
 	try {

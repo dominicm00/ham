@@ -45,6 +45,8 @@ Processor::Processor()
 	fDryRun(false),
 	fQuitOnError(false),
 	fPrintMakeTree(false),
+	fPrintActions(false),
+	fPrintCommands(false),
 	fPrimaryTargetNames(),
 	fMakeTargets(),
 	fMakeLevel(0)
@@ -122,6 +124,20 @@ void
 Processor::SetPrintMakeTree(bool printMakeTree)
 {
 	fPrintMakeTree = printMakeTree;
+}
+
+
+void
+Processor::SetPrintActions(bool printActions)
+{
+	fPrintActions = printActions;
+}
+
+
+void
+Processor::SetPrintCommands(bool printCommands)
+{
+	fPrintCommands = printCommands;
 }
 
 
@@ -362,7 +378,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 
-	_PrintMakeTreeState(makeTarget, parentTime);
+	if (fPrintMakeTree)
+		_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS
 // - IGNORE_IF_MISSING

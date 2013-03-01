@@ -41,6 +41,8 @@ public:
 			void				SetDryRun(bool dryRun);
 			void				SetQuitOnError(bool quitOnError);
 			void				SetPrintMakeTree(bool printMakeTree);
+			void				SetPrintActions(bool printActions);
+			void				SetPrintCommands(bool printCommands);
 
 			void				SetOutput(std::ostream& output);
 			void				SetErrorOutput(std::ostream& output);
@@ -89,6 +91,8 @@ private:
 			bool				fDryRun;
 			bool				fQuitOnError;
 			bool				fPrintMakeTree;
+			bool				fPrintActions;
+			bool				fPrintCommands;
 			StringList			fPrimaryTargetNames;
 			MakeTargetMap		fMakeTargets;
 			data::Time			fNow;
