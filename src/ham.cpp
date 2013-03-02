@@ -308,6 +308,9 @@ main(int argc, const char* const* argv)
 
 		// prepare the targets
 		processor.PrepareTargets();
+
+		// build the targets
+		processor.BuildTargets();
 	} catch (make::MakeException& exception) {
 		fprintf(stderr, "%s.\n", exception.Message());
 	} catch (util::TextFileException& exception) {
