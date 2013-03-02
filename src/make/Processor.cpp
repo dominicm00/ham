@@ -48,8 +48,10 @@ Processor::Processor()
 	fPrintActions(false),
 	fPrintCommands(false),
 	fPrimaryTargetNames(),
+	fPrimaryTargets(),
 	fMakeTargets(),
-	fMakeLevel(0)
+	fMakeLevel(0),
+	fMakableTargets()
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
@@ -194,6 +196,7 @@ void
 Processor::PrepareTargets()
 {
 	fNow = Time::Now();
+// TODO: Not used yet!
 
 	// Create make targets for the given primary target names.
 	if (fPrimaryTargetNames.IsEmpty())
@@ -217,7 +220,9 @@ Processor::PrepareTargets()
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
 		Target* target = fTargets.Lookup(targetName);
-		_PrepareTargetRecursively(_GetMakeTarget(target, false), Time(0));
+		MakeTarget* makeTarget = _GetMakeTarget(target, false);
+		fPrimaryTargets.insert(makeTarget);
+		_PrepareTargetRecursively(makeTarget, Time(0));
 	}
 }
 
@@ -225,7 +230,15 @@ Processor::PrepareTargets()
 void
 Processor::BuildTargets()
 {
-	// TODO:...
+	for (MakeTargetSet::iterator it = fPrimaryTargets.begin();
+		it != fPrimaryTargets.end(); ++it) {
+		_CollectMakableTargets(*it);
+	}
+
+	while (!fMakableTargets.empty()) {
+		MakeTarget* makeTarget = *fMakableTargets.begin();
+		_MakeTarget(makeTarget);
+	}
 }
 
 
@@ -295,6 +308,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	bool cantMake = false;
 	for (size_t i = 0; i < makeTarget->Dependencies().size(); i++) {
 		MakeTarget* dependency = makeTarget->Dependencies().at(i);
+		dependency->AddParent(makeTarget);
 
 		fMakeLevel++;
 		_PrepareTargetRecursively(dependency, time);
@@ -454,6 +468,122 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 			new code::OnExpression(targetNameNode.Get(), call.Get()), true);
 		onExpression->Evaluate(fEvaluationContext);
 	}
+}
+
+
+bool
+Processor::_CollectMakableTargets(MakeTarget* makeTarget)
+{
+	switch (makeTarget->GetFate()) {
+		case MakeTarget::MAKE:
+			makeTarget->SetMakeState(MakeTarget::PENDING);
+			break;
+		case MakeTarget::KEEP:
+			makeTarget->SetMakeState(MakeTarget::DONE);
+			return false;
+		case MakeTarget::UNPROCESSED:
+		case MakeTarget::PROCESSING:
+			// those can't happen
+		case MakeTarget::CANT_MAKE:
+			makeTarget->SetMakeState(MakeTarget::SKIPPED);
+			return false;
+	}
+
+	size_t pendingDependencyCount = 0;
+	for (MakeTargetSet::iterator it = makeTarget->Dependencies().begin();
+		it != makeTarget->Dependencies().end(); ++it) {
+		if (_CollectMakableTargets(*it))
+			pendingDependencyCount++;
+	}
+
+	makeTarget->SetPendingDependenciesCount(pendingDependencyCount);
+
+	if (pendingDependencyCount == 0)
+		fMakableTargets.insert(makeTarget);
+
+	return true;
+}
+
+
+void
+Processor::_MakeTarget(MakeTarget* makeTarget)
+{
+	Target* target = makeTarget->GetTarget();
+	if (target->ActionsCalls().empty()) {
+		_TargetMade(makeTarget, MakeTarget::DONE);
+		return;
+	}
+
+	for (std::vector<data::RuleActionsCall>::const_iterator it
+			= target->ActionsCalls().begin();
+		it != target->ActionsCalls().end(); ++it) {
+		data::RuleActionsCall actionsCall = *it;
+		data::RuleActions* actions = actionsCall.Actions();
+		printf("%s %s\n", actions->RuleName().ToCString(),
+			target->Name().ToCString());
+	}
+
+//		if (fDryRun)
+//			_TargetMade(makeTarget, MakeTarget::DONE);
+_TargetMade(makeTarget, MakeTarget::DONE);
+
+// TODO:...
+}
+
+
+void
+Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
+{
+	if (makeTarget->GetMakeState() == MakeTarget::PENDING)
+		makeTarget->SetMakeState(state);
+
+	switch (state) {
+		case MakeTarget::DONE:
+			break;
+		case MakeTarget::PENDING:
+			// cannot happen
+			break;
+		case MakeTarget::FAILED:
+//TODO: Reporting should happen where we know what action failed.
+//			printf("");
+			break;
+		case MakeTarget::SKIPPED:
+		{
+			// get the first dependency that couldn't be made
+			MakeTarget* lackingDependency = NULL;
+			for (MakeTargetSet::iterator it
+					= makeTarget->Dependencies().begin();
+				it != makeTarget->Dependencies().end(); ++it) {
+				MakeTarget* dependency = *it;
+				if (dependency->GetMakeState() == MakeTarget::FAILED
+					|| dependency->GetMakeState() == MakeTarget::SKIPPED) {
+					lackingDependency = dependency;
+				}
+			}
+
+			printf("...skipped %s for lack of %s...\n",
+				makeTarget->Name().ToCString(),
+				lackingDependency != NULL
+					? lackingDependency->Name().ToCString() : "???");
+			break;
+		}
+	}
+
+	// propagate the event to the target's parents
+	for (MakeTargetSet::iterator it = makeTarget->Parents().begin();
+		it != makeTarget->Parents().end(); ++it) {
+		MakeTarget* parent = *it;
+		size_t pendingDependencyCount = parent->PendingDependenciesCount() - 1;
+		parent->SetPendingDependenciesCount(pendingDependencyCount);
+
+		if (pendingDependencyCount == 0) {
+			if (parent->GetMakeState() == MakeTarget::PENDING)
+				fMakableTargets.insert(fMakableTargets.begin(), parent);
+			else
+				_TargetMade(parent, MakeTarget::SKIPPED);
+		}
+	}
+
 }
 
 

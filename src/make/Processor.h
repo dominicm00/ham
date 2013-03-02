@@ -66,10 +66,16 @@ private:
 
 private:
 			MakeTarget*			_GetMakeTarget(Target* target, bool create);
+
 			void				_PrepareTargetRecursively(
 									MakeTarget* makeTarget,
 									data::Time parentTime);
 			void				_ScanForHeaders(MakeTarget* makeTarget);
+
+			bool				_CollectMakableTargets(MakeTarget* makeTarget);
+			void				_MakeTarget(MakeTarget* makeTarget);
+			void				_TargetMade(MakeTarget* makeTarget,
+									MakeTarget::MakeState state);
 
 			void				_PrintMakeTreeBinding(
 									const MakeTarget* makeTarget);
@@ -94,9 +100,11 @@ private:
 			bool				fPrintActions;
 			bool				fPrintCommands;
 			StringList			fPrimaryTargetNames;
+			MakeTargetSet		fPrimaryTargets;
 			MakeTargetMap		fMakeTargets;
 			data::Time			fNow;
 			int					fMakeLevel;
+			MakeTargetSet		fMakableTargets;
 };
 
 
