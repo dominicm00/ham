@@ -452,7 +452,7 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 	// If anything was found, call the HDRRULE.
 	if (!headersFound.IsEmpty()) {
 		// Construct the code to evaluate the rule under the influence of the
-		// influence of the target.
+		// target.
 		code::NodeReference targetNameNode(new code::Constant(target->Name()),
 			true);
 		code::NodeReference headersNode(new code::Constant(headersFound), true);
