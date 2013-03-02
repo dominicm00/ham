@@ -35,6 +35,13 @@ public:
 				CANT_MAKE
 			};
 
+			enum MakeState {
+				DONE,
+				PENDING,
+				FAILED,
+				SKIPPED
+			};
+
 public:
 								MakeTarget(Target* target);
 								~MakeTarget();
@@ -81,6 +88,11 @@ public:
 									{ fIncludes.insert(include); }
 	inline	void				AddIncludes(const MakeTargetSet& includes);
 
+			const MakeTargetSet& Parents() const
+									{ return fParents; }
+			void				AddParent(MakeTarget* parent)
+									{ fParents.insert(parent); }
+
 			State				GetState() const
 									{ return fState; }
 			void				SetState(State state)
@@ -91,6 +103,16 @@ public:
 			void				SetFate(Fate fate)
 									{ fFate = fate; }
 
+			MakeState			GetMakeState() const
+									{ return fMakeState; }
+			void				SetMakeState(MakeState state)
+									{ fMakeState = state; }
+
+			size_t				PendingDependenciesCount() const
+									{ return fPendingDependencyCount; }
+			void				SetPendingDependenciesCount(size_t count)
+									{ fPendingDependencyCount = count; }
+
 private:
 			Target*				fTarget;
 			String				fBoundPath;
@@ -99,8 +121,11 @@ private:
 			bool				fFileExists;
 			MakeTargetSet		fDependencies;
 			MakeTargetSet		fIncludes;
+			MakeTargetSet		fParents;
 			State				fState;
 			Fate				fFate;
+			MakeState			fMakeState;
+			size_t				fPendingDependencyCount;
 };
 
 
