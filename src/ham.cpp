@@ -116,8 +116,9 @@ main(int argc, const char* const* argv)
 	bool dryRun = false;
 	bool quitOnError = false;
 	bool printMakeTree = false;
-	bool printActions = false;
+	bool printActions = true;
 	bool printCommands = false;
+	bool debugSpecified = false;
 	data::StringList forceUpdateTargets;
 
 	util::OptionIterator optionIterator(argc, argv,
@@ -162,8 +163,16 @@ main(int argc, const char* const* argv)
 			{
 				if (argument.empty())
 					print_usage_end_exit(programName, true);
+
+				// The first '-d' encountered clears all default debug options.
+				if (!debugSpecified) {
+					printActions = false;
+					debugSpecified = true;
+				}
+
 				for (size_t i = 0; i < argument.length(); i++) {
-					switch (argument[i]) {
+					char debugOption = argument[i];
+					switch (debugOption) {
 						case 'a':
 							printActions = true;
 							break;
@@ -181,8 +190,25 @@ main(int argc, const char* const* argv)
 							printCommands = true;
 							break;
 						default:
-// TODO: 0-9
-							print_usage_end_exit(programName, true);
+							if (!isdigit(debugOption))
+								print_usage_end_exit(programName, true);
+							switch (debugOption - '0') {
+// TODO: Support all debug levels correctly!
+								case 9:
+								case 8:
+								case 7:
+								case 6:
+								case 5:
+								case 4:
+									printCommands = true;
+								case 3:
+									printMakeTree = true;
+								case 2:
+								case 1:
+									printActions = true;
+								case 0:
+									break;
+							}
 					}
 				}
 				break;
@@ -254,12 +280,10 @@ main(int argc, const char* const* argv)
 	if (primaryTargets.IsEmpty())
 		primaryTargets.Append("all");
 
-	// dry-run implies printing actions and command, unless one or both of
-	// those have been specified explicitly.
-	if (dryRun && !printActions && ! printCommands) {
-		printActions = true;
+	// dry-run implies printing commands, unless debug options have been
+	// specified explicitly.
+	if (dryRun && !debugSpecified)
 		printCommands = true;
-	}
 
 	make::Processor processor;
 // TODO: Add environmental variables!
