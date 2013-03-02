@@ -31,16 +31,19 @@ public:
 
 	bool insert(const Element& element)
 	{
-		if (fSet.find(element) != fSet.end())
-			return false;
+		return insert(end(), element);
+	}
 
+	bool insert(const iterator& position, const Element& element)
+	{
 		std::pair<typename std::set<Element>::iterator, bool> result
 			= fSet.insert(element);
 		if (!result.second)
 			return false;
 
 		try {
-			fVector.push_back(element);
+			size_t index = position - fVector.begin();
+			fVector.insert(fVector.begin() + index, element);
 			return true;
 		} catch (...) {
 			fSet.erase(result.first);
@@ -51,6 +54,11 @@ public:
 	size_t size() const
 	{
 		return fVector.size();
+	}
+
+	bool empty() const
+	{
+		return fVector.empty();
 	}
 
 	const_reference at(size_t index) const
