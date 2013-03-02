@@ -9,6 +9,8 @@
 #include <set>
 #include <vector>
 
+#include "util/Exception.h"
+
 
 namespace ham {
 namespace util {
@@ -17,9 +19,7 @@ namespace util {
 template<typename Element>
 class SequentialSet {
 public:
-	typedef typename std::vector<Element>::const_iterator const_iterator;
-	typedef const_iterator iterator;
-	typedef typename std::vector<Element>::const_reference const_reference;
+	class Iterator;
 
 public:
 	SequentialSet()
@@ -29,20 +29,22 @@ public:
 	{
 	}
 
-	bool insert(const Element& element)
+	bool Append(const Element& element)
 	{
-		return insert(end(), element);
+		return Insert(element, Size());
 	}
 
-	bool insert(const iterator& position, const Element& element)
+	bool Insert(const Element& element, size_t index)
 	{
+		if (index > Size())
+			throw Exception("SequentialSet::Insert(): index out of bounds");
+
 		std::pair<typename std::set<Element>::iterator, bool> result
 			= fSet.insert(element);
 		if (!result.second)
 			return false;
 
 		try {
-			size_t index = position - fVector.begin();
 			fVector.insert(fVector.begin() + index, element);
 			return true;
 		} catch (...) {
@@ -51,34 +53,77 @@ public:
 		}
 	}
 
-	size_t size() const
+	size_t Size() const
 	{
 		return fVector.size();
 	}
 
-	bool empty() const
+	bool IsEmpty() const
 	{
 		return fVector.empty();
 	}
 
-	const_reference at(size_t index) const
+	const Element& ElementAt(size_t index) const
 	{
 		return fVector.at(index);
 	}
 
-	iterator begin() const
+	const Element& Head() const
 	{
-		return fVector.begin();
+		return ElementAt(0);
 	}
 
-	iterator end() const
+	Iterator GetIterator() const
 	{
-		return fVector.end();
+		return Iterator(*this);
 	}
 
 private:
 	std::set<Element>		fSet;
 	std::vector<Element>	fVector;
+};
+
+
+template<typename Element>
+class SequentialSet<Element>::Iterator {
+public:
+	Iterator()
+		:
+		fSet(NULL),
+		fNextIndex(0)
+	{
+	}
+
+	Iterator(const SequentialSet& set)
+		:
+		fSet(&set),
+		fNextIndex(0)
+	{
+	}
+
+	bool HasNext() const
+	{
+		return fSet != NULL && fNextIndex < fSet->Size();
+	}
+
+	const Element& Next()
+	{
+		return fSet->ElementAt(fNextIndex++);
+	}
+
+	bool operator==(const Iterator& other) const
+	{
+		return fSet == other.fSet && fNextIndex == other.fNextIndex;
+	}
+
+	bool operator!=(const Iterator& other) const
+	{
+		return !(*this == other);
+	}
+
+private:
+	const SequentialSet*	fSet;
+	size_t					fNextIndex;
 };
 
 

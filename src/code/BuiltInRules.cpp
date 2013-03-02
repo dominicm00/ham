@@ -207,7 +207,7 @@ public:
 		for (size_t i = 0; i < dependencyCount; i++) {
 			data::Target* target = context.Targets().LookupOrCreate(
 				dependencyNames.ElementAt(i));
-			dependencies.insert(target);
+			dependencies.Append(target);
 		}
 
 		// add the dependencies to the targets

@@ -76,22 +76,22 @@ public:
 			const MakeTargetSet& Dependencies() const
 									{ return fDependencies; }
 			void				AddDependency(MakeTarget* dependency)
-									{ fDependencies.insert(dependency); }
+									{ fDependencies.Append(dependency); }
 	inline	void				AddDependencies(
 									const MakeTargetSet& dependencies);
 			bool				IsLeaf() const
-									{ return fDependencies.size() == 0; }
+									{ return fDependencies.IsEmpty(); }
 
 			const MakeTargetSet& Includes() const
 									{ return fIncludes; }
 			void				AddInclude(MakeTarget* include)
-									{ fIncludes.insert(include); }
+									{ fIncludes.Append(include); }
 	inline	void				AddIncludes(const MakeTargetSet& includes);
 
 			const MakeTargetSet& Parents() const
 									{ return fParents; }
 			void				AddParent(MakeTarget* parent)
-									{ fParents.insert(parent); }
+									{ fParents.Append(parent); }
 
 			State				GetState() const
 									{ return fState; }
@@ -132,20 +132,16 @@ private:
 void
 MakeTarget::AddDependencies(const MakeTargetSet& dependencies)
 {
-	for (MakeTargetSet::const_iterator it = dependencies.begin();
-		it != dependencies.end(); ++it) {
-		AddDependency(*it);
-	}
+	for (MakeTargetSet::Iterator it = dependencies.GetIterator(); it.HasNext();)
+		AddDependency(it.Next());
 }
 
 
 void
 MakeTarget::AddIncludes(const MakeTargetSet& includes)
 {
-	for (MakeTargetSet::const_iterator it = includes.begin();
-		it != includes.end(); ++it) {
-		AddInclude(*it);
-	}
+	for (MakeTargetSet::Iterator it = includes.GetIterator(); it.HasNext();)
+		AddInclude(it.Next());
 }
 
 

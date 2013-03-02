@@ -221,7 +221,7 @@ Processor::PrepareTargets()
 		String targetName = fPrimaryTargetNames.ElementAt(i);
 		Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
-		fPrimaryTargets.insert(makeTarget);
+		fPrimaryTargets.Append(makeTarget);
 		_PrepareTargetRecursively(makeTarget, Time(0));
 	}
 }
@@ -230,13 +230,13 @@ Processor::PrepareTargets()
 void
 Processor::BuildTargets()
 {
-	for (MakeTargetSet::iterator it = fPrimaryTargets.begin();
-		it != fPrimaryTargets.end(); ++it) {
-		_CollectMakableTargets(*it);
+	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
+		it.HasNext();) {
+		_CollectMakableTargets(it.Next());
 	}
 
-	while (!fMakableTargets.empty()) {
-		MakeTarget* makeTarget = *fMakableTargets.begin();
+	while (!fMakableTargets.IsEmpty()) {
+		MakeTarget* makeTarget = fMakableTargets.Head();
 		_MakeTarget(makeTarget);
 	}
 }
@@ -296,18 +296,16 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 
 	// add make targets for dependencies
 	const TargetSet& dependencies = target->Dependencies();
-	for (TargetSet::iterator it = dependencies.begin();
-		it != dependencies.end(); ++it) {
-		makeTarget->AddDependency(_GetMakeTarget(*it, true));
-	}
+	for (TargetSet::Iterator it = dependencies.GetIterator(); it.HasNext();)
+		makeTarget->AddDependency(_GetMakeTarget(it.Next(), true));
 
 	// recursively process the target's dependencies
 	Time newestDependencyTime(0);
 	Time newestLeafTime(0);
 	bool dependencyUpdated = false;
 	bool cantMake = false;
-	for (size_t i = 0; i < makeTarget->Dependencies().size(); i++) {
-		MakeTarget* dependency = makeTarget->Dependencies().at(i);
+	for (size_t i = 0; i < makeTarget->Dependencies().Size(); i++) {
+		MakeTarget* dependency = makeTarget->Dependencies().ElementAt(i);
 		dependency->AddParent(makeTarget);
 
 		fMakeLevel++;
@@ -347,10 +345,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 
 	// add make targets for includes
 	const TargetSet& includes = target->Includes();
-	for (TargetSet::iterator it = includes.begin();
-		it != includes.end(); ++it) {
-		makeTarget->AddInclude(_GetMakeTarget(*it, true));
-	}
+	for (TargetSet::Iterator it = includes.GetIterator(); it.HasNext();)
+		makeTarget->AddInclude(_GetMakeTarget(it.Next(), true));
 
 	// For depends-on-leaves targets consider only the leaf times.
 	if (target->DependsOnLeaves())
@@ -490,16 +486,16 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	}
 
 	size_t pendingDependencyCount = 0;
-	for (MakeTargetSet::iterator it = makeTarget->Dependencies().begin();
-		it != makeTarget->Dependencies().end(); ++it) {
-		if (_CollectMakableTargets(*it))
+	for (MakeTargetSet::Iterator it = makeTarget->Dependencies().GetIterator();
+		it.HasNext();) {
+		if (_CollectMakableTargets(it.Next()))
 			pendingDependencyCount++;
 	}
 
 	makeTarget->SetPendingDependenciesCount(pendingDependencyCount);
 
 	if (pendingDependencyCount == 0)
-		fMakableTargets.insert(makeTarget);
+		fMakableTargets.Append(makeTarget);
 
 	return true;
 }
@@ -551,10 +547,10 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 		{
 			// get the first dependency that couldn't be made
 			MakeTarget* lackingDependency = NULL;
-			for (MakeTargetSet::iterator it
-					= makeTarget->Dependencies().begin();
-				it != makeTarget->Dependencies().end(); ++it) {
-				MakeTarget* dependency = *it;
+			for (MakeTargetSet::Iterator it
+					= makeTarget->Dependencies().GetIterator();
+				it.HasNext();) {
+				MakeTarget* dependency = it.Next();
 				if (dependency->GetMakeState() == MakeTarget::FAILED
 					|| dependency->GetMakeState() == MakeTarget::SKIPPED) {
 					lackingDependency = dependency;
@@ -570,15 +566,15 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 	}
 
 	// propagate the event to the target's parents
-	for (MakeTargetSet::iterator it = makeTarget->Parents().begin();
-		it != makeTarget->Parents().end(); ++it) {
-		MakeTarget* parent = *it;
+	for (MakeTargetSet::Iterator it = makeTarget->Parents().GetIterator();
+		it.HasNext();) {
+		MakeTarget* parent = it.Next();
 		size_t pendingDependencyCount = parent->PendingDependenciesCount() - 1;
 		parent->SetPendingDependenciesCount(pendingDependencyCount);
 
 		if (pendingDependencyCount == 0) {
 			if (parent->GetMakeState() == MakeTarget::PENDING)
-				fMakableTargets.insert(fMakableTargets.begin(), parent);
+				fMakableTargets.Insert( parent, 0);
 			else
 				_TargetMade(parent, MakeTarget::SKIPPED);
 		}

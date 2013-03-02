@@ -67,13 +67,13 @@ public:
 			const TargetSet&	Dependencies() const
 									{ return fDependencies; }
 			void				AddDependency(Target* dependency)
-									{ fDependencies.insert(dependency); }
+									{ fDependencies.Append(dependency); }
 	inline	void				AddDependencies(const TargetSet& dependencies);
 
 			const TargetSet&	Includes() const
 									{ return fIncludes; }
 			void				AddInclude(Target* include)
-									{ fIncludes.insert(include); }
+									{ fIncludes.Append(include); }
 	inline	void				AddIncludes(const TargetSet& includes);
 
 			const std::vector<RuleActionsCall>& ActionsCalls() const
@@ -120,20 +120,16 @@ Target::DependsOnLeaves() const
 void
 Target::AddDependencies(const TargetSet& dependencies)
 {
-	for (TargetSet::const_iterator it = dependencies.begin();
-		it != dependencies.end(); ++it) {
-		AddDependency(*it);
-	}
+	for (TargetSet::Iterator it = dependencies.GetIterator(); it.HasNext();)
+		AddDependency(it.Next());
 }
 
 
 void
 Target::AddIncludes(const TargetSet& includes)
 {
-	for (TargetSet::const_iterator it = includes.begin();
-		it != includes.end(); ++it) {
-		AddInclude(*it);
-	}
+	for (TargetSet::Iterator it = includes.GetIterator(); it.HasNext();)
+		AddInclude(it.Next());
 }
 
 
