@@ -353,7 +353,12 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	if (target->DependsOnLeaves())
 		newestDependencyTime = newestLeafTime;
 
-	// determine the target's state
+	// Consider a "don't update" target very old, so targets depending on it
+	// won't be remade unnecessarily.
+	if (target->IsDontUpdate())
+		time = Time(0);
+
+	// determine the target's state and fate
 	MakeTarget::State state;
 	MakeTarget::Fate fate = MakeTarget::KEEP;
 	if (isPseudoTarget || !makeTarget->FileExists()) {
