@@ -237,6 +237,7 @@ Processor::BuildTargets()
 
 	while (!fMakableTargets.IsEmpty()) {
 		MakeTarget* makeTarget = fMakableTargets.Head();
+		fMakableTargets.RemoveAt(0);
 		_MakeTarget(makeTarget);
 	}
 }
