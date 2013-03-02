@@ -53,6 +53,14 @@ public:
 		}
 	}
 
+	void RemoveAt(size_t index)
+	{
+		if (index >= Size())
+			throw Exception("SequentialSet::RemoveAt(): index out of bounds");
+		fSet.erase(fVector.at(index));
+		fVector.erase(fVector.begin() + index);
+	}
+
 	size_t Size() const
 	{
 		return fVector.size();
