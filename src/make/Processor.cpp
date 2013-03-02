@@ -517,7 +517,7 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 		data::RuleActionsCall actionsCall = *it;
 		data::RuleActions* actions = actionsCall.Actions();
 		printf("%s %s\n", actions->RuleName().ToCString(),
-			target->Name().ToCString());
+			makeTarget->BoundPath().ToCString());
 	}
 
 //		if (fDryRun)
