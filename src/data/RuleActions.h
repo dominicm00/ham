@@ -54,11 +54,13 @@ private:
 };
 
 
-class RuleActionsCall {
+class RuleActionsCall : public util::Referenceable {
 public:
-	RuleActionsCall(RuleActions* actions, const TargetList& sourceTargets)
+	RuleActionsCall(RuleActions* actions, const TargetList& targets,
+		const TargetList& sourceTargets)
 		:
 		fActions(actions),
+		fTargets(targets),
 		fSourceTargets(sourceTargets)
 	{
 		fActions->AcquireReference();
@@ -67,6 +69,7 @@ public:
 	RuleActionsCall(const RuleActionsCall& other)
 		:
 		fActions(other.fActions),
+		fTargets(other.fTargets),
 		fSourceTargets(other.fSourceTargets)
 	{
 		fActions->AcquireReference();
@@ -82,6 +85,11 @@ public:
 		return fActions;
 	}
 
+	const TargetList& Targets() const
+	{
+		return fTargets;
+	}
+
 	const TargetList& SourceTargets() const
 	{
 		return fSourceTargets;
@@ -92,12 +100,14 @@ public:
 		fActions->ReleaseReference();
 		fActions = other.fActions;
 		fActions->AcquireReference();
+		fTargets = other.fTargets;
 		fSourceTargets = other.fSourceTargets;
 		return *this;
 	}
 
 private:
 	RuleActions*	fActions;
+	TargetList		fTargets;
 	TargetList		fSourceTargets;
 };
 

@@ -62,7 +62,23 @@ public:
 			void				BuildTargets();
 
 private:
+			struct DebugOptions {
+				bool			fDryRun;
+				bool			fPrintMakeTree;
+				bool			fPrintActions;
+				bool			fPrintCommands;
+
+			public:
+								DebugOptions();
+			};
+
+			struct Command;
+			struct TargetBuildInfo;
+			struct TargetBuilder;
+
 			typedef std::map<Target*, MakeTarget*> MakeTargetMap;
+			typedef std::map<data::RuleActionsCall*, Command*> CommandMap;
+			typedef std::set<TargetBuildInfo*> TargetBuildInfoSet;
 
 private:
 			MakeTarget*			_GetMakeTarget(Target* target, bool create);
@@ -73,9 +89,12 @@ private:
 			void				_ScanForHeaders(MakeTarget* makeTarget);
 
 			bool				_CollectMakableTargets(MakeTarget* makeTarget);
-			void				_MakeTarget(MakeTarget* makeTarget);
+			TargetBuildInfo*	_MakeTarget(MakeTarget* makeTarget);
 			void				_TargetMade(MakeTarget* makeTarget,
 									MakeTarget::MakeState state);
+			Command*			_BuildCommand(
+									data::RuleActionsCall* actionsCall);
+
 
 			void				_PrintMakeTreeBinding(
 									const MakeTarget* makeTarget);
@@ -94,17 +113,16 @@ private:
 			String				fActionsOutputFile;
 			int					fJobCount;
 			bool				fBuildFromNewest;
-			bool				fDryRun;
 			bool				fQuitOnError;
-			bool				fPrintMakeTree;
-			bool				fPrintActions;
-			bool				fPrintCommands;
+			DebugOptions		fDebugOptions;
 			StringList			fPrimaryTargetNames;
 			MakeTargetSet		fPrimaryTargets;
 			MakeTargetMap		fMakeTargets;
 			data::Time			fNow;
 			int					fMakeLevel;
 			MakeTargetSet		fMakableTargets;
+			CommandMap			fCommands;
+			TargetBuildInfoSet	fTargetBuilders;
 };
 
 

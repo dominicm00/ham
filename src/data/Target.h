@@ -76,12 +76,12 @@ public:
 									{ fIncludes.Append(include); }
 	inline	void				AddIncludes(const TargetSet& includes);
 
-			const std::vector<RuleActionsCall>& ActionsCalls() const
+			const std::vector<RuleActionsCall*>& ActionsCalls() const
 									{ return fActionsCalls; }
 			bool				HasActionsCalls() const
 									{ return !fActionsCalls.empty(); }
 	inline	void				AddActionsCall(
-									const RuleActionsCall& actionsCall);
+									RuleActionsCall* actionsCall);
 
 private:
 			String				fName;
@@ -89,7 +89,7 @@ private:
 			uint32_t			fFlags;
 			TargetSet			fDependencies;
 			TargetSet			fIncludes;
-			std::vector<RuleActionsCall> fActionsCalls;
+			std::vector<RuleActionsCall*> fActionsCalls;
 };
 
 
@@ -134,9 +134,10 @@ Target::AddIncludes(const TargetSet& includes)
 
 
 void
-Target::AddActionsCall(const RuleActionsCall& actionsCall)
+Target::AddActionsCall(RuleActionsCall* actionsCall)
 {
 	fActionsCalls.push_back(actionsCall);
+	actionsCall->AcquireReference();
 }
 
 

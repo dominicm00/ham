@@ -82,6 +82,8 @@ FunctionCall::Evaluate(EvaluationContext& context)
 	StringList functions = fFunction->Evaluate(context);
 	size_t functionCount = functions.Size();
 	RulePool& rulePool = context.Rules();
+	data::TargetList targets;
+		// lazily initialized when needed
 	data::TargetList sourceTargets;
 		// lazily initialized when needed
 
@@ -93,29 +95,30 @@ FunctionCall::Evaluate(EvaluationContext& context)
 			continue;
 		}
 
-		if (RuleInstructions* instructions = function->Instructions())
-			result.Append(instructions->Evaluate(context, arguments));
-
 		// If the rule has actions, add respective action calls to the targets.
 		if (data::RuleActions* actions = function->Actions()) {
+			// lazily resolve the targets
+			if (targets.empty() && argumentCount > 0 && !arguments[0].IsEmpty())
+				context.Targets().LookupOrCreate(arguments[0], targets);
+
 			// lazily resolve the source targets
 			if (sourceTargets.empty() && argumentCount > 1
 				&& !arguments[1].IsEmpty()) {
-				for (StringList::Iterator it = arguments[0].GetIterator();
-					it.HasNext();) {
-					sourceTargets.push_back(
-						context.Targets().LookupOrCreate(it.Next()));
-				}
+				context.Targets().LookupOrCreate(arguments[1], sourceTargets);
 			}
 
-			data::RuleActionsCall actionsCall(actions, sourceTargets);
-			for (StringList::Iterator it = arguments[0].GetIterator();
-				it.HasNext();) {
-				data::Target* target
-					= context.Targets().LookupOrCreate(it.Next());
-				target->AddActionsCall(actionsCall);
+			util::Reference<data::RuleActionsCall> actionsCall(
+				new data::RuleActionsCall(actions, targets, sourceTargets),
+				true);
+			for (data::TargetList::iterator it = targets.begin();
+				it != targets.end(); ++it) {
+				(*it)->AddActionsCall(actionsCall.Get());
 			}
 		}
+
+		// execute rule instructions (if any)
+		if (RuleInstructions* instructions = function->Instructions())
+			result.Append(instructions->Evaluate(context, arguments));
 	}
 
 	// reset call depth

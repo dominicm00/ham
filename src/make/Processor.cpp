@@ -15,6 +15,7 @@
 #include "code/Constant.h"
 #include "code/FunctionCall.h"
 #include "code/Jambase.h"
+#include "code/Leaf.h"
 #include "code/OnExpression.h"
 #include "data/RegExp.h"
 #include "data/TargetBinder.h"
@@ -33,6 +34,284 @@ static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
 
 
+Processor::DebugOptions::DebugOptions()
+	:
+	fDryRun(false),
+	fPrintMakeTree(false),
+	fPrintActions(false),
+	fPrintCommands(false)
+{
+}
+
+
+struct Processor::Command : util::Referenceable {
+	enum State {
+		NOT_EXECUTED,
+		IN_PROGRESS,
+		SUCCEEDED,
+		FAILED
+	};
+
+public:
+	Command(data::RuleActionsCall* actions, const String& commandLine,
+		const StringList& boundTargetPaths)
+		:
+		fActions(actions),
+		fCommandLine(commandLine),
+		fBoundTargetPaths(boundTargetPaths),
+		fState(NOT_EXECUTED),
+		fWaitingBuildInfos()
+	{
+		fActions->AcquireReference();
+	}
+
+	~Command()
+	{
+		fActions->ReleaseReference();
+	}
+
+	data::RuleActionsCall* Actions() const
+	{
+		return fActions;
+	}
+
+	const String& CommandLine() const
+	{
+		return fCommandLine;
+	}
+
+	const StringList& BoundTargetPaths() const
+	{
+		return fBoundTargetPaths;
+	}
+
+	State GetState() const
+	{
+		return fState;
+	}
+
+	void SetState(State state)
+	{
+		fState = state;
+	}
+
+	const std::vector<TargetBuildInfo*>& WaitingBuildInfos() const
+	{
+		return fWaitingBuildInfos;
+	}
+
+	void AddWaitingBuildInfo(TargetBuildInfo* buildInfo)
+	{
+		fWaitingBuildInfos.push_back(buildInfo);
+	}
+
+	void ClearWaitingBuildInfos()
+	{
+		fWaitingBuildInfos.clear();
+	}
+
+private:
+	data::RuleActionsCall*			fActions;
+	String							fCommandLine;
+	StringList						fBoundTargetPaths;
+	State							fState;
+	std::vector<TargetBuildInfo*>	fWaitingBuildInfos;
+};
+
+
+struct Processor::TargetBuildInfo {
+	TargetBuildInfo(MakeTarget* target)
+		:
+		fTarget(target),
+		fCommands(),
+		fCommandIndex(0),
+		fFailed(false)
+	{
+	}
+
+	~TargetBuildInfo()
+	{
+		for (std::vector<Command*>::iterator it = fCommands.begin();
+			it != fCommands.end(); ++it) {
+			(*it)->ReleaseReference();
+		}
+	}
+
+	MakeTarget* GetTarget() const
+	{
+		return fTarget;
+	}
+
+	const std::vector<Command*>& Commands() const
+	{
+		return fCommands;
+	}
+
+	void AddCommand(Command* command)
+	{
+		fCommands.push_back(command);
+		command->AcquireReference();
+	}
+
+	Command* NextCommand()
+	{
+		if (fCommandIndex >= fCommands.size())
+			return NULL;
+		return fCommands[fCommandIndex++];
+	}
+
+	bool HasFailed() const
+	{
+		return fFailed;
+	}
+
+	void SetFailed(bool failed)
+	{
+		fFailed = failed;
+	}
+
+private:
+	MakeTarget*				fTarget;
+	std::vector<Command*>	fCommands;
+	size_t					fCommandIndex;
+	bool					fFailed;
+};
+
+
+struct Processor::TargetBuilder {
+	TargetBuilder(const DebugOptions& debugOptions, size_t maxJobCount)
+		:
+		fDebugOptions(debugOptions),
+		fMaxJobCount(maxJobCount),
+		fBuildInfos()
+	{
+	}
+
+	bool HasSpareJobSlots() const
+	{
+		return fMaxJobCount > fBuildInfos.size();
+	}
+
+	void AddBuildInfo(TargetBuildInfo* buildInfo)
+	{
+		fBuildInfos.push_back(buildInfo);
+// TODO: Ownership?
+		_ExecuteNextCommand(buildInfo);
+	}
+
+	TargetBuildInfo* NextFinishedBuildInfo()
+	{
+		// handle finished commands
+		while (!fFinishedCommands.empty()) {
+			Command* command = fFinishedCommands.front();
+			fFinishedCommands.erase(fFinishedCommands.begin());
+			for (std::vector<TargetBuildInfo*>::const_iterator it
+					= command->WaitingBuildInfos().begin();
+				it != command->WaitingBuildInfos().end(); ++it) {
+				TargetBuildInfo* buildInfo = *it;
+				switch (command->GetState()) {
+					case Command::NOT_EXECUTED:
+					case Command::IN_PROGRESS:
+						// cannot happen
+						break;
+					case Command::SUCCEEDED:
+						_ExecuteNextCommand(buildInfo);
+						break;
+					case Command::FAILED:
+// TODO: Insert at head to allow for early error detection?
+						fFinishedBuildInfos.push_back(buildInfo);
+						buildInfo->SetFailed(true);
+						fBuildInfos.erase(
+							std::find(fBuildInfos.begin(), fBuildInfos.end(),
+								buildInfo));
+						break;
+				}
+			}
+
+			command->ClearWaitingBuildInfos();
+		}
+
+		if (fFinishedBuildInfos.empty())
+			return NULL;
+
+		TargetBuildInfo* buildInfo = fFinishedBuildInfos.front();
+		fFinishedBuildInfos.erase(fFinishedBuildInfos.begin());
+		return buildInfo;
+	}
+
+	bool HasPendingBuildInfos() const
+	{
+		return !fBuildInfos.empty() || !fFinishedBuildInfos.empty();
+	}
+
+private:
+	void _ExecuteNextCommand(TargetBuildInfo* buildInfo)
+	{
+		for (;;) {
+			Command* command = buildInfo->NextCommand();
+			if (command == NULL) {
+				fFinishedBuildInfos.push_back(buildInfo);
+				fBuildInfos.erase(
+					std::find(fBuildInfos.begin(), fBuildInfos.end(),
+					buildInfo));
+				return;
+			}
+
+			switch (command->GetState()) {
+				case Command::NOT_EXECUTED:
+					// execute command
+					command->AddWaitingBuildInfo(buildInfo);
+					_ExecuteCommand(command);
+					return;
+				case Command::IN_PROGRESS:
+					// wait for command to finish
+					command->AddWaitingBuildInfo(buildInfo);
+					return;
+				case Command::SUCCEEDED:
+					// next command...
+					break;
+				case Command::FAILED:
+// TODO: Insert at head to allow for early error detection?
+					fFinishedBuildInfos.push_back(buildInfo);
+					buildInfo->SetFailed(true);
+					fBuildInfos.erase(
+						std::find(fBuildInfos.begin(), fBuildInfos.end(),
+							buildInfo));
+					return;
+			}
+		}
+	}
+
+	void _ExecuteCommand(Command* command)
+	{
+		if (fDebugOptions.fPrintActions) {
+			data::RuleActionsCall* actions = command->Actions();
+			printf("%s %s\n", actions->Actions()->RuleName().ToCString(),
+				command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
+		}
+
+		if (fDebugOptions.fPrintCommands) {
+			printf("%s\n", command->CommandLine().ToCString());
+		}
+
+		if (fDebugOptions.fDryRun) {
+			command->SetState(Command::SUCCEEDED);
+			fFinishedCommands.push_back(command);
+			return;
+		}
+
+// TODO:...
+	}
+
+private:
+	const DebugOptions&				fDebugOptions;
+	size_t							fMaxJobCount;
+	std::vector<TargetBuildInfo*>	fBuildInfos;
+	std::vector<TargetBuildInfo*>	fFinishedBuildInfos;
+	std::vector<Command*>			fFinishedCommands;
+};
+
+
 Processor::Processor()
 	:
 	fGlobalVariables(),
@@ -42,16 +321,15 @@ Processor::Processor()
 	fActionsOutputFile(),
 	fJobCount(1),
 	fBuildFromNewest(false),
-	fDryRun(false),
 	fQuitOnError(false),
-	fPrintMakeTree(false),
-	fPrintActions(false),
-	fPrintCommands(false),
+	fDebugOptions(),
 	fPrimaryTargetNames(),
 	fPrimaryTargets(),
 	fMakeTargets(),
 	fMakeLevel(0),
-	fMakableTargets()
+	fMakableTargets(),
+	fCommands(),
+	fTargetBuilders()
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
@@ -59,6 +337,16 @@ Processor::Processor()
 
 Processor::~Processor()
 {
+	for (TargetBuildInfoSet::iterator it = fTargetBuilders.begin();
+		it != fTargetBuilders.end(); ++it) {
+		delete *it;
+	}
+
+	for (CommandMap::iterator it = fCommands.begin(); it != fCommands.end();
+		++it) {
+		delete it->second;
+	}
+
 	for (MakeTargetMap::iterator it = fMakeTargets.begin();
 		it != fMakeTargets.end(); ++it) {
 		delete it->second;
@@ -111,7 +399,7 @@ Processor::SetBuildFromNewest(bool buildFromNewest)
 void
 Processor::SetDryRun(bool dryRun)
 {
-	fDryRun = dryRun;
+	fDebugOptions.fDryRun = dryRun;
 }
 
 
@@ -125,21 +413,21 @@ Processor::SetQuitOnError(bool quitOnError)
 void
 Processor::SetPrintMakeTree(bool printMakeTree)
 {
-	fPrintMakeTree = printMakeTree;
+	fDebugOptions.fPrintMakeTree = printMakeTree;
 }
 
 
 void
 Processor::SetPrintActions(bool printActions)
 {
-	fPrintActions = printActions;
+	fDebugOptions.fPrintActions = printActions;
 }
 
 
 void
 Processor::SetPrintCommands(bool printCommands)
 {
-	fPrintCommands = printCommands;
+	fDebugOptions.fPrintCommands = printCommands;
 }
 
 
@@ -235,10 +523,19 @@ Processor::BuildTargets()
 		_CollectMakableTargets(it.Next());
 	}
 
-	while (!fMakableTargets.IsEmpty()) {
-		MakeTarget* makeTarget = fMakableTargets.Head();
-		fMakableTargets.RemoveAt(0);
-		_MakeTarget(makeTarget);
+	TargetBuilder builder(fDebugOptions, fJobCount);
+
+	while (!fMakableTargets.IsEmpty() || builder.HasPendingBuildInfos()) {
+		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo()) {
+			_TargetMade(buildInfo->GetTarget(),
+				buildInfo->HasFailed() ? MakeTarget::FAILED : MakeTarget::DONE);
+		}
+
+		while (builder.HasSpareJobSlots() && !fMakableTargets.IsEmpty()) {
+			MakeTarget* makeTarget = fMakableTargets.Head();
+			fMakableTargets.RemoveAt(0);
+			builder.AddBuildInfo(_MakeTarget(makeTarget));
+		}
 	}
 }
 
@@ -275,7 +572,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		return;
 	}
 
-	if (fPrintMakeTree)
+	if (fDebugOptions.fPrintMakeTree)
 		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
 
 	makeTarget->SetFate(MakeTarget::PROCESSING);
@@ -292,7 +589,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	if (!time.IsValid())
 		time = Time(0);
 
-	if (fPrintMakeTree)
+	if (fDebugOptions.fPrintMakeTree)
 		_PrintMakeTreeBinding(makeTarget);
 
 	// add make targets for dependencies
@@ -394,7 +691,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 
-	if (fPrintMakeTree)
+	if (fDebugOptions.fPrintMakeTree)
 		_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS
@@ -507,29 +804,39 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 }
 
 
-void
+Processor::TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
 	Target* target = makeTarget->GetTarget();
 	if (target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
-		return;
+		return NULL;
 	}
 
-	for (std::vector<data::RuleActionsCall>::const_iterator it
+	std::auto_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
+
+	for (std::vector<data::RuleActionsCall*>::const_iterator it
 			= target->ActionsCalls().begin();
 		it != target->ActionsCalls().end(); ++it) {
-		data::RuleActionsCall actionsCall = *it;
-		data::RuleActions* actions = actionsCall.Actions();
-		printf("%s %s\n", actions->RuleName().ToCString(),
-			makeTarget->BoundPath().ToCString());
+		data::RuleActionsCall* actionsCall = *it;
+
+		util::Reference<Command> command;
+		CommandMap::iterator commandIt = fCommands.find(actionsCall);
+		if (commandIt != fCommands.end()) {
+			command.SetTo(commandIt->second);
+		} else {
+			// prepare the actions command line
+			command.SetTo(_BuildCommand(actionsCall), true);
+			if (actionsCall->Targets().size() > 1) {
+				fCommands[actionsCall] = command.Get();
+				command.Get()->AcquireReference();
+			}
+		}
+
+		buildInfo->AddCommand(command.Get());
 	}
 
-//		if (fDryRun)
-//			_TargetMade(makeTarget, MakeTarget::DONE);
-_TargetMade(makeTarget, MakeTarget::DONE);
-
-// TODO:...
+	return buildInfo.release();
 }
 
 
@@ -585,7 +892,113 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 				_TargetMade(parent, MakeTarget::SKIPPED);
 		}
 	}
+}
 
+
+Processor::Command*
+Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
+{
+	// create a variable domain for the built-in variables (the numbered ones
+	// and "<" and ">")
+	data::VariableDomain builtInVariables;
+
+	StringList boundTargets;
+	for (data::TargetList::const_iterator it = actionsCall->Targets().begin();
+		it != actionsCall->Targets().end(); ++it) {
+		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
+		boundTargets.Append(makeTarget->BoundPath());
+	}
+	builtInVariables.Set("1", boundTargets);
+	builtInVariables.Set("<", boundTargets);
+
+	StringList boundSourceTargets;
+	for (data::TargetList::const_iterator it
+			= actionsCall->SourceTargets().begin();
+		it != actionsCall->SourceTargets().end(); ++it) {
+		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
+		boundSourceTargets.Append(makeTarget->BoundPath());
+	}
+	builtInVariables.Set("2", boundSourceTargets);
+	builtInVariables.Set(">", boundSourceTargets);
+
+	// get the first of the targets and push a copy of its variable domain as a
+	// new local scope
+	data::Target* target = *actionsCall->Targets().begin();
+	data::VariableDomain localVariables(*target->Variables(true));
+	data::VariableScope* oldLocalScope = fEvaluationContext.LocalScope();
+	data::VariableScope localScope(localVariables, oldLocalScope);
+
+//	// prepare the local variable scope (for the named parameters)
+//	data::VariableDomain localVariables;
+//	data::VariableScope localScope(localVariables, oldLocalScope);
+//		// TODO: This is jam compatible behavior. It would be more logical to
+//		// have a NULL parent for the new scope, so the previous local variables
+//		// cannot be seen in the rule block.
+
+//	// set the named parameters
+//	StringList::Iterator it = fParameterNames.GetIterator();
+//	for (size_t i = 0; i < parameterCount && it.HasNext(); i++)
+//		localVariables.Set(it.Next(), parameters[i]);
+
+	// set the local variable scope and the built-in variables
+	fEvaluationContext.SetLocalScope(&localScope);
+
+	data::VariableDomain* oldBuiltInVariables
+		= fEvaluationContext.BuiltInVariables();
+	fEvaluationContext.SetBuiltInVariables(&builtInVariables);
+
+	String rawCommandLine = actionsCall->Actions()->Actions();
+	const char* remainder = rawCommandLine.ToCString();
+	const char* end = remainder + rawCommandLine.Length();
+	data::StringBuffer commandLine;
+// TODO: Support:
+// - UPDATED
+// - TOGETHER
+// - IGNORE
+// - QUIETLY
+// - PIECEMEAL
+// - EXISTING
+// - MAX_LINE_FACTOR
+
+	while (remainder < end) {
+		// transfer whitespace unchanged
+		if (isspace(*remainder)) {
+			commandLine += *remainder++;
+			continue;
+		}
+
+		// get the next contiguous non-whitespace sequence
+		const char* wordStart = remainder;
+		bool needsExpansion = false;
+		while (remainder < end && !isspace(*remainder)) {
+			if (*remainder == '$')
+				needsExpansion |= remainder + 1 < end && remainder[1] == '(';
+			remainder++;
+		}
+
+		// append the sequence, expanding variables, if necessary
+		if (needsExpansion) {
+// TODO: Set source and target as well as explicitly bound variables!
+			StringList result = code::Leaf::EvaluateString(fEvaluationContext,
+				wordStart, remainder, NULL);
+			bool isFirst = true;
+			for (StringList::Iterator it = result.GetIterator();
+				it.HasNext();) {
+				if (isFirst)
+					isFirst = false;
+				else
+					commandLine += ' ';
+				commandLine += it.Next();
+			}
+		} else
+			commandLine.Append(wordStart, remainder - wordStart);
+	}
+
+	// reinstate the old local variable scope and the built-in variables
+	fEvaluationContext.SetLocalScope(oldLocalScope);
+	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
+
+	return new Command(actionsCall, commandLine, boundTargets);
 }
 
 

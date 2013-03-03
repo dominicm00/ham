@@ -37,6 +37,11 @@ Target::Target(const String& name)
 
 Target::~Target()
 {
+	for (std::vector<RuleActionsCall*>::iterator it = fActionsCalls.begin();
+		it != fActionsCalls.end(); ++it) {
+		(*it)->ReleaseReference();
+	}
+
 	delete fVariables;
 }
 
