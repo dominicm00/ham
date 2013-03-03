@@ -21,7 +21,9 @@ public:
 								~TargetPool();
 
 	inline	Target*				Lookup(const String& name);
-	inline	Target*				LookupOrCreate(const String& name);
+			Target*				LookupOrCreate(const String& name);
+			void				LookupOrCreate(const StringList& names,
+									TargetList& _targets);
 
 private:
 			typedef std::map<String, Target> TargetMap;
@@ -36,21 +38,6 @@ TargetPool::Lookup(const String& name)
 {
 	TargetMap::iterator it = fTargets.find(name);
 	return it == fTargets.end() ? NULL : &it->second;
-}
-
-
-Target*
-TargetPool::LookupOrCreate(const String& name)
-{
-	// look up
-	TargetMap::iterator it = fTargets.find(name);
-	if (it != fTargets.end())
-		return &it->second;
-
-	// not found -- create
-	Target& target = fTargets[name];
-	target.SetName(name);
-	return &target;
 }
 
 
