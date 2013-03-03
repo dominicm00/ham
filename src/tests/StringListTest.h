@@ -27,13 +27,15 @@ public:
 			void				Concatenation();
 			void				Clear();
 			void				Join();
+			void				JoinWithSeparator();
 			void				Multiply();
 			void				Iteration();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringListTest, 13,
+	HAM_ADD_TEST_CASES(StringListTest, 14,
 		Constructor, ElementAccess, IsTrue, SubList, Contains, Constants,
-		Comparison, Assignment, Concatenation, Clear, Join, Multiply, Iteration)
+		Comparison, Assignment, Concatenation, Clear, Join, JoinWithSeparator,
+		Multiply, Iteration)
 };
 
 

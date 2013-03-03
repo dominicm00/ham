@@ -197,13 +197,55 @@ StringList::Join() const
 
 	// allocate buffer and compute result
 	String::Buffer* buffer = String::Buffer::Create(resultLength);
-	size_t offset = 0;
+	char* destination = buffer->fString;
 	for (size_t i = 0; i < size; i++) {
 		String element = ElementAt(i);
 		size_t length = element.Length();
-		memcpy(buffer->fString + offset, element.ToCString(), length);
+		memcpy(destination, element.ToCString(), length);
+		destination += length;
+	}
+
+	return String(buffer);
+}
+
+
+String
+StringList::Join(const StringPart& separator) const
+{
+	if (separator.IsEmpty())
+		return Join();
+
+	size_t size = fSize;
+	switch (size) {
+		case 0:
+			return String();
+		case 1:
+			return Head();
+		default:
+			break;
+	}
+
+	// compute result string length
+	size_t resultLength = 0;
+	for (size_t i = 0; i < size; i++)
 		resultLength += ElementAt(i).Length();
-		offset += length;
+
+	size_t separatorLength = separator.Length();
+	resultLength += (size - 1) * separatorLength;
+
+	// allocate buffer and compute result
+	String::Buffer* buffer = String::Buffer::Create(resultLength);
+	char* destination = buffer->fString;
+	for (size_t i = 0; i < size; i++) {
+		if (i > 0) {
+			memcpy(destination, separator.Start(), separatorLength);
+			destination += separatorLength;
+		}
+
+		String element = ElementAt(i);
+		size_t length = element.Length();
+		memcpy(destination, element.ToCString(), length);
+		destination += length;
 	}
 
 	return String(buffer);

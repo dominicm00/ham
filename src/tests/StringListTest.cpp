@@ -558,6 +558,109 @@ StringListTest::Join()
 
 
 void
+StringListTest::JoinWithSeparator()
+{
+	struct TestData {
+		TestList	listList;
+		const char*	separator;
+		std::string	result;
+	};
+
+	const TestData testData[] = {
+		{ TestList(),
+			"", "" },
+		{ TestList() + "",
+			"", "" },
+		{ TestList() + "foo",
+			"", "foo" },
+		{ TestList() + "foo" + "",
+			"", "foo" },
+		{ TestList() + "" + "foo",
+			"", "foo" },
+		{ TestList() + "foo" + "bar",
+			"", "foobar" },
+		{ TestList() + "foo" + "" + "bar",
+			"", "foobar" },
+		{ TestList() + "foo" + "bar" + "",
+			"", "foobar" },
+		{ TestList() + "" + "foo" + "" + "" + "bar" + "",
+			"", "foobar" },
+		{ TestList() + "foo" + "bar" + "foobar",
+			"", "foobarfoobar" },
+		{ TestList(),
+			"X", "" },
+		{ TestList() + "",
+			"X", "" },
+		{ TestList() + "foo",
+			"X", "foo" },
+		{ TestList() + "foo" + "",
+			"X", "fooX" },
+		{ TestList() + "" + "foo",
+			"X", "Xfoo" },
+		{ TestList() + "foo" + "bar",
+			"X", "fooXbar" },
+		{ TestList() + "foo" + "" + "bar",
+			"X", "fooXXbar" },
+		{ TestList() + "foo" + "bar" + "",
+			"X", "fooXbarX" },
+		{ TestList() + "" + "foo" + "" + "" + "bar" + "",
+			"X", "XfooXXXbarX" },
+		{ TestList() + "foo" + "bar" + "foobar",
+			"X", "fooXbarXfoobar" },
+		{ TestList(),
+			"XYZ", "" },
+		{ TestList() + "",
+			"XYZ", "" },
+		{ TestList() + "foo",
+			"XYZ", "foo" },
+		{ TestList() + "foo" + "",
+			"XYZ", "fooXYZ" },
+		{ TestList() + "" + "foo",
+			"XYZ", "XYZfoo" },
+		{ TestList() + "foo" + "bar",
+			"XYZ", "fooXYZbar" },
+		{ TestList() + "foo" + "" + "bar",
+			"XYZ", "fooXYZXYZbar" },
+		{ TestList() + "foo" + "bar" + "",
+			"XYZ", "fooXYZbarXYZ" },
+		{ TestList() + "" + "foo" + "" + "" + "bar" + "",
+			"XYZ", "XYZfooXYZXYZXYZbarXYZ" },
+		{ TestList() + "foo" + "bar" + "foobar",
+			"XYZ", "fooXYZbarXYZfoobar" },
+	};
+
+	const char* const testDataContext[] = {
+		"",
+		"a",
+		"abc",
+		"xyz"
+	};
+	const size_t testDataContextCount
+		= sizeof(testDataContext) / sizeof(testDataContext[0]);
+
+	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
+		const TestList& testList = testData[i].listList;
+		StringList list = MakeStringList(testList);
+		LIST_EQUAL(list, testList);
+
+		for (size_t prefix = 0; prefix < testDataContextCount; prefix++) {
+			for (size_t suffix = 0; suffix < testDataContextCount; suffix++) {
+				std::string separatorString = std::string()
+					+ testDataContext[prefix] + testData[i].separator
+					+ testDataContext[suffix];
+				StringPart separator(
+					separatorString.c_str() + strlen(testDataContext[prefix]),
+					strlen(testData[i].separator));
+
+				String string = list.Join(separator);
+				HAM_TEST_EQUAL(string.ToCString(), testData[i].result)
+			}
+		}
+	}
+}
+
+
+void
 StringListTest::Multiply()
 {
 	struct TestData {

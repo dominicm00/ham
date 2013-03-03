@@ -68,6 +68,7 @@ public:
 									{ *this = kFalse; }
 
 			String				Join() const;
+			String				Join(const StringPart& separator) const;
 
 	static	const StringList&	True()
 									{ return kTrue; }
