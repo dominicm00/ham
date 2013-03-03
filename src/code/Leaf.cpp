@@ -35,7 +35,7 @@ StringList
 Leaf::Evaluate(EvaluationContext& context)
 {
 	const char* string = fString.ToCString();
-	return _EvaluateString(context, string, string + fString.Length(),
+	return EvaluateString(context, string, string + fString.Length(),
 		&fString);
 }
 
@@ -58,7 +58,7 @@ Leaf::Dump(DumpContext& context) const
 
 
 /*static*/ StringList
-Leaf::_EvaluateString(EvaluationContext& context, const char* stringStart,
+Leaf::EvaluateString(EvaluationContext& context, const char* stringStart,
 	const char* stringEnd, const String* originalString)
 {
 	// The string to evaluate is a alternating sequence of literal strings and
@@ -283,14 +283,14 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// Handle the general, recursive case.
 
 	// Expand the variable names.
-	StringList variableNames = _EvaluateString(context, variableStart,
+	StringList variableNames = EvaluateString(context, variableStart,
 		variableNameEnd, NULL);
 	size_t variableCount = variableNames.Size();
 
 	// Expand and parse the subscripts.
 	std::vector<std::pair<size_t, size_t> > subscripts;
 	if (openingBracket != NULL) {
-		StringList subscriptStrings = _EvaluateString(context,
+		StringList subscriptStrings = EvaluateString(context,
 			openingBracket + 1, closingBracket, NULL);
 		if (subscriptStrings.IsEmpty())
 			return StringList();
@@ -330,7 +330,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			++colonIt;
 			const char* segmentEnd = colonIt != colons.end()
 				? *colonIt : variableEnd;
-			StringList operationsStrings = _EvaluateString(context,
+			StringList operationsStrings = EvaluateString(context,
 				segmentStart, segmentEnd, NULL);
 			if (operationsStrings.IsEmpty())
 				return StringList();

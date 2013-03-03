@@ -29,11 +29,12 @@ public:
 	virtual	Node*				Visit(NodeVisitor& visitor);
 	virtual	void				Dump(DumpContext& context) const;
 
-private:
-	static	StringList			_EvaluateString(EvaluationContext& context,
+	static	StringList			EvaluateString(EvaluationContext& context,
 									const char* stringStart,
 									const char* stringEnd,
 									const String* originalString);
+
+private:
 	static	StringList			_EvaluateVariableExpression(
 									EvaluationContext& context,
 									const char* variableStart,
