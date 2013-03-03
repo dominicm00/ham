@@ -133,11 +133,11 @@ PathTest::Make()
 
 	const char* const testDataContext[] = {
 		"",
-		"xyz"
-		"xyz/"
-		"xyz/abc"
-		"/xyz"
-		"/xyz/abc"
+		"xyz",
+		"xyz/",
+		"xyz/abc",
+		"/xyz",
+		"/xyz/abc",
 		"/xyz/abc/"
 	};
 	const size_t testDataContextCount
