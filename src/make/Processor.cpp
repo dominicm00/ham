@@ -19,7 +19,10 @@
 #include "code/OnExpression.h"
 #include "data/RegExp.h"
 #include "data/TargetBinder.h"
+#include "make/Command.h"
 #include "make/MakeException.h"
+#include "make/TargetBuilder.h"
+#include "make/TargetBuildInfo.h"
 #include "parser/Parser.h"
 
 
@@ -32,284 +35,6 @@ using data::Time;
 
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
-
-
-Processor::DebugOptions::DebugOptions()
-	:
-	fDryRun(false),
-	fPrintMakeTree(false),
-	fPrintActions(false),
-	fPrintCommands(false)
-{
-}
-
-
-struct Processor::Command : util::Referenceable {
-	enum State {
-		NOT_EXECUTED,
-		IN_PROGRESS,
-		SUCCEEDED,
-		FAILED
-	};
-
-public:
-	Command(data::RuleActionsCall* actions, const String& commandLine,
-		const StringList& boundTargetPaths)
-		:
-		fActions(actions),
-		fCommandLine(commandLine),
-		fBoundTargetPaths(boundTargetPaths),
-		fState(NOT_EXECUTED),
-		fWaitingBuildInfos()
-	{
-		fActions->AcquireReference();
-	}
-
-	~Command()
-	{
-		fActions->ReleaseReference();
-	}
-
-	data::RuleActionsCall* Actions() const
-	{
-		return fActions;
-	}
-
-	const String& CommandLine() const
-	{
-		return fCommandLine;
-	}
-
-	const StringList& BoundTargetPaths() const
-	{
-		return fBoundTargetPaths;
-	}
-
-	State GetState() const
-	{
-		return fState;
-	}
-
-	void SetState(State state)
-	{
-		fState = state;
-	}
-
-	const std::vector<TargetBuildInfo*>& WaitingBuildInfos() const
-	{
-		return fWaitingBuildInfos;
-	}
-
-	void AddWaitingBuildInfo(TargetBuildInfo* buildInfo)
-	{
-		fWaitingBuildInfos.push_back(buildInfo);
-	}
-
-	void ClearWaitingBuildInfos()
-	{
-		fWaitingBuildInfos.clear();
-	}
-
-private:
-	data::RuleActionsCall*			fActions;
-	String							fCommandLine;
-	StringList						fBoundTargetPaths;
-	State							fState;
-	std::vector<TargetBuildInfo*>	fWaitingBuildInfos;
-};
-
-
-struct Processor::TargetBuildInfo {
-	TargetBuildInfo(MakeTarget* target)
-		:
-		fTarget(target),
-		fCommands(),
-		fCommandIndex(0),
-		fFailed(false)
-	{
-	}
-
-	~TargetBuildInfo()
-	{
-		for (std::vector<Command*>::iterator it = fCommands.begin();
-			it != fCommands.end(); ++it) {
-			(*it)->ReleaseReference();
-		}
-	}
-
-	MakeTarget* GetTarget() const
-	{
-		return fTarget;
-	}
-
-	const std::vector<Command*>& Commands() const
-	{
-		return fCommands;
-	}
-
-	void AddCommand(Command* command)
-	{
-		fCommands.push_back(command);
-		command->AcquireReference();
-	}
-
-	Command* NextCommand()
-	{
-		if (fCommandIndex >= fCommands.size())
-			return NULL;
-		return fCommands[fCommandIndex++];
-	}
-
-	bool HasFailed() const
-	{
-		return fFailed;
-	}
-
-	void SetFailed(bool failed)
-	{
-		fFailed = failed;
-	}
-
-private:
-	MakeTarget*				fTarget;
-	std::vector<Command*>	fCommands;
-	size_t					fCommandIndex;
-	bool					fFailed;
-};
-
-
-struct Processor::TargetBuilder {
-	TargetBuilder(const DebugOptions& debugOptions, size_t maxJobCount)
-		:
-		fDebugOptions(debugOptions),
-		fMaxJobCount(maxJobCount),
-		fBuildInfos()
-	{
-	}
-
-	bool HasSpareJobSlots() const
-	{
-		return fMaxJobCount > fBuildInfos.size();
-	}
-
-	void AddBuildInfo(TargetBuildInfo* buildInfo)
-	{
-		fBuildInfos.push_back(buildInfo);
-// TODO: Ownership?
-		_ExecuteNextCommand(buildInfo);
-	}
-
-	TargetBuildInfo* NextFinishedBuildInfo()
-	{
-		// handle finished commands
-		while (!fFinishedCommands.empty()) {
-			Command* command = fFinishedCommands.front();
-			fFinishedCommands.erase(fFinishedCommands.begin());
-			for (std::vector<TargetBuildInfo*>::const_iterator it
-					= command->WaitingBuildInfos().begin();
-				it != command->WaitingBuildInfos().end(); ++it) {
-				TargetBuildInfo* buildInfo = *it;
-				switch (command->GetState()) {
-					case Command::NOT_EXECUTED:
-					case Command::IN_PROGRESS:
-						// cannot happen
-						break;
-					case Command::SUCCEEDED:
-						_ExecuteNextCommand(buildInfo);
-						break;
-					case Command::FAILED:
-// TODO: Insert at head to allow for early error detection?
-						fFinishedBuildInfos.push_back(buildInfo);
-						buildInfo->SetFailed(true);
-						fBuildInfos.erase(
-							std::find(fBuildInfos.begin(), fBuildInfos.end(),
-								buildInfo));
-						break;
-				}
-			}
-
-			command->ClearWaitingBuildInfos();
-		}
-
-		if (fFinishedBuildInfos.empty())
-			return NULL;
-
-		TargetBuildInfo* buildInfo = fFinishedBuildInfos.front();
-		fFinishedBuildInfos.erase(fFinishedBuildInfos.begin());
-		return buildInfo;
-	}
-
-	bool HasPendingBuildInfos() const
-	{
-		return !fBuildInfos.empty() || !fFinishedBuildInfos.empty();
-	}
-
-private:
-	void _ExecuteNextCommand(TargetBuildInfo* buildInfo)
-	{
-		for (;;) {
-			Command* command = buildInfo->NextCommand();
-			if (command == NULL) {
-				fFinishedBuildInfos.push_back(buildInfo);
-				fBuildInfos.erase(
-					std::find(fBuildInfos.begin(), fBuildInfos.end(),
-					buildInfo));
-				return;
-			}
-
-			switch (command->GetState()) {
-				case Command::NOT_EXECUTED:
-					// execute command
-					command->AddWaitingBuildInfo(buildInfo);
-					_ExecuteCommand(command);
-					return;
-				case Command::IN_PROGRESS:
-					// wait for command to finish
-					command->AddWaitingBuildInfo(buildInfo);
-					return;
-				case Command::SUCCEEDED:
-					// next command...
-					break;
-				case Command::FAILED:
-// TODO: Insert at head to allow for early error detection?
-					fFinishedBuildInfos.push_back(buildInfo);
-					buildInfo->SetFailed(true);
-					fBuildInfos.erase(
-						std::find(fBuildInfos.begin(), fBuildInfos.end(),
-							buildInfo));
-					return;
-			}
-		}
-	}
-
-	void _ExecuteCommand(Command* command)
-	{
-		if (fDebugOptions.fPrintActions) {
-			data::RuleActionsCall* actions = command->Actions();
-			printf("%s %s\n", actions->Actions()->RuleName().ToCString(),
-				command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
-		}
-
-		if (fDebugOptions.fPrintCommands) {
-			printf("%s\n", command->CommandLine().ToCString());
-		}
-
-		if (fDebugOptions.fDryRun) {
-			command->SetState(Command::SUCCEEDED);
-			fFinishedCommands.push_back(command);
-			return;
-		}
-
-// TODO:...
-	}
-
-private:
-	const DebugOptions&				fDebugOptions;
-	size_t							fMaxJobCount;
-	std::vector<TargetBuildInfo*>	fBuildInfos;
-	std::vector<TargetBuildInfo*>	fFinishedBuildInfos;
-	std::vector<Command*>			fFinishedCommands;
-};
 
 
 Processor::Processor()
@@ -329,7 +54,7 @@ Processor::Processor()
 	fMakeLevel(0),
 	fMakableTargets(),
 	fCommands(),
-	fTargetBuilders()
+	fTargetBuildInfos()
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
@@ -337,8 +62,8 @@ Processor::Processor()
 
 Processor::~Processor()
 {
-	for (TargetBuildInfoSet::iterator it = fTargetBuilders.begin();
-		it != fTargetBuilders.end(); ++it) {
+	for (TargetBuildInfoSet::iterator it = fTargetBuildInfos.begin();
+		it != fTargetBuildInfos.end(); ++it) {
 		delete *it;
 	}
 
@@ -399,7 +124,7 @@ Processor::SetBuildFromNewest(bool buildFromNewest)
 void
 Processor::SetDryRun(bool dryRun)
 {
-	fDebugOptions.fDryRun = dryRun;
+	fDebugOptions.SetDryRun(dryRun);
 }
 
 
@@ -413,21 +138,21 @@ Processor::SetQuitOnError(bool quitOnError)
 void
 Processor::SetPrintMakeTree(bool printMakeTree)
 {
-	fDebugOptions.fPrintMakeTree = printMakeTree;
+	fDebugOptions.SetPrintMakeTree(printMakeTree);
 }
 
 
 void
 Processor::SetPrintActions(bool printActions)
 {
-	fDebugOptions.fPrintActions = printActions;
+	fDebugOptions.SetPrintActions(printActions);
 }
 
 
 void
 Processor::SetPrintCommands(bool printCommands)
 {
-	fDebugOptions.fPrintCommands = printCommands;
+	fDebugOptions.SetPrintCommands(printCommands);
 }
 
 
@@ -581,7 +306,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		return;
 	}
 
-	if (fDebugOptions.fPrintMakeTree)
+	if (fDebugOptions.IsPrintMakeTree())
 		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
 
 	makeTarget->SetFate(MakeTarget::PROCESSING);
@@ -598,7 +323,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	if (!time.IsValid())
 		time = Time(0);
 
-	if (fDebugOptions.fPrintMakeTree)
+	if (fDebugOptions.IsPrintMakeTree())
 		_PrintMakeTreeBinding(makeTarget);
 
 	// add make targets for dependencies
@@ -700,7 +425,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 
-	if (fDebugOptions.fPrintMakeTree)
+	if (fDebugOptions.IsPrintMakeTree())
 		_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS
@@ -830,7 +555,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 }
 
 
-Processor::TargetBuildInfo*
+TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
 	Target* target = makeTarget->GetTarget();
@@ -921,7 +646,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 }
 
 
-Processor::Command*
+Command*
 Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
 	// create a variable domain for the built-in variables (the numbered ones

@@ -10,6 +10,7 @@
 #include "data/StringList.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
+#include "make/DebugOptions.h"
 #include "make/MakeTarget.h"
 
 
@@ -20,6 +21,9 @@ namespace make {
 using data::StringList;
 using data::Target;
 using data::TargetSet;
+
+class Command;
+class TargetBuildInfo;
 
 
 class Processor {
@@ -60,20 +64,6 @@ public:
 			void				BuildTargets();
 
 private:
-			struct DebugOptions {
-				bool			fDryRun;
-				bool			fPrintMakeTree;
-				bool			fPrintActions;
-				bool			fPrintCommands;
-
-			public:
-								DebugOptions();
-			};
-
-			struct Command;
-			struct TargetBuildInfo;
-			struct TargetBuilder;
-
 			typedef std::map<Target*, MakeTarget*> MakeTargetMap;
 			typedef std::map<data::RuleActionsCall*, Command*> CommandMap;
 			typedef std::set<TargetBuildInfo*> TargetBuildInfoSet;
@@ -122,7 +112,7 @@ private:
 			int					fMakeLevel;
 			MakeTargetSet		fMakableTargets;
 			CommandMap			fCommands;
-			TargetBuildInfoSet	fTargetBuilders;
+			TargetBuildInfoSet	fTargetBuildInfos;
 };
 
 
