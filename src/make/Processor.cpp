@@ -35,6 +35,7 @@ using data::Time;
 
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
+static const String kJamShellVariableName("JAMSHELL");
 
 
 Processor::Processor()
@@ -248,10 +249,21 @@ Processor::BuildTargets()
 		_CollectMakableTargets(it.Next());
 	}
 
-	TargetBuilder builder(fDebugOptions, fJobCount);
+	// get the JAMSHELL variable
+	StringList jamShell(
+		fEvaluationContext.LookupVariable(kJamShellVariableName));
+	if (!jamShell.IsTrue()) {
+		jamShell.Append(String("/bin/sh"));
+		jamShell.Append(String("-c"));
+		jamShell.Append(String("%"));
+// TODO: Platform dependent!
+	}
+
+	TargetBuilder builder(fDebugOptions, fJobCount, jamShell);
 
 	while (!fMakableTargets.IsEmpty() || builder.HasPendingBuildInfos()) {
-		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo()) {
+		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo(
+				!builder.HasSpareJobSlots() || fMakableTargets.IsEmpty())) {
 			_TargetMade(buildInfo->GetTarget(),
 				buildInfo->HasFailed() ? MakeTarget::FAILED : MakeTarget::DONE);
 		}

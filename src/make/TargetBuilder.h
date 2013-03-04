@@ -10,6 +10,9 @@
 
 #include <vector>
 
+#include "data/StringList.h"
+#include "process/Process.h"
+
 
 namespace ham {
 namespace make {
@@ -23,25 +26,35 @@ class TargetBuildInfo;
 class TargetBuilder {
 public:
 								TargetBuilder(const DebugOptions& debugOptions,
-									size_t maxJobCount);
+									size_t maxJobCount,
+									const StringList& jamShell);
+								~TargetBuilder();
 
 			bool				HasSpareJobSlots() const;
 
 			void				AddBuildInfo(TargetBuildInfo* buildInfo);
 
-			TargetBuildInfo*	NextFinishedBuildInfo();
+			TargetBuildInfo*	NextFinishedBuildInfo(bool canWait);
 			bool				HasPendingBuildInfos() const;
+
+private:
+			struct JobSlot;
 
 private:
 			void				_ExecuteNextCommand(TargetBuildInfo* buildInfo);
 			void				_ExecuteCommand(Command* command);
+			int					_FindFreeJobSlot() const;
+			int					_FindJobSlot(
+									process::Process::Id id) const;
 
 private:
 			const DebugOptions&	fDebugOptions;
 			size_t				fMaxJobCount;
+			StringList			fJamShell;
 			std::vector<TargetBuildInfo*> fBuildInfos;
 			std::vector<TargetBuildInfo*> fFinishedBuildInfos;
 			std::vector<Command*> fFinishedCommands;
+			JobSlot*			fJobSlots;
 };
 
 
