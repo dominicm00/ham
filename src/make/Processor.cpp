@@ -556,6 +556,15 @@ Processor::_GetMakeTarget(Target* target, bool create)
 }
 
 
+MakeTarget*
+Processor::_GetMakeTarget(const String& targetName, bool create)
+{
+	Target* target = create
+		? fTargets.LookupOrCreate(targetName) : fTargets.Lookup(targetName);
+	return target != NULL ? _GetMakeTarget(target, create) : NULL;
+}
+
+
 void
 Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	data::Time parentTime)

@@ -80,6 +80,8 @@ private:
 
 private:
 			MakeTarget*			_GetMakeTarget(Target* target, bool create);
+			MakeTarget*			_GetMakeTarget(const String& targetName,
+									bool create);
 
 			void				_PrepareTargetRecursively(
 									MakeTarget* makeTarget,
