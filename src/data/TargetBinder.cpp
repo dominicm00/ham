@@ -7,8 +7,8 @@
 #include "data/TargetBinder.h"
 
 #include "data/FileStatus.h"
-#include "data/MakeTarget.h"
 #include "data/Path.h"
+#include "data/Target.h"
 #include "data/VariableDomain.h"
 
 
@@ -78,20 +78,6 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	// Not found -- use the target name.
 	_boundPath = targetPath;
 	Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
-}
-
-
-/*static*/ void
-TargetBinder::Bind(const VariableDomain& globalVariables, MakeTarget* target)
-{
-	if (target->IsBound())
-		return;
-
-	String boundPath;
-	FileStatus fileStatus;
-	Bind(globalVariables, target->GetTarget(), boundPath, fileStatus);
-	target->SetBoundPath(boundPath);
-	target->SetFileStatus(fileStatus);
 }
 
 

@@ -8,7 +8,6 @@
 
 #include "data/FileStatus.h"
 #include "data/TargetBinder.h"
-#include "data/MakeTarget.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
 
@@ -297,39 +296,6 @@ TargetBinderTest::Bind()
 					"end time: (%u, %u)", boundPath.ToCString(),
 					(unsigned)fileStatus.LastModifiedTime().Seconds(),
 					(unsigned)fileStatus.LastModifiedTime().NanoSeconds(),
-					(unsigned)startTime.Seconds(),
-					(unsigned)startTime.NanoSeconds(),
-					(unsigned)endTime.Seconds(),
-					(unsigned)endTime.NanoSeconds())
-			}
-
-			data::MakeTarget makeTarget(target);
-			TargetBinder::Bind(globalVariables, &makeTarget);
-
-			HAM_TEST_ADD_INFO(
-				HAM_TEST_VERIFY(makeTarget.IsBound())
-				HAM_TEST_EQUAL(makeTarget.BoundPath(),
-					testData[i].boundPath.c_str()),
-				"target: \"%s\", target locate: %s, target search: %s, "
-				"global locate: %s, global search: %s", targetName.c_str(),
-				ValueToString(testData[i].targetLocate).c_str(),
-				ValueToString(testData[i].targetSearch).c_str(),
-				ValueToString(testData[i].globalLocate).c_str(),
-				ValueToString(testData[i].globalSearch).c_str())
-
-			if (testData[i].type != FileStatus::NONE) {
-				HAM_TEST_ADD_INFO(
-// The FS might not store the nanoseconds, so we only compare the seconds.
-//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >= startTime)
-//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <= endTime),
-					HAM_TEST_VERIFY(
-						makeTarget.GetTime().Seconds() >= startTime.Seconds())
-					HAM_TEST_VERIFY(
-						makeTarget.GetTime().Seconds() <= endTime.Seconds()),
-					"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
-					"end time: (%u, %u)", boundPath.ToCString(),
-					(unsigned)makeTarget.GetTime().Seconds(),
-					(unsigned)makeTarget.GetTime().NanoSeconds(),
 					(unsigned)startTime.Seconds(),
 					(unsigned)startTime.NanoSeconds(),
 					(unsigned)endTime.Seconds(),

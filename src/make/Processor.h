@@ -86,6 +86,7 @@ private:
 			void				_PrepareTargetRecursively(
 									MakeTarget* makeTarget,
 									data::Time parentTime);
+			void				_BindTarget(MakeTarget* makeTarget);
 			void				_ScanForHeaders(MakeTarget* makeTarget);
 
 			bool				_CollectMakableTargets(MakeTarget* makeTarget);
@@ -94,7 +95,6 @@ private:
 									MakeTarget::MakeState state);
 			Command*			_BuildCommand(
 									data::RuleActionsCall* actionsCall);
-
 
 			void				_PrintMakeTreeBinding(
 									const MakeTarget* makeTarget);

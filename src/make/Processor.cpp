@@ -578,12 +578,12 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetFate(MakeTarget::PROCESSING);
 
 	// bind the target
+	_BindTarget(makeTarget);
+
 	Target* target = makeTarget->GetTarget();
 	bool isPseudoTarget = target->IsNotAFile();
 	if (isPseudoTarget)
 		makeTarget->SetTime(Time(0));
-	else
-		data::TargetBinder::Bind(fGlobalVariables, makeTarget);
 
 	Time time = makeTarget->GetTime();
 	if (!time.IsValid())
@@ -697,6 +697,23 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 // - BUILD_ALWAYS
 // - IGNORE_IF_MISSING
 // - TEMPORARY
+}
+
+
+void
+Processor::_BindTarget(MakeTarget* makeTarget)
+{
+	if (makeTarget->IsBound())
+		return;
+
+	Target* target = makeTarget->GetTarget();
+
+	String boundPath;
+	data::FileStatus fileStatus;
+	data::TargetBinder::Bind(*fEvaluationContext.GlobalVariables(), target,
+		boundPath, fileStatus);
+	makeTarget->SetBoundPath(boundPath);
+	makeTarget->SetFileStatus(fileStatus);
 }
 
 

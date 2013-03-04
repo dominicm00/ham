@@ -14,7 +14,6 @@ namespace data {
 
 
 class FileStatus;
-class MakeTarget;
 class Target;
 class VariableDomain;
 
@@ -24,8 +23,6 @@ public:
 	static	void				Bind(const VariableDomain& globalVariables,
 									const Target* target, String& _boundPath,
 									FileStatus& _fileStatus);
-	static	void				Bind(const VariableDomain& globalVariables,
-									data::MakeTarget* target);
 };
 
 
