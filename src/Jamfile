@@ -10,6 +10,9 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) code ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) data ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) make ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) platform unix ] ;
+	# TODO: Handle different platforms!
+SEARCH_SOURCE += [ FDirName $(SUBDIR) process ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
 
@@ -69,6 +72,12 @@ SharedLibrary libham.so
 
 	# parser
 	Parser.cpp
+
+	# platform/*
+	PlatformProcessDelegate.cpp
+
+	# process
+	Process.cpp
 
 	# util
 	Constants.cpp
