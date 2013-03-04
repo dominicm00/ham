@@ -954,24 +954,29 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	data::VariableScope* oldLocalScope = fEvaluationContext.LocalScope();
 	data::VariableScope localScope(localVariables, oldLocalScope);
 
-//	// prepare the local variable scope (for the named parameters)
-//	data::VariableDomain localVariables;
-//	data::VariableScope localScope(localVariables, oldLocalScope);
-//		// TODO: This is jam compatible behavior. It would be more logical to
-//		// have a NULL parent for the new scope, so the previous local variables
-//		// cannot be seen in the rule block.
-
-//	// set the named parameters
-//	StringList::Iterator it = fParameterNames.GetIterator();
-//	for (size_t i = 0; i < parameterCount && it.HasNext(); i++)
-//		localVariables.Set(it.Next(), parameters[i]);
-
 	// set the local variable scope and the built-in variables
 	fEvaluationContext.SetLocalScope(&localScope);
 
 	data::VariableDomain* oldBuiltInVariables
 		= fEvaluationContext.BuiltInVariables();
 	fEvaluationContext.SetBuiltInVariables(&builtInVariables);
+
+	// bind the variables specified by the actions
+	for (StringList::Iterator it = actionsCall->Actions()->Variables();
+		it.HasNext();) {
+		String variable = it.Next();
+		if (const StringList* values
+				= fEvaluationContext.LookupVariable(variable)) {
+			StringList newValues;
+			for (StringList::Iterator valueIt = values->GetIterator();
+				valueIt.HasNext();) {
+				MakeTarget* makeTarget = _GetMakeTarget(valueIt.Next(), true);
+				_BindTarget(makeTarget);
+				newValues.Append(makeTarget->BoundPath());
+			}
+			localVariables.Set(variable, newValues);
+		}
+	}
 
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
@@ -1004,7 +1009,6 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
-// TODO: Set source and target as well as explicitly bound variables!
 			StringList result = code::Leaf::EvaluateString(fEvaluationContext,
 				wordStart, remainder, NULL);
 			bool isFirst = true;
