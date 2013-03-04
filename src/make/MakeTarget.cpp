@@ -4,14 +4,14 @@
  */
 
 
-#include "data/MakeTarget.h"
+#include "make/MakeTarget.h"
 
 
 namespace ham {
-namespace data {
+namespace make {
 
 
-MakeTarget::MakeTarget(Target* target)
+MakeTarget::MakeTarget(data::Target* target)
 	:
 	fTarget(target),
 	fBoundPath(),
@@ -35,12 +35,12 @@ MakeTarget::~MakeTarget()
 
 
 void
-MakeTarget::SetFileStatus(const FileStatus& fileStatus)
+MakeTarget::SetFileStatus(const data::FileStatus& fileStatus)
 {
-	fFileExists = fileStatus.GetType() != FileStatus::NONE;
-	fTime = fFileExists ? fileStatus.LastModifiedTime() : Time();
+	fFileExists = fileStatus.GetType() != data::FileStatus::NONE;
+	fTime = fFileExists ? fileStatus.LastModifiedTime() : data::Time();
 }
 
 
-} // namespace data
+} // namespace make
 } // namespace ham

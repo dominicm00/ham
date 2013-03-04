@@ -7,18 +7,16 @@
 
 
 #include "code/EvaluationContext.h"
-#include "data/MakeTarget.h"
 #include "data/StringList.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
+#include "make/MakeTarget.h"
 
 
 namespace ham {
 namespace make {
 
 
-using data::MakeTarget;
-using data::MakeTargetSet;
 using data::StringList;
 using data::Target;
 using data::TargetSet;

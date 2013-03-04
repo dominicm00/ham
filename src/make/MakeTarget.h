@@ -2,8 +2,8 @@
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_DATA_MAKE_TARGET_H
-#define HAM_DATA_MAKE_TARGET_H
+#ifndef HAM_MAKE_MAKE_TARGET_H
+#define HAM_MAKE_MAKE_TARGET_H
 
 
 #include "data/FileStatus.h"
@@ -11,7 +11,7 @@
 
 
 namespace ham {
-namespace data {
+namespace make {
 
 
 class MakeTarget;
@@ -43,13 +43,13 @@ public:
 			};
 
 public:
-								MakeTarget(Target* target);
+								MakeTarget(data::Target* target);
 								~MakeTarget();
 
 			String				Name() const
 									{ return fTarget->Name(); }
 
-			Target*				GetTarget() const
+			data::Target*		GetTarget() const
 									{ return fTarget; }
 
 			bool				IsBound() const
@@ -59,19 +59,20 @@ public:
 			void				SetBoundPath(const String& path)
 									{ fBoundPath = path; }
 
-			Time				GetTime() const
+			data::Time			GetTime() const
 									{ return fTime; }
-			void				SetTime(const Time& time)
+			void				SetTime(const data::Time& time)
 									{ fTime = time; }
 
-			Time				LeafTime() const
+			data::Time			LeafTime() const
 									{ return fLeafTime; }
-			void				SetLeafTime(const Time& time)
+			void				SetLeafTime(const data::Time& time)
 									{ fLeafTime = time; }
 
 			bool				FileExists() const
 									{ return fFileExists; }
-			void				SetFileStatus(const FileStatus& fileStatus);
+			void				SetFileStatus(
+									const data::FileStatus& fileStatus);
 
 			const MakeTargetSet& Dependencies() const
 									{ return fDependencies; }
@@ -114,10 +115,10 @@ public:
 									{ fPendingDependencyCount = count; }
 
 private:
-			Target*				fTarget;
+			data::Target*		fTarget;
 			String				fBoundPath;
-			Time				fTime;
-			Time				fLeafTime;
+			data::Time			fTime;
+			data::Time			fLeafTime;
 			bool				fFileExists;
 			MakeTargetSet		fDependencies;
 			MakeTargetSet		fIncludes;
@@ -145,8 +146,8 @@ MakeTarget::AddIncludes(const MakeTargetSet& includes)
 }
 
 
-} // namespace data
+} // namespace make
 } // namespace ham
 
 
-#endif	// HAM_DATA_MAKE_TARGET_H
+#endif	// HAM_MAKE_MAKE_TARGET_H

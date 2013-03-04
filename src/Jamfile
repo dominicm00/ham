@@ -47,7 +47,6 @@ SharedLibrary libham.so
 
 	# data
 	FileStatus.cpp
-	MakeTarget.cpp
 	Path.cpp
 	RegExp.cpp
 	RuleActions.cpp
@@ -61,6 +60,7 @@ SharedLibrary libham.so
 	VariableScope.cpp
 
 	# make
+	MakeTarget.cpp
 	Processor.cpp
 
 	# parser
