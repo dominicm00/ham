@@ -43,12 +43,7 @@ Processor::Processor()
 	fGlobalVariables(),
 	fTargets(),
 	fEvaluationContext(fGlobalVariables, fTargets),
-	fJambaseFile(),
-	fActionsOutputFile(),
-	fJobCount(1),
-	fBuildFromNewest(false),
-	fQuitOnError(false),
-	fDebugOptions(),
+	fOptions(),
 	fPrimaryTargetNames(),
 	fPrimaryTargets(),
 	fMakeTargets(),
@@ -82,6 +77,13 @@ Processor::~Processor()
 
 
 void
+Processor::SetOptions(const Options& options)
+{
+	fOptions = options;
+}
+
+
+void
 Processor::SetCompatibility(behavior::Compatibility compatibility)
 {
 	fEvaluationContext.SetCompatibility(compatibility);
@@ -92,69 +94,6 @@ void
 Processor::SetBehavior(behavior::Behavior behavior)
 {
 	fEvaluationContext.SetBehavior(behavior);
-}
-
-
-void
-Processor::SetJambaseFile(const char* fileName)
-{
-	fJambaseFile = fileName;
-}
-
-
-void
-Processor::SetActionsOutputFile(const char* fileName)
-{
-	fActionsOutputFile = fileName;
-}
-
-
-void
-Processor::SetJobCount(int count)
-{
-	fJobCount = count;
-}
-
-
-void
-Processor::SetBuildFromNewest(bool buildFromNewest)
-{
-	fBuildFromNewest = buildFromNewest;
-}
-
-
-void
-Processor::SetDryRun(bool dryRun)
-{
-	fDebugOptions.SetDryRun(dryRun);
-}
-
-
-void
-Processor::SetQuitOnError(bool quitOnError)
-{
-	fQuitOnError = quitOnError;
-}
-
-
-void
-Processor::SetPrintMakeTree(bool printMakeTree)
-{
-	fDebugOptions.SetPrintMakeTree(printMakeTree);
-}
-
-
-void
-Processor::SetPrintActions(bool printActions)
-{
-	fDebugOptions.SetPrintActions(printActions);
-}
-
-
-void
-Processor::SetPrintCommands(bool printCommands)
-{
-	fDebugOptions.SetPrintCommands(printCommands);
 }
 
 
@@ -194,12 +133,12 @@ Processor::ProcessJambase()
 
 	util::Reference<code::Block> block;
 
-	if (fJambaseFile.IsEmpty()) {
+	if (fOptions.JambaseFile().IsEmpty()) {
 		parser.SetFileName("Jambase");
 		block.SetTo(parser.Parse(code::kJambase), true);
 	} else {
-		parser.SetFileName(fJambaseFile.ToStlString());
-		block.SetTo(parser.ParseFile(fJambaseFile.ToCString()), true);
+		parser.SetFileName(fOptions.JambaseFile().ToStlString());
+		block.SetTo(parser.ParseFile(fOptions.JambaseFile().ToCString()), true);
 	}
 
 	// execute the code
@@ -267,7 +206,7 @@ Processor::BuildTargets()
 // TODO: Platform dependent!
 	}
 
-	TargetBuilder builder(fDebugOptions, fJobCount, jamShell);
+	TargetBuilder builder(fOptions, jamShell);
 
 	size_t targetsUpdated = 0;
 	size_t targetsFailed = 0;
@@ -344,7 +283,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		return;
 	}
 
-	if (fDebugOptions.IsPrintMakeTree())
+	if (fOptions.IsPrintMakeTree())
 		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
 
 	makeTarget->SetFate(MakeTarget::PROCESSING);
@@ -361,7 +300,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	if (!time.IsValid())
 		time = Time(0);
 
-	if (fDebugOptions.IsPrintMakeTree())
+	if (fOptions.IsPrintMakeTree())
 		_PrintMakeTreeBinding(makeTarget);
 
 	// add make targets for dependencies
@@ -463,7 +402,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 
-	if (fDebugOptions.IsPrintMakeTree())
+	if (fOptions.IsPrintMakeTree())
 		_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS

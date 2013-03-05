@@ -64,8 +64,8 @@ SharedLibrary libham.so
 
 	# make
 	Command.cpp
-	DebugOptions.cpp
 	MakeTarget.cpp
+	Options.cpp
 	Processor.cpp
 	TargetBuilder.cpp
 	TargetBuildInfo.cpp

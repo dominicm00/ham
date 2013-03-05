@@ -8,7 +8,7 @@
 
 #include "data/RuleActions.h"
 #include "make/Command.h"
-#include "make/DebugOptions.h"
+#include "make/Options.h"
 #include "make/TargetBuildInfo.h"
 #include "process/ChildInfo.h"
 
@@ -31,16 +31,15 @@ public:
 };
 
 
-TargetBuilder::TargetBuilder(const DebugOptions& debugOptions,
-	size_t maxJobCount, const StringList& jamShell)
+TargetBuilder::TargetBuilder(const Options& options, const StringList& jamShell)
 	:
-	fDebugOptions(debugOptions),
-	fMaxJobCount(maxJobCount),
+	fOptions(options),
+	fMaxJobCount(options.JobCount()),
 	fJamShell(jamShell),
 	fBuildInfos(),
 	fFinishedBuildInfos(),
 	fFinishedCommands(),
-	fJobSlots(new JobSlot[maxJobCount])
+	fJobSlots(new JobSlot[fMaxJobCount])
 {
 }
 
@@ -199,17 +198,17 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 void
 TargetBuilder::_ExecuteCommand(Command* command)
 {
-	if (fDebugOptions.IsPrintActions()) {
+	if (fOptions.IsPrintActions()) {
 		data::RuleActionsCall* actions = command->Actions();
 		printf("%s %s\n", actions->Actions()->RuleName().ToCString(),
 			command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
 	}
 
-	if (fDebugOptions.IsPrintCommands()) {
+	if (fOptions.IsPrintCommands()) {
 		printf("%s\n", command->CommandLine().ToCString());
 	}
 
-	if (fDebugOptions.IsDryRun()) {
+	if (fOptions.IsDryRun()) {
 		command->SetState(Command::SUCCEEDED);
 		fFinishedCommands.push_back(command);
 		return;

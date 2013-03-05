@@ -10,8 +10,8 @@
 #include "data/StringList.h"
 #include "data/TargetPool.h"
 #include "data/VariableDomain.h"
-#include "make/DebugOptions.h"
 #include "make/MakeTarget.h"
+#include "make/Options.h"
 
 
 namespace ham {
@@ -31,20 +31,12 @@ public:
 								Processor();
 								~Processor();
 
+			void				SetOptions(const Options& options);
+
 			void				SetCompatibility(
 									behavior::Compatibility compatibility);
 									// resets behavior as well
 			void				SetBehavior(behavior::Behavior behavior);
-
-			void				SetJambaseFile(const char* fileName);
-			void				SetActionsOutputFile(const char* fileName);
-			void				SetJobCount(int count);
-			void				SetBuildFromNewest(bool buildFromNewest);
-			void				SetDryRun(bool dryRun);
-			void				SetQuitOnError(bool quitOnError);
-			void				SetPrintMakeTree(bool printMakeTree);
-			void				SetPrintActions(bool printActions);
-			void				SetPrintCommands(bool printCommands);
 
 			void				SetOutput(std::ostream& output);
 			void				SetErrorOutput(std::ostream& output);
@@ -99,12 +91,7 @@ private:
 			data::VariableDomain fGlobalVariables;
 			data::TargetPool	fTargets;
 			code::EvaluationContext fEvaluationContext;
-			String				fJambaseFile;
-			String				fActionsOutputFile;
-			int					fJobCount;
-			bool				fBuildFromNewest;
-			bool				fQuitOnError;
-			DebugOptions		fDebugOptions;
+			Options				fOptions;
 			StringList			fPrimaryTargetNames;
 			MakeTargetSet		fPrimaryTargets;
 			MakeTargetMap		fMakeTargets;

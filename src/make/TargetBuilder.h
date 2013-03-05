@@ -19,14 +19,13 @@ namespace make {
 
 
 class Command;
-class DebugOptions;
+class Options;
 class TargetBuildInfo;
 
 
 class TargetBuilder {
 public:
-								TargetBuilder(const DebugOptions& debugOptions,
-									size_t maxJobCount,
+								TargetBuilder(const Options& options,
 									const StringList& jamShell);
 								~TargetBuilder();
 
@@ -48,7 +47,7 @@ private:
 									process::Process::Id id) const;
 
 private:
-			const DebugOptions&	fDebugOptions;
+			const Options&		fOptions;
 			size_t				fMaxJobCount;
 			StringList			fJamShell;
 			std::vector<TargetBuildInfo*> fBuildInfos;

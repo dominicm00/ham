@@ -4,19 +4,24 @@
  */
 
 
-#include "make/DebugOptions.h"
+#include "make/Options.h"
 
 
 namespace ham {
 namespace make {
 
 
-DebugOptions::DebugOptions()
+Options::Options()
 	:
+	fJambaseFile(),
+	fActionsOutputFile(),
 	fDryRun(false),
 	fPrintMakeTree(false),
 	fPrintActions(false),
-	fPrintCommands(false)
+	fPrintCommands(false),
+	fJobCount(1),
+	fBuildFromNewest(false),
+	fQuitOnError(false)
 {
 }
 

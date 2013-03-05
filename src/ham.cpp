@@ -10,6 +10,7 @@
 #include <map>
 
 #include "make/MakeException.h"
+#include "make/Options.h"
 #include "make/Processor.h"
 #include "util/OptionIterator.h"
 #include "util/TextFileException.h"
@@ -286,7 +287,6 @@ main(int argc, const char* const* argv)
 		printCommands = true;
 
 	make::Processor processor;
-// TODO: Add environmental variables!
 
 	// set explicitly specified variables
 	for (std::map<data::String, data::String>::iterator it = variables.begin();
@@ -310,18 +310,21 @@ main(int argc, const char* const* argv)
 	processor.SetCompatibility(compatibility);
 
 	// set other options
-	processor.SetPrimaryTargets(primaryTargets);
+	make::Options options;
 	if (jambaseFileSpecified)
-		processor.SetJambaseFile(jambaseFile.c_str());
-	processor.SetBuildFromNewest(buildFromNewest);
-	processor.SetJobCount(jobCount);
-	processor.SetDryRun(dryRun);
-	processor.SetPrintMakeTree(printMakeTree);
-	processor.SetPrintActions(printActions);
-	processor.SetPrintCommands(printCommands);
+		options.SetJambaseFile(jambaseFile.c_str());
+	options.SetBuildFromNewest(buildFromNewest);
+	options.SetJobCount(jobCount);
+	options.SetDryRun(dryRun);
+	options.SetPrintMakeTree(printMakeTree);
+	options.SetPrintActions(printActions);
+	options.SetPrintCommands(printCommands);
 	if (actionsOutputFileSpecified)
-		processor.SetActionsOutputFile(actionsOutputFile.c_str());
-	processor.SetQuitOnError(quitOnError);
+		options.SetActionsOutputFile(actionsOutputFile.c_str());
+	options.SetQuitOnError(quitOnError);
+	processor.SetOptions(options);
+
+	processor.SetPrimaryTargets(primaryTargets);
 
 	try {
 		// execute the jam code
