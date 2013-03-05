@@ -29,7 +29,7 @@ private:
 									size_t column = 0);
 
 private:
-			struct TestInput;
+			struct TestFile;
 			struct TestCase;
 
 private:

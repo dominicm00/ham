@@ -29,24 +29,28 @@ MultipleFilesDataBasedTest::MultipleFilesDataBasedTest(const std::string& name)
 void
 MultipleFilesDataBasedTest::AddDataSet(
 	const std::map<std::string, std::string>& inputFiles,
-	const std::vector<std::string>& output, bool outputIsException,
-	bool earlyExit, uint32_t compatibilityMask, bool supportedByHam,
-	uint32_t skipMask, size_t startLineIndex, size_t endLineIndex)
+	const std::map<std::string, int>& inputFileAges,
+	const std::map<std::string, std::string>& outputFiles,
+	bool outputIsException, bool earlyExit, uint32_t compatibilityMask,
+	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
+	size_t endLineIndex)
 {
-	DataBasedTest::AddDataSet(new DataSet(inputFiles, output, outputIsException,
-		earlyExit, compatibilityMask, supportedByHam, skipMask, startLineIndex,
-		endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(inputFiles, inputFileAges,
+		outputFiles, outputIsException, earlyExit, compatibilityMask,
+		supportedByHam, skipMask, startLineIndex, endLineIndex));
 }
 
 
 void
 MultipleFilesDataBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 	const std::string& outputPrefix, const std::string& outputSuffix,
-	std::map<std::string, std::string>& _code) const
+	std::map<std::string, std::string>& _code,
+	std::map<std::string, int>& _codeAge) const
 {
 	const DataSet& dataSet = *dynamic_cast<const DataSet*>(dataSetBase);
 
 	_code = dataSet.fInputFiles;
+	_codeAge = dataSet.fInputFileAges;
 
 	std::map<std::string, std::string>::iterator it
 		= _code.find(util::kJamfileName);

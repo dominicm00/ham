@@ -23,7 +23,10 @@ public:
 			void				AddDataSet(
 									const std::map<std::string, std::string>&
 										inputFiles,
-									const std::vector<std::string>& output,
+									const std::map<std::string, int>&
+										inputFileAges,
+									const std::map<std::string, std::string>&
+										outputFiles,
 									bool outputIsException, bool earlyExit,
 									uint32_t compatibilityMask,
 									bool supportedByHam, uint32_t skipMask,
@@ -33,27 +36,30 @@ protected:
 	virtual	void				PrepareCode(const DataSetBase* dataSet,
 									const std::string& outputPrefix,
 									const std::string& outputSuffix,
-									std::map<std::string, std::string>& _code)
-									const;
+									std::map<std::string, std::string>& _code,
+									std::map<std::string, int>& _codeAge) const;
 
 private:
 			struct DataSet : public DataSetBase {
 				DataSet(const std::map<std::string, std::string>& inputFiles,
-					const std::vector<std::string>& output,
+					const std::map<std::string, int>& inputFileAges,
+					const std::map<std::string, std::string>& outputFiles,
 					bool outputIsException, bool earlyExit,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
-					DataSetBase(output, outputIsException, earlyExit,
+					DataSetBase(outputFiles, outputIsException, earlyExit,
 						compatibilityMask, supportedByHam, skipMask,
 						startLineIndex, endLineIndex),
-					fInputFiles(inputFiles)
+					fInputFiles(inputFiles),
+					fInputFileAges(inputFileAges)
 				{
 				}
 
 			public:
 				std::map<std::string, std::string>	fInputFiles;
+				std::map<std::string, int>			fInputFileAges;
 			};
 };
 

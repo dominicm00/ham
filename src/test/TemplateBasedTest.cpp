@@ -30,11 +30,12 @@ TemplateBasedTest::TemplateBasedTest(const std::string& name,
 
 void
 TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
-	const std::vector<std::string>& output, bool outputIsException,
-	bool earlyExit, uint32_t compatibilityMask, bool supportedByHam,
-	uint32_t skipMask, size_t startLineIndex, size_t endLineIndex)
+	const std::map<std::string, std::string>& outputFiles,
+	bool outputIsException, bool earlyExit, uint32_t compatibilityMask,
+	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
+	size_t endLineIndex)
 {
-	DataBasedTest::AddDataSet(new DataSet(input, output, outputIsException,
+	DataBasedTest::AddDataSet(new DataSet(input, outputFiles, outputIsException,
 		earlyExit, compatibilityMask, supportedByHam, skipMask, startLineIndex,
 		endLineIndex));
 }
@@ -43,7 +44,8 @@ TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
 void
 TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 	const std::string& outputPrefix, const std::string& outputSuffix,
-	std::map<std::string, std::string>& _code) const
+	std::map<std::string, std::string>& _code,
+	std::map<std::string, int>& _codeAge) const
 {
 	const DataSet& dataSet = *dynamic_cast<const DataSet*>(dataSetBase);
 
@@ -97,6 +99,7 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 
 	_code.clear();
 	_code[util::kJamfileName] = code;
+	_codeAge.clear();
 }
 
 

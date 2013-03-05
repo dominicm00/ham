@@ -6,6 +6,7 @@
 
 #include "test/DataBasedTest.h"
 
+#include <fstream>
 #include <sstream>
 
 #include "behavior/Behavior.h"
@@ -16,6 +17,26 @@
 
 namespace ham {
 namespace test {
+
+
+static std::vector<std::string>
+split_lines(const std::string& string)
+{
+	std::vector<std::string> lines;
+	size_t index = 0;
+	for (;;) {
+		size_t lineEnd = string.find_first_of('\n', index);
+		if (lineEnd == std::string::npos) {
+			// All lines are supposed to end with '\n'.
+			break;
+		}
+
+		lines.push_back(std::string(string, index, lineEnd - index));
+		index = lineEnd + 1;
+	}
+
+	return lines;
+}
 
 
 DataBasedTest::DataBasedTest(const std::string& name)
@@ -91,20 +112,24 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	static const char* const kOutputSuffix = "---test-output-end---";
 
 	std::map<std::string, std::string> code;
+	std::map<std::string, int> codeAge;
 	PrepareCode(dataSet, std::string("Echo ") + kOutputPrefix + " ;\n",
-		std::string("Echo ") + kOutputSuffix + " ;\n", code);
+		std::string("Echo ") + kOutputSuffix + " ;\n", code, codeAge);
 
 	// execute the code
+	std::string expectedOutput = dataSet->fOutputFiles.at("");
 	std::stringstream outputStream;
+	TestFixture::CodeExecuter codeExecuter;
 	try {
-		TestFixture::ExecuteCode(environment, code, outputStream, outputStream);
+		codeExecuter.Execute(environment, code, codeAge, outputStream,
+			outputStream);
 	} catch (util::TextFileException& exception) {
 		if (dataSet->fOutputIsException) {
 			// and check the exception message against what's expected
-			std::vector<std::string> output;
-			output.push_back(exception.Message());
+			std::string expectedExceptionMessage
+				= split_lines(expectedOutput).at(0);
 			HAM_TEST_ADD_INFO(
-				HAM_TEST_EQUAL(output, dataSet->fOutput),
+				HAM_TEST_EQUAL(exception.Message(), expectedExceptionMessage),
 					"code:\n%s\nlines: %zu-%zu", _CodeToString(code).c_str(),
 					dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
 			return;
@@ -116,12 +141,29 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 			exception.Position().Column() + 1, exception.Position().FileName(),
 			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
 			dataSet->fEndLineIndex)
+	} catch (util::Exception& exception) {
+		if (dataSet->fOutputIsException) {
+			// and check the exception message against what's expected
+			std::string expectedExceptionMessage
+				= split_lines(expectedOutput).at(0);
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(exception.Message(), expectedExceptionMessage),
+					"code:\n%s\nlines: %zu-%zu", _CodeToString(code).c_str(),
+					dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+			return;
+		}
+
+		HAM_TEST_THROW(
+			"%s.\n%s\ntest case lines: %zu-%zu", exception.Message(),
+			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex)
 	}
 
 	if (dataSet->fOutputIsException) {
+		std::string expectedExceptionMessage
+			= split_lines(expectedOutput).at(0);
 		HAM_TEST_THROW("Expected exception: \"%s\"\nActual output: \"%s\"\n"
-			"code:\n%s\nlines: %zu-%zu",
-			TestFixture::ValueToString(dataSet->fOutput).c_str(),
+			"code:\n%s\nlines: %zu-%zu", expectedExceptionMessage.c_str(),
 			outputStream.str().c_str(), _CodeToString(code).c_str(),
 			dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
 	}
@@ -155,9 +197,38 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 
 	// and check the output against what's expected
 	HAM_TEST_ADD_INFO(
-		HAM_TEST_EQUAL(output, dataSet->fOutput),
-			"code:\n%s\nlines: %zu-%zu", _CodeToString(code).c_str(),
-			dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+		HAM_TEST_EQUAL(output, split_lines(expectedOutput)),
+		"code:\n%s\nlines: %zu-%zu", _CodeToString(code).c_str(),
+		dataSet->fStartLineIndex + 1, dataSet->fEndLineIndex)
+
+	// check the expected output files
+	for (std::map<std::string, std::string>::const_iterator it
+			= dataSet->fOutputFiles.begin();
+		it != dataSet->fOutputFiles.end(); ++it) {
+		std::string fileName = it->first;
+		if (fileName.empty())
+			continue;
+
+		std::ifstream file(fileName);
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_VERIFY(!file.fail()),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu", fileName.c_str(),
+			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex)
+
+		std::string content;
+		std::string line;
+		while (std::getline(file, line)) {
+			content += line;
+			content += '\n';
+		}
+
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_EQUAL(content, it->second),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu", fileName.c_str(),
+			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex)
+	}
 }
 
 

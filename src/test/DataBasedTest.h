@@ -31,13 +31,14 @@ public:
 
 protected:
 			struct DataSetBase {
-				DataSetBase(const std::vector<std::string>& output,
+				DataSetBase(
+					const std::map<std::string, std::string>& outputFiles,
 					bool outputIsException, bool earlyExit,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
-					fOutput(output),
+					fOutputFiles(outputFiles),
 					fOutputIsException(outputIsException),
 					fEarlyExit(earlyExit),
 					fCompatibilityMask(compatibilityMask),
@@ -53,14 +54,14 @@ protected:
 			}
 
 			public:
-				std::vector<std::string>	fOutput;
-				bool						fOutputIsException;
-				bool						fEarlyExit;
-				uint32_t					fCompatibilityMask;
-				bool						fSupportedByHam;
-				uint32_t					fSkipMask;
-				size_t						fStartLineIndex;
-				size_t						fEndLineIndex;
+				std::map<std::string, std::string>	fOutputFiles;
+				bool								fOutputIsException;
+				bool								fEarlyExit;
+				uint32_t							fCompatibilityMask;
+				bool								fSupportedByHam;
+				uint32_t							fSkipMask;
+				size_t								fStartLineIndex;
+				size_t								fEndLineIndex;
 			};
 
 protected:
@@ -69,8 +70,9 @@ protected:
 	virtual	void				PrepareCode(const DataSetBase* dataSet,
 									const std::string& outputPrefix,
 									const std::string& outputSuffix,
-									std::map<std::string, std::string>& _code)
-									const = 0;
+									std::map<std::string, std::string>& _code,
+									std::map<std::string, int>& _codeAge) const
+									= 0;
 
 private:
 			void				_RunTest(TestEnvironment* environment,

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utime.h>
 
 #include <fstream>
 #include <iterator>
@@ -107,81 +108,122 @@ TestFixture::TemporaryDirectoryCreator::Delete()
 // #pragma mark - ExecutableExecuter
 
 
-struct TestFixture::CodeExecuter {
-	void Execute(const char* jamExecutable,
-		behavior::Compatibility compatibility,
-		const std::map<std::string, std::string>& code, std::ostream& output,
-		std::ostream& errorOutput)
-	{
-		fTemporaryDirectoryCreator.Delete();
-		fOutputPipe = NULL;
+TestFixture::CodeExecuter::CodeExecuter()
+{
+}
 
-		try {
-			// create a temporary test directory and change into it
-			fTemporaryDirectoryCreator.Create(true);
 
-			// write the code to the Jamfiles
-			for (std::map<std::string, std::string>::const_iterator it
-					= code.begin();
-				it != code.end(); ++it) {
-				std::string jamfilePath = MakePath(
-					fTemporaryDirectoryCreator.Directory(), it->first.c_str());
-				CreateFile(jamfilePath.c_str(), it->second.c_str());
+TestFixture::CodeExecuter::~CodeExecuter()
+{
+	Cleanup();
+}
+
+
+void
+TestFixture::CodeExecuter::Execute(const char* jamExecutable,
+	behavior::Compatibility compatibility,
+	const std::map<std::string, std::string>& code,
+	const std::map<std::string, int>& codeAge, std::ostream& output,
+	std::ostream& errorOutput)
+{
+	fTemporaryDirectoryCreator.Delete();
+	fOutputPipe = NULL;
+
+	// create a temporary test directory and change into it
+	fTemporaryDirectoryCreator.Create(true);
+
+	// write the code to the Jamfiles
+	data::Time now = data::Time::Now();
+	for (std::map<std::string, std::string>::const_iterator it
+			= code.begin();
+		it != code.end(); ++it) {
+		std::string jamfilePath = MakePath(
+			fTemporaryDirectoryCreator.Directory(), it->first.c_str());
+		CreateFile(jamfilePath.c_str(), it->second.c_str());
+
+		if (codeAge.find(it->first) != codeAge.end()) {
+			int age = codeAge.at(it->first);
+// TODO: Platform specific!
+			utimbuf times;
+			times.actime = times.modtime = (time_t)now.Seconds() - age;
+			if (utime(it->first.c_str(), &times) != 0) {
+				HAM_TEST_THROW("Failed to set time on \"%s\": %s",
+					it->first.c_str(), strerror(errno))
 			}
+		}
+	}
 
-			if (jamExecutable != NULL) {
-				// run the executable
-				fOutputPipe = popen(jamExecutable, "r");
-				if (fOutputPipe == NULL) {
-					HAM_TEST_THROW("Failed to execute \"%s\": %s",
-						jamExecutable, strerror(errno))
-				}
-
-				// read input until done
-				std::ostream_iterator<char> outputIterator(output);
-				char buffer[4096];
-				for (;;) {
-					size_t bytesRead = fread(buffer, 1, sizeof(buffer),
-						fOutputPipe);
-					if (bytesRead > 0) {
-						outputIterator = std::copy(buffer, buffer + bytesRead,
-							outputIterator);
-					}
-
-					if (bytesRead < sizeof(buffer))
-						break;
-				}
-			} else {
-				make::Processor processor;
-				processor.SetCompatibility(compatibility);
-				processor.SetOutput(output);
-				processor.SetErrorOutput(errorOutput);
-				processor.ProcessJambase();
-			}
-		} catch (...) {
-			_Cleanup();
-			throw;
+	if (jamExecutable != NULL) {
+		// run the executable
+		fOutputPipe = popen(jamExecutable, "r");
+		if (fOutputPipe == NULL) {
+			HAM_TEST_THROW("Failed to execute \"%s\": %s",
+				jamExecutable, strerror(errno))
 		}
 
-		_Cleanup();
+		// read input until done
+		std::ostream_iterator<char> outputIterator(output);
+		char buffer[4096];
+		for (;;) {
+			size_t bytesRead = fread(buffer, 1, sizeof(buffer),
+				fOutputPipe);
+			if (bytesRead > 0) {
+				outputIterator = std::copy(buffer, buffer + bytesRead,
+					outputIterator);
+			}
+
+			if (bytesRead < sizeof(buffer))
+				break;
+		}
+	} else {
+		make::Processor processor;
+		processor.SetCompatibility(compatibility);
+		processor.SetOutput(output);
+		processor.SetErrorOutput(errorOutput);
+		processor.ProcessJambase();
+		processor.SetPrimaryTargets(StringList().Append(String("all")));
+		processor.PrepareTargets();
+		processor.BuildTargets();
+	}
+}
+
+
+void
+TestFixture::CodeExecuter::Execute(TestEnvironment* environment,
+	const std::string& code, std::ostream& output, std::ostream& errorOutput)
+{
+	std::map<std::string, std::string> codeFiles;
+	codeFiles[util::kJamfileName] = code;
+	return Execute(environment, codeFiles, std::map<std::string, int>(),
+		output, errorOutput);
+}
+
+
+void
+TestFixture::CodeExecuter::Execute(TestEnvironment* environment,
+	const std::map<std::string, std::string>& code,
+	const std::map<std::string, int>& codeAge, std::ostream& output,
+	std::ostream& errorOutput)
+{
+	std::string jamExecutable = environment->JamExecutable();
+	return Execute(jamExecutable.empty() ? NULL : jamExecutable.c_str(),
+		environment->GetCompatibility(), code, codeAge, output, errorOutput);
+}
+
+
+void
+TestFixture::CodeExecuter::Cleanup()
+{
+	// close pipe to jam process
+	if (fOutputPipe != NULL) {
+		pclose(fOutputPipe);
+		fOutputPipe = NULL;
 	}
 
-private:
-	void _Cleanup()
-	{
-		// close pipe to jam process
-		if (fOutputPipe != NULL)
-			pclose(fOutputPipe);
-
-		// change the directory back to the original directory and delete the
-		// temporary directory
-		fTemporaryDirectoryCreator.Delete();
-	}
-
-private:
-	TemporaryDirectoryCreator	fTemporaryDirectoryCreator;
-	FILE*						fOutputPipe;
-};
+	// change the directory back to the original directory and delete the
+	// temporary directory
+	fTemporaryDirectoryCreator.Delete();
+}
 
 
 // #pragma mark - TestFixture
@@ -244,22 +286,17 @@ TestFixture::MakeStringListList(
 TestFixture::ExecuteCode(TestEnvironment* environment, const std::string& code,
 	std::ostream& output, std::ostream& errorOutput)
 {
-	std::string jamExecutable = environment->JamExecutable();
-	std::map<std::string,std::string> codeFiles;
-	codeFiles[util::kJamfileName] = code;
-	return ExecuteCode(environment, codeFiles, output, errorOutput);
+	CodeExecuter().Execute(environment, code, output, errorOutput);
 }
 
 
 /*static*/ void
 TestFixture::ExecuteCode(TestEnvironment* environment,
-	const std::map<std::string, std::string>& code, std::ostream& output,
+	const std::map<std::string, std::string>& code,
+	const std::map<std::string, int>& codeAge, std::ostream& output,
 	std::ostream& errorOutput)
 {
-	std::string jamExecutable = environment->JamExecutable();
-	return CodeExecuter().Execute(
-		jamExecutable.empty() ? NULL : jamExecutable.c_str(),
-		environment->GetCompatibility(), code, output, errorOutput);
+	CodeExecuter().Execute(environment, code, codeAge, output, errorOutput);
 }
 
 

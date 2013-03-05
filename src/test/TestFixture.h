@@ -26,6 +26,7 @@ class TestEnvironment;
 class TestFixture {
 public:
 			class TemporaryDirectoryCreator;
+			class CodeExecuter;
 
 public:
 	static	data::StringList	MakeStringList(const char* element1,
@@ -64,9 +65,11 @@ public:
 	static	void				ExecuteCode(TestEnvironment* environment,
 									const std::map<std::string, std::string>&
 										code,
+									const std::map<std::string, int>& codeAge,
 									std::ostream& output,
 									std::ostream& errorOutput);
 									// code: file name -> file content
+									// codeAge: file name -> age in seconds
 
 	static	std::string			CurrentWorkingDirectory();
 	static	void				CreateTemporaryDirectory(std::string& _path);
@@ -79,9 +82,6 @@ public:
 	static	void				RemoveRecursively(std::string entry);
 
 	static	std::string			MakePath(const char* head, const char* tail);
-
-private:
-			struct CodeExecuter;
 };
 
 
@@ -99,6 +99,39 @@ public:
 private:
 			std::string			fOldWorkingDirectory;
 			std::string			fTemporaryDirectory;
+};
+
+
+class TestFixture::CodeExecuter {
+public:
+								CodeExecuter();
+								~CodeExecuter();
+
+			void				Execute(const char* jamExecutable,
+									behavior::Compatibility compatibility,
+									const std::map<std::string, std::string>&
+										code,
+									const std::map<std::string, int>& codeAge,
+									std::ostream& output,
+									std::ostream& errorOutput);
+			void				Execute(TestEnvironment* environment,
+									const std::string& code,
+									std::ostream& output,
+									std::ostream& errorOutput);
+			void				Execute(TestEnvironment* environment,
+									const std::map<std::string, std::string>&
+										code,
+									const std::map<std::string, int>& codeAge,
+									std::ostream& output,
+									std::ostream& errorOutput);
+									// code: file name -> file content
+									// codeAge: file name -> age in seconds
+
+			void				Cleanup();
+
+private:
+			TemporaryDirectoryCreator fTemporaryDirectoryCreator;
+			FILE*				fOutputPipe;
 };
 
 
