@@ -81,7 +81,7 @@ private:
 
 			bool				_CollectMakableTargets(MakeTarget* makeTarget);
 			TargetBuildInfo*	_MakeTarget(MakeTarget* makeTarget);
-			void				_TargetMade(MakeTarget* makeTarget,
+			size_t				_TargetMade(MakeTarget* makeTarget,
 									MakeTarget::MakeState state);
 			Command*			_BuildCommand(
 									data::RuleActionsCall* actionsCall);
@@ -113,6 +113,7 @@ private:
 			MakeTargetSet		fMakableTargets;
 			CommandMap			fCommands;
 			TargetBuildInfoSet	fTargetBuildInfos;
+			size_t				fTargetsToUpdateCount;
 };
 
 

@@ -55,7 +55,8 @@ Processor::Processor()
 	fMakeLevel(0),
 	fMakableTargets(),
 	fCommands(),
-	fTargetBuildInfos()
+	fTargetBuildInfos(),
+	fTargetsToUpdateCount(0)
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
@@ -244,10 +245,17 @@ Processor::PrepareTargets()
 void
 Processor::BuildTargets()
 {
+	printf("...found %zu target(s)...\n", fMakeTargets.size());
+
 	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
 		it.HasNext();) {
 		_CollectMakableTargets(it.Next());
 	}
+
+	if (fMakableTargets.IsEmpty())
+		return;
+
+	printf("...updating %zu target(s)...\n", fTargetsToUpdateCount);
 
 	// get the JAMSHELL variable
 	StringList jamShell(
@@ -261,11 +269,22 @@ Processor::BuildTargets()
 
 	TargetBuilder builder(fDebugOptions, fJobCount, jamShell);
 
+	size_t targetsUpdated = 0;
+	size_t targetsFailed = 0;
+	size_t targetsSkipped = 0;
+
 	while (!fMakableTargets.IsEmpty() || builder.HasPendingBuildInfos()) {
 		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo(
 				!builder.HasSpareJobSlots() || fMakableTargets.IsEmpty())) {
-			_TargetMade(buildInfo->GetTarget(),
-				buildInfo->HasFailed() ? MakeTarget::FAILED : MakeTarget::DONE);
+			if (buildInfo->HasFailed()) {
+				targetsFailed++;
+				targetsSkipped += _TargetMade(buildInfo->GetTarget(),
+					MakeTarget::FAILED);
+			} else {
+				targetsUpdated++;
+				targetsSkipped += _TargetMade(buildInfo->GetTarget(),
+					MakeTarget::DONE);
+			}
 		}
 
 		while (builder.HasSpareJobSlots() && !fMakableTargets.IsEmpty()) {
@@ -274,6 +293,13 @@ Processor::BuildTargets()
 			builder.AddBuildInfo(_MakeTarget(makeTarget));
 		}
 	}
+
+	if (targetsFailed > 0)
+		printf("...failed updating %zu target(s)...\n", targetsFailed);
+	if (targetsSkipped > 0)
+		printf("...skipped %zu target(s)...\n", targetsSkipped);
+	if (targetsUpdated > 0)
+		printf("...updated %zu target(s)...\n", targetsUpdated);
 }
 
 
@@ -539,6 +565,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
 			makeTarget->SetMakeState(MakeTarget::PENDING);
+			fTargetsToUpdateCount++;
 			break;
 		case MakeTarget::KEEP:
 			makeTarget->SetMakeState(MakeTarget::DONE);
@@ -603,11 +630,13 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 }
 
 
-void
+size_t
 Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 {
 	if (makeTarget->GetMakeState() == MakeTarget::PENDING)
 		makeTarget->SetMakeState(state);
+
+	size_t skippedCount = 0;
 
 	switch (state) {
 		case MakeTarget::DONE:
@@ -637,6 +666,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 				makeTarget->Name().ToCString(),
 				lackingDependency != NULL
 					? lackingDependency->Name().ToCString() : "???");
+			skippedCount++;
 			break;
 		}
 	}
@@ -648,13 +678,18 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 		size_t pendingDependencyCount = parent->PendingDependenciesCount() - 1;
 		parent->SetPendingDependenciesCount(pendingDependencyCount);
 
+		if (state != MakeTarget::DONE)
+			parent->SetMakeState(MakeTarget::SKIPPED);
+
 		if (pendingDependencyCount == 0) {
 			if (parent->GetMakeState() == MakeTarget::PENDING)
-				fMakableTargets.Insert( parent, 0);
+				fMakableTargets.Insert(parent, 0);
 			else
-				_TargetMade(parent, MakeTarget::SKIPPED);
+				skippedCount += _TargetMade(parent, parent->GetMakeState());
 		}
 	}
+
+	return skippedCount;
 }
 
 
