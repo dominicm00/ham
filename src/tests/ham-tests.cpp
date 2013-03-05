@@ -114,7 +114,7 @@ find_test_data_directory()
 
 
 static void
-add_simple_data_based_tests(test::TestSuite& testSuite,
+add_data_based_tests_recursive(test::TestSuite& testSuite,
 	const std::string& directory)
 {
 	DIR* dir = opendir(directory.c_str());
@@ -134,7 +134,7 @@ add_simple_data_based_tests(test::TestSuite& testSuite,
 		if (S_ISDIR(st.st_mode)) {
 			std::auto_ptr<test::TestSuite> subTestSuite(
 				new test::TestSuite(name));
-			add_simple_data_based_tests(*subTestSuite, path);
+			add_data_based_tests_recursive(*subTestSuite, path);
 			if (subTestSuite->CountTests() > 0) {
 				testSuite.AddTest(subTestSuite.get());
 				subTestSuite.release();
@@ -144,7 +144,7 @@ add_simple_data_based_tests(test::TestSuite& testSuite,
 				testSuite.AddTest(
 					test::DataBasedTestParser().Parse(path.c_str()));
 			} catch (parser::ParseException& exception) {
-				fprintf(stderr, "add_simple_data_based_tests(): %s:%zu:%zu "
+				fprintf(stderr, "add_data_based_tests_recursive(): %s:%zu:%zu "
 					"Parse exception: %s\n", path.c_str(),
 					exception.Position().Line() + 1,
 					exception.Position().Column() + 1, exception.Message());
@@ -161,15 +161,12 @@ static void
 add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
 {
 	// get the simple tests
-	std::auto_ptr<test::TestSuite> simpleTestSuite(
-		new test::TestSuite("Simple"));
-	std::string simpleDirectory = directory + "/simple";
-	add_simple_data_based_tests(*simpleTestSuite, simpleDirectory);
-	if (simpleTestSuite->CountTests() > 0) {
-		test::TestSuiteBuilder(testSuite)
-			.AddSuite("DataBased")
-				.Add(simpleTestSuite.get());
-		simpleTestSuite.release();
+	std::auto_ptr<test::TestSuite> dataBasedTestSuite(
+		new test::TestSuite("DataBased"));
+	add_data_based_tests_recursive(*dataBasedTestSuite, directory);
+	if (dataBasedTestSuite->CountTests() > 0) {
+		testSuite.AddTest(dataBasedTestSuite.get());
+		dataBasedTestSuite.release();
 	}
 }
 
