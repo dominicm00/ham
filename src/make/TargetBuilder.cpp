@@ -94,6 +94,24 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 						fBuildInfos.erase(
 							std::find(fBuildInfos.begin(), fBuildInfos.end(),
 								buildInfo));
+
+						// print diagnostics
+						printf("%s\n", command->CommandLine().ToCString());
+						printf("...failed %s %s\n",
+							command->Actions()->Actions()->RuleName()
+								.ToCString(),
+							command->BoundTargetPaths().Join(StringPart(" "))
+								.ToCString());
+
+						// remove the targets
+						for (StringList::Iterator it
+								= command->BoundTargetPaths().GetIterator();
+							it.HasNext();) {
+							String path = it.Next();
+// TODO: Platform specific!
+							if (unlink(path.ToCString()) == 0)
+								printf("...removing %s\n", path.ToCString());
+						}
 						break;
 				}
 			}
