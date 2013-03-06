@@ -290,8 +290,8 @@ DataBasedTestParser::Parse(const char* fileName)
 					}
 
 					inputFile = arguments[0];
-					if (arguments.size() > 1)
-						inputFileAge = atoi(arguments[1].c_str());
+					inputFileAge = arguments.size() > 1
+						? atoi(arguments[1].c_str()) : 0;
 					continue;
 				}
 
