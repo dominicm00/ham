@@ -141,15 +141,15 @@ TestFixture::CodeExecuter::Execute(const char* jamExecutable,
 			fTemporaryDirectoryCreator.Directory(), it->first.c_str());
 		CreateFile(jamfilePath.c_str(), it->second.c_str());
 
-		if (codeAge.find(it->first) != codeAge.end()) {
-			int age = codeAge.at(it->first);
+		// set file time
+		int age = codeAge.find(it->first) != codeAge.end()
+			? codeAge.at(it->first) : 0;
 // TODO: Platform specific!
-			utimbuf times;
-			times.actime = times.modtime = (time_t)now.Seconds() - age;
-			if (utime(it->first.c_str(), &times) != 0) {
-				HAM_TEST_THROW("Failed to set time on \"%s\": %s",
-					it->first.c_str(), strerror(errno))
-			}
+		utimbuf times;
+		times.actime = times.modtime = (time_t)now.Seconds() - age;
+		if (utime(it->first.c_str(), &times) != 0) {
+			HAM_TEST_THROW("Failed to set time on \"%s\": %s",
+				it->first.c_str(), strerror(errno))
 		}
 	}
 
