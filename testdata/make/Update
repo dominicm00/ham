@@ -1,0 +1,562 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# Update missing leaf target.
+# target	- target (missing)
+#
+#!file Jamfile
+actions EchoToFile
+{
+	echo "Updated" > $(1)
+}
+
+LOCATE on target = . ;
+EchoToFile target ;
+
+Depends all : target ;
+-
+#!file target
+Updated
+---
+# Update missing file target, single dependency.
+# target	- target (missing)
+# source1	- source
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+CopyFile target : source1 ;
+Depends target : source1 ;
+
+Depends all : target ;
+
+#!file source1
+Source1
+-
+#!file target
+Source1
+Updated
+---
+# Update existing file target, single dependency.
+# target	- target (older)
+#  source1	- source (newer)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+CopyFile target : source1 ;
+Depends target : source1 ;
+
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1
+Source1
+-
+#!file target
+Source1
+Updated
+---
+# Don't update existing file target, single older dependency.
+# target	- target (newer)
+#  source1	- source (older)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+CopyFile target : source1 ;
+Depends target : source1 ;
+
+Depends all : target ;
+
+#!file target
+Old
+#!file source1 1
+Source1
+-
+#!file target
+Old
+---
+# Update missing file target, multiple dependencies.
+# target	- target (missing)
+#  source1	- source
+#  source2	- source
+#  source3	- source
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file source1
+Source1
+#!file source2
+Source2
+#!file source3
+Source3
+-
+#!file target
+Source1
+Source2
+Source3
+Updated
+---
+# Update older file target, multiple newer dependencies.
+# target	- target (older)
+#  source1	- source (newer)
+#  source2	- source (newer)
+#  source3	- source (newer)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1
+Source1
+#!file source2
+Source2
+#!file source3
+Source3
+-
+#!file target
+Source1
+Source2
+Source3
+Updated
+---
+# Update file target, multiple dependencies, one newer.
+# target	- target
+#  source1	- source (older)
+#  source2	- source (newer)
+#  source3	- source (older)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1 2
+Source1
+#!file source2
+Source2
+#!file source3 2
+Source3
+-
+#!file target
+Source1
+Source2
+Source3
+Updated
+---
+# Don't update newer file target, multiple older dependencies.
+# target	- target
+#  source1	- source (older)
+#  source2	- source (older)
+#  source3	- source (older)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file target
+Old
+#!file source1 1
+Source1
+#!file source2 1
+Source2
+#!file source3 1
+Source3
+-
+#!file target
+Old
+---
+# 2 level dependency tree. All targets missing.
+# target		- target (missing)
+#  target1		- target (missing)
+#   source11	- source
+#   source12	- source
+#  target2		- target (missing)
+#   source21	- source
+#   source22	- source
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file source11 1
+Source11
+#!file source12 1
+Source12
+#!file source21 1
+Source21
+#!file source22 1
+Source22
+-
+#!file target1
+Source11
+Source12
+Updated
+#!file target2
+Source21
+Source22
+Updated
+#!file target
+Source11
+Source12
+Updated
+Source21
+Source22
+Updated
+Updated
+---
+# 2 level dependency tree. All intermediate targets missing.
+# target		- target (newer)
+#  target1		- target (missing)
+#   source11	- source
+#   source12	- source
+#  target2		- target (missing)
+#   source21	- source
+#   source22	- source
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file target
+Old
+#!file source11 1
+Source11
+#!file source12 1
+Source12
+#!file source21 1
+Source21
+#!file source22 1
+Source22
+-
+#!file target1
+Source11
+Source12
+Updated
+#!file target2
+Source21
+Source22
+Updated
+#!file target
+Source11
+Source12
+Updated
+Source21
+Source22
+Updated
+Updated
+---
+# 2 level dependency tree. Intermediate target older.
+# target		- target (newer)
+#  target1		- target (newer)
+#   source11	- source
+#   source12	- source
+#  target2		- target (older)
+#   source21	- source
+#   source22	- source
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file target
+Old
+#!file target1
+Old1
+#!file target2 2
+Old2
+#!file source11 1
+Source11
+#!file source12 1
+Source12
+#!file source21 1
+Source21
+#!file source22 1
+Source22
+-
+#!file target1
+Old1
+#!file target2
+Source21
+Source22
+Updated
+#!file target
+Old1
+Source21
+Source22
+Updated
+Updated
+---
+# 2 level dependency tree. All targets older.
+# target		- target (older)
+#  target1		- target (older)
+#   source11	- source (newer)
+#   source12	- source (newer)
+#  target2		- target (older)
+#   source21	- source (newer)
+#   source22	- source (newer)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file target1 1
+Old1
+#!file target2 1
+Old2
+#!file source11
+Source11
+#!file source12
+Source12
+#!file source21
+Source21
+#!file source22
+Source22
+-
+#!file target1
+Source11
+Source12
+Updated
+#!file target2
+Source21
+Source22
+Updated
+#!file target
+Source11
+Source12
+Updated
+Source21
+Source22
+Updated
+Updated
+---
+# 2 level dependency tree. Intermediate targets newer.
+# target		- target (older)
+#  target1		- target (newer)
+#   source11	- source (older)
+#   source12	- source (older)
+#  target2		- target (newer)
+#   source21	- source (older)
+#   source22	- source (older)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file target1
+Old1
+#!file target2
+Old2
+#!file source11 1
+Source11
+#!file source12 1
+Source12
+#!file source21 1
+Source21
+#!file source22 1
+Source22
+-
+#!file target1
+Old1
+#!file target2
+Old2
+#!file target
+Old1
+Old2
+Updated
+---
+# 2 level dependency tree. All targets newer.
+# target		- target (newer)
+#  target1		- target (newer)
+#   source11	- source (older)
+#   source12	- source (older)
+#  target2		- target (newer)
+#   source21	- source (older)
+#   source22	- source (older)
+#
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target target1 target2 = . ;
+JoinFiles target : target1 target2 ;
+JoinFiles target1 : source11 source12 ;
+JoinFiles target2 : source21 source22 ;
+Depends all : target ;
+
+#!file target
+Old
+#!file target1
+Old1
+#!file target2
+Old2
+#!file source11 1
+Source11
+#!file source12 1
+Source12
+#!file source21 1
+Source21
+#!file source22 1
+Source22
+-
+#!file target1
+Old1
+#!file target2
+Old2
+#!file target
+Old
+---
