@@ -15,7 +15,8 @@ const char* const kJambase =
 #if 0
 #	include "JambaseData.h"
 #else
-	"include Jamfile ;"
+	"NotFile all ;\n"
+	"include Jamfile ;\n"
 #endif
 	;
 
