@@ -504,7 +504,8 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
 			makeTarget->SetMakeState(MakeTarget::PENDING);
-			fTargetsToUpdateCount++;
+			if (!makeTarget->GetTarget()->IsNotAFile())
+				fTargetsToUpdateCount++;
 			break;
 		case MakeTarget::KEEP:
 			makeTarget->SetMakeState(MakeTarget::DONE);
