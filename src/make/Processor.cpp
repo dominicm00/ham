@@ -229,7 +229,8 @@ Processor::BuildTargets()
 		while (builder.HasSpareJobSlots() && !fMakableTargets.IsEmpty()) {
 			MakeTarget* makeTarget = fMakableTargets.Head();
 			fMakableTargets.RemoveAt(0);
-			builder.AddBuildInfo(_MakeTarget(makeTarget));
+			if (TargetBuildInfo* buildInfo = _MakeTarget(makeTarget))
+				builder.AddBuildInfo(buildInfo);
 		}
 	}
 
