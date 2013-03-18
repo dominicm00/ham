@@ -581,11 +581,17 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
+actions LogPseudo1
+{
+	echo $(1) > pseudo1 ;
+}
+
 LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
 Depends target1 : source11 source12 ;
+LogPseudo1 target1 ;
 JoinFiles target2 : source21 source22 ;
 Depends all : target ;
 
@@ -605,6 +611,7 @@ Old2
 #!file target
 Old2
 Updated
+#!file pseudo1 missing
 ---
 # 2 level dependency tree. Intermediate pseudo target, old target.
 # target		- target (older)
@@ -627,11 +634,17 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
+actions LogPseudo1
+{
+	echo $(1) > pseudo1 ;
+}
+
 LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
 Depends target1 : source11 source12 ;
+LogPseudo1 target1 ;
 JoinFiles target2 : source21 source22 ;
 Depends all : target ;
 
@@ -653,6 +666,7 @@ Old2
 #!file target
 Old2
 Updated
+#!file pseudo1 missing
 ---
 # 2 level dependency tree. Intermediate pseudo target with newer source.
 # target		- target
@@ -675,11 +689,17 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
+actions LogPseudo1
+{
+	echo $(1) > pseudo1 ;
+}
+
 LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
 Depends target1 : source11 source12 ;
+LogPseudo1 target1 ;
 JoinFiles target2 : source21 source22 ;
 Depends all : target ;
 
@@ -701,6 +721,7 @@ Old2
 #!file target
 Old2
 Updated
+#!file pseudo1 missing
 ---
 # 2 level dependency tree. Intermediate pseudo target. Target up-to-date.
 # target		- target (up-to-date)
@@ -723,11 +744,17 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
+actions LogPseudo1
+{
+	echo $(1) > pseudo1 ;
+}
+
 LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
 Depends target1 : source11 source12 ;
+LogPseudo1 target1 ;
 JoinFiles target2 : source21 source22 ;
 Depends all : target ;
 
@@ -748,6 +775,7 @@ Source22
 Old2
 #!file target
 Old
+#!file pseudo1 missing
 ---
 # 2 level dependency tree. Intermediate missing target without actions, missing
 # main target.
