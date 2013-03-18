@@ -376,7 +376,8 @@ TestFixture::CreateDirectory(const char* path, bool createAncestors)
 	}
 }
 
-void TestFixture::CreateFile(const char* path, const char* content)
+/*static*/ void
+TestFixture::CreateFile(const char* path, const char* content)
 {
 	CreateParentDirectory(path);
 // TODO: Replace path delimiters with platform specific ones!
@@ -398,6 +399,7 @@ void TestFixture::CreateFile(const char* path, const char* content)
 /*static*/ void
 TestFixture::RemoveRecursively(std::string entry)
 {
+// TODO: Platform dependent!
 	struct stat st;
 	if (lstat(entry.c_str(), &st) < 0) {
 		HAM_TEST_THROW("Failed to stat entry \"%s\" for removal: %s",
