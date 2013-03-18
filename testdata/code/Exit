@@ -6,7 +6,7 @@
 #!file Jamfile
 Exit ;
 -
-#!earlyExit
+#!error evaluation
 
 ---
 #!file Jamfile
@@ -14,7 +14,7 @@ Echo 1 ;
 Exit Hello World! ;
 Echo 2 ;
 -
-#!earlyExit
+#!error evaluation
 1
 Hello World!
 ---
@@ -28,7 +28,7 @@ Echo 3 ;
 Exit Hello World! ;
 Echo 4 ;
 -
-#!earlyExit
+#!error evaluation
 1
 3
 Hello World!
@@ -48,7 +48,7 @@ Echo 5 ;
 Exit Hello World! ;
 Echo 6 ;
 -
-#!earlyExit
+#!error evaluation
 1
 3
 5
@@ -62,7 +62,7 @@ for var in 1 2 3 {
 }
 Echo 3 ;
 -
-#!earlyExit
+#!error evaluation
 1
 Hello World!
 ---
@@ -74,7 +74,7 @@ while true {
 }
 Echo 3 ;
 -
-#!earlyExit
+#!error evaluation
 1
 Hello World!
 ---
@@ -88,7 +88,7 @@ rule Foo
 Foo ;
 Echo 3 ;
 -
-#!earlyExit
+#!error evaluation
 1
 Hello World!
 ---

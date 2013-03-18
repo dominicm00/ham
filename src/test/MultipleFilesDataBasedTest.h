@@ -27,7 +27,9 @@ public:
 										inputFileAges,
 									const std::map<std::string, std::string>&
 										outputFiles,
-									bool outputIsException, bool earlyExit,
+									const std::set<std::string>&
+										missingOutputFiles,
+									bool outputIsException, ExitState exitState,
 									uint32_t compatibilityMask,
 									bool supportedByHam, uint32_t skipMask,
 									size_t startLineIndex, size_t endLineIndex);
@@ -44,14 +46,15 @@ private:
 				DataSet(const std::map<std::string, std::string>& inputFiles,
 					const std::map<std::string, int>& inputFileAges,
 					const std::map<std::string, std::string>& outputFiles,
-					bool outputIsException, bool earlyExit,
+					const std::set<std::string>& missingOutputFiles,
+					bool outputIsException, ExitState exitState,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
-					DataSetBase(outputFiles, outputIsException, earlyExit,
-						compatibilityMask, supportedByHam, skipMask,
-						startLineIndex, endLineIndex),
+					DataSetBase(outputFiles, missingOutputFiles,
+						outputIsException, exitState, compatibilityMask,
+						supportedByHam, skipMask, startLineIndex, endLineIndex),
 					fInputFiles(inputFiles),
 					fInputFileAges(inputFileAges)
 				{

@@ -83,17 +83,20 @@ public:
 
 struct DataBasedTestParser::TestCase {
 	TestCase(const std::vector<TestFile>& inputFiles,
-		const std::vector<TestFile>& outputFiles, bool outputIsException,
-		bool earlyExit, uint32_t compatibilityMask, bool supportedByHam,
-		uint32_t skipMask, size_t startLineIndex, size_t endLineIndex)
+		const std::vector<TestFile>& outputFiles,
+		const std::set<std::string>& missingOutputFiles, bool outputIsException,
+		DataBasedTest::ExitState exitState, uint32_t compatibilityMask,
+		bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
+		size_t endLineIndex)
 		:
 		fCompatibilityMask(compatibilityMask),
 		fSupportedByHam(supportedByHam),
 		fSkipMask(skipMask),
 		fInputFiles(inputFiles),
 		fOutputFiles(outputFiles),
+		fMissingOutputFiles(missingOutputFiles),
 		fOutputIsException(outputIsException),
-		fEarlyExit(earlyExit),
+		fExitState(exitState),
 		fStartLineIndex(startLineIndex),
 		fEndLineIndex(endLineIndex)
 	{
@@ -105,8 +108,9 @@ public:
 	uint32_t					fSkipMask;
 	std::vector<TestFile>		fInputFiles;
 	std::vector<TestFile>		fOutputFiles;
+	std::set<std::string>		fMissingOutputFiles;
 	bool						fOutputIsException;
-	bool						fEarlyExit;
+	DataBasedTest::ExitState	fExitState;
 	size_t						fStartLineIndex;
 	size_t						fEndLineIndex;
 };
@@ -179,7 +183,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::vector<std::string> previousInput;
 	std::vector<std::string> previousOutput;
 	bool previousOutputIsException = false;
-	bool previousEarlyExit = false;
+	DataBasedTest::ExitState previousExitState = DataBasedTest::EXIT_OK;
 
 	bool done = false;
 
@@ -319,10 +323,11 @@ DataBasedTestParser::Parse(const char* fileName)
 			break;
 
 		std::vector<TestFile> outputFiles;
+		std::set<std::string> missingOutputFiles;
 		std::vector<std::string> output;
 		std::string outputFile;
 		bool outputIsException = false;
-		bool earlyExit = false;
+		DataBasedTest::ExitState exitState = DataBasedTest::EXIT_OK;
 		for (;;) {
 			std::string line;
 			std::string directive;
@@ -342,7 +347,7 @@ DataBasedTestParser::Parse(const char* fileName)
 
 					output.push_back(previousOutput.at(output.size()));
 					outputIsException = previousOutputIsException;
-					earlyExit = previousEarlyExit;
+					exitState = previousExitState;
 					continue;
 				}
 
@@ -351,8 +356,23 @@ DataBasedTestParser::Parse(const char* fileName)
 					continue;
 				}
 
-				if (directive == "earlyExit") {
-					earlyExit = true;
+				if (directive == "error") {
+					if (line.empty()) {
+						_Throw(std::string("\"#!error\" directive requires "
+							"argument"));
+					}
+
+					if (line == "evaluation") {
+						exitState = DataBasedTest::EXIT_EVALUATION_ERROR;
+					} else if (line == "bind") {
+						exitState = DataBasedTest::EXIT_BIND_ERROR;
+					} else if (line == "make") {
+						exitState = DataBasedTest::EXIT_MAKE_ERROR;
+					} else {
+						_Throw(std::string("Invalid argument \"") + line
+							+ "\" for \"#!error\" directive");
+					}
+
 					continue;
 				}
 
@@ -363,7 +383,9 @@ DataBasedTestParser::Parse(const char* fileName)
 							"case"));
 					}
 
-					if (line.empty()) {
+					std::vector<std::string> arguments = split_string(line);
+
+					if (arguments.empty()) {
 						_Throw(std::string("\"#!file\" directive requires "
 							"file name argument"));
 					}
@@ -372,7 +394,18 @@ DataBasedTestParser::Parse(const char* fileName)
 					outputFiles.push_back(TestFile(output, outputFile, 0));
 
 					output.clear();
-					outputFile = line;
+					outputFile = arguments[0];
+
+					if (arguments.size() > 1) {
+						if (arguments[1] == "missing") {
+							missingOutputFiles.insert(arguments[0]);
+						} else {
+							_Throw(std::string("Invalid second argument \""
+								+ arguments[1]
+								+ "\" for \"#!file\" directive"));
+						}
+					}
+
 					continue;
 				}
 
@@ -391,10 +424,11 @@ DataBasedTestParser::Parse(const char* fileName)
 		previousInput = input;
 		previousOutput = output;
 		previousOutputIsException = outputIsException;
-		previousEarlyExit = earlyExit;
+		previousExitState = exitState;
 
-		testCases.push_back(TestCase(inputFiles, outputFiles, outputIsException,
-			earlyExit, compatibilityMask & ~skipMask, supportedByHam, skipMask,
+		testCases.push_back(TestCase(inputFiles, outputFiles,
+			missingOutputFiles, outputIsException, exitState,
+			compatibilityMask & ~skipMask, supportedByHam, skipMask,
 			dataSetLineIndex, fLineIndex - 1));
 	}
 
@@ -424,15 +458,18 @@ DataBasedTestParser::Parse(const char* fileName)
 					= testCase.fOutputFiles.begin();
 				outputFileIt != testCase.fOutputFiles.end(); ++outputFileIt) {
 				const TestFile& outputFile = *outputFileIt;
-				outputFiles[outputFile.fFile]
-					= join_file_content(outputFile.fContent);
+				if (testCase.fMissingOutputFiles.find(outputFile.fFile)
+						== testCase.fMissingOutputFiles.end()) {
+					outputFiles[outputFile.fFile]
+						= join_file_content(outputFile.fContent);
+				}
 			}
 
 			test->AddDataSet(inputFiles, inputFileAges, outputFiles,
-				testCase.fOutputIsException, testCase.fEarlyExit,
-				testCase.fCompatibilityMask, testCase.fSupportedByHam,
-				testCase.fSkipMask, testCase.fStartLineIndex,
-				testCase.fEndLineIndex);
+				testCase.fMissingOutputFiles, testCase.fOutputIsException,
+				testCase.fExitState, testCase.fCompatibilityMask,
+				testCase.fSupportedByHam, testCase.fSkipMask,
+				testCase.fStartLineIndex, testCase.fEndLineIndex);
 		}
 
 		return test.release();
@@ -450,8 +487,11 @@ DataBasedTestParser::Parse(const char* fileName)
 				= testCase.fOutputFiles.begin();
 			outputFileIt != testCase.fOutputFiles.end(); ++outputFileIt) {
 			const TestFile& outputFile = *outputFileIt;
-			outputFiles[outputFile.fFile]
-				= join_file_content(outputFile.fContent);
+			if (testCase.fMissingOutputFiles.find(outputFile.fFile)
+					== testCase.fMissingOutputFiles.end()) {
+				outputFiles[outputFile.fFile]
+					= join_file_content(outputFile.fContent);
+			}
 		}
 
 		std::vector<std::string> content = testCase.fInputFiles.at(0).fContent;
@@ -462,10 +502,11 @@ DataBasedTestParser::Parse(const char* fileName)
 		}
 
 		test->AddDataSet(content,
-			outputFiles, testCase.fOutputIsException,
-			testCase.fEarlyExit, testCase.fCompatibilityMask,
-			testCase.fSupportedByHam, testCase.fSkipMask,
-			testCase.fStartLineIndex, testCase.fEndLineIndex);
+			outputFiles, testCase.fMissingOutputFiles,
+			testCase.fOutputIsException, testCase.fExitState,
+			testCase.fCompatibilityMask, testCase.fSupportedByHam,
+			testCase.fSkipMask, testCase.fStartLineIndex,
+			testCase.fEndLineIndex);
 	}
 
 	return test.release();

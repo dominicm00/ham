@@ -80,6 +80,7 @@ public:
 	static	void				CreateFile(const char* path,
 									const char* content);
 	static	void				RemoveRecursively(std::string entry);
+	static	bool				FileExists(const std::string& path);
 
 	static	std::string			MakePath(const char* head, const char* tail);
 };

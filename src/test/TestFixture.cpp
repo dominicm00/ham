@@ -442,6 +442,15 @@ TestFixture::RemoveRecursively(std::string entry)
 }
 
 
+/*static*/ bool
+TestFixture::FileExists(const std::string& path)
+{
+// TODO: Platform dependent!
+	struct stat st;
+	return lstat(path.c_str(), &st) == 0;
+}
+
+
 /*static*/ std::string
 TestFixture::MakePath(const char* head, const char* tail)
 {

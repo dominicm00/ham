@@ -7,6 +7,7 @@
 
 
 #include <map>
+#include <set>
 #include <vector>
 
 #include "test/RunnableTest.h"
@@ -17,6 +18,14 @@ namespace test {
 
 
 class DataBasedTest : public RunnableTest {
+public:
+			enum ExitState {
+				EXIT_OK,
+				EXIT_EVALUATION_ERROR,
+				EXIT_BIND_ERROR,
+				EXIT_MAKE_ERROR
+			};
+
 public:
 								DataBasedTest(const std::string& name);
 	virtual						~DataBasedTest();
@@ -33,14 +42,16 @@ protected:
 			struct DataSetBase {
 				DataSetBase(
 					const std::map<std::string, std::string>& outputFiles,
-					bool outputIsException, bool earlyExit,
+					const std::set<std::string>& missingOutputFiles,
+					bool outputIsException, ExitState exitState,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
 					fOutputFiles(outputFiles),
+					fMissingOutputFiles(missingOutputFiles),
 					fOutputIsException(outputIsException),
-					fEarlyExit(earlyExit),
+					fExitState(exitState),
 					fCompatibilityMask(compatibilityMask),
 					fSupportedByHam(supportedByHam),
 					fSkipMask(skipMask),
@@ -55,8 +66,9 @@ protected:
 
 			public:
 				std::map<std::string, std::string>	fOutputFiles;
+				std::set<std::string>				fMissingOutputFiles;
 				bool								fOutputIsException;
-				bool								fEarlyExit;
+				ExitState							fExitState;
 				uint32_t							fCompatibilityMask;
 				bool								fSupportedByHam;
 				uint32_t							fSkipMask;

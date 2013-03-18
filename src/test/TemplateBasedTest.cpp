@@ -31,13 +31,14 @@ TemplateBasedTest::TemplateBasedTest(const std::string& name,
 void
 TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
 	const std::map<std::string, std::string>& outputFiles,
-	bool outputIsException, bool earlyExit, uint32_t compatibilityMask,
+	const std::set<std::string>& missingOutputFiles,
+	bool outputIsException, ExitState exitState, uint32_t compatibilityMask,
 	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
 	size_t endLineIndex)
 {
-	DataBasedTest::AddDataSet(new DataSet(input, outputFiles, outputIsException,
-		earlyExit, compatibilityMask, supportedByHam, skipMask, startLineIndex,
-		endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(input, outputFiles,
+		missingOutputFiles, outputIsException, exitState, compatibilityMask,
+		supportedByHam, skipMask, startLineIndex, endLineIndex));
 }
 
 

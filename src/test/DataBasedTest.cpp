@@ -183,7 +183,7 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	std::vector<std::string> output;
 	for (;;) {
 		if (!_ReadEchoLine(environment, outputStream, line)) {
-			if (dataSet->fEarlyExit)
+			if (dataSet->fExitState == EXIT_EVALUATION_ERROR)
 				break;
 			HAM_TEST_THROW("Unexpected end of output (looking for end of "
 				"output marker).\noutput: \"%s\"\nlines: %zu-%zu",
@@ -225,6 +225,18 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_EQUAL(content, it->second),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu", fileName.c_str(),
+			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex)
+	}
+
+	// check the expected missing files
+	for (std::set<std::string>::const_iterator it
+			= dataSet->fMissingOutputFiles.begin();
+		it != dataSet->fMissingOutputFiles.end(); ++it) {
+		const std::string& fileName = *it;
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_VERIFY(!TestFixture::FileExists(fileName)),
 			"output file: %s\ncode:\n%s\nlines: %zu-%zu", fileName.c_str(),
 			_CodeToString(code).c_str(), dataSet->fStartLineIndex + 1,
 			dataSet->fEndLineIndex)

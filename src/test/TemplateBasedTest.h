@@ -22,7 +22,9 @@ public:
 									const std::vector<std::string>& input,
 									const std::map<std::string, std::string>&
 										outputFiles,
-									bool outputIsException, bool earlyExit,
+									const std::set<std::string>&
+										missingOutputFiles,
+									bool outputIsException, ExitState exitState,
 									uint32_t compatibilityMask,
 									bool supportedByHam, uint32_t skipMask,
 									size_t startLineIndex, size_t endLineIndex);
@@ -38,14 +40,15 @@ private:
 			struct DataSet : public DataSetBase {
 				DataSet(const std::vector<std::string>& input,
 					const std::map<std::string, std::string>& outputFiles,
-					bool outputIsException, bool earlyExit,
+					const std::set<std::string>& missingOutputFiles,
+					bool outputIsException, ExitState exitState,
 					uint32_t compatibilityMask, bool supportedByHam,
 					uint32_t skipMask, size_t startLineIndex,
 					size_t endLineIndex)
 					:
-					DataSetBase(outputFiles, outputIsException, earlyExit,
-						compatibilityMask, supportedByHam, skipMask,
-						startLineIndex, endLineIndex),
+					DataSetBase(outputFiles, missingOutputFiles,
+						outputIsException, exitState, compatibilityMask,
+						supportedByHam, skipMask, startLineIndex, endLineIndex),
 					fInput(input)
 				{
 				}
