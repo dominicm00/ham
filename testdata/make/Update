@@ -581,7 +581,7 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
-LOCATE on target target1 target2 = . ;
+LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
@@ -627,7 +627,7 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
-LOCATE on target target1 target2 = . ;
+LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
@@ -675,7 +675,7 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
-LOCATE on target target1 target2 = . ;
+LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
@@ -723,7 +723,7 @@ actions JoinFiles
 	echo "Updated" >> $(1)
 }
 
-LOCATE on target target1 target2 = . ;
+LOCATE on target target2 = . ;
 Depends target : target1 ;
 JoinFiles target : target2 ;
 NotFile target1 ;
@@ -983,7 +983,7 @@ Old
 # Target depends on missing target without actions. Target missing. Update
 # fails.
 # target		- target (missing)
-#  target1		- target (pseudo)
+#  target1		- target (missing)
 #
 #!file Jamfile
 actions EchoToFile
@@ -991,7 +991,7 @@ actions EchoToFile
 	echo "Updated" > $(1)
 }
 
-LOCATE on target = . ;
+LOCATE on target target1 = . ;
 EchoToFile target ;
 Depends target : target1 ;
 Depends all : target ;
@@ -1001,7 +1001,7 @@ Depends all : target ;
 ---
 # Target depends on missing target without actions. Target exists. Update fails.
 # target		- target (up-to-date)
-#  target1		- target (pseudo)
+#  target1		- target (missing)
 #
 #!file Jamfile
 actions EchoToFile
@@ -1009,7 +1009,7 @@ actions EchoToFile
 	echo "Updated" > $(1)
 }
 
-LOCATE on target = . ;
+LOCATE on target target1 = . ;
 EchoToFile target ;
 Depends target : target1 ;
 Depends all : target ;
@@ -1039,7 +1039,7 @@ actions CopyFile
 	echo "Updated" >> $(1)
 }
 
-LOCATE on target = . ;
+LOCATE on target target1 = . ;
 CopyFile target : target1 ;
 Depends target1 : source11 ;
 Depends all : target ;
