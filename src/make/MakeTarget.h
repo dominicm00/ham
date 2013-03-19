@@ -43,13 +43,13 @@ public:
 			};
 
 public:
-								MakeTarget(data::Target* target);
+								MakeTarget(const data::Target* target);
 								~MakeTarget();
 
 			String				Name() const
 									{ return fTarget->Name(); }
 
-			data::Target*		GetTarget() const
+			const data::Target*	GetTarget() const
 									{ return fTarget; }
 
 			bool				IsBound() const
@@ -115,7 +115,7 @@ public:
 									{ fPendingDependencyCount = count; }
 
 private:
-			data::Target*		fTarget;
+			const data::Target*	fTarget;
 			String				fBoundPath;
 			data::Time			fTime;
 			data::Time			fLeafTime;

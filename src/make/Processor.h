@@ -56,12 +56,13 @@ public:
 			void				BuildTargets();
 
 private:
-			typedef std::map<Target*, MakeTarget*> MakeTargetMap;
+			typedef std::map<const Target*, MakeTarget*> MakeTargetMap;
 			typedef std::map<data::RuleActionsCall*, Command*> CommandMap;
 			typedef std::set<TargetBuildInfo*> TargetBuildInfoSet;
 
 private:
-			MakeTarget*			_GetMakeTarget(Target* target, bool create);
+			MakeTarget*			_GetMakeTarget(const Target* target,
+									bool create);
 			MakeTarget*			_GetMakeTarget(const String& targetName,
 									bool create);
 

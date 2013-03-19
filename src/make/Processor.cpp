@@ -159,7 +159,7 @@ Processor::PrepareTargets()
 	size_t primaryTargetCount = fPrimaryTargetNames.Size();
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		Target* target = fTargets.Lookup(targetName);
+		const Target* target = fTargets.Lookup(targetName);
 		if (target == NULL) {
 			throw MakeException(std::string("Unknown target \"")
 				+ targetName.ToCString() + "\"");
@@ -173,7 +173,7 @@ Processor::PrepareTargets()
 
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		Target* target = fTargets.Lookup(targetName);
+		const Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
 		fPrimaryTargets.Append(makeTarget);
 		_PrepareTargetRecursively(makeTarget, Time(0));
@@ -244,7 +244,7 @@ Processor::BuildTargets()
 
 
 MakeTarget*
-Processor::_GetMakeTarget(Target* target, bool create)
+Processor::_GetMakeTarget(const Target* target, bool create)
 {
 	MakeTargetMap::iterator it = fMakeTargets.find(target);
 	if (it != fMakeTargets.end())
@@ -262,7 +262,7 @@ Processor::_GetMakeTarget(Target* target, bool create)
 MakeTarget*
 Processor::_GetMakeTarget(const String& targetName, bool create)
 {
-	Target* target = create
+	const Target* target = create
 		? fTargets.LookupOrCreate(targetName) : fTargets.Lookup(targetName);
 	return target != NULL ? _GetMakeTarget(target, create) : NULL;
 }
@@ -292,7 +292,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	// bind the target
 	_BindTarget(makeTarget);
 
-	Target* target = makeTarget->GetTarget();
+	const Target* target = makeTarget->GetTarget();
 	bool isPseudoTarget = target->IsNotAFile();
 	if (isPseudoTarget)
 		makeTarget->SetTime(Time(0));
@@ -418,7 +418,7 @@ Processor::_BindTarget(MakeTarget* makeTarget)
 	if (makeTarget->IsBound())
 		return;
 
-	Target* target = makeTarget->GetTarget();
+	const Target* target = makeTarget->GetTarget();
 
 	String boundPath;
 	data::FileStatus fileStatus;
@@ -538,7 +538,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
-	Target* target = makeTarget->GetTarget();
+	const Target* target = makeTarget->GetTarget();
 	if (target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
 		return NULL;
@@ -662,8 +662,10 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 	// get the first of the targets and push a copy of its variable domain as a
 	// new local scope
-	data::Target* target = *actionsCall->Targets().begin();
-	data::VariableDomain localVariables(*target->Variables(true));
+	const Target* target = *actionsCall->Targets().begin();
+	data::VariableDomain localVariables;
+	if (target->Variables() != NULL)
+		localVariables = *target->Variables();
 	data::VariableScope* oldLocalScope = fEvaluationContext.LocalScope();
 	data::VariableScope localScope(localVariables, oldLocalScope);
 

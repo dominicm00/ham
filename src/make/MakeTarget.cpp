@@ -11,7 +11,7 @@ namespace ham {
 namespace make {
 
 
-MakeTarget::MakeTarget(data::Target* target)
+MakeTarget::MakeTarget(const data::Target* target)
 	:
 	fTarget(target),
 	fBoundPath(),
