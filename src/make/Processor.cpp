@@ -539,7 +539,7 @@ TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
 	const Target* target = makeTarget->GetTarget();
-	if (target->ActionsCalls().empty()) {
+	if (target->IsNotAFile() || target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
 		return NULL;
 	}
