@@ -284,6 +284,21 @@ Processor::_GetMakeTarget(const String& targetName, bool create)
 }
 
 
+bool
+Processor::_IsPseudoTarget(const MakeTarget* makeTarget) const
+{
+	// Like Jam we also consider missing targets without actions but with
+	// dependencies pseudo targets, even if they haven't been declared NotFile.
+// TODO: This should be made Jam compatibility behavior and disabled by default.
+// It probably just complicates trouble shooting for the user to hide this
+// error.
+	const Target* target = makeTarget->GetTarget();
+	return target->IsNotAFile()
+		|| (!makeTarget->FileExists() && !target->HasActionsCalls()
+			&& !target->Dependencies().IsEmpty());
+}
+
+
 void
 Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 {
@@ -304,13 +319,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	// bind the target
 	_BindTarget(makeTarget);
 
-	// Determine whether it is a pseudo target. We also consider missing targets
-	// without actions but with dependencies pseudo targets, even if they
-	// haven't been declared NotFile.
-	const Target* target = makeTarget->GetTarget();
-	bool isPseudoTarget = target->IsNotAFile()
-		|| (!makeTarget->FileExists() && !target->HasActionsCalls()
-			&& !target->Dependencies().IsEmpty());
+	// Determine whether it is a pseudo target.
+	bool isPseudoTarget = _IsPseudoTarget(makeTarget);
 	if (isPseudoTarget || !makeTarget->FileExists())
 		makeTarget->SetOriginalTime(Time(0));
 
@@ -319,6 +329,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		time = Time(0);
 
 	// add make targets for dependencies
+	const Target* target = makeTarget->GetTarget();
 	const TargetSet& dependencies = target->Dependencies();
 	for (TargetSet::Iterator it = dependencies.GetIterator(); it.HasNext();)
 		makeTarget->AddDependency(_GetMakeTarget(it.Next(), true));
@@ -547,7 +558,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
 			makeTarget->SetMakeState(MakeTarget::PENDING);
-			if (!makeTarget->GetTarget()->IsNotAFile())
+			if (!_IsPseudoTarget(makeTarget))
 				fTargetsToUpdateCount++;
 			break;
 		case MakeTarget::MAKE_IF_NEEDED:
@@ -581,7 +592,7 @@ TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
 	const Target* target = makeTarget->GetTarget();
-	if (target->IsNotAFile() || target->ActionsCalls().empty()) {
+	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
 		return NULL;
 	}
@@ -790,14 +801,13 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 void
 Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 {
-	const Target* target = makeTarget->GetTarget();
 	const char* timeString;
 	if (makeTarget->FileExists()) {
 		_PrintMakeTreeStep(makeTarget, "bind", NULL, ": %s",
 			makeTarget->BoundPath().ToCString());
 		timeString = makeTarget->GetOriginalTime().ToString().ToCString();
 	} else {
-		if (target->IsNotAFile())
+		if (_IsPseudoTarget(makeTarget))
 			timeString = "unbound";
 		else
 			timeString = "missing";
@@ -819,9 +829,7 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 
 	if (makeTarget->FileExists())
 		stateString = NULL;
-	else if (target->IsNotAFile())
-		stateString = "pseudo";
-	else if (!target->HasActionsCalls() && !target->Dependencies().IsEmpty())
+	else if (_IsPseudoTarget(makeTarget))
 		stateString = "pseudo*";
 	else
 		stateString = "missing";
@@ -830,7 +838,7 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 		case MakeTarget::MAKE:
 			if (stateString == NULL)
 				stateString = "update";
-			if (!target->IsNotAFile() && target->HasActionsCalls())
+			if (!_IsPseudoTarget(makeTarget) && target->HasActionsCalls())
 				flag = '+';
 			break;
 		case MakeTarget::MAKE_IF_NEEDED:

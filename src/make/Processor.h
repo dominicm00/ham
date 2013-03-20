@@ -65,6 +65,8 @@ private:
 									bool create);
 			MakeTarget*			_GetMakeTarget(const String& targetName,
 									bool create);
+			bool				_IsPseudoTarget(const MakeTarget* makeTarget)
+									const;
 
 			void				_PrepareTargetRecursively(
 									MakeTarget* makeTarget);
