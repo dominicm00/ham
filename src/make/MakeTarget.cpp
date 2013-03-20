@@ -15,14 +15,16 @@ MakeTarget::MakeTarget(const data::Target* target)
 	:
 	fTarget(target),
 	fBoundPath(),
+	fOriginalTime(),
 	fTime(),
 	fLeafTime(),
 	fFileExists(false),
 	fDependencies(),
 	fIncludes(),
 	fParents(),
+	fProcessingState(UNPROCESSED),
 	fState(UP_TO_DATE),
-	fFate(UNPROCESSED),
+	fFate(KEEP),
 	fMakeState(PENDING),
 	fPendingDependencyCount(0)
 {
@@ -38,7 +40,7 @@ void
 MakeTarget::SetFileStatus(const data::FileStatus& fileStatus)
 {
 	fFileExists = fileStatus.GetType() != data::FileStatus::NONE;
-	fTime = fFileExists ? fileStatus.LastModifiedTime() : data::Time();
+	fOriginalTime = fFileExists ? fileStatus.LastModifiedTime() : data::Time();
 }
 
 

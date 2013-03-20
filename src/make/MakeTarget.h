@@ -21,6 +21,12 @@ typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 
 class MakeTarget {
 public:
+			enum ProcessingState {
+				UNPROCESSED,
+				PROCESSING,
+				PROCESSED
+			};
+
 			enum State {
 				UP_TO_DATE,
 				OUT_OF_DATE,
@@ -28,9 +34,8 @@ public:
 			};
 
 			enum Fate {
-				UNPROCESSED,
-				PROCESSING,
 				MAKE,
+				MAKE_IF_NEEDED,
 				KEEP,
 				CANT_MAKE
 			};
@@ -58,6 +63,11 @@ public:
 									{ return fBoundPath; }
 			void				SetBoundPath(const String& path)
 									{ fBoundPath = path; }
+
+			data::Time			GetOriginalTime() const
+									{ return fOriginalTime; }
+			void				SetOriginalTime(const data::Time& time)
+									{ fOriginalTime = time; }
 
 			data::Time			GetTime() const
 									{ return fTime; }
@@ -94,6 +104,11 @@ public:
 			void				AddParent(MakeTarget* parent)
 									{ fParents.Append(parent); }
 
+			ProcessingState		GetProcessingState() const
+									{ return fProcessingState; }
+			void				SetProcessingState(ProcessingState state)
+									{ fProcessingState = state; }
+
 			State				GetState() const
 									{ return fState; }
 			void				SetState(State state)
@@ -117,12 +132,19 @@ public:
 private:
 			const data::Target*	fTarget;
 			String				fBoundPath;
+			data::Time			fOriginalTime;
+									// file time, or, if missing, least possible
 			data::Time			fTime;
+									// "make" time -- may be file time or
+									// time inherited from dependencies
 			data::Time			fLeafTime;
+									// == fTime, if leaf, otherwise the time of
+									// the newest leaf dependency
 			bool				fFileExists;
 			MakeTargetSet		fDependencies;
 			MakeTargetSet		fIncludes;
 			MakeTargetSet		fParents;
+			ProcessingState		fProcessingState;
 			State				fState;
 			Fate				fFate;
 			MakeState			fMakeState;

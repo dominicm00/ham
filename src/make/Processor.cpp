@@ -168,7 +168,8 @@ Processor::PrepareTargets()
 		_GetMakeTarget(target, true);
 	}
 
-	// Bind the targets and their dependencies recursively.
+	// Bind the targets and their dependencies recursively and decide their
+	// fate tentatively -- e.g. for temporary targets a second pass is needed.
 	fMakeLevel = 0;
 
 	for (size_t i = 0; i < primaryTargetCount; i++) {
@@ -176,7 +177,22 @@ Processor::PrepareTargets()
 		const Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
 		fPrimaryTargets.Append(makeTarget);
-		_PrepareTargetRecursively(makeTarget, Time(0));
+		_PrepareTargetRecursively(makeTarget);
+	}
+
+	// Decide the targets' fate for good.
+	// Reset the processing state first.
+	for (MakeTargetMap::const_iterator it = fMakeTargets.begin();
+		it != fMakeTargets.end(); ++it) {
+		it->second->SetProcessingState(MakeTarget::UNPROCESSED);
+	}
+
+	fMakeLevel = 0;
+
+	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
+		it.HasNext();) {
+		MakeTarget* makeTarget = it.Next();
+		_SealTargetFateRecursively(makeTarget, Time(0), true);
 	}
 }
 
@@ -269,13 +285,12 @@ Processor::_GetMakeTarget(const String& targetName, bool create)
 
 
 void
-Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
-	data::Time parentTime)
+Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 {
 	// Check whether the target has already been processed (also detect cycles)
 	// and mark in-progress.
-	if (makeTarget->GetFate() != MakeTarget::UNPROCESSED) {
-		if (makeTarget->GetFate() == MakeTarget::PROCESSING) {
+	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
+		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
 			throw MakeException(std::string("Target \"")
 				+ makeTarget->Name().ToCString() + "\" depends on itself");
 		}
@@ -284,25 +299,24 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		return;
 	}
 
-	if (fOptions.IsPrintMakeTree())
-		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
-
-	makeTarget->SetFate(MakeTarget::PROCESSING);
+	makeTarget->SetProcessingState(MakeTarget::PROCESSING);
 
 	// bind the target
 	_BindTarget(makeTarget);
 
+	// Determine whether it is a pseudo target. We also consider missing targets
+	// without actions but with dependencies pseudo targets, even if they
+	// haven't been declared NotFile.
 	const Target* target = makeTarget->GetTarget();
-	bool isPseudoTarget = target->IsNotAFile();
-	if (isPseudoTarget)
-		makeTarget->SetTime(Time(0));
+	bool isPseudoTarget = target->IsNotAFile()
+		|| (!makeTarget->FileExists() && !target->HasActionsCalls()
+			&& !target->Dependencies().IsEmpty());
+	if (isPseudoTarget || !makeTarget->FileExists())
+		makeTarget->SetOriginalTime(Time(0));
 
-	Time time = makeTarget->GetTime();
+	Time time = makeTarget->GetOriginalTime();
 	if (!time.IsValid())
 		time = Time(0);
-
-	if (fOptions.IsPrintMakeTree())
-		_PrintMakeTreeBinding(makeTarget);
 
 	// add make targets for dependencies
 	const TargetSet& dependencies = target->Dependencies();
@@ -319,7 +333,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		dependency->AddParent(makeTarget);
 
 		fMakeLevel++;
-		_PrepareTargetRecursively(dependency, time);
+		_PrepareTargetRecursively(dependency);
 		fMakeLevel--;
 
 		// Add the dependency's includes as the target's dependencies. This
@@ -334,11 +348,9 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 		newestLeafTime = std::max(newestLeafTime, dependency->LeafTime());
 
 		switch (dependency->GetFate()) {
-			case MakeTarget::UNPROCESSED:
-			case MakeTarget::PROCESSING:
-				// cannot happen
-				break;
 			case MakeTarget::KEEP:
+				break;
+			case MakeTarget::MAKE_IF_NEEDED:
 				break;
 			case MakeTarget::MAKE:
 				dependencyUpdated = true;
@@ -372,10 +384,12 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	MakeTarget::Fate fate = MakeTarget::KEEP;
 	if (isPseudoTarget || !makeTarget->FileExists()) {
 		state = MakeTarget::MISSING;
-		if (cantMake)
+		if (cantMake) {
 			fate = MakeTarget::CANT_MAKE;
-		else
-			fate = MakeTarget::MAKE;
+		} else {
+			fate = isPseudoTarget
+				? MakeTarget::MAKE_IF_NEEDED : MakeTarget::MAKE;
+		}
 	} else if (newestDependencyTime > time) {
 		state = MakeTarget::OUT_OF_DATE;
 		if (cantMake)
@@ -388,8 +402,12 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 			fate = MakeTarget::MAKE;
 	}
 
-	if (fate == MakeTarget::MAKE && !target->HasActionsCalls()) {
-		if (!isPseudoTarget) {
+	if (fate == MakeTarget::MAKE) {
+		// If target is temporary, downgrade to MAKE_IF_NEEDED.
+		if (target->IsTemporary())
+			fate = MakeTarget::MAKE_IF_NEEDED;
+
+		if (!target->HasActionsCalls() && !isPseudoTarget) {
 			if (target->IsIgnoreIfMissing())
 				fate = MakeTarget::KEEP;
 			else
@@ -402,13 +420,37 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget,
 	makeTarget->SetFate(fate);
 	makeTarget->SetTime(time);
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
+	makeTarget->SetProcessingState(MakeTarget::PROCESSED);
 
-	if (fOptions.IsPrintMakeTree())
-		_PrintMakeTreeState(makeTarget, parentTime);
 // TODO: Support:
 // - BUILD_ALWAYS
 // - IGNORE_IF_MISSING
 // - TEMPORARY
+}
+
+
+void
+Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
+	data::Time parentTime, bool makeParent)
+{
+	if (makeTarget->GetFate() == MakeTarget::MAKE_IF_NEEDED && makeParent)
+		makeTarget->SetFate(MakeTarget::MAKE);
+
+	if (fOptions.IsPrintMakeTree()) {
+		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
+		_PrintMakeTreeBinding(makeTarget);
+	}
+
+	for (size_t i = 0; i < makeTarget->Dependencies().Size(); i++) {
+		MakeTarget* dependency = makeTarget->Dependencies().ElementAt(i);
+		fMakeLevel++;
+		_SealTargetFateRecursively(dependency, makeTarget->GetOriginalTime(),
+			makeTarget->GetFate() == MakeTarget::MAKE);
+		fMakeLevel--;
+	}
+
+	if (fOptions.IsPrintMakeTree())
+		_PrintMakeTreeState(makeTarget, parentTime);
 }
 
 
@@ -508,12 +550,12 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 			if (!makeTarget->GetTarget()->IsNotAFile())
 				fTargetsToUpdateCount++;
 			break;
+		case MakeTarget::MAKE_IF_NEEDED:
+			// If it is still MAKE_IF_NEEDED after the first pass, we don't need
+			// to make it.
 		case MakeTarget::KEEP:
 			makeTarget->SetMakeState(MakeTarget::DONE);
 			return false;
-		case MakeTarget::UNPROCESSED:
-		case MakeTarget::PROCESSING:
-			// those can't happen
 		case MakeTarget::CANT_MAKE:
 			makeTarget->SetMakeState(MakeTarget::SKIPPED);
 			return false;
@@ -586,8 +628,6 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 			// cannot happen
 			break;
 		case MakeTarget::FAILED:
-//TODO: Reporting should happen where we know what action failed.
-//			printf("");
 			break;
 		case MakeTarget::SKIPPED:
 		{
@@ -755,7 +795,7 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 	if (makeTarget->FileExists()) {
 		_PrintMakeTreeStep(makeTarget, "bind", NULL, ": %s",
 			makeTarget->BoundPath().ToCString());
-		timeString = makeTarget->GetTime().ToString().ToCString();
+		timeString = makeTarget->GetOriginalTime().ToString().ToCString();
 	} else {
 		if (target->IsNotAFile())
 			timeString = "unbound";
@@ -763,7 +803,7 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 			timeString = "missing";
 	}
 
-// TODO: Binding might also be "parent".
+// TODO: In Jam binding might also be "parent".
 	_PrintMakeTreeStep(makeTarget, "time", NULL, ": %s", timeString);
 }
 
@@ -777,31 +817,36 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 	char madeString[6] = "made ";
 	char& flag = madeString[4];
 
+	if (makeTarget->FileExists())
+		stateString = NULL;
+	else if (target->IsNotAFile())
+		stateString = "pseudo";
+	else if (!target->HasActionsCalls() && !target->Dependencies().IsEmpty())
+		stateString = "pseudo*";
+	else
+		stateString = "missing";
+
 	switch (makeTarget->GetFate()) {
-		case MakeTarget::UNPROCESSED:
-			stateString = "unprocessed";
-			break;
-		case MakeTarget::PROCESSING:
-			stateString = "processing";
-			break;
 		case MakeTarget::MAKE:
-			stateString = makeTarget->FileExists() || target->IsNotAFile()
-				? "update" : "missing";
-			if (!target->IsNotAFile())
+			if (stateString == NULL)
+				stateString = "update";
+			if (!target->IsNotAFile() && target->HasActionsCalls())
 				flag = '+';
 			break;
+		case MakeTarget::MAKE_IF_NEEDED:
+			if (stateString == NULL)
+				stateString = "no update";
+			flag = '-';
+			break;
 		case MakeTarget::KEEP:
-			if (makeTarget->GetTime() > parentTime) {
+			if (makeTarget->GetOriginalTime() > parentTime) {
 				flag = '*';
 				stateString = "newer";
 			} else
 				stateString = "stable";
 			break;
 		case MakeTarget::CANT_MAKE:
-			stateString = "missing";
-			break;
-		default:
-			stateString = "unknown";
+			stateString = "missing!";
 			break;
 	}
 

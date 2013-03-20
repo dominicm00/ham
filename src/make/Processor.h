@@ -67,8 +67,10 @@ private:
 									bool create);
 
 			void				_PrepareTargetRecursively(
+									MakeTarget* makeTarget);
+			void				_SealTargetFateRecursively(
 									MakeTarget* makeTarget,
-									data::Time parentTime);
+									data::Time parentTime, bool makeParent);
 			void				_BindTarget(MakeTarget* makeTarget);
 			void				_ScanForHeaders(MakeTarget* makeTarget);
 
