@@ -443,6 +443,21 @@ void
 Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 	data::Time parentTime, bool makeParent)
 {
+	// Check whether the target has already been processed (also detect cycles)
+	// and mark in-progress.
+	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
+		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
+			throw MakeException(std::string("Target \"")
+				+ makeTarget->Name().ToCString() + "\" depends on itself");
+		}
+
+		// Already done, though we process it again, if its fate will change.
+		if (makeTarget->GetFate() != MakeTarget::MAKE_IF_NEEDED || !makeParent)
+			return;
+	}
+
+	makeTarget->SetProcessingState(MakeTarget::PROCESSING);
+
 	if (makeTarget->GetFate() == MakeTarget::MAKE_IF_NEEDED && makeParent)
 		makeTarget->SetFate(MakeTarget::MAKE);
 
@@ -459,6 +474,8 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 				&& !_IsPseudoTarget(makeTarget));
 		fMakeLevel--;
 	}
+
+	makeTarget->SetProcessingState(MakeTarget::PROCESSED);
 
 	if (fOptions.IsPrintMakeTree())
 		_PrintMakeTreeState(makeTarget, parentTime);
