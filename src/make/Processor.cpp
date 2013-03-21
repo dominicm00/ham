@@ -830,7 +830,7 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 	if (makeTarget->FileExists())
 		stateString = NULL;
 	else if (_IsPseudoTarget(makeTarget))
-		stateString = "pseudo*";
+		stateString = "pseudo";
 	else
 		stateString = "missing";
 
