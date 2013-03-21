@@ -364,7 +364,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			case MakeTarget::MAKE_IF_NEEDED:
 				break;
 			case MakeTarget::MAKE:
-				dependencyUpdated = true;
+				if (!_IsPseudoTarget(dependency))
+					dependencyUpdated = true;
 				break;
 			case MakeTarget::CANT_MAKE:
 				cantMake = true;
@@ -395,12 +396,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	MakeTarget::Fate fate = MakeTarget::KEEP;
 	if (isPseudoTarget || !makeTarget->FileExists()) {
 		state = MakeTarget::MISSING;
-		if (cantMake) {
+		if (cantMake)
 			fate = MakeTarget::CANT_MAKE;
-		} else {
-			fate = isPseudoTarget
-				? MakeTarget::MAKE_IF_NEEDED : MakeTarget::MAKE;
-		}
+		else
+			fate = MakeTarget::MAKE;
 	} else if (newestDependencyTime > time) {
 		state = MakeTarget::OUT_OF_DATE;
 		if (cantMake)
@@ -456,7 +455,8 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 		MakeTarget* dependency = makeTarget->Dependencies().ElementAt(i);
 		fMakeLevel++;
 		_SealTargetFateRecursively(dependency, makeTarget->GetOriginalTime(),
-			makeTarget->GetFate() == MakeTarget::MAKE);
+			makeTarget->GetFate() == MakeTarget::MAKE
+				&& !_IsPseudoTarget(makeTarget));
 		fMakeLevel--;
 	}
 
