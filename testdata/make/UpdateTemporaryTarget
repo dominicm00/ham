@@ -1,0 +1,178 @@
+# Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# Don't update missing temporary leaf target.
+# target	- target (temporary, missing)
+#
+#!file Jamfile
+actions EchoToFile
+{
+	echo "Updated" > $(1)
+	echo "$(1)" > temporary1
+}
+
+LOCATE on target = . ;
+Temporary target ;
+EchoToFile target ;
+
+Depends all : target ;
+-
+#!file target missing
+#!file temporary1 missing
+---
+# Don't update existing temporary leaf target.
+# target	- target (temporary, missing)
+#
+#!file Jamfile
+actions EchoToFile
+{
+	echo "Updated" > $(1)
+	echo "$(1)" > temporary1
+}
+
+LOCATE on target = . ;
+Temporary target ;
+EchoToFile target ;
+
+Depends all : target ;
+#!file target
+Old
+-
+#!file target
+Old
+#!file temporary1 missing
+---
+# Update missing file target, single missing temporary leaf dependency.
+# target	- target (missing)
+#  target1	- target (temporary, missing)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+actions EchoToFile
+{
+	echo "Created" > $(1)
+}
+
+LOCATE on target target1 = . ;
+CopyFile target : target1 ;
+Depends target : target1 ;
+
+Temporary target1 ;
+EchoToFile target1 ;
+
+Depends all : target ;
+-
+#!file target
+Created
+Updated
+#!file target1
+Created
+---
+# Update missing file target, single existing temporary leaf dependency.
+# target	- target (missing)
+#  target1	- target (temporary)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+actions EchoToFile
+{
+	echo "Created" > $(1)
+}
+
+LOCATE on target target1 = . ;
+CopyFile target : target1 ;
+Depends target : target1 ;
+
+Temporary target1 ;
+EchoToFile target1 ;
+
+Depends all : target ;
+
+#!file target1
+Old1
+-
+#!file target
+Old1
+Updated
+#!file target1
+Old1
+---
+# Update old file target, single existing temporary leaf dependency.
+# target	- target (old)
+#  target1	- target (temporary)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+actions EchoToFile
+{
+	echo "Created" > $(1)
+}
+
+LOCATE on target target1 = . ;
+CopyFile target : target1 ;
+Depends target : target1 ;
+
+Temporary target1 ;
+EchoToFile target1 ;
+
+Depends all : target ;
+
+#!file target 1
+Old
+#!file target1
+Old1
+-
+#!file target
+Old1
+Updated
+#!file target1
+Old1
+---
+# Don't update file target, single missing temporary leaf dependency.
+# target	- target (up-to-date)
+#  target1	- target (missing)
+#
+#!file Jamfile
+actions CopyFile
+{
+	cp $(2) $(1)
+	echo "Updated" >> $(1)
+}
+
+actions EchoToFile
+{
+	echo "Created" > $(1)
+}
+
+LOCATE on target target1 = . ;
+CopyFile target : target1 ;
+Depends target : target1 ;
+
+Temporary target1 ;
+EchoToFile target1 ;
+
+Depends all : target ;
+
+#!file target 1
+Old
+-
+#!file target
+Old
+---
