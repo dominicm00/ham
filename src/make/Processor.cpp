@@ -388,8 +388,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 
 	// Consider a "don't update" target very old, so targets depending on it
 	// won't be remade unnecessarily.
-	if (target->IsDontUpdate())
-		time = Time(0);
+	if (target->IsDontUpdate()) {
+		time = newestDependencyTime = Time(0);
+		makeTarget->SetOriginalTime(time);
+	}
 
 	// determine the target's state and fate
 	MakeTarget::State state;
