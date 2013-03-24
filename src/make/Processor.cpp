@@ -365,8 +365,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			case MakeTarget::MAKE_IF_NEEDED:
 				break;
 			case MakeTarget::MAKE:
-				if (!_IsPseudoTarget(dependency))
+				if (!_IsPseudoTarget(dependency)
+					&& (!target->DependsOnLeaves() || dependency->IsLeaf())) {
 					dependencyUpdated = true;
+				}
 				break;
 			case MakeTarget::CANT_MAKE:
 				cantMake = true;
@@ -575,21 +577,23 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 bool
 Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 {
+	bool needToMake = false;
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
 			makeTarget->SetMakeState(MakeTarget::PENDING);
 			if (!_IsPseudoTarget(makeTarget))
 				fTargetsToUpdateCount++;
+			needToMake = true;
 			break;
 		case MakeTarget::MAKE_IF_NEEDED:
 			// If it is still MAKE_IF_NEEDED after the second pass, we don't
 			// need to make it.
 		case MakeTarget::KEEP:
 			makeTarget->SetMakeState(MakeTarget::DONE);
-			return false;
+			break;
 		case MakeTarget::CANT_MAKE:
 			makeTarget->SetMakeState(MakeTarget::SKIPPED);
-			return false;
+			break;
 	}
 
 	size_t pendingDependencyCount = 0;
@@ -601,10 +605,10 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 
 	makeTarget->SetPendingDependenciesCount(pendingDependencyCount);
 
-	if (pendingDependencyCount == 0)
+	if (pendingDependencyCount == 0 && needToMake)
 		fMakableTargets.Append(makeTarget);
 
-	return true;
+	return needToMake;
 }
 
 
