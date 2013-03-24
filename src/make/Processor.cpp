@@ -582,8 +582,8 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 				fTargetsToUpdateCount++;
 			break;
 		case MakeTarget::MAKE_IF_NEEDED:
-			// If it is still MAKE_IF_NEEDED after the first pass, we don't need
-			// to make it.
+			// If it is still MAKE_IF_NEEDED after the second pass, we don't
+			// need to make it.
 		case MakeTarget::KEEP:
 			makeTarget->SetMakeState(MakeTarget::DONE);
 			return false;
