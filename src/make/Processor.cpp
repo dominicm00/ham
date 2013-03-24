@@ -210,7 +210,8 @@ Processor::BuildTargets()
 	if (fMakableTargets.IsEmpty())
 		return;
 
-	printf("...updating %zu target(s)...\n", fTargetsToUpdateCount);
+	if (fTargetsToUpdateCount > 0)
+		printf("...updating %zu target(s)...\n", fTargetsToUpdateCount);
 
 	// get the JAMSHELL variable
 	StringList jamShell(
