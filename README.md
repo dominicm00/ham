@@ -18,8 +18,8 @@ While Jam is a great build system, its legacy codebase makes it difficult to fix
 To run Ham in compatability mode, use the `-cX` flag with the value `jam` for [Perforce Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html), `boost` for [Boost.Build](https://www.boost.org/build), or `ham` (the default). For example, you can define `jam` and `b2` as follows:
 
 ```shell
-alias jam='ham -c jam'
-alias b2='ham -c boost'
+alias jam='ham -cjam'
+alias b2='ham -cboost'
 ```
 
 While in compatability mode, Ham will attempt to respect the command line parameters and features of the chosen tool. For convienence, Ham provides aliases for many commands. A compatability matrix is provided below:
