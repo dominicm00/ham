@@ -1,6 +1,6 @@
-# Ham
+# Ham - WIP
 
-## WIP Disclaimer
+## Disclaimer
 Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for experimental/development purposes.
 
 ## Introduction
