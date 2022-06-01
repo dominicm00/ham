@@ -40,7 +40,7 @@ alias jam='ham -cjam'
 alias b2='ham -cboost'
 ```
 
-While in compatability mode, Ham will attempt to respect the command line
+While in compatibility mode, Ham will attempt to respect the command line
 parameters and features of the chosen tool. For convienence, Ham provides
 aliases for many commands. A compatability matrix is provided below:
 
@@ -78,5 +78,5 @@ portable building experience.
 
 [^1]: Debug information/levels differ between `ham`, `jam`, and `b2`.
 [^2]: `jam` has several bugs with their implementation of concurrent actions.
-[^3]: In `-c ham` mode, `-q` is enabled by default, but the flag is accepted for
+[^3]: In `-cham` mode, `-q` is enabled by default, but the flag is accepted for
     convienence.
