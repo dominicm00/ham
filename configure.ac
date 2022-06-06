@@ -11,10 +11,6 @@ AC_CONFIG_FILES([
 
 AC_PROG_CXX
 
-dnl For gnulib.
-gl_EARLY
-gl_INIT
-
 AM_PROG_AR
 
 LT_INIT([disable-shared])
