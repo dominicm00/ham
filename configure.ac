@@ -7,13 +7,14 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([Jamfile])
 AC_CONFIG_FILES([
   Makefile
+  src/Makefile
   ])
 
 AC_PROG_CXX
 
 AM_PROG_AR
 
-LT_INIT([disable-shared])
+LT_INIT([shared])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 AM_SILENT_RULES([yes])
