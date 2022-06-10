@@ -72,9 +72,36 @@ tutorial](https://web.archive.org/web/20160304233139/http://geoz.co.nz/jamdoc/ja
 of Ham's built-in rules is currently in-progress.
 
 ## Building Ham
-Ham is currently only tested to build on Linux, and can be built by running
-`Bootstrap.sh`. Work is ongoing to bootstrap off the GNU build system for a more
-portable building experience.
+Ham is built using
+[Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html). Currently
+no distribution tarballs are available, so Ham must be built from the repository
+source code.
+
+To build Ham from this repository, the following dependencies are required:
+- [Autoconf](https://www.gnu.org/software/autoconf/)
+- [Automake](https://www.gnu.org/software/automake/)
+- [Libtool](https://www.gnu.org/software/libtool/)
+- A C++ compiler with support for C++14
+
+**NOTE:** Ham plans to take the following dependencies in the near future:
+- A C++ compiler with support for C++20 (specifically
+  [concepts](https://en.cppreference.com/w/cpp/concepts))
+- [Flex](https://github.com/westes/flex) (not required with distribution
+  tarball)
+- [Bison](https://www.gnu.org/software/bison/) (not required with distribution
+  tarball)
+
+To build Ham from the repository source code, initialize the Automake system and
+then run the standard `./configure && make`.
+
+```sh
+autoreconf --install
+./configure
+# Add -jN (where N is the number of parallel CPUs on your system) for faster builds
+make
+```
+
+You can then run `make install` to install Ham on your system.
 
 [^1]: Debug information/levels differ between `ham`, `jam`, and `b2`.
 [^2]: `jam` has several bugs with their implementation of concurrent actions.
