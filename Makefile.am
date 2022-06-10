@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -I./src @warnings@
+AM_CPPFLAGS = -I./src
+AM_CXXFLAGS = -std=c++14 @warnings@
 
 SUBDIRS = src
 
