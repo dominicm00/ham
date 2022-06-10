@@ -35,7 +35,7 @@ Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Ja
 `boost` for [Boost.Build](https://www.boost.org/build), or `ham` (the
 default). For example, you can define `jam` and `b2` as follows:
 
-```shell
+```sh
 alias jam='ham -cjam'
 alias b2='ham -cboost'
 ```
