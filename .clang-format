@@ -1,0 +1,22 @@
+---
+# Decently close to Haiku coding style
+BasedOnStyle: Mozilla
+IndentWidth: 4
+---
+Language: Cpp
+AlignOperands: DontAlign
+AllowAllArgumentsOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Linux
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: BeforeColon
+Cpp11BracedListStyle: true
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+PackConstructorInitializers: Never
+TabWidth: 4
+UseTab: Always
+...
