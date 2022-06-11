@@ -1,48 +1,40 @@
 # Ham - WIP
 
 ## Disclaimer
-Ham is a work-in-progress, and currently **does not work**. Please do not
-attempt to use Ham other than for experimental/development purposes.
+Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for
+experimental/development purposes.
 
 ## Introduction
 Ham is a drop-in replacement for the [Jam build
-system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). It's
-primary goal is to be compatible with and extend [Haiku
-Jam](https://git.haiku-os.org/buildtools/tree/jam), and eventually be used as
-Haiku's official build system. However, compatibility with [Perforce
+system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). It's primary goal is to be
+compatible with and extend [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), and eventually be used as Haiku's
+official build system. However, compatibility with [Perforce
 Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html),
-[Boost.Build](https://www.boost.org/build), and possibly other variants is
-planned.
+[Boost.Build](https://www.boost.org/build), and possibly other variants is planned.
 
 ## Motivation
-While Jam is a great build system, its legacy codebase makes it difficult to fix
-bugs or introduce new features. Ham uses a modern, friendly C++ codebase, is
-rigorously tested, and combines the various forks of Jam into one tool. Ham will
-also have additional features such as:
-- More robust multi-threading support, fixing long-standing bugs when using
-  `-jN`.
-- A granular caching system that avoids large rebuilds when changing
-  Jamfiles/environment variables.
+While Jam is a great build system, its legacy codebase makes it difficult to fix bugs or introduce new features. Ham
+uses a modern, friendly C++ codebase, is rigorously tested, and combines the various forks of Jam into one tool. Ham
+will also have additional features such as:
+- More robust multi-threading support, fixing long-standing bugs when using `-jN`.
+- A granular caching system that avoids large rebuilds when changing Jamfiles/environment variables.
 - Written as a library for IDE integration.
 
 ## Usage
-**Disclaimer:** This represents the planned interface for Ham, but currently
-does not work.
+**Disclaimer:** This represents the planned interface for Ham, but currently does not work.
 
-To run Ham in compatability mode, use the `-cX` flag with the value `jam` for
-[Perforce
-Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html),
-`boost` for [Boost.Build](https://www.boost.org/build), or `ham` (the
-default). For example, you can define `jam` and `b2` as follows:
+To run Ham in compatability mode, use the `-cX` flag with the value `jam` for [Perforce
+Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html), `boost` for
+[Boost.Build](https://www.boost.org/build), or `ham` (the default). For example, you can define `jam` and `b2` as
+follows:
 
 ```sh
 alias jam='ham -cjam'
 alias b2='ham -cboost'
 ```
 
-While in compatibility mode, Ham will attempt to respect the command line
-parameters and features of the chosen tool. For convienence, Ham provides
-aliases for many commands. A compatability matrix is provided below:
+While in compatibility mode, Ham will attempt to respect the command line parameters and features of the chosen
+tool. For convienence, Ham provides aliases for many commands. A compatability matrix is provided below:
 
 *Key: X=implemented, P=planned, N/A=not applicable*
 
@@ -66,16 +58,14 @@ aliases for many commands. A compatability matrix is provided below:
 | `-e`                 | export compilation database    | P     |           | P           |       | P             |
 
 Info about the Jam language can be found in the [Perforce
-documentation](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html)
-and the (archived) [Gentoo
-tutorial](https://web.archive.org/web/20160304233139/http://geoz.co.nz/jamdoc/jam-guide.html). Documentation
-of Ham's built-in rules is currently in-progress.
+documentation](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html) and the (archived)
+[Gentoo tutorial](https://web.archive.org/web/20160304233139/http://geoz.co.nz/jamdoc/jam-guide.html). Documentation of
+Ham's built-in rules is currently in-progress.
 
 ## Building Ham
 Ham is built using
-[Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html). Currently
-no distribution tarballs are available, so Ham must be built from the repository
-source code.
+[Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html). Currently no
+distribution tarballs are available, so Ham must be built from the repository source code.
 
 To build Ham from this repository, the following dependencies are required:
 - [Autoconf](https://www.gnu.org/software/autoconf/)
@@ -84,15 +74,12 @@ To build Ham from this repository, the following dependencies are required:
 - A C++ compiler with support for C++14
 
 **NOTE:** Ham plans to take the following dependencies in the near future:
-- A C++ compiler with support for C++20 (specifically
-  [concepts](https://en.cppreference.com/w/cpp/concepts))
-- [Flex](https://github.com/westes/flex) (not required with distribution
-  tarball)
-- [Bison](https://www.gnu.org/software/bison/) (not required with distribution
-  tarball)
+- A C++ compiler with support for C++20 (specifically [concepts](https://en.cppreference.com/w/cpp/concepts))
+- [Flex](https://github.com/westes/flex) (not required with distribution tarball)
+- [Bison](https://www.gnu.org/software/bison/) (not required with distribution tarball)
 
-To build Ham from the repository source code, initialize the Automake system and
-then run the standard `./configure && make`.
+To build Ham from the repository source code, initialize the Automake system and then run the standard `./configure &&
+make`.
 
 ```sh
 autoreconf --install
