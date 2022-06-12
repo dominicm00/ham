@@ -3,20 +3,18 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "behavior/Behavior.h"
 
-
-namespace ham {
-namespace behavior {
-
+namespace ham
+{
+namespace behavior
+{
 
 Behavior::Behavior(Compatibility compatibility)
-	:
-	fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
-	fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE),
-	fBrokenSubscriptJoin(NO_BROKEN_SUBSCRIPT_JOIN),
-	fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR)
+	: fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
+	  fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE),
+	  fBrokenSubscriptJoin(NO_BROKEN_SUBSCRIPT_JOIN),
+	  fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR)
 {
 	switch (compatibility) {
 		case COMPATIBILITY_JAM:
@@ -33,6 +31,5 @@ Behavior::Behavior(Compatibility compatibility)
 	}
 }
 
-
-}	// namespace behavior
-}	// namespace ham
+} // namespace behavior
+} // namespace ham

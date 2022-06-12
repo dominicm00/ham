@@ -5,31 +5,29 @@
 #ifndef HAM_CODE_IN_LIST_EXPRESSION_H
 #define HAM_CODE_IN_LIST_EXPRESSION_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class InListExpression : public Node
+{
+  public:
+	InListExpression(Node* left, Node* right);
+	virtual ~InListExpression();
 
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-class InListExpression : public Node {
-public:
-								InListExpression(Node* left, Node* right);
-	virtual						~InListExpression();
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			Node*				fLeft;
-			Node*				fRight;
+  private:
+	Node* fLeft;
+	Node* fRight;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_IN_LIST_EXPRESSION_H
+#endif // HAM_CODE_IN_LIST_EXPRESSION_H

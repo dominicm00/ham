@@ -3,32 +3,28 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Case.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "data/RegExp.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 Case::Case(const String& pattern, Node* block)
-	:
-	fPattern(pattern),
-	fBlock(block)
+	: fPattern(pattern),
+	  fBlock(block)
 {
 	fBlock->AcquireReference();
 }
-
 
 Case::~Case()
 {
 	fBlock->ReleaseReference();
 }
-
 
 bool
 Case::Matches(EvaluationContext& context, const StringList& value) const
@@ -37,7 +33,7 @@ Case::Matches(EvaluationContext& context, const StringList& value) const
 
 	RegExp regExp(fPattern.ToCString(), RegExp::PATTERN_TYPE_WILDCARD);
 	if (!regExp.IsValid()) {
-// TODO: Throw exception!
+		// TODO: Throw exception!
 		return false;
 	}
 
@@ -47,13 +43,11 @@ Case::Matches(EvaluationContext& context, const StringList& value) const
 		&& match.EndOffset() == string.Length();
 }
 
-
 StringList
 Case::Evaluate(EvaluationContext& context)
 {
 	return fBlock->Evaluate(context);
 }
-
 
 code::Node*
 Case::Visit(NodeVisitor& visitor)
@@ -63,7 +57,6 @@ Case::Visit(NodeVisitor& visitor)
 
 	return fBlock->Visit(visitor);
 }
-
 
 void
 Case::Dump(DumpContext& context) const
@@ -77,6 +70,5 @@ Case::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

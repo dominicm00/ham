@@ -5,33 +5,30 @@
 #ifndef HAM_CODE_FOR_H
 #define HAM_CODE_FOR_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class For : public Node
+{
+  public:
+	For(Node* variable, Node* list, Node* block);
+	virtual ~For();
 
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-class For : public Node {
-public:
-								For(Node* variable, Node* list,
-									Node* block);
-	virtual						~For();
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			Node*				fVariable;
-			Node*				fList;
-			Node*				fBlock;
+  private:
+	Node* fVariable;
+	Node* fList;
+	Node* fBlock;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_FOR_H
+#endif // HAM_CODE_FOR_H

@@ -5,26 +5,23 @@
 #ifndef HAM_PARSER_PARSE_POSITION_H
 #define HAM_PARSER_PARSE_POSITION_H
 
-
 #include <stddef.h>
 
-
-namespace ham {
-namespace parser {
-
+namespace ham
+{
+namespace parser
+{
 
 struct ParsePosition {
 	ParsePosition()
-		:
-		fLine(0),
-		fColumn(0)
+		: fLine(0),
+		  fColumn(0)
 	{
 	}
 
 	ParsePosition(size_t line, size_t column)
-		:
-		fLine(line),
-		fColumn(column)
+		: fLine(line),
+		  fColumn(column)
 	{
 	}
 
@@ -34,24 +31,16 @@ struct ParsePosition {
 		fColumn = column;
 	}
 
-	size_t Line() const
-	{
-		return fLine;
-	}
+	size_t Line() const { return fLine; }
 
-	size_t Column() const
-	{
-		return fColumn;
-	}
+	size_t Column() const { return fColumn; }
 
-private:
-	size_t	fLine;
-	size_t	fColumn;
+  private:
+	size_t fLine;
+	size_t fColumn;
 };
 
+} // namespace parser
+} // namespace ham
 
-}	// namespace parser
-}	// namespace ham
-
-
-#endif	// HAM_PARSER_PARSE_POSITION_H
+#endif // HAM_PARSER_PARSE_POSITION_H

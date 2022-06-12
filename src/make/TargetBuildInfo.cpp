@@ -3,37 +3,33 @@
  * Distributed under the terms of the MIT License.
  */
 
-
-#include "make/Command.h"
 #include "make/TargetBuildInfo.h"
+#include "make/Command.h"
 
-
-namespace ham {
-namespace make {
-
+namespace ham
+{
+namespace make
+{
 
 class Command;
 class MakeTarget;
 
-
 TargetBuildInfo::TargetBuildInfo(MakeTarget* target)
-	:
-	fTarget(target),
-	fCommands(),
-	fCommandIndex(0),
-	fFailed(false)
+	: fTarget(target),
+	  fCommands(),
+	  fCommandIndex(0),
+	  fFailed(false)
 {
 }
-
 
 TargetBuildInfo::~TargetBuildInfo()
 {
 	for (std::vector<Command*>::iterator it = fCommands.begin();
-		it != fCommands.end(); ++it) {
+		 it != fCommands.end();
+		 ++it) {
 		(*it)->ReleaseReference();
 	}
 }
-
 
 void
 TargetBuildInfo::AddCommand(Command* command)
@@ -42,7 +38,6 @@ TargetBuildInfo::AddCommand(Command* command)
 	command->AcquireReference();
 }
 
-
 Command*
 TargetBuildInfo::NextCommand()
 {
@@ -50,7 +45,6 @@ TargetBuildInfo::NextCommand()
 		return NULL;
 	return fCommands[fCommandIndex++];
 }
-
 
 } // namespace make
 } // namespace ham

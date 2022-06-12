@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Include.h"
 
 #include <fstream>
@@ -20,24 +19,21 @@
 #include "parser/Parser.h"
 #include "util/Constants.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 Include::Include(Node* fileNames)
-	:
-	fFileNames(fileNames)
+	: fFileNames(fileNames)
 {
 	fFileNames->AcquireReference();
 }
-
 
 Include::~Include()
 {
 	fFileNames->ReleaseReference();
 }
-
 
 StringList
 Include::Evaluate(EvaluationContext& context)
@@ -46,8 +42,8 @@ Include::Evaluate(EvaluationContext& context)
 	size_t includeDepth = context.IncludeDepth();
 	if (includeDepth >= util::kIncludeDepthLimit) {
 		std::stringstream message;
-		message << "Reached include depth limit ("
-			<< util::kIncludeDepthLimit << ")";
+		message << "Reached include depth limit (" << util::kIncludeDepthLimit
+				<< ")";
 		throw EvaluationException(message.str());
 	}
 	context.SetIncludeDepth(includeDepth + 1);
@@ -57,12 +53,14 @@ Include::Evaluate(EvaluationContext& context)
 		// Only the file referred to by the first element is included.
 
 		// bind the target
-		data::Target* target
-			= context.Targets().LookupOrCreate(fileNames.ElementAt(0));
+		data::Target* target =
+			context.Targets().LookupOrCreate(fileNames.ElementAt(0));
 		String filePath;
 		data::FileStatus fileStatus;
-		data::TargetBinder::Bind(*context.GlobalVariables(), target, filePath,
-			fileStatus);
+		data::TargetBinder::Bind(*context.GlobalVariables(),
+								 target,
+								 filePath,
+								 fileStatus);
 
 		// open the file
 		std::ifstream file(filePath.ToCString());
@@ -71,7 +69,7 @@ Include::Evaluate(EvaluationContext& context)
 				return StringList::False();
 			throw EvaluationException(
 				std::string("include: Failed to open file \"")
-					+ filePath.ToCString() + "\"");
+				+ filePath.ToCString() + "\"");
 		}
 
 		// parse and evaluate it
@@ -91,7 +89,6 @@ Include::Evaluate(EvaluationContext& context)
 	return StringList::False();
 }
 
-
 code::Node*
 Include::Visit(NodeVisitor& visitor)
 {
@@ -100,7 +97,6 @@ Include::Visit(NodeVisitor& visitor)
 
 	return fFileNames->Visit(visitor);
 }
-
 
 void
 Include::Dump(DumpContext& context) const
@@ -114,6 +110,5 @@ Include::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

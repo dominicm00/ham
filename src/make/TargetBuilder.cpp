@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "make/TargetBuilder.h"
 
 #include "data/RuleActions.h"
@@ -12,43 +11,38 @@
 #include "make/TargetBuildInfo.h"
 #include "process/ChildInfo.h"
 
-
-namespace ham {
-namespace make {
-
+namespace ham
+{
+namespace make
+{
 
 struct TargetBuilder::JobSlot {
 	process::Process fProcess;
-	Command*		fCommand;
+	Command* fCommand;
 
-public:
+  public:
 	JobSlot()
-		:
-		fProcess(),
-		fCommand(NULL)
+		: fProcess(),
+		  fCommand(NULL)
 	{
 	}
 };
 
-
 TargetBuilder::TargetBuilder(const Options& options, const StringList& jamShell)
-	:
-	fOptions(options),
-	fMaxJobCount(options.JobCount()),
-	fJamShell(jamShell),
-	fBuildInfos(),
-	fFinishedBuildInfos(),
-	fFinishedCommands(),
-	fJobSlots(new JobSlot[fMaxJobCount])
+	: fOptions(options),
+	  fMaxJobCount(options.JobCount()),
+	  fJamShell(jamShell),
+	  fBuildInfos(),
+	  fFinishedBuildInfos(),
+	  fFinishedCommands(),
+	  fJobSlots(new JobSlot[fMaxJobCount])
 {
 }
-
 
 TargetBuilder::~TargetBuilder()
 {
 	delete[] fJobSlots;
 }
-
 
 bool
 TargetBuilder::HasSpareJobSlots() const
@@ -56,15 +50,13 @@ TargetBuilder::HasSpareJobSlots() const
 	return fMaxJobCount > fBuildInfos.size();
 }
 
-
 void
 TargetBuilder::AddBuildInfo(TargetBuildInfo* buildInfo)
 {
 	fBuildInfos.push_back(buildInfo);
-// TODO: Ownership?
+	// TODO: Ownership?
 	_ExecuteNextCommand(buildInfo);
 }
-
 
 TargetBuildInfo*
 TargetBuilder::NextFinishedBuildInfo(bool canWait)
@@ -74,9 +66,10 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 		while (!fFinishedCommands.empty()) {
 			Command* command = fFinishedCommands.front();
 			fFinishedCommands.erase(fFinishedCommands.begin());
-			for (std::vector<TargetBuildInfo*>::const_iterator it
-					= command->WaitingBuildInfos().begin();
-				it != command->WaitingBuildInfos().end(); ++it) {
+			for (std::vector<TargetBuildInfo*>::const_iterator it =
+					 command->WaitingBuildInfos().begin();
+				 it != command->WaitingBuildInfos().end();
+				 ++it) {
 				TargetBuildInfo* buildInfo = *it;
 				switch (command->GetState()) {
 					case Command::NOT_EXECUTED:
@@ -87,27 +80,31 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 						_ExecuteNextCommand(buildInfo);
 						break;
 					case Command::FAILED:
-// TODO: Insert at head to allow for early error detection?
+						// TODO: Insert at head to allow for early error
+						// detection?
 						fFinishedBuildInfos.push_back(buildInfo);
 						buildInfo->SetFailed(true);
-						fBuildInfos.erase(
-							std::find(fBuildInfos.begin(), fBuildInfos.end(),
-								buildInfo));
+						fBuildInfos.erase(std::find(fBuildInfos.begin(),
+													fBuildInfos.end(),
+													buildInfo));
 
 						// print diagnostics
 						printf("%s\n", command->CommandLine().ToCString());
 						printf("...failed %s %s\n",
-							command->Actions()->Actions()->RuleName()
-								.ToCString(),
-							command->BoundTargetPaths().Join(StringPart(" "))
-								.ToCString());
+							   command->Actions()
+								   ->Actions()
+								   ->RuleName()
+								   .ToCString(),
+							   command->BoundTargetPaths()
+								   .Join(StringPart(" "))
+								   .ToCString());
 
 						// remove the targets
-						for (StringList::Iterator it
-								= command->BoundTargetPaths().GetIterator();
-							it.HasNext();) {
+						for (StringList::Iterator it =
+								 command->BoundTargetPaths().GetIterator();
+							 it.HasNext();) {
 							String path = it.Next();
-// TODO: Platform specific!
+							// TODO: Platform specific!
 							if (unlink(path.ToCString()) == 0)
 								printf("...removing %s\n", path.ToCString());
 						}
@@ -143,18 +140,16 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 		fJobSlots[jobSlot].fProcess.Unset();
 
 		fFinishedCommands.push_back(command);
-		command->SetState(
-			processInfo.fExitCode == 0 ? Command::SUCCEEDED : Command::FAILED);
+		command->SetState(processInfo.fExitCode == 0 ? Command::SUCCEEDED
+													 : Command::FAILED);
 	}
 }
-
 
 bool
 TargetBuilder::HasPendingBuildInfos() const
 {
 	return !fBuildInfos.empty() || !fFinishedBuildInfos.empty();
 }
-
 
 void
 TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
@@ -164,8 +159,7 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 		if (command == NULL) {
 			fFinishedBuildInfos.push_back(buildInfo);
 			fBuildInfos.erase(
-				std::find(fBuildInfos.begin(), fBuildInfos.end(),
-				buildInfo));
+				std::find(fBuildInfos.begin(), fBuildInfos.end(), buildInfo));
 			return;
 		}
 
@@ -183,25 +177,25 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 				// next command...
 				break;
 			case Command::FAILED:
-// TODO: Insert at head to allow for early error detection?
+				// TODO: Insert at head to allow for early error detection?
 				fFinishedBuildInfos.push_back(buildInfo);
 				buildInfo->SetFailed(true);
-				fBuildInfos.erase(
-					std::find(fBuildInfos.begin(), fBuildInfos.end(),
-						buildInfo));
+				fBuildInfos.erase(std::find(fBuildInfos.begin(),
+											fBuildInfos.end(),
+											buildInfo));
 				return;
 		}
 	}
 }
-
 
 void
 TargetBuilder::_ExecuteCommand(Command* command)
 {
 	if (fOptions.IsPrintActions()) {
 		data::RuleActionsCall* actions = command->Actions();
-		printf("%s %s\n", actions->Actions()->RuleName().ToCString(),
-			command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
+		printf("%s %s\n",
+			   actions->Actions()->RuleName().ToCString(),
+			   command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
 	}
 
 	if (fOptions.IsPrintCommands()) {
@@ -215,9 +209,9 @@ TargetBuilder::_ExecuteCommand(Command* command)
 	}
 
 	int jobSlot = _FindFreeJobSlot();
-// TODO:...
-//	if (jobSlot < 0)
-//		throw InternalError();
+	// TODO:...
+	//	if (jobSlot < 0)
+	//		throw InternalError();
 	char slotString[16];
 	snprintf(slotString, sizeof(slotString), "%d", jobSlot + 1);
 
@@ -236,8 +230,9 @@ TargetBuilder::_ExecuteCommand(Command* command)
 	arguments[argumentCount] = NULL;
 
 	// launch the command
-	bool launched = fJobSlots[jobSlot].fProcess.Launch(arguments[0], arguments,
-		argumentCount);
+	bool launched = fJobSlots[jobSlot].fProcess.Launch(arguments[0],
+													   arguments,
+													   argumentCount);
 
 	delete[] arguments;
 
@@ -251,7 +246,6 @@ TargetBuilder::_ExecuteCommand(Command* command)
 	fJobSlots[jobSlot].fCommand = command;
 }
 
-
 int
 TargetBuilder::_FindFreeJobSlot() const
 {
@@ -262,7 +256,6 @@ TargetBuilder::_FindFreeJobSlot() const
 
 	return -1;
 }
-
 
 int
 TargetBuilder::_FindJobSlot(process::Process::Id id) const
@@ -276,7 +269,6 @@ TargetBuilder::_FindJobSlot(process::Process::Id id) const
 
 	return -1;
 }
-
 
 } // namespace make
 } // namespace ham

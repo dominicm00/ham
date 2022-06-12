@@ -3,29 +3,24 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/FileStatus.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 FileStatus::FileStatus()
-	:
-	fType(NONE),
-	fLastModifiedTime()
+	: fType(NONE),
+	  fLastModifiedTime()
 {
 }
-
 
 FileStatus::FileStatus(Type type, const Time& lastModifiedTime)
-	:
-	fType(type),
-	fLastModifiedTime(lastModifiedTime)
+	: fType(type),
+	  fLastModifiedTime(lastModifiedTime)
 {
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

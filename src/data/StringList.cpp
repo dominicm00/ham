@@ -3,16 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "StringList.h"
 
 #include <algorithm>
 #include <vector>
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 StringList::Data StringList::Data::sEmptyData(0);
 const StringList StringList::kTrue("1");
@@ -20,39 +19,32 @@ const StringList StringList::kFalse;
 
 static const size_t kMinCapacity = 8;
 
-
 StringList::StringList()
-	:
-	fData(&Data::sEmptyData),
-	fOffset(0),
-	fSize(0)
+	: fData(&Data::sEmptyData),
+	  fOffset(0),
+	  fSize(0)
 {
 	fData->Acquire();
 }
 
-
 StringList::StringList(size_t elementCount)
-	:
-	fData(_CreateData(elementCount)),
-	fOffset(0),
-	fSize(elementCount)
+	: fData(_CreateData(elementCount)),
+	  fOffset(0),
+	  fSize(elementCount)
 {
 	for (size_t i = 0; i < elementCount; i++)
 		fData->ConstructElement(i, String());
 	fData->fSize = elementCount;
 }
 
-
 StringList::StringList(const String& string)
-	:
-	fData(_CreateData(1)),
-	fOffset(0),
-	fSize(1)
+	: fData(_CreateData(1)),
+	  fOffset(0),
+	  fSize(1)
 {
 	fData->ConstructElement(0, string);
 	fData->fSize = 1;
 }
-
 
 StringList::StringList(const StringList* other)
 {
@@ -69,9 +61,9 @@ StringList::StringList(const StringList* other)
 	fData->Acquire();
 }
 
-
-StringList::StringList(const StringList& other, size_t startIndex,
-	size_t endIndex)
+StringList::StringList(const StringList& other,
+					   size_t startIndex,
+					   size_t endIndex)
 {
 	if (startIndex < other.fSize && startIndex < endIndex) {
 		fData = other.fData;
@@ -86,22 +78,18 @@ StringList::StringList(const StringList& other, size_t startIndex,
 	fData->Acquire();
 }
 
-
 StringList::StringList(const StringList& other)
-	:
-	fData(other.fData),
-	fOffset(other.fOffset),
-	fSize(other.fSize)
+	: fData(other.fData),
+	  fOffset(other.fOffset),
+	  fSize(other.fSize)
 {
 	fData->Acquire();
 }
-
 
 StringList::~StringList()
 {
 	fData->Release();
 }
-
 
 bool
 StringList::IsTrue() const
@@ -115,7 +103,6 @@ StringList::IsTrue() const
 	return false;
 }
 
-
 bool
 StringList::Contains(const String& string) const
 {
@@ -127,13 +114,13 @@ StringList::Contains(const String& string) const
 	return false;
 }
 
-
 int
 StringList::CompareWith(const StringList& other,
-	bool ignoreTrailingEmptyStrings) const
+						bool ignoreTrailingEmptyStrings) const
 {
 	size_t commonSize = ignoreTrailingEmptyStrings
-		? std::max(fSize, other.fSize) : std::min(fSize, other.fSize);
+		? std::max(fSize, other.fSize)
+		: std::min(fSize, other.fSize);
 	for (size_t i = 0; i < commonSize; i++) {
 		int compare = ElementAt(i).CompareWith(other.ElementAt(i));
 		if (compare != 0)
@@ -143,7 +130,6 @@ StringList::CompareWith(const StringList& other,
 	return ignoreTrailingEmptyStrings ? 0 : (int)fSize - (int)other.fSize;
 }
 
-
 StringList&
 StringList::Append(const String& string)
 {
@@ -152,7 +138,6 @@ StringList::Append(const String& string)
 	fData->fSize = ++fSize;
 	return *this;
 }
-
 
 StringList&
 StringList::Append(const StringList& list)
@@ -175,7 +160,6 @@ StringList::Append(const StringList& list)
 	fData->fSize = fSize;
 	return *this;
 }
-
 
 String
 StringList::Join() const
@@ -207,7 +191,6 @@ StringList::Join() const
 
 	return String(buffer);
 }
-
 
 String
 StringList::Join(const StringPart& separator) const
@@ -251,7 +234,6 @@ StringList::Join(const StringPart& separator) const
 	return String(buffer);
 }
 
-
 StringList
 StringList::Multiply(const StringListList& listList)
 {
@@ -268,7 +250,8 @@ StringList::Multiply(const StringListList& listList)
 	std::vector<const StringList*> lists(listCount);
 	size_t listIndex = 0;
 	for (StringListList::const_iterator it = listList.begin();
-			it != listList.end(); ++it) {
+		 it != listList.end();
+		 ++it) {
 		resultSize *= it->Size();
 		lists[listIndex++] = &*it;
 	}
@@ -291,7 +274,8 @@ StringList::Multiply(const StringListList& listList)
 			continue;
 		}
 
-		factorList.SetElementAt(listIndex,
+		factorList.SetElementAt(
+			listIndex,
 			lists[listIndex]->ElementAt(indexes[listIndex]));
 
 		// descend
@@ -310,7 +294,6 @@ StringList::Multiply(const StringListList& listList)
 	return resultList;
 }
 
-
 bool
 StringList::operator==(const StringList& other) const
 {
@@ -323,7 +306,6 @@ StringList::operator==(const StringList& other) const
 
 	return true;
 }
-
 
 StringList&
 StringList::operator=(const StringList& other)
@@ -339,7 +321,6 @@ StringList::operator=(const StringList& other)
 	return *this;
 }
 
-
 StringList::Data*
 StringList::_CreateData(size_t size)
 {
@@ -350,7 +331,6 @@ StringList::_CreateData(size_t size)
 
 	return Data::Create(_CapacityForSize(size));
 }
-
 
 /**
  * Makes sure we are the only user of the data object (exception: 0 size), it is
@@ -390,7 +370,6 @@ StringList::_Detach(size_t newSize)
 	fSize = toCopy;
 }
 
-
 /*static*/ inline size_t
 StringList::_CapacityForSize(size_t size)
 {
@@ -400,6 +379,5 @@ StringList::_CapacityForSize(size_t size)
 	return capacity;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

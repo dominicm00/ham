@@ -5,38 +5,33 @@
 #ifndef HAM_DATA_VARIABLE_DOMAIN_H
 #define HAM_DATA_VARIABLE_DOMAIN_H
 
-
 #include <map>
 
 #include "StringList.h"
 
+namespace ham
+{
+namespace data
+{
 
-namespace ham {
-namespace data {
+class VariableDomain
+{
+  public:
+	inline VariableDomain();
 
+	inline const StringList* Lookup(const String& variable) const;
+	inline StringList* Lookup(const String& variable);
+	inline StringList& LookupOrCreate(const String& variable);
+	inline void Set(const String& variable, const StringList& value);
 
-class VariableDomain {
-public:
-	inline						VariableDomain();
+  private:
+	typedef std::map<String, StringList> VariableMap;
 
-	inline	const StringList*	Lookup(const String& variable) const;
-	inline	StringList*			Lookup(const String& variable);
-	inline	StringList&			LookupOrCreate(const String& variable);
-	inline	void				Set(const String& variable,
-									const StringList& value);
-
-private:
-			typedef std::map<String, StringList> VariableMap;
-
-private:
-			VariableMap			fVariables;
+  private:
+	VariableMap fVariables;
 };
 
-
-VariableDomain::VariableDomain()
-{
-}
-
+VariableDomain::VariableDomain() {}
 
 const StringList*
 VariableDomain::Lookup(const String& variable) const
@@ -45,7 +40,6 @@ VariableDomain::Lookup(const String& variable) const
 	return it == fVariables.end() ? NULL : &it->second;
 }
 
-
 StringList*
 VariableDomain::Lookup(const String& variable)
 {
@@ -53,13 +47,11 @@ VariableDomain::Lookup(const String& variable)
 	return it == fVariables.end() ? NULL : &it->second;
 }
 
-
 StringList&
 VariableDomain::LookupOrCreate(const String& variable)
 {
 	return fVariables[variable];
 }
-
 
 void
 VariableDomain::Set(const String& variable, const StringList& value)
@@ -67,9 +59,7 @@ VariableDomain::Set(const String& variable, const StringList& value)
 	fVariables[variable] = value;
 }
 
-
 } // namespace data
 } // namespace ham
 
-
-#endif	// HAM_DATA_VARIABLE_DOMAIN_H
+#endif // HAM_DATA_VARIABLE_DOMAIN_H

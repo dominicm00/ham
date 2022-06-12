@@ -3,16 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/Time.h"
 
 #include <sys/time.h>
 #include <time.h>
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 /*static*/ Time
 Time::Now()
@@ -20,14 +19,12 @@ Time::Now()
 	timeval time;
 	gettimeofday(&time, NULL);
 	return Time(time.tv_sec, time.tv_usec * 1000);
-
 }
-
 
 String
 Time::ToString(bool includeNanoSeconds) const
 {
-// TODO: Support parameter
+	// TODO: Support parameter
 	char buffer[32];
 	time_t time = Seconds();
 	ctime_r(&time, buffer);
@@ -39,6 +36,5 @@ Time::ToString(bool includeNanoSeconds) const
 	return String(buffer);
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

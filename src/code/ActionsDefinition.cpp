@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/ActionsDefinition.h"
 
 #include "code/DumpContext.h"
@@ -11,30 +10,29 @@
 #include "code/Rule.h"
 #include "data/RuleActions.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
-
-
-ActionsDefinition::ActionsDefinition(uint32_t flags, const String& ruleName,
-	Node* variables, const String& actions)
-	:
-	fRuleName(ruleName),
-	fVariables(variables),
-	fActions(actions),
-	fFlags(flags)
+ActionsDefinition::ActionsDefinition(uint32_t flags,
+									 const String& ruleName,
+									 Node* variables,
+									 const String& actions)
+	: fRuleName(ruleName),
+	  fVariables(variables),
+	  fActions(actions),
+	  fFlags(flags)
 {
 	if (fVariables != NULL)
 		fVariables->AcquireReference();
 }
-
 
 ActionsDefinition::~ActionsDefinition()
 {
 	if (fVariables != NULL)
 		fVariables->ReleaseReference();
 }
-
 
 StringList
 ActionsDefinition::Evaluate(EvaluationContext& context)
@@ -47,11 +45,11 @@ ActionsDefinition::Evaluate(EvaluationContext& context)
 	// create and add the actions to the rule
 	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
 	util::Reference<data::RuleActions> actions(
-		new data::RuleActions(fRuleName, variables, fActions, fFlags), true);
+		new data::RuleActions(fRuleName, variables, fActions, fFlags),
+		true);
 	rule.SetActions(actions.Get());
 	return StringList::False();
 }
-
 
 Node*
 ActionsDefinition::Visit(NodeVisitor& visitor)
@@ -62,12 +60,10 @@ ActionsDefinition::Visit(NodeVisitor& visitor)
 	return fVariables->Visit(visitor);
 }
 
-
 void
 ActionsDefinition::Dump(DumpContext& context) const
 {
-	context << "ActionsDefinition(\"" << fRuleName << ", " << fFlags
-		<< ",\n";
+	context << "ActionsDefinition(\"" << fRuleName << ", " << fFlags << ",\n";
 	context.BeginChildren();
 
 	if (fVariables != NULL)
@@ -82,6 +78,5 @@ ActionsDefinition::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

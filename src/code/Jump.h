@@ -5,33 +5,32 @@
 #ifndef HAM_CODE_JUMP_H
 #define HAM_CODE_JUMP_H
 
-
 #include "code/Node.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 template<typename JumpType>
-class Jump : public Node {
-public:
-								Jump(Node* result);
-	virtual						~Jump();
+class Jump : public Node
+{
+  public:
+	Jump(Node* result);
+	virtual ~Jump();
 
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-private:
-			Node*				fResult;
+  private:
+	Node* fResult;
 };
-
 
 // declare the specializations
 
-#define HAM_DECLARE_JUMP_STATEMENT(name)				\
-	struct JumpType##name;								\
+#define HAM_DECLARE_JUMP_STATEMENT(name)                                       \
+	struct JumpType##name;                                                     \
 	typedef Jump<JumpType##name> name;
 
 HAM_DECLARE_JUMP_STATEMENT(Break)
@@ -41,9 +40,7 @@ HAM_DECLARE_JUMP_STATEMENT(JumpToEof)
 
 #undef HAM_DECLARE_JUMP_STATEMENT
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_JUMP_H
+#endif // HAM_CODE_JUMP_H

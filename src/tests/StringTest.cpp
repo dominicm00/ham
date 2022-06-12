@@ -3,47 +3,43 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "tests/StringTest.h"
 
 #include <string>
 
 #include "data/String.h"
 
-
-namespace ham {
-namespace tests {
-
+namespace ham
+{
+namespace tests
+{
 
 using data::String;
-
 
 static int
 sign(int number)
 {
-	return number == 0 ? 0 : (number < 0 ? - 1 : 1);
+	return number == 0 ? 0 : (number < 0 ? -1 : 1);
 }
 
-
-#define STRING_EQUAL(actual, expected)							\
-	HAM_TEST_EQUAL(actual.ToCString(), std::string(expected))	\
-	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected))	\
-	HAM_TEST_EQUAL(actual.Length(), strlen(expected))			\
+#define STRING_EQUAL(actual, expected)                                         \
+	HAM_TEST_EQUAL(actual.ToCString(), std::string(expected))                  \
+	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected))                \
+	HAM_TEST_EQUAL(actual.Length(), strlen(expected))                          \
 	HAM_TEST_EQUAL(actual.IsEmpty(), strlen(expected) == 0)
 
-#define STRING_COMPARE_WORK(string1, string2, expected)				\
-	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected)	\
-	HAM_TEST_EQUAL(string1 == string2, expected == 0)				\
-	HAM_TEST_EQUAL(string1 != string2, expected != 0)				\
-	HAM_TEST_EQUAL(string1 < string2, expected < 0)					\
-	HAM_TEST_EQUAL(string1 > string2, expected > 0)					\
-	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)				\
+#define STRING_COMPARE_WORK(string1, string2, expected)                        \
+	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected)               \
+	HAM_TEST_EQUAL(string1 == string2, expected == 0)                          \
+	HAM_TEST_EQUAL(string1 != string2, expected != 0)                          \
+	HAM_TEST_EQUAL(string1 < string2, expected < 0)                            \
+	HAM_TEST_EQUAL(string1 > string2, expected > 0)                            \
+	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)                          \
 	HAM_TEST_EQUAL(string1 >= string2, expected >= 0)
 
-#define STRING_COMPARE(string1, string2, expected)				\
-	STRING_COMPARE_WORK(string1, string2, expected)				\
+#define STRING_COMPARE(string1, string2, expected)                             \
+	STRING_COMPARE_WORK(string1, string2, expected)                            \
 	STRING_COMPARE_WORK(string2, string1, -expected)
-
 
 void
 StringTest::Constructor()
@@ -117,7 +113,6 @@ StringTest::Constructor()
 	}
 }
 
-
 void
 StringTest::CastOperator()
 {
@@ -136,25 +131,22 @@ StringTest::CastOperator()
 	}
 }
 
-
 void
 StringTest::Comparison()
 {
 	struct TestData {
-		const char*	string1;
-		const char*	string2;
-		int			compare;
+		const char* string1;
+		const char* string2;
+		int compare;
 	};
 
-	const TestData testData[] = {
-		{ "",		"",			0 },
-		{ "foo",	"",			1 },
-		{ "foo",	"foo",		0 },
-		{ "foobar",	"foo",		1 },
-		{ "foo",	"bar",		1 },
-		{ "foo",	"barfoo",	1 },
-		{ "foobar",	"bar",		1 }
-	};
+	const TestData testData[] = {{"", "", 0},
+								 {"foo", "", 1},
+								 {"foo", "foo", 0},
+								 {"foobar", "foo", 1},
+								 {"foo", "bar", 1},
+								 {"foo", "barfoo", 1},
+								 {"foobar", "bar", 1}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		String string1(testData[i].string1);
@@ -163,22 +155,19 @@ StringTest::Comparison()
 	}
 }
 
-
 void
 StringTest::Assignment()
 {
 	struct TestData {
-		const char*	string1;
-		const char*	string2;
+		const char* string1;
+		const char* string2;
 	};
 
-	const TestData testData[] = {
-		{ "",		"" },
-		{ "foo",	"" },
-		{ "foo",	"foo" },
-		{ "foo",	"bar" },
-		{ "foobar",	"foo" }
-	};
+	const TestData testData[] = {{"", ""},
+								 {"foo", ""},
+								 {"foo", "foo"},
+								 {"foo", "bar"},
+								 {"foobar", "foo"}};
 
 	// =(const String&)
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
@@ -218,22 +207,19 @@ StringTest::Assignment()
 	}
 }
 
-
 void
 StringTest::Concatenation()
 {
 	struct TestData {
-		const char*	string1;
-		const char*	string2;
+		const char* string1;
+		const char* string2;
 	};
 
-	const TestData testData[] = {
-		{ "",		"" },
-		{ "foo",	"" },
-		{ "foo",	"foo" },
-		{ "foo",	"bar" },
-		{ "foobar",	"foo" }
-	};
+	const TestData testData[] = {{"", ""},
+								 {"foo", ""},
+								 {"foo", "foo"},
+								 {"foo", "bar"},
+								 {"foobar", "foo"}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* testString1 = testData[i].string1;
@@ -304,7 +290,6 @@ StringTest::Concatenation()
 	}
 }
 
-
 void
 StringTest::ToLowerUpper()
 {
@@ -367,43 +352,41 @@ StringTest::ToLowerUpper()
 	}
 }
 
-
 void
 StringTest::SubString()
 {
 	struct TestData {
-		const char*	string;
-		size_t		startOffset;
-		size_t		endOffset;
-		const char*	result;
+		const char* string;
+		size_t startOffset;
+		size_t endOffset;
+		const char* result;
 	};
 
 	const TestData testData[] = {
-		{ "",			0, 0, "" },
-		{ "foobar",		0, 0, "" },
-		{ "foobar",		3, 3, "" },
-		{ "foobar",		4, 2, "" },
-		{ "foobar",		6, 7, "" },
-		{ "foobar",		0, 6, "foobar" },
-		{ "foobar",		0, 8, "foobar" },
-		{ "foobar",		0, 4, "foob" },
-		{ "foobar",		2, 4, "ob" },
-		{ "foobar",		2, 6, "obar" },
-		{ "foobar",		2, 9, "obar" },
+		{"", 0, 0, ""},
+		{"foobar", 0, 0, ""},
+		{"foobar", 3, 3, ""},
+		{"foobar", 4, 2, ""},
+		{"foobar", 6, 7, ""},
+		{"foobar", 0, 6, "foobar"},
+		{"foobar", 0, 8, "foobar"},
+		{"foobar", 0, 4, "foob"},
+		{"foobar", 2, 4, "ob"},
+		{"foobar", 2, 6, "obar"},
+		{"foobar", 2, 9, "obar"},
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		String string(testData[i].string);
-		String subString = string.SubString(testData[i].startOffset,
-			testData[i].endOffset);
-		HAM_TEST_ADD_INFO(
-			STRING_EQUAL(subString, testData[i].result),
-			"string: \"%s\", offsets: %zu - %zu", testData[i].string,
-			testData[i].startOffset, testData[i].endOffset
-		)
+		String subString =
+			string.SubString(testData[i].startOffset, testData[i].endOffset);
+		HAM_TEST_ADD_INFO(STRING_EQUAL(subString, testData[i].result),
+						  "string: \"%s\", offsets: %zu - %zu",
+						  testData[i].string,
+						  testData[i].startOffset,
+						  testData[i].endOffset)
 	}
 }
-
 
 } // namespace tests
 } // namespace ham

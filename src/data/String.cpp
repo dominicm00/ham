@@ -3,58 +3,46 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/String.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 String::Buffer String::Buffer::sEmptyBuffer(0);
 
-
 String::String()
-	:
-	fBuffer(&Buffer::sEmptyBuffer)
+	: fBuffer(&Buffer::sEmptyBuffer)
 {
 	fBuffer->Acquire();
 }
 
-
 String::String(const char* string)
-	:
-	fBuffer(_CreateBuffer(string, strlen(string)))
+	: fBuffer(_CreateBuffer(string, strlen(string)))
 {
 }
 
-
 String::String(const char* string, size_t maxLength)
-	:
-	fBuffer(_CreateBuffer(string, strnlen(string, maxLength)))
+	: fBuffer(_CreateBuffer(string, strnlen(string, maxLength)))
 {
 }
 
 String::String(const StringPart& string)
-	:
-	fBuffer(_CreateBuffer(string.Start(), string.Length()))
+	: fBuffer(_CreateBuffer(string.Start(), string.Length()))
 {
 }
 
-
 String::String(const String& other)
-	:
-	fBuffer(other.fBuffer)
+	: fBuffer(other.fBuffer)
 {
 	fBuffer->Acquire();
 }
-
 
 String::~String()
 {
 	fBuffer->Release();
 }
-
 
 String
 String::SubString(size_t startOffset, size_t endOffset) const
@@ -72,7 +60,6 @@ String::SubString(size_t startOffset, size_t endOffset) const
 		_CreateBuffer(ToCString() + startOffset, endOffset - startOffset));
 }
 
-
 String&
 String::ToUpper()
 {
@@ -83,7 +70,6 @@ String::ToUpper()
 
 	return *this;
 }
-
 
 String&
 String::ToLower()
@@ -96,7 +82,6 @@ String::ToLower()
 	return *this;
 }
 
-
 String&
 String::operator=(const String& other)
 {
@@ -108,7 +93,6 @@ String::operator=(const String& other)
 
 	return *this;
 }
-
 
 String
 String::operator+(const String& other) const
@@ -129,15 +113,15 @@ String::operator+(const String& other) const
 }
 
 String::String(String::Buffer* buffer)
-	:
-	fBuffer(buffer)
+	: fBuffer(buffer)
 {
 }
 
-
 /*static*/ String
-String::_Concatenate(const char* string1, size_t length1, const char* string2,
-	size_t length2)
+String::_Concatenate(const char* string1,
+					 size_t length1,
+					 const char* string2,
+					 size_t length2)
 {
 	if (length1 == 0 && length2 == 0)
 		return String();
@@ -148,7 +132,6 @@ String::_Concatenate(const char* string1, size_t length1, const char* string2,
 
 	return String(buffer);
 }
-
 
 /*static*/ String::Buffer*
 String::_CreateBuffer(const char* string, size_t length)
@@ -163,7 +146,6 @@ String::_CreateBuffer(const char* string, size_t length)
 	return buffer;
 }
 
-
 void
 String::_CopyOnWriteBuffer()
 {
@@ -175,6 +157,5 @@ String::_CopyOnWriteBuffer()
 	fBuffer = buffer;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

@@ -5,31 +5,30 @@
 #ifndef HAM_CODE_LIST_H
 #define HAM_CODE_LIST_H
 
-
 #include <vector>
 
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class List : public Node
+{
+  public:
+	List();
+	virtual ~List();
 
+	inline void AppendKeepReference(Node* child);
 
-class List : public Node {
-public:
-								List();
-	virtual						~List();
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-	inline	void				AppendKeepReference(Node* child);
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			std::vector<Node*>	fChildren;
+  private:
+	std::vector<Node*> fChildren;
 };
-
 
 void
 List::AppendKeepReference(Node* child)
@@ -41,9 +40,7 @@ List::AppendKeepReference(Node* child)
 	}
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_LIST_H
+#endif // HAM_CODE_LIST_H

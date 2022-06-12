@@ -3,48 +3,43 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/Target.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 Target::Target()
-	:
-	fName(),
-	fVariables(NULL),
-	fFlags(0),
-	fDependencies(),
-	fIncludes(),
-	fActionsCalls()
+	: fName(),
+	  fVariables(NULL),
+	  fFlags(0),
+	  fDependencies(),
+	  fIncludes(),
+	  fActionsCalls()
 {
 }
-
 
 Target::Target(const String& name)
-	:
-	fName(name),
-	fVariables(NULL),
-	fFlags(0),
-	fDependencies(),
-	fIncludes(),
-	fActionsCalls()
+	: fName(name),
+	  fVariables(NULL),
+	  fFlags(0),
+	  fDependencies(),
+	  fIncludes(),
+	  fActionsCalls()
 {
 }
-
 
 Target::~Target()
 {
 	for (std::vector<RuleActionsCall*>::iterator it = fActionsCalls.begin();
-		it != fActionsCalls.end(); ++it) {
+		 it != fActionsCalls.end();
+		 ++it) {
 		(*it)->ReleaseReference();
 	}
 
 	delete fVariables;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "parser/Parser.h"
 
 #include <stdlib.h>
@@ -11,8 +10,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 
 #include "code/ActionsDefinition.h"
 #include "code/Assignment.h"
@@ -23,8 +22,8 @@
 #include "code/For.h"
 #include "code/FunctionCall.h"
 #include "code/If.h"
-#include "code/Include.h"
 #include "code/InListExpression.h"
+#include "code/Include.h"
 #include "code/Jump.h"
 #include "code/Leaf.h"
 #include "code/List.h"
@@ -37,65 +36,57 @@
 #include "data/RuleActions.h"
 #include "parser/ParseException.h"
 
+namespace ham
+{
+namespace parser
+{
 
-namespace ham {
-namespace parser {
+namespace
+{
+struct ActionsFlagMap : std::map<data::String, uint32_t> {
+	ActionsFlagMap()
+	{
+		(*this)["updated"] = data::RuleActions::UPDATED;
+		(*this)["together"] = data::RuleActions::TOGETHER;
+		(*this)["ignore"] = data::RuleActions::IGNORE;
+		(*this)["quietly"] = data::RuleActions::QUIETLY;
+		(*this)["piecemeal"] = data::RuleActions::PIECEMEAL;
+		(*this)["existing"] = data::RuleActions::EXISTING;
+		(*this)["maxline"] = data::RuleActions::MAX_LINE_FACTOR;
+	}
+};
 
-
-namespace {
-	struct ActionsFlagMap : std::map<data::String, uint32_t> {
-		ActionsFlagMap()
-		{
-			(*this)["updated"] = data::RuleActions::UPDATED;
-			(*this)["together"] = data::RuleActions::TOGETHER;
-			(*this)["ignore"] = data::RuleActions::IGNORE;
-			(*this)["quietly"] = data::RuleActions::QUIETLY;
-			(*this)["piecemeal"] = data::RuleActions::PIECEMEAL;
-			(*this)["existing"] = data::RuleActions::EXISTING;
-			(*this)["maxline"] = data::RuleActions::MAX_LINE_FACTOR;
-		}
-	};
-
-	static ActionsFlagMap sActionsFlags;
+static ActionsFlagMap sActionsFlags;
 }
-
 
 // #pragma mark - Listener
 
-
-Parser::Listener::~Listener()
-{
-}
-
+Parser::Listener::~Listener() {}
 
 void
 Parser::Listener::NonterminalStart(const char* name)
 {
 }
 
-
 void
 Parser::Listener::NonterminalEnd(const char* name)
 {
 }
-
 
 void
 Parser::Listener::NextToken(const Token& token)
 {
 }
 
-
 // #pragma mark - NodeListContainer
 
-
 struct Parser::NodeListContainer {
-	code::NodeList	fNodes;
+	code::NodeList fNodes;
 
 	~NodeListContainer()
 	{
 		for (code::NodeList::iterator it = fNodes.begin(); it != fNodes.end();
-				++it) {
+			 ++it) {
 			(*it)->ReleaseReference();
 		}
 	}
@@ -106,20 +97,14 @@ struct Parser::NodeListContainer {
 		node->AcquireReference();
 	}
 
-	void Detach()
-	{
-		fNodes.clear();
-	}
+	void Detach() { fNodes.clear(); }
 };
-
 
 // #pragma mark - ListenerNotifier
 
-
 struct Parser::ListenerNotifier {
 	ListenerNotifier(Parser::Listener* listener, const char* name)
-		:
-		fListener(listener)
+		: fListener(listener)
 	{
 		if (fListener != NULL) {
 			fName = name;
@@ -133,22 +118,18 @@ struct Parser::ListenerNotifier {
 			fListener->NonterminalEnd(fName);
 	}
 
-private:
-	Parser::Listener*	fListener;
-	const char*			fName;
+  private:
+	Parser::Listener* fListener;
+	const char* fName;
 };
 
-
-#define PARSER_NONTERMINAL(name)	ListenerNotifier _notifier(fListener, name);
-
+#define PARSER_NONTERMINAL(name) ListenerNotifier _notifier(fListener, name);
 
 // #pragma mark - DumpListener
 
-
 struct Parser::DumpListener : Parser::Listener {
 	DumpListener()
-		:
-		fLevel(0)
+		: fLevel(0)
 	{
 	}
 
@@ -166,24 +147,23 @@ struct Parser::DumpListener : Parser::Listener {
 
 	virtual void NextToken(const Token& token)
 	{
-		printf("%*s(%d, \"%s\")\n", (int)fLevel * 2, "", token.ID(),
-			token.ToCString());
+		printf("%*s(%d, \"%s\")\n",
+			   (int)fLevel * 2,
+			   "",
+			   token.ID(),
+			   token.ToCString());
 	}
 
-private:
-	size_t	fLevel;
+  private:
+	size_t fLevel;
 };
-
 
 // #pragma mark - Parser
 
-
 Parser::Parser()
-	:
-	fListener(NULL)
+	: fListener(NULL)
 {
 }
-
 
 code::Block*
 Parser::Parse(const std::string& input)
@@ -192,15 +172,14 @@ Parser::Parse(const std::string& input)
 	return Parse(stream);
 }
 
-
 code::Block*
 Parser::Parse(std::istream& input)
 {
 	bool skipWhiteSpace = (input.flags() & std::ios_base::skipws) != 0;
 	try {
 		std::noskipws(input);
-		code::Block* result
-			= Parse(InputIteratorType(input), InputIteratorType());
+		code::Block* result =
+			Parse(InputIteratorType(input), InputIteratorType());
 		if (skipWhiteSpace)
 			std::skipws(input);
 		return result;
@@ -211,7 +190,6 @@ Parser::Parse(std::istream& input)
 	}
 }
 
-
 code::Block*
 Parser::Parse(const InputIteratorType& start, const InputIteratorType& end)
 {
@@ -219,19 +197,17 @@ Parser::Parse(const InputIteratorType& start, const InputIteratorType& end)
 	return _ParseFile();
 }
 
-
 code::Block*
 Parser::ParseFile(const char* fileName)
 {
 	std::ifstream input(fileName);
 	if (input.fail()) {
-		_Throw((std::string("Failed to open file \"") + fileName + "\"")
-			.c_str());
+		_Throw(
+			(std::string("Failed to open file \"") + fileName + "\"").c_str());
 	}
 
 	return Parse(input);
 }
-
 
 void
 Parser::Test(int argc, const char* const* argv)
@@ -254,22 +230,23 @@ Parser::Test(int argc, const char* const* argv)
 		util::Reference<code::Block> blockReference(block, true);
 		std::cout << "Parse tree:\n";
 		code::DumpContext dumpContext;
-//		block->Dump(dumpContext);
+		//		block->Dump(dumpContext);
 	} catch (LexException& exception) {
 		printf("Parser::Test(): %zu:%zu Lex exception: %s\n",
-			exception.Position().Line() + 1, exception.Position().Column() + 1,
-			exception.Message());
+			   exception.Position().Line() + 1,
+			   exception.Position().Column() + 1,
+			   exception.Message());
 	} catch (ParseException& exception) {
 		printf("Parser::Test(): %zu:%zu Parse exception: %s\n",
-			exception.Position().Line() + 1, exception.Position().Column() + 1,
-			exception.Message());
+			   exception.Position().Line() + 1,
+			   exception.Position().Column() + 1,
+			   exception.Message());
 	} catch (...) {
 		printf("Parser::Test(): Caught exception\n");
 	}
 
 	fListener = NULL;
 }
-
 
 code::Block*
 Parser::_ParseFile()
@@ -281,7 +258,6 @@ Parser::_ParseFile()
 
 	return block.Detach();
 }
-
 
 code::Block*
 Parser::_ParseBlock()
@@ -303,97 +279,89 @@ Parser::_ParseBlock()
 	return block.Detach();
 }
 
-
 code::Node*
 Parser::_TryParseStatement()
 {
 	PARSER_NONTERMINAL("statement");
 
 	switch (_Token().ID()) {
-		case TOKEN_LEFT_BRACE:
-		{
+		case TOKEN_LEFT_BRACE: {
 			// "{" block "}"
 			PARSER_NONTERMINAL("braced block");
 
 			_NextToken();
 			code::NodeReference result(_ParseBlock(), true);
 			_SkipToken(TOKEN_RIGHT_BRACE,
-				"Expected '}' at the end of the block");
+					   "Expected '}' at the end of the block");
 			return result.Detach();
 		}
 
-		case TOKEN_INCLUDE:
-		{
+		case TOKEN_INCLUDE: {
 			// "include" list ";"
 			PARSER_NONTERMINAL("include");
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_SEMICOLON,
-				"Expected ';' at the end of the 'include' statement");
+					   "Expected ';' at the end of the 'include' statement");
 
 			// create node
 			return new code::Include(list.Get());
 		}
 
-		case TOKEN_BREAK:
-		{
+		case TOKEN_BREAK: {
 			// "break" list ";"
 			PARSER_NONTERMINAL("break");
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_SEMICOLON,
-				"Expected ';' at the end of the 'break' statement");
+					   "Expected ';' at the end of the 'break' statement");
 
 			// create node
 			return new code::Break(list.Get());
 		}
 
-		case TOKEN_CONTINUE:
-		{
+		case TOKEN_CONTINUE: {
 			// "continue" list ";"
 			PARSER_NONTERMINAL("continue");
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_SEMICOLON,
-				"Expected ';' at the end of the 'continue' statement");
+					   "Expected ';' at the end of the 'continue' statement");
 
 			// create node
 			return new code::Continue(list.Get());
 		}
 
-		case TOKEN_RETURN:
-		{
+		case TOKEN_RETURN: {
 			// "return" list ";"
 			PARSER_NONTERMINAL("return");
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_SEMICOLON,
-				"Expected ';' at the end of the 'return' statement");
+					   "Expected ';' at the end of the 'return' statement");
 
 			// create node
 			return new code::Return(list.Get());
 		}
 
-		case TOKEN_JUMPTOEOF:
-		{
+		case TOKEN_JUMPTOEOF: {
 			// "jumptoeof" list ";"
 			PARSER_NONTERMINAL("jumptoeof");
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_SEMICOLON,
-				"Expected ';' at the end of the 'jumptoeof' statement");
+					   "Expected ';' at the end of the 'jumptoeof' statement");
 
 			// create node
 			return new code::JumpToEof(list.Get());
 		}
 
-		case TOKEN_IF:
-		{
+		case TOKEN_IF: {
 			// "if" expression "{" block "}" [ "else" statement ]
 			PARSER_NONTERMINAL("if");
 
@@ -407,21 +375,22 @@ Parser::_TryParseStatement()
 			code::NodeReference elseBlock;
 			if (_TrySkipToken(TOKEN_ELSE)) {
 				elseBlock.SetTo(_Expect(_TryParseStatement(),
-					"Expected statement after 'else'"), true);
+										"Expected statement after 'else'"),
+								true);
 			}
 
 			// create node
 			return new code::If(expression.Get(), block.Get(), elseBlock.Get());
 		}
 
-		case TOKEN_FOR:
-		{
+		case TOKEN_FOR: {
 			// "for" argument "in" list "{" block "}"
 			PARSER_NONTERMINAL("for");
 
 			_NextToken();
-			code::NodeReference argument(_Expect(_TryParseArgument(),
-				"Expected argument after 'for'"), true);
+			code::NodeReference argument(
+				_Expect(_TryParseArgument(), "Expected argument after 'for'"),
+				true);
 			_SkipToken(TOKEN_IN, "Expected 'in' after 'for' argument");
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'for' head");
@@ -432,8 +401,7 @@ Parser::_TryParseStatement()
 			return new code::For(argument.Get(), list.Get(), block.Get());
 		}
 
-		case TOKEN_WHILE:
-		{
+		case TOKEN_WHILE: {
 			// "while" expression "{" block "}"
 			PARSER_NONTERMINAL("while");
 
@@ -447,8 +415,7 @@ Parser::_TryParseStatement()
 			return new code::While(expression.Get(), block.Get());
 		}
 
-		case TOKEN_SWITCH:
-		{
+		case TOKEN_SWITCH: {
 			// "switch" list "{" case* "}"
 			PARSER_NONTERMINAL("switch");
 
@@ -458,7 +425,8 @@ Parser::_TryParseStatement()
 
 			// create node
 			util::Reference<code::Switch> switchNode(
-				new code::Switch(list.Get()), true);
+				new code::Switch(list.Get()),
+				true);
 
 			// each case: "case" identifier ":" block
 			while (_TrySkipToken(TOKEN_CASE)) {
@@ -476,28 +444,29 @@ Parser::_TryParseStatement()
 			}
 
 			_SkipToken(TOKEN_RIGHT_BRACE,
-				"Expected '}' at the end of the 'switch' statement");
+					   "Expected '}' at the end of the 'switch' statement");
 
 			return switchNode.Detach();
 		}
 
-		case TOKEN_ON:
-		{
+		case TOKEN_ON: {
 			// "on" argument statement
 			PARSER_NONTERMINAL("on");
 
 			_NextToken();
-			code::NodeReference argument(_Expect(_TryParseArgument(),
-				"Expected argument after 'on'"), true);
-			code::NodeReference statement(_Expect(_TryParseStatement(),
-				"Expected statement after 'on' argument"), true);
+			code::NodeReference argument(
+				_Expect(_TryParseArgument(), "Expected argument after 'on'"),
+				true);
+			code::NodeReference statement(
+				_Expect(_TryParseStatement(),
+						"Expected statement after 'on' argument"),
+				true);
 
 			// create node
 			return new code::OnExpression(argument.Get(), statement.Get());
 		}
 
-		case TOKEN_RULE:
-		{
+		case TOKEN_RULE: {
 			// "rule" identifier [ identifier ( ":" identifier )*  ]
 			// "{" block "}"
 			PARSER_NONTERMINAL("rule definition");
@@ -532,12 +501,12 @@ Parser::_TryParseStatement()
 			_SkipToken(TOKEN_RIGHT_BRACE, "Expected '}' after 'while' block");
 
 			// create node
-			return new code::RuleDefinition(ruleName, parameterNames,
-				block.Get());
+			return new code::RuleDefinition(ruleName,
+											parameterNames,
+											block.Get());
 		}
 
-		case TOKEN_ACTIONS:
-		{
+		case TOKEN_ACTIONS: {
 			// "actions" actionsFlags identifier [ "bind" list ]
 			// "{" rawActions "}"
 			PARSER_NONTERMINAL("actions definition");
@@ -547,8 +516,8 @@ Parser::_TryParseStatement()
 			// actionsflags: ( actionsFlag | ("maxline" string) )*
 			uint32_t actionsFlags = 0;
 			while (_Token() == TOKEN_STRING) {
-				ActionsFlagMap::const_iterator it = sActionsFlags.find(
-					_Token());
+				ActionsFlagMap::const_iterator it =
+					sActionsFlags.find(_Token());
 				if (it == sActionsFlags.end())
 					break;
 
@@ -591,12 +560,13 @@ Parser::_TryParseStatement()
 			_SkipToken(TOKEN_RIGHT_BRACE, "Expected '}' after 'actions' block");
 
 			// create node
-			return new code::ActionsDefinition(actionsFlags, ruleName,
-				bindList.Get(), commands);
+			return new code::ActionsDefinition(actionsFlags,
+											   ruleName,
+											   bindList.Get(),
+											   commands);
 		}
 
-		default:
-		{
+		default: {
 			// 1. argument "on" list <assignmentOp> list ";"
 			// 2. argument <assignmentOp> list ';'
 			// 3. argument listOfLists ';'
@@ -608,58 +578,62 @@ Parser::_TryParseStatement()
 				return NULL;
 
 			switch (_Token().ID()) {
-				case TOKEN_ON:
-				{
+				case TOKEN_ON: {
 					// 1. argument "on" list <assignmentOp> list ";"
 					PARSER_NONTERMINAL("on assignment");
 
 					_NextToken();
 					code::NodeReference onTargets(_ParseList(), true);
 
-					code::AssignmentOperator operatorType
-						= _ParseAssignmentOperator();
+					code::AssignmentOperator operatorType =
+						_ParseAssignmentOperator();
 
 					code::NodeReference rhs(_ParseList(), true);
-					_SkipToken(TOKEN_SEMICOLON,
+					_SkipToken(
+						TOKEN_SEMICOLON,
 						"Expected ';' at the end of the assignment statement");
 
 					// create node
-					return new code::Assignment(argument.Get(), operatorType,
-						rhs.Get(), onTargets.Get());
+					return new code::Assignment(argument.Get(),
+												operatorType,
+												rhs.Get(),
+												onTargets.Get());
 				}
 
 				case TOKEN_ASSIGN:
 				case TOKEN_ASSIGN_PLUS:
-				case TOKEN_ASSIGN_DEFAULT:
-				{
+				case TOKEN_ASSIGN_DEFAULT: {
 					// 2. argument <assignmentOp> list ';'
 					PARSER_NONTERMINAL("assignment");
 
-					code::AssignmentOperator operatorType
-						= _ParseAssignmentOperator();
+					code::AssignmentOperator operatorType =
+						_ParseAssignmentOperator();
 
 					code::NodeReference rhs(_ParseList(), true);
-					_SkipToken(TOKEN_SEMICOLON,
+					_SkipToken(
+						TOKEN_SEMICOLON,
 						"Expected ';' at the end of the assignment statement");
 
 					// create node
-					return new code::Assignment(argument.Get(), operatorType,
-						rhs.Get());
+					return new code::Assignment(argument.Get(),
+												operatorType,
+												rhs.Get());
 				}
 
-				default:
-				{
+				default: {
 					// 3. argument listOfLists ';'
 					PARSER_NONTERMINAL("rule invocation");
 
 					NodeListContainer arguments;
 					_ParseListOfLists(arguments);
-					_SkipToken(TOKEN_SEMICOLON,
+					_SkipToken(
+						TOKEN_SEMICOLON,
 						"Expected ';' at the end of the rule invocation");
 
 					// create node
-					code::Node* result = new code::FunctionCall(argument.Get(),
-						arguments.fNodes);
+					code::Node* result =
+						new code::FunctionCall(argument.Get(),
+											   arguments.fNodes);
 
 					arguments.Detach();
 
@@ -669,7 +643,6 @@ Parser::_TryParseStatement()
 		}
 	}
 }
-
 
 code::Node*
 Parser::_ParseLocalVariableDeclaration()
@@ -690,13 +663,12 @@ Parser::_ParseLocalVariableDeclaration()
 
 	// skip ";"
 	_SkipToken(TOKEN_SEMICOLON,
-		"Expected ';' after local variable declaration");
+			   "Expected ';' after local variable declaration");
 
 	// create node
 	return new code::LocalVariableDeclaration(variables.Get(),
-		initializer.Get());
+											  initializer.Get());
 }
-
 
 code::List*
 Parser::_ParseList()
@@ -712,7 +684,6 @@ Parser::_ParseList()
 	return list.Detach();
 }
 
-
 code::Node*
 Parser::_TryParseArgument(bool allowKeyword)
 {
@@ -722,7 +693,7 @@ Parser::_TryParseArgument(bool allowKeyword)
 	if (_TrySkipToken(TOKEN_LEFT_BRACKET)) {
 		code::NodeReference result(_ParseBracketExpression(), true);
 		_SkipToken(TOKEN_RIGHT_BRACKET,
-			"Expected ']' at the end of a bracket expression");
+				   "Expected ']' at the end of a bracket expression");
 		return result.Detach();
 	}
 
@@ -734,7 +705,6 @@ Parser::_TryParseArgument(bool allowKeyword)
 
 	return NULL;
 }
-
 
 code::Node*
 Parser::_ParseBracketExpression()
@@ -753,7 +723,6 @@ Parser::_ParseBracketExpression()
 	return NULL;
 }
 
-
 code::Node*
 Parser::_TryParseBracketOnExpression()
 {
@@ -763,8 +732,9 @@ Parser::_TryParseBracketOnExpression()
 	if (!_TrySkipToken(TOKEN_ON))
 		return NULL;
 
-	code::NodeReference onTarget(_Expect(_TryParseArgument(),
-		"Expected target argument after 'on'"), true);
+	code::NodeReference onTarget(
+		_Expect(_TryParseArgument(), "Expected target argument after 'on'"),
+		true);
 
 	// either a "return ..." or a function call
 	code::NodeReference expression;
@@ -781,7 +751,6 @@ Parser::_TryParseBracketOnExpression()
 	// create result
 	return new code::OnExpression(onTarget.Get(), expression.Get());
 }
-
 
 code::Node*
 Parser::_TryParseFunctionCall()
@@ -805,7 +774,6 @@ Parser::_TryParseFunctionCall()
 	return result;
 }
 
-
 void
 Parser::_ParseListOfLists(NodeListContainer& nodes)
 {
@@ -817,7 +785,6 @@ Parser::_ParseListOfLists(NodeListContainer& nodes)
 	while (_TrySkipToken(TOKEN_COLON))
 		nodes.Add(_ParseList());
 }
-
 
 code::Node*
 Parser::_ParseExpression()
@@ -837,7 +804,6 @@ Parser::_ParseExpression()
 	}
 }
 
-
 code::Node*
 Parser::_ParseAndExpression()
 {
@@ -856,7 +822,6 @@ Parser::_ParseAndExpression()
 	}
 }
 
-
 code::Node*
 Parser::_ParseComparison()
 {
@@ -867,17 +832,15 @@ Parser::_ParseComparison()
 
 	for (;;) {
 		switch (_Token().ID()) {
-			case TOKEN_EQUAL:
-			{
+			case TOKEN_EQUAL: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
-				result.SetTo(
-					new code::EqualExpression(result.Get(), rhs.Get()), true);
+				result.SetTo(new code::EqualExpression(result.Get(), rhs.Get()),
+							 true);
 				break;
 			}
 
-			case TOKEN_NOT_EQUAL:
-			{
+			case TOKEN_NOT_EQUAL: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
@@ -886,8 +849,7 @@ Parser::_ParseComparison()
 				break;
 			}
 
-			case TOKEN_LESS_OR_EQUAL:
-			{
+			case TOKEN_LESS_OR_EQUAL: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
@@ -896,17 +858,15 @@ Parser::_ParseComparison()
 				break;
 			}
 
-			case TOKEN_LESS:
-			{
+			case TOKEN_LESS: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(new code::LessExpression(result.Get(), rhs.Get()),
-					true);
+							 true);
 				break;
 			}
 
-			case TOKEN_GREATER_OR_EQUAL:
-			{
+			case TOKEN_GREATER_OR_EQUAL: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
@@ -915,12 +875,12 @@ Parser::_ParseComparison()
 				break;
 			}
 
-			case TOKEN_GREATER:
-			{
+			case TOKEN_GREATER: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
-					new code::GreaterExpression(result.Get(), rhs.Get()), true);
+					new code::GreaterExpression(result.Get(), rhs.Get()),
+					true);
 				break;
 			}
 
@@ -930,15 +890,13 @@ Parser::_ParseComparison()
 	}
 }
 
-
 code::Node*
 Parser::_ParseAtom()
 {
 	PARSER_NONTERMINAL("atom");
 
 	switch (_Token().ID()) {
-		case TOKEN_NOT:
-		{
+		case TOKEN_NOT: {
 			// "!" atom
 			PARSER_NONTERMINAL("not expression");
 
@@ -949,25 +907,24 @@ Parser::_ParseAtom()
 			return new code::NotExpression(atom.Get());
 		}
 
-		case TOKEN_LEFT_PARENTHESIS:
-		{
+		case TOKEN_LEFT_PARENTHESIS: {
 			// "(" expression ")"
 			PARSER_NONTERMINAL("(expression)");
 
 			_NextToken();
 			code::NodeReference expression(_ParseExpression(), true);
 			_SkipToken(TOKEN_RIGHT_PARENTHESIS,
-				"Expected ')' after expression");
+					   "Expected ')' after expression");
 			return expression.Detach();
 		}
 
-		default:
-		{
+		default: {
 			// argument [ "in" list ]
 			PARSER_NONTERMINAL("argument (in list)");
 
-			code::NodeReference argument(_Expect(_TryParseArgument(),
-				"Expected argument"), true);
+			code::NodeReference argument(
+				_Expect(_TryParseArgument(), "Expected argument"),
+				true);
 
 			// the "in" part is optional
 			if (!_TrySkipToken(TOKEN_IN))
@@ -980,7 +937,6 @@ Parser::_ParseAtom()
 		}
 	}
 }
-
 
 code::AssignmentOperator
 Parser::_ParseAssignmentOperator()
@@ -1001,13 +957,11 @@ Parser::_ParseAssignmentOperator()
 	}
 }
 
-
 void
 Parser::_Throw(const char* message)
 {
 	throw ParseException(message, fFileName, fLexer.CurrentTokenPosition());
 }
-
 
 void
 Parser::_ThrowExpected(const char* expected)
@@ -1021,6 +975,5 @@ Parser::_ThrowExpected(const char* expected)
 	_Throw(message.c_str());
 }
 
-
-}	// namespace parser
-}	// namespace ham
+} // namespace parser
+} // namespace ham

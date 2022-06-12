@@ -3,46 +3,42 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "tests/StringPartTest.h"
 
 #include <string>
 
 #include "data/String.h"
 
-
-namespace ham {
-namespace tests {
-
+namespace ham
+{
+namespace tests
+{
 
 using data::String;
-
 
 static int
 sign(int number)
 {
-	return number == 0 ? 0 : (number < 0 ? - 1 : 1);
+	return number == 0 ? 0 : (number < 0 ? -1 : 1);
 }
 
-
-#define STRING_EQUAL(actual, expected)							\
-	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected))	\
-	HAM_TEST_EQUAL(actual.Length(), strlen(expected))			\
+#define STRING_EQUAL(actual, expected)                                         \
+	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected))                \
+	HAM_TEST_EQUAL(actual.Length(), strlen(expected))                          \
 	HAM_TEST_EQUAL(actual.IsEmpty(), strlen(expected) == 0)
 
-#define STRING_COMPARE_WORK(string1, string2, expected)				\
-	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected)	\
-	HAM_TEST_EQUAL(string1 == string2, expected == 0)				\
-	HAM_TEST_EQUAL(string1 != string2, expected != 0)				\
-	HAM_TEST_EQUAL(string1 < string2, expected < 0)					\
-	HAM_TEST_EQUAL(string1 > string2, expected > 0)					\
-	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)				\
+#define STRING_COMPARE_WORK(string1, string2, expected)                        \
+	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected)               \
+	HAM_TEST_EQUAL(string1 == string2, expected == 0)                          \
+	HAM_TEST_EQUAL(string1 != string2, expected != 0)                          \
+	HAM_TEST_EQUAL(string1 < string2, expected < 0)                            \
+	HAM_TEST_EQUAL(string1 > string2, expected > 0)                            \
+	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)                          \
 	HAM_TEST_EQUAL(string1 >= string2, expected >= 0)
 
-#define STRING_COMPARE(string1, string2, expected)				\
-	STRING_COMPARE_WORK(string1, string2, expected)				\
+#define STRING_COMPARE(string1, string2, expected)                             \
+	STRING_COMPARE_WORK(string1, string2, expected)                            \
 	STRING_COMPARE_WORK(string2, string1, -expected)
-
 
 void
 ham::tests::StringPartTest::Constructor()
@@ -103,7 +99,6 @@ ham::tests::StringPartTest::Constructor()
 		STRING_EQUAL(string2, "foobar")
 	}
 }
-
 
 void
 StringPartTest::SetTo()
@@ -219,25 +214,22 @@ StringPartTest::SetTo()
 	}
 }
 
-
 void
 StringPartTest::Comparison()
 {
 	struct TestData {
-		const char*	string1;
-		const char*	string2;
-		int			compare;
+		const char* string1;
+		const char* string2;
+		int compare;
 	};
 
-	const TestData testData[] = {
-		{ "",		"",			0 },
-		{ "foo",	"",			1 },
-		{ "foo",	"foo",		0 },
-		{ "foobar",	"foo",		1 },
-		{ "foo",	"bar",		1 },
-		{ "foo",	"barfoo",	1 },
-		{ "foobar",	"bar",		1 }
-	};
+	const TestData testData[] = {{"", "", 0},
+								 {"foo", "", 1},
+								 {"foo", "foo", 0},
+								 {"foobar", "foo", 1},
+								 {"foo", "bar", 1},
+								 {"foo", "barfoo", 1},
+								 {"foobar", "bar", 1}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		StringPart string1(testData[i].string1);
@@ -254,22 +246,19 @@ StringPartTest::Comparison()
 	}
 }
 
-
 void
 StringPartTest::Assignment()
 {
 	struct TestData {
-		const char*	string1;
-		const char*	string2;
+		const char* string1;
+		const char* string2;
 	};
 
-	const TestData testData[] = {
-		{ "",		"" },
-		{ "foo",	"" },
-		{ "foo",	"foo" },
-		{ "foo",	"bar" },
-		{ "foobar",	"foo" }
-	};
+	const TestData testData[] = {{"", ""},
+								 {"foo", ""},
+								 {"foo", "foo"},
+								 {"foo", "bar"},
+								 {"foobar", "foo"}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* testString1 = testData[i].string1;
@@ -307,7 +296,6 @@ StringPartTest::Assignment()
 		}
 	}
 }
-
 
 } // namespace tests
 } // namespace ham

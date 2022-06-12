@@ -5,33 +5,32 @@
 #ifndef HAM_CODE_DUMP_CONTEXT_H
 #define HAM_CODE_DUMP_CONTEXT_H
 
-
 #include <sstream>
 
 #include "data/String.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class DumpContext
+{
+  public:
+	DumpContext();
 
-
-class DumpContext {
-public:
-								DumpContext();
-
-	inline	void				BeginChildren();
-	inline	void				EndChildren();
+	inline void BeginChildren();
+	inline void EndChildren();
 
 	template<typename Type>
-	inline	DumpContext&		operator<<(const Type& value);
+	inline DumpContext& operator<<(const Type& value);
 
-			DumpContext&		PrintString(const std::string& string);
+	DumpContext& PrintString(const std::string& string);
 
-private:
-			int					fNodeLevel;
-			bool				fNewLine;
+  private:
+	int fNodeLevel;
+	bool fNewLine;
 };
-
 
 void
 DumpContext::BeginChildren()
@@ -39,13 +38,11 @@ DumpContext::BeginChildren()
 	fNodeLevel++;
 }
 
-
 void
 DumpContext::EndChildren()
 {
 	fNodeLevel--;
 }
-
 
 template<typename Type>
 DumpContext&
@@ -59,9 +56,7 @@ DumpContext::operator<<(const Type& value)
 	return PrintString(stream.str());
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_DUMP_CONTEXT_H
+#endif // HAM_CODE_DUMP_CONTEXT_H

@@ -3,32 +3,31 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Assignment.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "data/TargetPool.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
-
-
-Assignment::Assignment(Node* left, AssignmentOperator operatorType, Node* right,
-	Node* onTargets)
-	:
-	fLeft(left),
-	fRight(right),
-	fOnTargets(onTargets),
-	fOperator(operatorType)
+Assignment::Assignment(Node* left,
+					   AssignmentOperator operatorType,
+					   Node* right,
+					   Node* onTargets)
+	: fLeft(left),
+	  fRight(right),
+	  fOnTargets(onTargets),
+	  fOperator(operatorType)
 {
 	fLeft->AcquireReference();
 	fRight->AcquireReference();
 	if (fOnTargets != NULL)
 		fOnTargets->AcquireReference();
 }
-
 
 Assignment::~Assignment()
 {
@@ -37,7 +36,6 @@ Assignment::~Assignment()
 	if (fOnTargets != NULL)
 		fOnTargets->ReleaseReference();
 }
-
 
 StringList
 Assignment::Evaluate(EvaluationContext& context)
@@ -55,7 +53,7 @@ Assignment::Evaluate(EvaluationContext& context)
 
 			// set the variables
 			for (StringList::Iterator varIt = lhs.GetIterator();
-					varIt.HasNext();) {
+				 varIt.HasNext();) {
 				String variable = varIt.Next();
 				switch (fOperator) {
 					case ASSIGNMENT_OPERATOR_ASSIGN:
@@ -103,7 +101,6 @@ Assignment::Evaluate(EvaluationContext& context)
 	return rhs;
 }
 
-
 code::Node*
 Assignment::Visit(NodeVisitor& visitor)
 {
@@ -118,7 +115,6 @@ Assignment::Visit(NodeVisitor& visitor)
 
 	return fOnTargets != NULL ? fOnTargets->Visit(visitor) : NULL;
 }
-
 
 void
 Assignment::Dump(DumpContext& context) const
@@ -148,6 +144,5 @@ Assignment::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

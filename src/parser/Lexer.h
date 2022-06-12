@@ -5,7 +5,6 @@
 #ifndef HAM_PARSER_LEXER_H
 #define HAM_PARSER_LEXER_H
 
-
 #include <map>
 #include <stdexcept>
 
@@ -13,42 +12,37 @@
 #include "parser/LexException.h"
 #include "parser/Token.h"
 
-
 //#define TRACE_PARSER_LEXER
 #ifdef TRACE_PARSER_LEXER
-#	define TRACE(...)	printf(__VA_ARGS__)
+#define TRACE(...) printf(__VA_ARGS__)
 #else
-#	define TRACE(...)	do { } while (false)
+#define TRACE(...)                                                             \
+	do {                                                                       \
+	} while (false)
 #endif
 
-
-namespace ham {
-namespace parser {
-
-
-template<typename BaseIterator> struct TokenIterator;
-
+namespace ham
+{
+namespace parser
+{
 
 template<typename BaseIterator>
-class Lexer {
-private:
+struct TokenIterator;
+
+template<typename BaseIterator>
+class Lexer
+{
+  private:
 	struct Iterator {
 		Iterator()
-			:
-			fLine(0),
-			fColumn(0)
+			: fLine(0),
+			  fColumn(0)
 		{
 		}
 
-		size_t Line() const
-		{
-			return fLine;
-		}
+		size_t Line() const { return fLine; }
 
-		size_t Column() const
-		{
-			return fColumn;
-		}
+		size_t Column() const { return fColumn; }
 
 		Iterator& operator=(const BaseIterator& iterator)
 		{
@@ -90,22 +84,16 @@ private:
 			return *this;
 		}
 
-		char operator*()
-		{
-			return *fIterator;
-		}
+		char operator*() { return *fIterator; }
 
-	private:
-		BaseIterator	fIterator;
-		size_t			fLine;
-		size_t			fColumn;
+	  private:
+		BaseIterator fIterator;
+		size_t fLine;
+		size_t fColumn;
 	};
 
-public:
-	Lexer()
-	{
-		_Init();
-	}
+  public:
+	Lexer() { _Init(); }
 
 	void Init(const BaseIterator& start, const BaseIterator& end)
 	{
@@ -123,15 +111,9 @@ public:
 		return fCurrentToken;
 	}
 
-	const Token& CurrentToken() const
-	{
-		return fCurrentToken;
-	}
+	const Token& CurrentToken() const { return fCurrentToken; }
 
-	const ParsePosition& CurrentTokenPosition() const
-	{
-		return fFilePosition;
-	}
+	const ParsePosition& CurrentTokenPosition() const { return fFilePosition; }
 
 	data::String ScanActions()
 	{
@@ -161,10 +143,10 @@ public:
 		return data::String(token.Data());
 	}
 
-private:
+  private:
 	typedef std::map<data::String, TokenID> KeywordMap;
 
-private:
+  private:
 	void _Init()
 	{
 		// TODO: Use a better map.
@@ -225,10 +207,7 @@ private:
 		}
 	}
 
-	bool _IsEndOfInput() const
-	{
-		return fPosition == fEnd;
-	}
+	bool _IsEndOfInput() const { return fPosition == fEnd; }
 
 	void _ReadNextToken()
 	{
@@ -257,7 +236,7 @@ private:
 
 				if (fPosition == fEnd) {
 					throw LexException("Backslash at end of file",
-						fFilePosition);
+									   fFilePosition);
 				}
 
 				// fetch the escaped char
@@ -294,7 +273,7 @@ private:
 
 				if (!foundEnd) {
 					throw LexException("Unterminated string literal",
-						fFilePosition);
+									   fFilePosition);
 				}
 
 				continue;
@@ -316,20 +295,17 @@ private:
 		fCurrentToken.SetTo(tokenID, token);
 	}
 
-private:
-	Iterator		fPosition;
-	BaseIterator	fEnd;
-	Token			fCurrentToken;
-	KeywordMap		fKeywords;
-	ParsePosition	fFilePosition;
+  private:
+	Iterator fPosition;
+	BaseIterator fEnd;
+	Token fCurrentToken;
+	KeywordMap fKeywords;
+	ParsePosition fFilePosition;
 };
 
-
-}	// namespace parser
-}	// namespace ham
-
+} // namespace parser
+} // namespace ham
 
 #undef TRACE
 
-
-#endif	// HAM_PARSER_TOKEN_H
+#endif // HAM_PARSER_TOKEN_H

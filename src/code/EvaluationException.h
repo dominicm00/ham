@@ -5,28 +5,26 @@
 #ifndef HAM_CODE_EVALUATION_EXCEPTION_H
 #define HAM_CODE_EVALUATION_EXCEPTION_H
 
-
 #include "util/TextFileException.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
-
-
-class EvaluationException : public util::TextFileException {
-public:
-	EvaluationException(const std::string& message = std::string(),
+class EvaluationException : public util::TextFileException
+{
+  public:
+	EvaluationException(
+		const std::string& message = std::string(),
 		const std::string& fileName = std::string(),
 		const util::TextFilePosition& position = util::TextFilePosition())
-		:
-		util::TextFileException(message, position)
+		: util::TextFileException(message, position)
 	{
 	}
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_EVALUATION_EXCEPTION_H
+#endif // HAM_CODE_EVALUATION_EXCEPTION_H

@@ -5,31 +5,30 @@
 #ifndef HAM_CODE_RULE_POOL_H
 #define HAM_CODE_RULE_POOL_H
 
-
 #include <map>
 
 #include "code/Rule.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class RulePool
+{
+  public:
+	RulePool() {}
+	~RulePool() {}
 
+	inline Rule* Lookup(const String& name);
+	inline Rule& LookupOrCreate(const String& name);
 
-class RulePool {
-public:
-								RulePool()	{}
-								~RulePool()	{}
+  private:
+	typedef std::map<String, Rule> RuleMap;
 
-	inline	Rule*				Lookup(const String& name);
-	inline	Rule&				LookupOrCreate(const String& name);
-
-private:
-			typedef std::map<String, Rule> RuleMap;
-
-private:
-			RuleMap				fRules;
+  private:
+	RuleMap fRules;
 };
-
 
 Rule*
 RulePool::Lookup(const String& name)
@@ -37,7 +36,6 @@ RulePool::Lookup(const String& name)
 	RuleMap::iterator it = fRules.find(name);
 	return it == fRules.end() ? NULL : &it->second;
 }
-
 
 Rule&
 RulePool::LookupOrCreate(const String& name)
@@ -53,9 +51,7 @@ RulePool::LookupOrCreate(const String& name)
 	return rule;
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_RULE_POOL_H
+#endif // HAM_CODE_RULE_POOL_H

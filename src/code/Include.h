@@ -5,30 +5,28 @@
 #ifndef HAM_CODE_INCLUDE_H
 #define HAM_CODE_INCLUDE_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class Include : public Node
+{
+  public:
+	Include(Node* fileNames);
+	virtual ~Include();
 
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-class Include : public Node {
-public:
-								Include(Node* fileNames);
-	virtual						~Include();
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			Node*				fFileNames;
+  private:
+	Node* fFileNames;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_INCLUDE_H
+#endif // HAM_CODE_INCLUDE_H

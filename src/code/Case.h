@@ -5,34 +5,31 @@
 #ifndef HAM_CODE_CASE_H
 #define HAM_CODE_CASE_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class Case : public Node
+{
+  public:
+	Case(const String& pattern, Node* block);
+	virtual ~Case();
 
+	bool Matches(EvaluationContext& context, const StringList& value) const;
 
-class Case : public Node {
-public:
-								Case(const String& pattern, Node* block);
-	virtual						~Case();
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-			bool				Matches(EvaluationContext& context,
-									const StringList& value) const;
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			String				fPattern;
-			Node*				fBlock;
+  private:
+	String fPattern;
+	Node* fBlock;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_CASE_H
+#endif // HAM_CODE_CASE_H

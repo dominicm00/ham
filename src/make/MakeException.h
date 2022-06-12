@@ -5,26 +5,23 @@
 #ifndef HAM_MAKE_MAKE_EXCEPTION_H
 #define HAM_MAKE_MAKE_EXCEPTION_H
 
-
 #include "util/Exception.h"
 
+namespace ham
+{
+namespace make
+{
 
-namespace ham {
-namespace make {
-
-
-class MakeException : public util::Exception {
-public:
+class MakeException : public util::Exception
+{
+  public:
 	MakeException(const std::string& message = std::string())
-		:
-		util::Exception(message)
+		: util::Exception(message)
 	{
 	}
 };
 
+} // namespace make
+} // namespace ham
 
-}	// namespace make
-}	// namespace ham
-
-
-#endif	// HAM_MAKE_MAKE_EXCEPTION_H
+#endif // HAM_MAKE_MAKE_EXCEPTION_H

@@ -3,25 +3,19 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "util/Referenceable.h"
 
-
-namespace ham {
-namespace util {
-
+namespace ham
+{
+namespace util
+{
 
 Referenceable::Referenceable()
-	:
-	fReferenceCount(1)
+	: fReferenceCount(1)
 {
 }
 
-
-Referenceable::~Referenceable()
-{
-}
-
+Referenceable::~Referenceable() {}
 
 int32_t
 Referenceable::AcquireReference()
@@ -32,7 +26,6 @@ Referenceable::AcquireReference()
 	return previousReferenceCount;
 }
 
-
 int32_t
 Referenceable::ReleaseReference()
 {
@@ -42,12 +35,10 @@ Referenceable::ReleaseReference()
 	return previousReferenceCount;
 }
 
-
 void
 Referenceable::FirstReferenceAcquired()
 {
 }
-
 
 void
 Referenceable::LastReferenceReleased()
@@ -55,6 +46,5 @@ Referenceable::LastReferenceReleased()
 	delete this;
 }
 
-
-}	// namespace util
-}	// namespace ham
+} // namespace util
+} // namespace ham

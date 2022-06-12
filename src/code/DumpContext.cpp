@@ -3,23 +3,20 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/DumpContext.h"
 
 #include <iostream>
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 DumpContext::DumpContext()
-	:
-	fNodeLevel(0),
-	fNewLine(true)
+	: fNodeLevel(0),
+	  fNewLine(true)
 {
 }
-
 
 DumpContext&
 DumpContext::PrintString(const std::string& string)
@@ -46,6 +43,5 @@ DumpContext::PrintString(const std::string& string)
 	return *this;
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

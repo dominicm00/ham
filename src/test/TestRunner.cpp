@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/TestRunner.h"
 
 #include <stdio.h>
@@ -12,20 +11,18 @@
 #include "test/TestException.h"
 #include "test/TestSuite.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 TestRunner::TestRunner()
-	:
-	fTestsToRun(),
-	fEnvironment(NULL),
-	fCurrentTest(NULL),
-	fCurrentTestFixture(NULL)
+	: fTestsToRun(),
+	  fEnvironment(NULL),
+	  fCurrentTest(NULL),
+	  fCurrentTestFixture(NULL)
 {
 }
-
 
 bool
 TestRunner::AddTest(Test* test, const std::string& testCasePath)
@@ -55,16 +52,16 @@ TestRunner::AddTest(Test* test, const std::string& testCasePath)
 	if (testSuite == NULL)
 		return false;
 
-	Test* subTest = testSuite->GetTest(
-		std::string(testCasePath, 0, separatorIndex));
+	Test* subTest =
+		testSuite->GetTest(std::string(testCasePath, 0, separatorIndex));
 	if (subTest == NULL)
 		return false;
 
 	return AddTest(subTest,
-		separatorIndex != std::string::npos
-			? std::string(testCasePath, separatorIndex + 2) : std::string());
+				   separatorIndex != std::string::npos
+					   ? std::string(testCasePath, separatorIndex + 2)
+					   : std::string());
 }
-
 
 void
 TestRunner::Run(TestEnvironment* environment)
@@ -77,7 +74,8 @@ TestRunner::Run(TestEnvironment* environment)
 	fUnexpectedlyPassedTests.clear();
 
 	for (TestIdentifierList::const_iterator it = fTestsToRun.begin();
-		it != fTestsToRun.end(); ++it) {
+		 it != fTestsToRun.end();
+		 ++it) {
 		_RunTest(it->GetTest(), it->TestCaseIndex());
 	}
 
@@ -85,36 +83,39 @@ TestRunner::Run(TestEnvironment* environment)
 
 	fEnvironment = NULL;
 
-	size_t totalTests = fPassedTests + fFailedTests.size()
-		+ fExpectedlyFailedTests;
+	size_t totalTests =
+		fPassedTests + fFailedTests.size() + fExpectedlyFailedTests;
 	printf("--------\n");
 	printf("Summary: %zu tests run, %zu passed", totalTests, fPassedTests);
 	if (fUnexpectedlyPassedTests.size() > 0)
 		printf(" (%zu unexpectedly)", fUnexpectedlyPassedTests.size());
 	printf(", %zu failed, %zu failed expectedly, %zu skipped\n",
-		fFailedTests.size(), fExpectedlyFailedTests, fSkippedTests);
+		   fFailedTests.size(),
+		   fExpectedlyFailedTests,
+		   fSkippedTests);
 
 	if (!fFailedTests.empty()) {
 		printf("Failed tests:\n");
 		for (TestIdentifierList::iterator it = fFailedTests.begin();
-			it != fFailedTests.end(); ++it) {
+			 it != fFailedTests.end();
+			 ++it) {
 			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
 			printf("  %s\n",
-				test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+				   test->TestCaseAt(it->TestCaseIndex(), true).c_str());
 		}
 	}
 
 	if (!fUnexpectedlyPassedTests.empty()) {
 		printf("Tests passed unexpectedly:\n");
 		for (TestIdentifierList::iterator it = fUnexpectedlyPassedTests.begin();
-			it != fUnexpectedlyPassedTests.end(); ++it) {
+			 it != fUnexpectedlyPassedTests.end();
+			 ++it) {
 			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
 			printf("  %s\n",
-				test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+				   test->TestCaseAt(it->TestCaseIndex(), true).c_str());
 		}
 	}
 }
-
 
 void
 TestRunner::_RunTest(Test* test, int testCase)
@@ -142,15 +143,15 @@ TestRunner::_RunTest(Test* test, int testCase)
 		_RunTest(testSuite->TestAt(i), -1);
 }
 
-
 void
 TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 {
 	bool supportedByHam;
 	uint32_t skipMask;
-	bool compatible = (test->TestCaseCompatibility(testCase, supportedByHam,
-				skipMask)
-			& (1 << fEnvironment->GetCompatibility())) != 0
+	bool compatible =
+		(test->TestCaseCompatibility(testCase, supportedByHam, skipMask)
+		 & (1 << fEnvironment->GetCompatibility()))
+			!= 0
 		&& (!fEnvironment->JamExecutable().empty() || supportedByHam);
 
 	try {
@@ -176,15 +177,16 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 		if (compatible) {
 			fFailedTests.push_back(TestIdentifier(test, testCase));
 			printf("FAILED\n");
-			printf("%s:%d:\n  %s\n", exception.File(), exception.Line(),
-				exception.Message().c_str());
+			printf("%s:%d:\n  %s\n",
+				   exception.File(),
+				   exception.Line(),
+				   exception.Message().c_str());
 		} else {
 			fExpectedlyFailedTests++;
 			printf("FAILED (expected)\n");
 		}
 	}
 }
-
 
 void
 TestRunner::_InitFixture(RunnableTest* test)
@@ -198,7 +200,6 @@ TestRunner::_InitFixture(RunnableTest* test)
 	fCurrentTest = test;
 }
 
-
 void
 TestRunner::_CleanupFixture()
 {
@@ -208,6 +209,5 @@ TestRunner::_CleanupFixture()
 	fCurrentTestFixture = NULL;
 }
 
-
-}	// namespace test
-}	// namespace ham
+} // namespace test
+} // namespace ham

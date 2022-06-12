@@ -5,82 +5,74 @@
 #ifndef HAM_DATA_REG_EXP_H
 #define HAM_DATA_REG_EXP_H
 
-
 #include <stddef.h>
 
+namespace ham
+{
+namespace data
+{
 
-namespace ham {
-namespace data {
+class RegExp
+{
+  public:
+	enum PatternType { PATTERN_TYPE_REGULAR_EXPRESSION, PATTERN_TYPE_WILDCARD };
 
+	class MatchResult;
 
-class RegExp {
-public:
-			enum PatternType {
-				PATTERN_TYPE_REGULAR_EXPRESSION,
-				PATTERN_TYPE_WILDCARD
-			};
+  public:
+	RegExp();
+	RegExp(const char* pattern,
+		   PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION);
+	RegExp(const RegExp& other);
+	~RegExp();
 
-			class MatchResult;
+	bool IsValid() const { return fData != NULL; }
 
-public:
-								RegExp();
-								RegExp(const char* pattern,
-									PatternType patternType
-										= PATTERN_TYPE_REGULAR_EXPRESSION);
-								RegExp(const RegExp& other);
-								~RegExp();
+	bool SetPattern(const char* pattern,
+					PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION);
 
-			bool				IsValid() const
-									{ return fData != NULL; }
+	MatchResult Match(const char* string) const;
 
-			bool				SetPattern(const char* pattern,
-									PatternType patternType
-										= PATTERN_TYPE_REGULAR_EXPRESSION);
+	RegExp& operator=(const RegExp& other);
 
-			MatchResult			Match(const char* string) const;
+  private:
+	struct Data;
+	struct MatchResultData;
 
-			RegExp&				operator=(const RegExp& other);
-
-private:
-			struct Data;
-			struct MatchResultData;
-
-private:
-			Data*				fData;
+  private:
+	Data* fData;
 };
 
+class RegExp::MatchResult
+{
+  public:
+	MatchResult();
+	MatchResult(const MatchResult& other);
+	~MatchResult();
 
-class RegExp::MatchResult {
-public:
-								MatchResult();
-								MatchResult(const MatchResult& other);
-								~MatchResult();
+	bool HasMatched() const;
 
-			bool				HasMatched() const;
+	size_t StartOffset() const;
+	size_t EndOffset() const;
 
-			size_t				StartOffset() const;
-			size_t				EndOffset() const;
+	size_t GroupCount() const;
+	size_t GroupStartOffsetAt(size_t index) const;
+	size_t GroupEndOffsetAt(size_t index) const;
 
-			size_t				GroupCount() const;
-			size_t				GroupStartOffsetAt(size_t index) const;
-			size_t				GroupEndOffsetAt(size_t index) const;
+	MatchResult& operator=(const MatchResult& other);
 
-			MatchResult&		operator=(const MatchResult& other);
+  private:
+	friend class RegExp;
 
-private:
-			friend class RegExp;
+  private:
+	MatchResult(MatchResultData* data);
+	// takes over the data reference
 
-private:
-								MatchResult(MatchResultData* data);
-									// takes over the data reference
-
-private:
-			MatchResultData*	fData;
+  private:
+	MatchResultData* fData;
 };
 
+} // namespace data
+} // namespace ham
 
-}	// namespace data
-}	// namespace ham
-
-
-#endif	// HAM_DATA_REG_EXP_H
+#endif // HAM_DATA_REG_EXP_H

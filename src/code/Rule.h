@@ -5,51 +5,44 @@
 #ifndef HAM_CODE_RULE_H
 #define HAM_CODE_RULE_H
 
-
 #include "code/RuleInstructions.h"
 #include "data/RuleActions.h"
 #include "data/String.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 using data::String;
 
+class Rule
+{
+  public:
+	inline Rule();
+	inline ~Rule();
 
-class Rule {
-public:
-	inline						Rule();
-	inline						~Rule();
+	void SetName(const String& name) { fName = name; }
 
-			void				SetName(const String& name)
-									{ fName = name; }
+	RuleInstructions* Instructions() const { return fInstructions; }
+	inline void SetInstructions(RuleInstructions* instructions);
 
-			RuleInstructions*	Instructions() const
-									{ return fInstructions; }
-	inline	void				SetInstructions(RuleInstructions* instructions);
+	data::RuleActions* Actions() const { return fActions; }
+	inline void SetActions(data::RuleActions* actions);
+	// takes over ownership
 
-			data::RuleActions*		Actions() const
-									{ return fActions; }
-	inline	void				SetActions(data::RuleActions* actions);
-									// takes over ownership
-
-private:
-			String				fName;
-			RuleInstructions*	fInstructions;
-			data::RuleActions*	fActions;
+  private:
+	String fName;
+	RuleInstructions* fInstructions;
+	data::RuleActions* fActions;
 };
 
-
 Rule::Rule()
-	:
-	fName(),
-	fInstructions(NULL),
-	fActions(NULL)
+	: fName(),
+	  fInstructions(NULL),
+	  fActions(NULL)
 {
 }
-
 
 Rule::~Rule()
 {
@@ -58,7 +51,6 @@ Rule::~Rule()
 	if (fActions != NULL)
 		fActions->ReleaseReference();
 }
-
 
 void
 Rule::SetInstructions(RuleInstructions* instructions)
@@ -72,7 +64,6 @@ Rule::SetInstructions(RuleInstructions* instructions)
 		fInstructions->AcquireReference();
 }
 
-
 void
 Rule::SetActions(data::RuleActions* actions)
 {
@@ -85,9 +76,7 @@ Rule::SetActions(data::RuleActions* actions)
 		fActions->AcquireReference();
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_RULE_H
+#endif // HAM_CODE_RULE_H

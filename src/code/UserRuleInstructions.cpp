@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/UserRuleInstructions.h"
 
 #include <stdio.h>
@@ -12,33 +11,29 @@
 #include "code/Node.h"
 #include "data/VariableScope.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 class Node;
 
-
 UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
-	Node* block)
-	:
-	fParameterNames(parameterNames),
-	fBlock(block)
+										   Node* block)
+	: fParameterNames(parameterNames),
+	  fBlock(block)
 {
 	fBlock->AcquireReference();
 }
-
 
 UserRuleInstructions::~UserRuleInstructions()
 {
 	fBlock->ReleaseReference();
 }
 
-
 StringList
 UserRuleInstructions::Evaluate(EvaluationContext& context,
-	const StringListList& parameters)
+							   const StringListList& parameters)
 {
 	// create a variable domain for the built-in variables (the numbered ones
 	// and "<" and ">")
@@ -65,9 +60,9 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	data::VariableScope* oldLocalScope = context.LocalScope();
 	data::VariableDomain localVariables;
 	data::VariableScope localScope(localVariables, oldLocalScope);
-		// TODO: This is jam compatible behavior. It would be more logical to
-		// have a NULL parent for the new scope, so the previous local variables
-		// cannot be seen in the rule block.
+	// TODO: This is jam compatible behavior. It would be more logical to
+	// have a NULL parent for the new scope, so the previous local variables
+	// cannot be seen in the rule block.
 
 	// set the named parameters
 	StringList::Iterator it = fParameterNames.GetIterator();
@@ -93,6 +88,5 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	return result;
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

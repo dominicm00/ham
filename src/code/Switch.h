@@ -5,34 +5,33 @@
 #ifndef HAM_CODE_SWITCH_H
 #define HAM_CODE_SWITCH_H
 
-
 #include <list>
 
 #include "code/Case.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class Switch : public Node
+{
+  public:
+	Switch(Node* argument);
+	virtual ~Switch();
 
+	inline void AddCase(const String& pattern, Node* block);
 
-class Switch : public Node {
-public:
-								Switch(Node* argument);
-	virtual						~Switch();
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-	inline	void				AddCase(const String& pattern, Node* block);
+  private:
+	typedef std::list<Case*> CaseList;
 
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			typedef std::list<Case*> CaseList;
-
-			Node*				fArgument;
-			CaseList			fCases;
+	Node* fArgument;
+	CaseList fCases;
 };
-
 
 void
 Switch::AddCase(const String& pattern, Node* block)
@@ -46,9 +45,7 @@ Switch::AddCase(const String& pattern, Node* block)
 	}
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_SWITCH_H
+#endif // HAM_CODE_SWITCH_H

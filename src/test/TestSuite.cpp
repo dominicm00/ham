@@ -3,20 +3,17 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/TestSuite.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 TestSuite::TestSuite(const std::string& name)
-	:
-	Test(name)
+	: Test(name)
 {
 }
-
 
 TestSuite::~TestSuite()
 {
@@ -24,19 +21,17 @@ TestSuite::~TestSuite()
 		delete *it;
 }
 
-
 test::Test*
 TestSuite::TestAt(int index) const
 {
 	return index >= 0 && (size_t)index < fTests.size() ? fTests[index] : NULL;
 }
 
-
 test::Test*
 TestSuite::GetTest(const std::string& name) const
 {
 	for (TestList::const_iterator it = fTests.begin(); it != fTests.end();
-		++it) {
+		 ++it) {
 		Test* test = *it;
 		if (test->Name() == name)
 			return test;
@@ -45,7 +40,6 @@ TestSuite::GetTest(const std::string& name) const
 	return NULL;
 }
 
-
 void
 TestSuite::AddTest(Test* test)
 {
@@ -53,6 +47,5 @@ TestSuite::AddTest(Test* test)
 	test->SetTestSuite(this);
 }
 
-
-}	// namespace test
-}	// namespace ham
+} // namespace test
+} // namespace ham

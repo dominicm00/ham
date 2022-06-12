@@ -3,28 +3,26 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "util/OptionIterator.h"
 
-
-namespace ham {
-namespace util {
-
+namespace ham
+{
+namespace util
+{
 
 // #pragma mark - OptionSpecification
 
-
 OptionSpecification&
-OptionSpecification::Add(int shortOption, const char* longOption,
-	bool hasArgument)
+OptionSpecification::Add(int shortOption,
+						 const char* longOption,
+						 bool hasArgument)
 {
-	Option option = { shortOption, longOption, hasArgument };
+	Option option = {shortOption, longOption, hasArgument};
 	fShortOptions[shortOption] = option;
 	if (longOption != NULL)
 		fLongOptions[longOption] = option;
 	return *this;
 }
-
 
 const OptionSpecification::Option*
 OptionSpecification::ShortOption(int option) const
@@ -33,36 +31,33 @@ OptionSpecification::ShortOption(int option) const
 	return it != fShortOptions.end() ? &it->second : NULL;
 }
 
-
 const OptionSpecification::Option*
 OptionSpecification::LongOption(const std::string option) const
 {
-	std::map<std::string, Option>::const_iterator it
-		= fLongOptions.find(option);
+	std::map<std::string, Option>::const_iterator it =
+		fLongOptions.find(option);
 	return it != fLongOptions.end() ? &it->second : NULL;
 }
 
-
 // #pragma mark - OptionIterator
 
-
-OptionIterator::OptionIterator(int argumentCount, const char* const* arguments,
-	const OptionSpecification& options)
-	:
-	fOptions(options),
-	fArguments(arguments),
-	fArgumentCount(argumentCount),
-	fIndex(1),
-	fCurrentOption(NULL),
-	fOptionArgument(NULL),
-	fRemainingShortOptions(NULL),
-	fStatus(MORE_OPTIONS)
+OptionIterator::OptionIterator(int argumentCount,
+							   const char* const* arguments,
+							   const OptionSpecification& options)
+	: fOptions(options),
+	  fArguments(arguments),
+	  fArgumentCount(argumentCount),
+	  fIndex(1),
+	  fCurrentOption(NULL),
+	  fOptionArgument(NULL),
+	  fRemainingShortOptions(NULL),
+	  fStatus(MORE_OPTIONS)
 {
 	_FindNext();
 }
 
-
-int OptionIterator::Next(std::string& argument)
+int
+OptionIterator::Next(std::string& argument)
 {
 	if (!HasNext())
 		return '\0';
@@ -73,7 +68,6 @@ int OptionIterator::Next(std::string& argument)
 	_FindNext();
 	return option;
 }
-
 
 OptionIterator::Status
 OptionIterator::_FindNextInternal()
@@ -128,7 +122,6 @@ OptionIterator::_FindNextInternal()
 	if (fRemainingShortOptions[0] == '\0')
 		fRemainingShortOptions = NULL;
 
-
 	if (fCurrentOption == NULL) {
 		// unknown short option
 		return ERROR;
@@ -154,6 +147,5 @@ OptionIterator::_FindNextInternal()
 	return MORE_OPTIONS;
 }
 
-
-}	// namespace util
-}	// namespace ham
+} // namespace util
+} // namespace ham

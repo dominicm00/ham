@@ -3,23 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Node.h"
 
-
-namespace ham {
-namespace code {
-
-
-NodeVisitor::~NodeVisitor()
+namespace ham
 {
-}
-
-
-Node::~Node()
+namespace code
 {
-}
 
+NodeVisitor::~NodeVisitor() {}
 
-}	// namespace code
-}	// namespace ham
+Node::~Node() {}
+
+} // namespace code
+} // namespace ham

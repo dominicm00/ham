@@ -3,13 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "VariableScope.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 StringList*
 VariableScope::Lookup(const String& variable) const
@@ -26,6 +25,5 @@ VariableScope::Lookup(const String& variable) const
 	return NULL;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

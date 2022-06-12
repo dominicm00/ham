@@ -5,45 +5,40 @@
 #ifndef HAM_PLATFORM_UNIX_PLATFORM_PROCESS_DELEGATE_H
 #define HAM_PLATFORM_UNIX_PLATFORM_PROCESS_DELEGATE_H
 
-
 #include <unistd.h>
 
-
-namespace ham {
-namespace process {
-
+namespace ham
+{
+namespace process
+{
 
 class ChildInfo;
 
+class PlatformProcessDelegate
+{
+  public:
+	typedef pid_t Id;
 
-class PlatformProcessDelegate {
-public:
-			typedef pid_t Id;
+  public:
+	PlatformProcessDelegate();
 
-public:
-								PlatformProcessDelegate();
+	void Unset();
 
-			void				Unset();
+	bool IsValid() const { return fPid >= 0; }
 
-			bool				IsValid() const
-									{ return fPid >= 0; }
+	bool Launch(const char* command,
+				const char* const* arguments,
+				size_t argumentCount);
 
-			bool				Launch(const char* command,
-									const char* const* arguments,
-									size_t argumentCount);
+	Id GetId() const { return fPid; }
 
-			Id					GetId() const
-									{ return fPid; }
+	static bool WaitForChild(ChildInfo& _childInfo);
 
-	static	bool				WaitForChild(ChildInfo& _childInfo);
-
-private:
-			pid_t				fPid;
+  private:
+	pid_t fPid;
 };
-
 
 } // namespace process
 } // namespace ham
 
-
-#endif	// HAM_PLATFORM_UNIX_PLATFORM_PROCESS_DELEGATE_H
+#endif // HAM_PLATFORM_UNIX_PLATFORM_PROCESS_DELEGATE_H

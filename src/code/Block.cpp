@@ -3,33 +3,30 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Block.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 Block::Block()
-	:
-	fStatements(),
-	fLocalVariableScopeNeeded(true)
+	: fStatements(),
+	  fLocalVariableScopeNeeded(true)
 {
 }
-
 
 Block::~Block()
 {
 	for (StatementList::const_iterator it = fStatements.begin();
-			it != fStatements.end(); ++it) {
+		 it != fStatements.end();
+		 ++it) {
 		(*it)->ReleaseReference();
 	}
 }
-
 
 StringList
 Block::Evaluate(EvaluationContext& context)
@@ -54,7 +51,6 @@ Block::Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
 code::Node*
 Block::Visit(NodeVisitor& visitor)
 {
@@ -62,14 +58,14 @@ Block::Visit(NodeVisitor& visitor)
 		return this;
 
 	for (StatementList::const_iterator it = fStatements.begin();
-			it != fStatements.end(); ++it) {
+		 it != fStatements.end();
+		 ++it) {
 		if (Node* result = (*it)->Visit(visitor))
 			return result;
 	}
 
 	return NULL;
 }
-
 
 void
 Block::Dump(DumpContext& context) const
@@ -78,7 +74,8 @@ Block::Dump(DumpContext& context) const
 	context.BeginChildren();
 
 	for (StatementList::const_iterator it = fStatements.begin();
-			it != fStatements.end(); ++it) {
+		 it != fStatements.end();
+		 ++it) {
 		(*it)->Dump(context);
 	}
 
@@ -86,13 +83,13 @@ Block::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
 StringList
 Block::_Evaluate(EvaluationContext& context)
 {
 	StringList result;
 	for (StatementList::const_iterator it = fStatements.begin();
-			it != fStatements.end(); ++it) {
+		 it != fStatements.end();
+		 ++it) {
 		result = (*it)->Evaluate(context);
 
 		// terminate the block early, if a jump condition is set
@@ -103,6 +100,5 @@ Block::_Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

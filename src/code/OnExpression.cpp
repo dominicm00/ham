@@ -3,34 +3,30 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/OnExpression.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 #include "data/TargetPool.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 OnExpression::OnExpression(Node* object, Node* expression)
-	:
-	fObject(object),
-	fExpression(expression)
+	: fObject(object),
+	  fExpression(expression)
 {
 	fObject->AcquireReference();
 	fExpression->AcquireReference();
 }
-
 
 OnExpression::~OnExpression()
 {
 	fObject->ReleaseReference();
 	fExpression->ReleaseReference();
 }
-
 
 StringList
 OnExpression::Evaluate(EvaluationContext& context)
@@ -56,7 +52,6 @@ OnExpression::Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
 code::Node*
 OnExpression::Visit(NodeVisitor& visitor)
 {
@@ -68,7 +63,6 @@ OnExpression::Visit(NodeVisitor& visitor)
 
 	return fExpression->Visit(visitor);
 }
-
 
 void
 OnExpression::Dump(DumpContext& context) const
@@ -83,6 +77,5 @@ OnExpression::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

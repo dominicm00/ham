@@ -5,78 +5,64 @@
 #ifndef HAM_MAKE_OPTIONS_H
 #define HAM_MAKE_OPTIONS_H
 
-
 #include "data/String.h"
 
+namespace ham
+{
+namespace make
+{
 
-namespace ham {
-namespace make {
+class Options
+{
+  public:
+	Options();
 
+	String JambaseFile() const { return fJambaseFile; }
+	void SetJambaseFile(const String& fileName) { fJambaseFile = fileName; }
 
-class Options {
-public:
-								Options();
+	String ActionsOutputFile() const { return fActionsOutputFile; }
+	void SetActionsOutputFile(const String& fileName)
+	{
+		fActionsOutputFile = fileName;
+	}
 
-			String				JambaseFile() const
-									{ return fJambaseFile; }
-			void				SetJambaseFile(const String& fileName)
-									{ fJambaseFile = fileName; }
+	bool IsDryRun() const { return fDryRun; }
+	void SetDryRun(bool dryRun) { fDryRun = dryRun; }
 
-			String				ActionsOutputFile() const
-									{ return fActionsOutputFile; }
-			void				SetActionsOutputFile(const String& fileName)
-									{ fActionsOutputFile = fileName; }
+	bool IsPrintMakeTree() const { return fPrintMakeTree; }
+	void SetPrintMakeTree(bool print) { fPrintMakeTree = print; }
 
-			bool				IsDryRun() const
-									{ return fDryRun; }
-			void				SetDryRun(bool dryRun)
-									{ fDryRun = dryRun; }
+	bool IsPrintActions() const { return fPrintActions; }
+	void SetPrintActions(bool print) { fPrintActions = print; }
 
-			bool				IsPrintMakeTree() const
-									{ return fPrintMakeTree; }
-			void				SetPrintMakeTree(bool print)
-									{ fPrintMakeTree = print; }
+	bool IsPrintCommands() const { return fPrintCommands; }
+	void SetPrintCommands(bool print) { fPrintCommands = print; }
 
-			bool				IsPrintActions() const
-									{ return fPrintActions; }
-			void				SetPrintActions(bool print)
-									{ fPrintActions = print; }
+	int JobCount() const { return fJobCount; }
+	void SetJobCount(int count) { fJobCount = count; }
 
-			bool				IsPrintCommands() const
-									{ return fPrintCommands; }
-			void				SetPrintCommands(bool print)
-									{ fPrintCommands = print; }
+	bool IsBuildFromNewest() const { return fBuildFromNewest; }
+	void SetBuildFromNewest(bool buildFromNewest)
+	{
+		fBuildFromNewest = buildFromNewest;
+	}
 
-			int					JobCount() const
-									{ return fJobCount; }
-			void				SetJobCount(int count)
-									{ fJobCount = count; }
+	bool IsQuitOnError() const { return fQuitOnError; }
+	void SetQuitOnError(bool quitOnError) { fQuitOnError = quitOnError; }
 
-			bool				IsBuildFromNewest() const
-									{ return fBuildFromNewest; }
-			void				SetBuildFromNewest(bool buildFromNewest)
-									{ fBuildFromNewest = buildFromNewest; }
-
-			bool				IsQuitOnError() const
-									{ return fQuitOnError; }
-			void				SetQuitOnError(bool quitOnError)
-									{ fQuitOnError = quitOnError; }
-
-public:
-			String				fJambaseFile;
-			String				fActionsOutputFile;
-			bool				fDryRun;
-			bool				fPrintMakeTree;
-			bool				fPrintActions;
-			bool				fPrintCommands;
-			int					fJobCount;
-			bool				fBuildFromNewest;
-			bool				fQuitOnError;
+  public:
+	String fJambaseFile;
+	String fActionsOutputFile;
+	bool fDryRun;
+	bool fPrintMakeTree;
+	bool fPrintActions;
+	bool fPrintCommands;
+	int fJobCount;
+	bool fBuildFromNewest;
+	bool fQuitOnError;
 };
-
 
 } // namespace make
 } // namespace ham
 
-
-#endif	// HAM_MAKE_OPTIONS_H
+#endif // HAM_MAKE_OPTIONS_H

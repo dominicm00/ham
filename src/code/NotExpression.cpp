@@ -3,30 +3,26 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/NotExpression.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 NotExpression::NotExpression(Node* child)
-	:
-	fChild(child)
+	: fChild(child)
 {
 	fChild->AcquireReference();
 }
-
 
 NotExpression::~NotExpression()
 {
 	fChild->ReleaseReference();
 }
-
 
 code::Node*
 NotExpression::Visit(NodeVisitor& visitor)
@@ -37,14 +33,12 @@ NotExpression::Visit(NodeVisitor& visitor)
 	return fChild->Visit(visitor);
 }
 
-
 StringList
 NotExpression::Evaluate(EvaluationContext& context)
 {
 	StringList childList = fChild->Evaluate(context);
 	return childList.IsTrue() ? StringList::False() : StringList::True();
 }
-
 
 void
 NotExpression::Dump(DumpContext& context) const
@@ -58,6 +52,5 @@ NotExpression::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

@@ -5,47 +5,44 @@
 #ifndef HAM_CODE_BLOCK_H
 #define HAM_CODE_BLOCK_H
 
-
 #include <list>
 
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class Block : public Node
+{
+  public:
+	Block();
+	virtual ~Block();
 
+	inline void SetLocalVariableScopeNeeded(bool localVariableScopeNeeded);
 
-class Block : public Node {
-public:
-								Block();
-	virtual						~Block();
+	inline void AppendKeepReference(Node* statement);
 
-	inline	void				SetLocalVariableScopeNeeded(
-									bool localVariableScopeNeeded);
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-	inline	void				AppendKeepReference(Node* statement);
+  private:
+	StringList _Evaluate(EvaluationContext& context);
 
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
+  private:
+	typedef std::list<Node*> StatementList;
 
-private:
-			StringList			_Evaluate(EvaluationContext& context);
-
-private:
-			typedef std::list<Node*> StatementList;
-
-			StatementList		fStatements;
-			bool				fLocalVariableScopeNeeded;
+	StatementList fStatements;
+	bool fLocalVariableScopeNeeded;
 };
-
 
 void
 Block::SetLocalVariableScopeNeeded(bool localVariableScopeNeeded)
 {
 	fLocalVariableScopeNeeded = localVariableScopeNeeded;
 }
-
 
 void
 Block::AppendKeepReference(Node* statement)
@@ -57,9 +54,7 @@ Block::AppendKeepReference(Node* statement)
 	}
 }
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_BLOCK_H
+#endif // HAM_CODE_BLOCK_H

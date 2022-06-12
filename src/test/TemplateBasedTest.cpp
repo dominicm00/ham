@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/TemplateBasedTest.h"
 
 #include <sstream>
@@ -14,39 +13,49 @@
 #include "test/TestFixture.h"
 #include "util/Constants.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 TemplateBasedTest::TemplateBasedTest(const std::string& name,
-	const std::string& code)
-	:
-	DataBasedTest(name),
-	fCode(code)
+									 const std::string& code)
+	: DataBasedTest(name),
+	  fCode(code)
 {
 }
-
 
 void
-TemplateBasedTest::AddDataSet(const std::vector<std::string>& input,
+TemplateBasedTest::AddDataSet(
+	const std::vector<std::string>& input,
 	const std::map<std::string, std::string>& outputFiles,
 	const std::set<std::string>& missingOutputFiles,
-	bool outputIsException, ExitState exitState, uint32_t compatibilityMask,
-	bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
+	bool outputIsException,
+	ExitState exitState,
+	uint32_t compatibilityMask,
+	bool supportedByHam,
+	uint32_t skipMask,
+	size_t startLineIndex,
 	size_t endLineIndex)
 {
-	DataBasedTest::AddDataSet(new DataSet(input, outputFiles,
-		missingOutputFiles, outputIsException, exitState, compatibilityMask,
-		supportedByHam, skipMask, startLineIndex, endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(input,
+										  outputFiles,
+										  missingOutputFiles,
+										  outputIsException,
+										  exitState,
+										  compatibilityMask,
+										  supportedByHam,
+										  skipMask,
+										  startLineIndex,
+										  endLineIndex));
 }
-
 
 void
 TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
-	const std::string& outputPrefix, const std::string& outputSuffix,
-	std::map<std::string, std::string>& _code,
-	std::map<std::string, int>& _codeAge) const
+							   const std::string& outputPrefix,
+							   const std::string& outputSuffix,
+							   std::map<std::string, std::string>& _code,
+							   std::map<std::string, int>& _codeAge) const
 {
 	const DataSet& dataSet = *dynamic_cast<const DataSet*>(dataSetBase);
 
@@ -79,15 +88,21 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 		char* indexEnd;
 		long index = strtol(percent, &indexEnd, 10);
 		if (indexEnd == percent) {
-			throw TestException(__FILE__, __LINE__,
-				"Stray '%%' in code template:\n%s", fCode.c_str());
+			throw TestException(__FILE__,
+								__LINE__,
+								"Stray '%%' in code template:\n%s",
+								fCode.c_str());
 		}
 
 		if (index < 1 || (size_t)index > dataSet.fInput.size()) {
-			throw TestException(__FILE__, __LINE__,
+			throw TestException(
+				__FILE__,
+				__LINE__,
 				"Code template requires input data element at %ld, but got "
-				"only %zu input elements (lines %zu-%zu).", index,
-				dataSet.fInput.size(), dataSet.fStartLineIndex + 1,
+				"only %zu input elements (lines %zu-%zu).",
+				index,
+				dataSet.fInput.size(),
+				dataSet.fStartLineIndex + 1,
 				dataSet.fEndLineIndex);
 		}
 
@@ -102,7 +117,6 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 	_code[util::kJamfileName] = code;
 	_codeAge.clear();
 }
-
 
 } // namespace test
 } // namespace ham

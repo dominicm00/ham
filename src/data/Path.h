@@ -5,109 +5,84 @@
 #ifndef HAM_DATA_PATH_H
 #define HAM_DATA_PATH_H
 
-
 #include "behavior/Behavior.h"
 #include "data/StringBuffer.h"
 #include "data/StringPart.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 class FileStatus;
 
+class Path
+{
+  public:
+	class Parts;
 
-class Path {
-public:
-			class Parts;
-
-public:
-	static	bool				IsAbsolute(const StringPart& path);
-	static	StringPart			RemoveGrist(const StringPart& path);
-	static	String				Make(const StringPart& head,
-									const StringPart& tail);
-	static	bool				Exists(const char* path);
-	static	bool				GetFileStatus(const char* path,
-									FileStatus& _status);
+  public:
+	static bool IsAbsolute(const StringPart& path);
+	static StringPart RemoveGrist(const StringPart& path);
+	static String Make(const StringPart& head, const StringPart& tail);
+	static bool Exists(const char* path);
+	static bool GetFileStatus(const char* path, FileStatus& _status);
 };
-
 
 struct Path::Parts {
-public:
-								Parts()
-									{}
-								Parts(const StringPart& path)
-									{ SetTo(path); }
+  public:
+	Parts() {}
+	Parts(const StringPart& path) { SetTo(path); }
 
-			void				SetTo(const StringPart& path);
-			void				GetPath(StringBuffer& buffer,
-									const behavior::Behavior& behavior) const;
-	inline	String				ToPath(const behavior::Behavior& behavior)
-									const;
+	void SetTo(const StringPart& path);
+	void GetPath(StringBuffer& buffer,
+				 const behavior::Behavior& behavior) const;
+	inline String ToPath(const behavior::Behavior& behavior) const;
 
-			bool				IsAbsolute() const;
+	bool IsAbsolute() const;
 
-			const StringPart&	Grist() const
-									{ return fGrist; }
-			void				SetGrist(const StringPart& grist)
-									{ fGrist = grist; }
-			void				UnsetGrist()
-									{ fGrist.Unset(); }
+	const StringPart& Grist() const { return fGrist; }
+	void SetGrist(const StringPart& grist) { fGrist = grist; }
+	void UnsetGrist() { fGrist.Unset(); }
 
-			const StringPart&	Root() const
-									{ return fRoot; }
-			void				SetRoot(const StringPart& root)
-									{ fRoot = root; }
-			void				UnsetRoot()
-									{ fRoot.Unset(); }
+	const StringPart& Root() const { return fRoot; }
+	void SetRoot(const StringPart& root) { fRoot = root; }
+	void UnsetRoot() { fRoot.Unset(); }
 
-			const StringPart&	Directory() const
-									{ return fDirectory; }
-			void				SetDirectory(const StringPart& directory)
-									{ fDirectory = directory; }
-			void				UnsetDirectory()
-									{ fDirectory.Unset(); }
+	const StringPart& Directory() const { return fDirectory; }
+	void SetDirectory(const StringPart& directory) { fDirectory = directory; }
+	void UnsetDirectory() { fDirectory.Unset(); }
 
-			const StringPart&	BaseName() const
-									{ return fBaseName; }
-			void				SetBaseName(const StringPart& baseName)
-									{ fBaseName = baseName; }
-			void				UnsetBaseName()
-									{ fBaseName.Unset(); }
+	const StringPart& BaseName() const { return fBaseName; }
+	void SetBaseName(const StringPart& baseName) { fBaseName = baseName; }
+	void UnsetBaseName() { fBaseName.Unset(); }
 
-			const StringPart&	Suffix() const
-									{ return fSuffix; }
-			void				SetSuffix(const StringPart& suffix)
-									{ fSuffix = suffix; }
-			void				UnsetSuffix()
-									{ fSuffix.Unset(); }
+	const StringPart& Suffix() const { return fSuffix; }
+	void SetSuffix(const StringPart& suffix) { fSuffix = suffix; }
+	void UnsetSuffix() { fSuffix.Unset(); }
 
-			const StringPart&	ArchiveMember() const
-									{ return fArchiveMember; }
-			void				SetArchiveMember(
-									const StringPart& archiveMember)
-									{ fArchiveMember = archiveMember; }
-			void				UnsetArchiveMember()
-									{ fArchiveMember.Unset(); }
+	const StringPart& ArchiveMember() const { return fArchiveMember; }
+	void SetArchiveMember(const StringPart& archiveMember)
+	{
+		fArchiveMember = archiveMember;
+	}
+	void UnsetArchiveMember() { fArchiveMember.Unset(); }
 
-private:
-			StringPart			fGrist;
-			StringPart			fRoot;
-			StringPart			fDirectory;
-			StringPart			fBaseName;
-			StringPart			fSuffix;
-			StringPart			fArchiveMember;
+  private:
+	StringPart fGrist;
+	StringPart fRoot;
+	StringPart fDirectory;
+	StringPart fBaseName;
+	StringPart fSuffix;
+	StringPart fArchiveMember;
 };
-
 
 /*static*/ inline bool
 Path::IsAbsolute(const StringPart& path)
 {
-// TODO: Platform dependent!
+	// TODO: Platform dependent!
 	return !path.IsEmpty() && path.Start()[0] == '/';
 }
-
 
 String
 Path::Parts::ToPath(const behavior::Behavior& behavior) const
@@ -117,9 +92,7 @@ Path::Parts::ToPath(const behavior::Behavior& behavior) const
 	return buffer;
 }
 
-
-}	// namespace data
-}	// namespace ham
-
+} // namespace data
+} // namespace ham
 
 #endif // HAM_DATA_PATH_H

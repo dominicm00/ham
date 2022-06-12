@@ -5,29 +5,26 @@
 #ifndef HAM_CODE_RULE_INSTRUCTIONS_H
 #define HAM_CODE_RULE_INSTRUCTIONS_H
 
-
 #include "data/StringList.h"
 #include "util/Referenceable.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 class EvaluationContext;
 
+class RuleInstructions : public util::Referenceable
+{
+  public:
+	virtual ~RuleInstructions();
 
-class RuleInstructions : public util::Referenceable {
-public:
-	virtual						~RuleInstructions();
-
-	virtual	StringList			Evaluate(EvaluationContext& context,
-									const StringListList& parameters) = 0;
+	virtual StringList Evaluate(EvaluationContext& context,
+								const StringListList& parameters) = 0;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_RULE_INSTRUCTIONS_H
+#endif // HAM_CODE_RULE_INSTRUCTIONS_H

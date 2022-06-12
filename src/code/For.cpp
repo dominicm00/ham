@@ -3,28 +3,25 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/For.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 For::For(Node* variable, Node* list, Node* block)
-	:
-	fVariable(variable),
-	fList(list),
-	fBlock(block)
+	: fVariable(variable),
+	  fList(list),
+	  fBlock(block)
 {
 	fVariable->AcquireReference();
 	fList->AcquireReference();
 	fBlock->AcquireReference();
 }
-
 
 For::~For()
 {
@@ -32,7 +29,6 @@ For::~For()
 	fList->ReleaseReference();
 	fBlock->ReleaseReference();
 }
-
 
 StringList
 For::Evaluate(EvaluationContext& context)
@@ -50,8 +46,8 @@ For::Evaluate(EvaluationContext& context)
 		variableValue = context.GlobalVariables()->Lookup(variables.Head());
 		if (variableValue == NULL) {
 			// no existing global variable either -- create one
-			variableValue = &context.GlobalVariables()->LookupOrCreate(
-				variables.Head());
+			variableValue =
+				&context.GlobalVariables()->LookupOrCreate(variables.Head());
 		}
 	}
 
@@ -86,7 +82,6 @@ For::Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
 code::Node*
 For::Visit(NodeVisitor& visitor)
 {
@@ -102,7 +97,6 @@ For::Visit(NodeVisitor& visitor)
 	return fBlock->Visit(visitor);
 }
 
-
 void
 For::Dump(DumpContext& context) const
 {
@@ -117,6 +111,5 @@ For::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

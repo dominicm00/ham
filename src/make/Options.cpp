@@ -3,29 +3,25 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "make/Options.h"
 
-
-namespace ham {
-namespace make {
-
+namespace ham
+{
+namespace make
+{
 
 Options::Options()
-	:
-	fJambaseFile(),
-	fActionsOutputFile(),
-	fDryRun(false),
-	fPrintMakeTree(false),
-	fPrintActions(false),
-	fPrintCommands(false),
-	fJobCount(1),
-	fBuildFromNewest(false),
-	fQuitOnError(false)
+	: fJambaseFile(),
+	  fActionsOutputFile(),
+	  fDryRun(false),
+	  fPrintMakeTree(false),
+	  fPrintActions(false),
+	  fPrintCommands(false),
+	  fJobCount(1),
+	  fBuildFromNewest(false),
+	  fQuitOnError(false)
 {
 }
 
-
 } // namespace make
 } // namespace ham
-

@@ -3,35 +3,28 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Constant.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 Constant::Constant(const StringList& value)
-	:
-	fValue(value)
+	: fValue(value)
 {
 }
 
-
-Constant::~Constant()
-{
-}
-
+Constant::~Constant() {}
 
 StringList
 Constant::Evaluate(EvaluationContext& context)
 {
 	return fValue;
 }
-
 
 code::Node*
 Constant::Visit(NodeVisitor& visitor)
@@ -42,13 +35,11 @@ Constant::Visit(NodeVisitor& visitor)
 	return NULL;
 }
 
-
 void
 Constant::Dump(DumpContext& context) const
 {
 	context << "Constant(\"" << fValue << "\")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

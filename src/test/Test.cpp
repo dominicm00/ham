@@ -3,28 +3,22 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/Test.h"
 
 #include "test/TestSuite.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 Test::Test(const std::string& name)
-	:
-	fName(name),
-	fTestSuite(NULL)
+	: fName(name),
+	  fTestSuite(NULL)
 {
 }
 
-
-Test::~Test()
-{
-}
-
+Test::~Test() {}
 
 std::string
 Test::FullyQualifiedName() const
@@ -39,6 +33,5 @@ Test::FullyQualifiedName() const
 	return name + "::" + fName;
 }
 
-
-}	// namespace test
-}	// namespace ham
+} // namespace test
+} // namespace ham

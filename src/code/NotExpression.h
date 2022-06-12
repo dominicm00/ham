@@ -5,30 +5,28 @@
 #ifndef HAM_CODE_NOT_EXPRESSION_H
 #define HAM_CODE_NOT_EXPRESSION_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class NotExpression : public Node
+{
+  public:
+	NotExpression(Node* child);
+	virtual ~NotExpression();
 
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-class NotExpression : public Node {
-public:
-								NotExpression(Node* child);
-	virtual						~NotExpression();
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			Node*				fChild;
+  private:
+	Node* fChild;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_NOT_EXPRESSION_H
+#endif // HAM_CODE_NOT_EXPRESSION_H

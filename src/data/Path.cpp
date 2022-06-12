@@ -3,17 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/Path.h"
 
 #include <sys/stat.h>
 
 #include "data/FileStatus.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 static const char*
 find_grist_end(const StringPart& path)
@@ -31,9 +30,7 @@ find_grist_end(const StringPart& path)
 	return remainder + 1;
 }
 
-
 // #pragma mark - Path
-
 
 /*static*/ StringPart
 Path::RemoveGrist(const StringPart& path)
@@ -42,7 +39,6 @@ Path::RemoveGrist(const StringPart& path)
 		return StringPart(gristEnd, path.End());
 	return path;
 }
-
 
 String
 Path::Make(const StringPart& head, const StringPart& tail)
@@ -54,7 +50,7 @@ Path::Make(const StringPart& head, const StringPart& tail)
 	if (IsAbsolute(tail))
 		return String(tail);
 
-// TODO: Path separator!
+	// TODO: Path separator!
 	StringBuffer buffer;
 	buffer += head;
 	if (head.End()[-1] != '/')
@@ -63,7 +59,6 @@ Path::Make(const StringPart& head, const StringPart& tail)
 	return buffer;
 }
 
-
 /*static*/ bool
 Path::Exists(const char* path)
 {
@@ -71,11 +66,10 @@ Path::Exists(const char* path)
 	return GetFileStatus(path, status);
 }
 
-
 /*static*/ bool
 Path::GetFileStatus(const char* path, FileStatus& _status)
 {
-// TODO: Platform specific!
+	// TODO: Platform specific!
 	struct stat st;
 	if (lstat(path, &st) != 0) {
 		_status = FileStatus();
@@ -96,16 +90,13 @@ Path::GetFileStatus(const char* path, FileStatus& _status)
 	return true;
 }
 
-
 // #pragma mark - Path::Parts
-
 
 bool
 Path::Parts::IsAbsolute() const
 {
 	return Path::IsAbsolute(fDirectory) || Path::IsAbsolute(fRoot);
 }
-
 
 void
 Path::Parts::SetTo(const StringPart& path)
@@ -128,7 +119,7 @@ Path::Parts::SetTo(const StringPart& path)
 	// directory path
 	if (const char* lastSlash = strrchr(remainder, '/')) {
 		fDirectory.SetTo(remainder,
-			lastSlash == remainder ? remainder + 1 : lastSlash);
+						 lastSlash == remainder ? remainder + 1 : lastSlash);
 		remainder = lastSlash + 1;
 	} else
 		fDirectory.Unset();
@@ -138,16 +129,19 @@ Path::Parts::SetTo(const StringPart& path)
 	if (remainder != pathEnd && pathEnd[-1] == ')')
 		archiveMemberStart = strchr(remainder, '(');
 	if (archiveMemberStart != NULL)
-		fArchiveMember.SetTo(archiveMemberStart + 1 , pathEnd - 1);
+		fArchiveMember.SetTo(archiveMemberStart + 1, pathEnd - 1);
 	else
 		fArchiveMember.Unset();
 
 	// suffix
-	const char* fileNameEnd = archiveMemberStart != NULL
-		? archiveMemberStart : pathEnd;
+	const char* fileNameEnd =
+		archiveMemberStart != NULL ? archiveMemberStart : pathEnd;
 	typedef std::reverse_iterator<const char*> ReverseStringIterator;
 	const char* lastDot = std::find(ReverseStringIterator(fileNameEnd),
-		ReverseStringIterator(remainder), '.').base() - 1;
+									ReverseStringIterator(remainder),
+									'.')
+							  .base()
+		- 1;
 	if (lastDot != remainder - 1) {
 		fSuffix.SetTo(lastDot, fileNameEnd);
 		fileNameEnd = lastDot;
@@ -158,10 +152,9 @@ Path::Parts::SetTo(const StringPart& path)
 	fBaseName.SetTo(remainder, fileNameEnd);
 }
 
-
 void
 Path::Parts::GetPath(StringBuffer& buffer,
-	const behavior::Behavior& behavior) const
+					 const behavior::Behavior& behavior) const
 {
 	// TODO: This is platform dependent!
 
@@ -175,8 +168,7 @@ Path::Parts::GetPath(StringBuffer& buffer,
 
 	// Use root only, if the directory part isn't absolute and if the root isn't
 	// ".".
-	if (!fRoot.IsEmpty()
-		&& (fRoot.Length() > 1 || fRoot.Start()[0] != '.')
+	if (!fRoot.IsEmpty() && (fRoot.Length() > 1 || fRoot.Start()[0] != '.')
 		&& !Path::IsAbsolute(fDirectory)) {
 		buffer += fRoot;
 		if (behavior.GetPathRootReplacerSlash()
@@ -204,6 +196,5 @@ Path::Parts::GetPath(StringBuffer& buffer,
 	}
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

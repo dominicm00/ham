@@ -3,12 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "make/Processor.h"
 
-#include <stdarg.h>
 #include <fstream>
 #include <memory>
+#include <stdarg.h>
 
 #include "code/Block.h"
 #include "code/BuiltInRules.h"
@@ -21,60 +20,57 @@
 #include "data/TargetBinder.h"
 #include "make/Command.h"
 #include "make/MakeException.h"
-#include "make/TargetBuilder.h"
 #include "make/TargetBuildInfo.h"
+#include "make/TargetBuilder.h"
 #include "parser/Parser.h"
 
-
-namespace ham {
-namespace make {
-
+namespace ham
+{
+namespace make
+{
 
 using data::Time;
-
 
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
 static const String kJamShellVariableName("JAMSHELL");
 
-
 Processor::Processor()
-	:
-	fGlobalVariables(),
-	fTargets(),
-	fEvaluationContext(fGlobalVariables, fTargets),
-	fOptions(),
-	fPrimaryTargetNames(),
-	fPrimaryTargets(),
-	fMakeTargets(),
-	fMakeLevel(0),
-	fMakableTargets(),
-	fCommands(),
-	fTargetBuildInfos(),
-	fTargetsToUpdateCount(0)
+	: fGlobalVariables(),
+	  fTargets(),
+	  fEvaluationContext(fGlobalVariables, fTargets),
+	  fOptions(),
+	  fPrimaryTargetNames(),
+	  fPrimaryTargets(),
+	  fMakeTargets(),
+	  fMakeLevel(0),
+	  fMakableTargets(),
+	  fCommands(),
+	  fTargetBuildInfos(),
+	  fTargetsToUpdateCount(0)
 {
 	code::BuiltInRules::RegisterRules(fEvaluationContext.Rules());
 }
 
-
 Processor::~Processor()
 {
 	for (TargetBuildInfoSet::iterator it = fTargetBuildInfos.begin();
-		it != fTargetBuildInfos.end(); ++it) {
+		 it != fTargetBuildInfos.end();
+		 ++it) {
 		delete *it;
 	}
 
 	for (CommandMap::iterator it = fCommands.begin(); it != fCommands.end();
-		++it) {
+		 ++it) {
 		delete it->second;
 	}
 
 	for (MakeTargetMap::iterator it = fMakeTargets.begin();
-		it != fMakeTargets.end(); ++it) {
+		 it != fMakeTargets.end();
+		 ++it) {
 		delete it->second;
 	}
 }
-
 
 void
 Processor::SetOptions(const Options& options)
@@ -82,13 +78,11 @@ Processor::SetOptions(const Options& options)
 	fOptions = options;
 }
 
-
 void
 Processor::SetCompatibility(behavior::Compatibility compatibility)
 {
 	fEvaluationContext.SetCompatibility(compatibility);
 }
-
 
 void
 Processor::SetBehavior(behavior::Behavior behavior)
@@ -96,13 +90,11 @@ Processor::SetBehavior(behavior::Behavior behavior)
 	fEvaluationContext.SetBehavior(behavior);
 }
 
-
 void
 Processor::SetOutput(std::ostream& output)
 {
 	fEvaluationContext.SetOutput(output);
 }
-
 
 void
 Processor::SetErrorOutput(std::ostream& output)
@@ -110,20 +102,17 @@ Processor::SetErrorOutput(std::ostream& output)
 	fEvaluationContext.SetErrorOutput(output);
 }
 
-
 void
 Processor::SetPrimaryTargets(const StringList& targets)
 {
 	fPrimaryTargetNames = targets;
 }
 
-
 void
 Processor::SetForceUpdateTargets(const StringList& targets)
 {
 	// TODO:...
 }
-
 
 void
 Processor::ProcessJambase()
@@ -145,12 +134,11 @@ Processor::ProcessJambase()
 	block->Evaluate(fEvaluationContext);
 }
 
-
 void
 Processor::PrepareTargets()
 {
 	fNow = Time::Now();
-// TODO: Not used yet!
+	// TODO: Not used yet!
 
 	// Create make targets for the given primary target names.
 	if (fPrimaryTargetNames.IsEmpty())
@@ -162,7 +150,7 @@ Processor::PrepareTargets()
 		const Target* target = fTargets.Lookup(targetName);
 		if (target == NULL) {
 			throw MakeException(std::string("Unknown target \"")
-				+ targetName.ToCString() + "\"");
+								+ targetName.ToCString() + "\"");
 		}
 
 		_GetMakeTarget(target, true);
@@ -183,19 +171,19 @@ Processor::PrepareTargets()
 	// Decide the targets' fate for good.
 	// Reset the processing state first.
 	for (MakeTargetMap::const_iterator it = fMakeTargets.begin();
-		it != fMakeTargets.end(); ++it) {
+		 it != fMakeTargets.end();
+		 ++it) {
 		it->second->SetProcessingState(MakeTarget::UNPROCESSED);
 	}
 
 	fMakeLevel = 0;
 
 	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
-		it.HasNext();) {
+		 it.HasNext();) {
 		MakeTarget* makeTarget = it.Next();
 		_SealTargetFateRecursively(makeTarget, Time(0), true);
 	}
 }
-
 
 void
 Processor::BuildTargets()
@@ -203,7 +191,7 @@ Processor::BuildTargets()
 	printf("...found %zu target(s)...\n", fMakeTargets.size());
 
 	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
-		it.HasNext();) {
+		 it.HasNext();) {
 		_CollectMakableTargets(it.Next());
 	}
 
@@ -220,7 +208,7 @@ Processor::BuildTargets()
 		jamShell.Append(String("/bin/sh"));
 		jamShell.Append(String("-c"));
 		jamShell.Append(String("%"));
-// TODO: Platform dependent!
+		// TODO: Platform dependent!
 	}
 
 	TargetBuilder builder(fOptions, jamShell);
@@ -231,15 +219,15 @@ Processor::BuildTargets()
 
 	while (!fMakableTargets.IsEmpty() || builder.HasPendingBuildInfos()) {
 		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo(
-				!builder.HasSpareJobSlots() || fMakableTargets.IsEmpty())) {
+				   !builder.HasSpareJobSlots() || fMakableTargets.IsEmpty())) {
 			if (buildInfo->HasFailed()) {
 				targetsFailed++;
-				targetsSkipped += _TargetMade(buildInfo->GetTarget(),
-					MakeTarget::FAILED);
+				targetsSkipped +=
+					_TargetMade(buildInfo->GetTarget(), MakeTarget::FAILED);
 			} else {
 				targetsUpdated++;
-				targetsSkipped += _TargetMade(buildInfo->GetTarget(),
-					MakeTarget::DONE);
+				targetsSkipped +=
+					_TargetMade(buildInfo->GetTarget(), MakeTarget::DONE);
 			}
 		}
 
@@ -259,7 +247,6 @@ Processor::BuildTargets()
 		printf("...updated %zu target(s)...\n", targetsUpdated);
 }
 
-
 MakeTarget*
 Processor::_GetMakeTarget(const Target* target, bool create)
 {
@@ -275,30 +262,27 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 	return makeTarget.release();
 }
 
-
 MakeTarget*
 Processor::_GetMakeTarget(const String& targetName, bool create)
 {
-	const Target* target = create
-		? fTargets.LookupOrCreate(targetName) : fTargets.Lookup(targetName);
+	const Target* target = create ? fTargets.LookupOrCreate(targetName)
+								  : fTargets.Lookup(targetName);
 	return target != NULL ? _GetMakeTarget(target, create) : NULL;
 }
-
 
 bool
 Processor::_IsPseudoTarget(const MakeTarget* makeTarget) const
 {
 	// Like Jam we also consider missing targets without actions but with
 	// dependencies pseudo targets, even if they haven't been declared NotFile.
-// TODO: This should be made Jam compatibility behavior and disabled by default.
-// It probably just complicates trouble shooting for the user to hide this
-// error.
+	// TODO: This should be made Jam compatibility behavior and disabled by
+	// default. It probably just complicates trouble shooting for the user to
+	// hide this error.
 	const Target* target = makeTarget->GetTarget();
 	return target->IsNotAFile()
 		|| (!makeTarget->FileExists() && !target->HasActionsCalls()
 			&& !target->Dependencies().IsEmpty());
 }
-
 
 void
 Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
@@ -308,7 +292,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
 		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
 			throw MakeException(std::string("Target \"")
-				+ makeTarget->Name().ToCString() + "\" depends on itself");
+								+ makeTarget->Name().ToCString()
+								+ "\" depends on itself");
 		}
 
 		// already done
@@ -355,8 +340,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		makeTarget->AddDependencies(dependency->Includes());
 
 		// track times
-		newestDependencyTime = std::max(newestDependencyTime,
-			dependency->GetTime());
+		newestDependencyTime =
+			std::max(newestDependencyTime, dependency->GetTime());
 		newestLeafTime = std::max(newestLeafTime, dependency->LeafTime());
 
 		switch (dependency->GetFate()) {
@@ -437,23 +422,24 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	makeTarget->SetLeafTime(makeTarget->IsLeaf() ? time : newestLeafTime);
 	makeTarget->SetProcessingState(MakeTarget::PROCESSED);
 
-// TODO: Support:
-// - BUILD_ALWAYS
-// - IGNORE_IF_MISSING
-// - TEMPORARY
+	// TODO: Support:
+	// - BUILD_ALWAYS
+	// - IGNORE_IF_MISSING
+	// - TEMPORARY
 }
-
 
 void
 Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
-	data::Time parentTime, bool makeParent)
+									  data::Time parentTime,
+									  bool makeParent)
 {
 	// Check whether the target has already been processed (also detect cycles)
 	// and mark in-progress.
 	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
 		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
 			throw MakeException(std::string("Target \"")
-				+ makeTarget->Name().ToCString() + "\" depends on itself");
+								+ makeTarget->Name().ToCString()
+								+ "\" depends on itself");
 		}
 
 		// Already done, though we process it again, if its fate will change.
@@ -474,9 +460,10 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 	for (size_t i = 0; i < makeTarget->Dependencies().Size(); i++) {
 		MakeTarget* dependency = makeTarget->Dependencies().ElementAt(i);
 		fMakeLevel++;
-		_SealTargetFateRecursively(dependency, makeTarget->GetOriginalTime(),
-			makeTarget->GetFate() == MakeTarget::MAKE
-				&& !_IsPseudoTarget(makeTarget));
+		_SealTargetFateRecursively(dependency,
+								   makeTarget->GetOriginalTime(),
+								   makeTarget->GetFate() == MakeTarget::MAKE
+									   && !_IsPseudoTarget(makeTarget));
 		fMakeLevel--;
 	}
 
@@ -485,7 +472,6 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 	if (fOptions.IsPrintMakeTree())
 		_PrintMakeTreeState(makeTarget, parentTime);
 }
-
 
 void
 Processor::_BindTarget(MakeTarget* makeTarget)
@@ -497,12 +483,13 @@ Processor::_BindTarget(MakeTarget* makeTarget)
 
 	String boundPath;
 	data::FileStatus fileStatus;
-	data::TargetBinder::Bind(*fEvaluationContext.GlobalVariables(), target,
-		boundPath, fileStatus);
+	data::TargetBinder::Bind(*fEvaluationContext.GlobalVariables(),
+							 target,
+							 boundPath,
+							 fileStatus);
 	makeTarget->SetBoundPath(boundPath);
 	makeTarget->SetFileStatus(fileStatus);
 }
-
 
 void
 Processor::_ScanForHeaders(MakeTarget* makeTarget)
@@ -531,7 +518,7 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 	// open the file
 	std::ifstream file(makeTarget->BoundPath().ToCString());
 	if (file.fail()) {
-// TODO: Error/warning!
+		// TODO: Error/warning!
 		return;
 	}
 
@@ -546,7 +533,7 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 				size_t startOffset = result.GroupStartOffsetAt(i);
 				size_t endOffset = result.GroupEndOffsetAt(i);
 				String headerName(line.c_str() + startOffset,
-					endOffset - startOffset);
+								  endOffset - startOffset);
 				if (!headerName.IsEmpty())
 					headersFound.Append(headerName);
 			}
@@ -560,19 +547,20 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 		// Construct the code to evaluate the rule under the influence of the
 		// target.
 		code::NodeReference targetNameNode(new code::Constant(target->Name()),
-			true);
+										   true);
 		code::NodeReference headersNode(new code::Constant(headersFound), true);
 		code::NodeReference callFunction(new code::Constant(scanRule), true);
 		util::Reference<code::FunctionCall> call(
-			new code::FunctionCall(callFunction.Get()), true);
+			new code::FunctionCall(callFunction.Get()),
+			true);
 		call->AddArgument(targetNameNode.Get());
 		call->AddArgument(headersNode.Get());
 		code::NodeReference onExpression(
-			new code::OnExpression(targetNameNode.Get(), call.Get()), true);
+			new code::OnExpression(targetNameNode.Get(), call.Get()),
+			true);
 		onExpression->Evaluate(fEvaluationContext);
 	}
 }
-
 
 bool
 Processor::_CollectMakableTargets(MakeTarget* makeTarget)
@@ -598,7 +586,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 
 	size_t pendingDependencyCount = 0;
 	for (MakeTargetSet::Iterator it = makeTarget->Dependencies().GetIterator();
-		it.HasNext();) {
+		 it.HasNext();) {
 		if (_CollectMakableTargets(it.Next()))
 			pendingDependencyCount++;
 	}
@@ -611,7 +599,6 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	return needToMake;
 }
 
-
 TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
@@ -623,9 +610,10 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 
 	std::auto_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
 
-	for (std::vector<data::RuleActionsCall*>::const_iterator it
-			= target->ActionsCalls().begin();
-		it != target->ActionsCalls().end(); ++it) {
+	for (std::vector<data::RuleActionsCall*>::const_iterator it =
+			 target->ActionsCalls().begin();
+		 it != target->ActionsCalls().end();
+		 ++it) {
 		data::RuleActionsCall* actionsCall = *it;
 
 		util::Reference<Command> command;
@@ -647,7 +635,6 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 	return buildInfo.release();
 }
 
-
 size_t
 Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 {
@@ -664,13 +651,12 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 			break;
 		case MakeTarget::FAILED:
 			break;
-		case MakeTarget::SKIPPED:
-		{
+		case MakeTarget::SKIPPED: {
 			// get the first dependency that couldn't be made
 			MakeTarget* lackingDependency = NULL;
-			for (MakeTargetSet::Iterator it
-					= makeTarget->Dependencies().GetIterator();
-				it.HasNext();) {
+			for (MakeTargetSet::Iterator it =
+					 makeTarget->Dependencies().GetIterator();
+				 it.HasNext();) {
 				MakeTarget* dependency = it.Next();
 				if (dependency->GetMakeState() == MakeTarget::FAILED
 					|| dependency->GetMakeState() == MakeTarget::SKIPPED) {
@@ -679,9 +665,10 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 			}
 
 			printf("...skipped %s for lack of %s...\n",
-				makeTarget->Name().ToCString(),
-				lackingDependency != NULL
-					? lackingDependency->Name().ToCString() : "???");
+				   makeTarget->Name().ToCString(),
+				   lackingDependency != NULL
+					   ? lackingDependency->Name().ToCString()
+					   : "???");
 			skippedCount++;
 			break;
 		}
@@ -689,7 +676,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 
 	// propagate the event to the target's parents
 	for (MakeTargetSet::Iterator it = makeTarget->Parents().GetIterator();
-		it.HasNext();) {
+		 it.HasNext();) {
 		MakeTarget* parent = it.Next();
 		size_t pendingDependencyCount = parent->PendingDependenciesCount() - 1;
 		parent->SetPendingDependenciesCount(pendingDependencyCount);
@@ -708,7 +695,6 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 	return skippedCount;
 }
 
-
 Command*
 Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
@@ -718,7 +704,8 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 	StringList boundTargets;
 	for (data::TargetList::const_iterator it = actionsCall->Targets().begin();
-		it != actionsCall->Targets().end(); ++it) {
+		 it != actionsCall->Targets().end();
+		 ++it) {
 		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
 		boundTargets.Append(makeTarget->BoundPath());
 	}
@@ -726,9 +713,10 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	builtInVariables.Set("<", boundTargets);
 
 	StringList boundSourceTargets;
-	for (data::TargetList::const_iterator it
-			= actionsCall->SourceTargets().begin();
-		it != actionsCall->SourceTargets().end(); ++it) {
+	for (data::TargetList::const_iterator it =
+			 actionsCall->SourceTargets().begin();
+		 it != actionsCall->SourceTargets().end();
+		 ++it) {
 		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
 		boundSourceTargets.Append(makeTarget->BoundPath());
 	}
@@ -747,19 +735,19 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// set the local variable scope and the built-in variables
 	fEvaluationContext.SetLocalScope(&localScope);
 
-	data::VariableDomain* oldBuiltInVariables
-		= fEvaluationContext.BuiltInVariables();
+	data::VariableDomain* oldBuiltInVariables =
+		fEvaluationContext.BuiltInVariables();
 	fEvaluationContext.SetBuiltInVariables(&builtInVariables);
 
 	// bind the variables specified by the actions
 	for (StringList::Iterator it = actionsCall->Actions()->Variables();
-		it.HasNext();) {
+		 it.HasNext();) {
 		String variable = it.Next();
-		if (const StringList* values
-				= fEvaluationContext.LookupVariable(variable)) {
+		if (const StringList* values =
+				fEvaluationContext.LookupVariable(variable)) {
 			StringList newValues;
 			for (StringList::Iterator valueIt = values->GetIterator();
-				valueIt.HasNext();) {
+				 valueIt.HasNext();) {
 				MakeTarget* makeTarget = _GetMakeTarget(valueIt.Next(), true);
 				_BindTarget(makeTarget);
 				newValues.Append(makeTarget->BoundPath());
@@ -772,14 +760,14 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
-// TODO: Support:
-// - UPDATED
-// - TOGETHER
-// - IGNORE
-// - QUIETLY
-// - PIECEMEAL
-// - EXISTING
-// - MAX_LINE_FACTOR
+	// TODO: Support:
+	// - UPDATED
+	// - TOGETHER
+	// - IGNORE
+	// - QUIETLY
+	// - PIECEMEAL
+	// - EXISTING
+	// - MAX_LINE_FACTOR
 
 	while (remainder < end) {
 		// transfer whitespace unchanged
@@ -800,10 +788,12 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
 			StringList result = code::Leaf::EvaluateString(fEvaluationContext,
-				wordStart, remainder, NULL);
+														   wordStart,
+														   remainder,
+														   NULL);
 			bool isFirst = true;
 			for (StringList::Iterator it = result.GetIterator();
-				it.HasNext();) {
+				 it.HasNext();) {
 				if (isFirst)
 					isFirst = false;
 				else
@@ -821,14 +811,16 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	return new Command(actionsCall, commandLine, boundTargets);
 }
 
-
 void
 Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 {
 	const char* timeString;
 	if (makeTarget->FileExists()) {
-		_PrintMakeTreeStep(makeTarget, "bind", NULL, ": %s",
-			makeTarget->BoundPath().ToCString());
+		_PrintMakeTreeStep(makeTarget,
+						   "bind",
+						   NULL,
+						   ": %s",
+						   makeTarget->BoundPath().ToCString());
 		timeString = makeTarget->GetOriginalTime().ToString().ToCString();
 	} else {
 		if (_IsPseudoTarget(makeTarget))
@@ -837,14 +829,13 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 			timeString = "missing";
 	}
 
-// TODO: In Jam binding might also be "parent".
+	// TODO: In Jam binding might also be "parent".
 	_PrintMakeTreeStep(makeTarget, "time", NULL, ": %s", timeString);
 }
 
-
 void
 Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
-	data::Time parentTime)
+							   data::Time parentTime)
 {
 	const Target* target = makeTarget->GetTarget();
 	const char* stateString;
@@ -885,13 +876,19 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 	_PrintMakeTreeStep(makeTarget, madeString, stateString, NULL);
 }
 
-
 void
-Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget, const char* step,
-	const char* state, const char* pattern, ...)
+Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget,
+							  const char* step,
+							  const char* state,
+							  const char* pattern,
+							  ...)
 {
-	printf("%-7s %-10s %*s%s", step, state != NULL ? state : "--", fMakeLevel,
-		"", makeTarget->Name().ToCString());
+	printf("%-7s %-10s %*s%s",
+		   step,
+		   state != NULL ? state : "--",
+		   fMakeLevel,
+		   "",
+		   makeTarget->Name().ToCString());
 	if (pattern != NULL) {
 		char buffer[1024];
 		va_list args;
@@ -904,6 +901,5 @@ Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget, const char* step,
 	printf("\n");
 }
 
-
-}	// namespace make
-}	// namespace ham
+} // namespace make
+} // namespace ham

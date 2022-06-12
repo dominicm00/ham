@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/RegExp.h"
 
 #include "data/StringBuffer.h"
@@ -13,18 +12,16 @@
 
 #include <vector>
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 // #pragma mark - RegExp::Data
 
-
 struct RegExp::Data {
 	Data(const char* pattern, PatternType patternType)
-		:
-		fReferenceCount(1)
+		: fReferenceCount(1)
 	{
 		// convert the shell pattern to a regular expression
 		StringBuffer patternString;
@@ -38,8 +35,7 @@ struct RegExp::Data {
 					case '*':
 						patternString += ".*";
 						continue;
-					case '[':
-					{
+					case '[': {
 						// find the matching ']' first
 						const char* end = pattern;
 						while (*end != ']') {
@@ -83,8 +79,7 @@ struct RegExp::Data {
 						break;
 					}
 
-					case '\\':
-					{
+					case '\\': {
 						// Quotes the next character. Works the same way for
 						// regular expressions.
 						if (*pattern == '\0') {
@@ -126,10 +121,7 @@ struct RegExp::Data {
 			regfree(&fCompiledExpression);
 	}
 
-	void Acquire()
-	{
-		util::increment_reference_count(fReferenceCount);
-	}
+	void Acquire() { util::increment_reference_count(fReferenceCount); }
 
 	void Release()
 	{
@@ -137,32 +129,23 @@ struct RegExp::Data {
 			delete this;
 	}
 
-	bool IsValid() const
-	{
-		return fError == 0;
-	}
+	bool IsValid() const { return fError == 0; }
 
-	const regex_t* CompiledExpression() const
-	{
-		return &fCompiledExpression;
-	}
+	const regex_t* CompiledExpression() const { return &fCompiledExpression; }
 
-private:
-	int32_t	fReferenceCount;
-	int		fError;
-	regex_t	fCompiledExpression;
+  private:
+	int32_t fReferenceCount;
+	int fError;
+	regex_t fCompiledExpression;
 };
-
 
 // #pragma mark - RegExp::MatchResultData
 
-
 struct RegExp::MatchResultData {
 	MatchResultData(const regex_t* compiledExpression, const char* string)
-		:
-		fReferenceCount(1),
-		fMatchCount(0),
-		fMatches(NULL)
+		: fReferenceCount(1),
+		  fMatchCount(0),
+		  fMatches(NULL)
 	{
 		// Do the matching: Since we need to provide a buffer for the matches
 		// for regexec() to fill in, but don't know the number of matches
@@ -172,7 +155,7 @@ struct RegExp::MatchResultData {
 		for (;;) {
 			fMatches = new regmatch_t[maxMatchCount];
 			if (regexec(compiledExpression, string, maxMatchCount, fMatches, 0)
-					!= 0) {
+				!= 0) {
 				delete[] fMatches;
 				fMatches = NULL;
 				fMatchCount = 0;
@@ -201,15 +184,9 @@ struct RegExp::MatchResultData {
 		}
 	}
 
-	~MatchResultData()
-	{
-		delete[] fMatches;
-	}
+	~MatchResultData() { delete[] fMatches; }
 
-	void Acquire()
-	{
-		util::increment_reference_count(fReferenceCount);
-	}
+	void Acquire() { util::increment_reference_count(fReferenceCount); }
 
 	void Release()
 	{
@@ -217,56 +194,41 @@ struct RegExp::MatchResultData {
 			delete this;
 	}
 
-	size_t MatchCount() const
-	{
-		return fMatchCount;
-	}
+	size_t MatchCount() const { return fMatchCount; }
 
-	const regmatch_t* Matches() const
-	{
-		return fMatches;
-	}
+	const regmatch_t* Matches() const { return fMatches; }
 
-private:
-	int32_t		fReferenceCount;
-	size_t		fMatchCount;
-	regmatch_t*	fMatches;
+  private:
+	int32_t fReferenceCount;
+	size_t fMatchCount;
+	regmatch_t* fMatches;
 };
-
 
 // #pragma mark - RegExp
 
-
 RegExp::RegExp()
-	:
-	fData(NULL)
+	: fData(NULL)
 {
 }
 
-
 RegExp::RegExp(const char* pattern, PatternType patternType)
-	:
-	fData(NULL)
+	: fData(NULL)
 {
 	SetPattern(pattern, patternType);
 }
 
-
 RegExp::RegExp(const RegExp& other)
-	:
-	fData(other.fData)
+	: fData(other.fData)
 {
 	if (fData != NULL)
 		fData->Acquire();
 }
-
 
 RegExp::~RegExp()
 {
 	if (fData != NULL)
 		fData->Release();
 }
-
 
 bool
 RegExp::SetPattern(const char* pattern, PatternType patternType)
@@ -286,7 +248,6 @@ RegExp::SetPattern(const char* pattern, PatternType patternType)
 	return true;
 }
 
-
 RegExp::MatchResult
 RegExp::Match(const char* string) const
 {
@@ -296,7 +257,6 @@ RegExp::Match(const char* string) const
 	return MatchResult(
 		new MatchResultData(fData->CompiledExpression(), string));
 }
-
 
 RegExp&
 RegExp::operator=(const RegExp& other)
@@ -312,32 +272,24 @@ RegExp::operator=(const RegExp& other)
 	return *this;
 }
 
-
 // #pragma mark - RegExp::MatchResult
 
-
 RegExp::MatchResult::MatchResult()
-	:
-	fData(NULL)
+	: fData(NULL)
 {
 }
-
 
 RegExp::MatchResult::MatchResult(MatchResultData* data)
-	:
-	fData(data)
+	: fData(data)
 {
 }
 
-
 RegExp::MatchResult::MatchResult(const MatchResult& other)
-	:
-	fData(other.fData)
+	: fData(other.fData)
 {
 	if (fData != NULL)
 		fData->Acquire();
 }
-
 
 RegExp::MatchResult::~MatchResult()
 {
@@ -345,29 +297,25 @@ RegExp::MatchResult::~MatchResult()
 		fData->Release();
 }
 
-
 bool
 RegExp::MatchResult::HasMatched() const
 {
 	return fData != NULL && fData->MatchCount() > 0;
 }
 
-
 size_t
 RegExp::MatchResult::StartOffset() const
 {
-	return fData != NULL && fData->MatchCount() > 0
-		? fData->Matches()[0].rm_so : 0;
+	return fData != NULL && fData->MatchCount() > 0 ? fData->Matches()[0].rm_so
+													: 0;
 }
-
 
 size_t
 RegExp::MatchResult::EndOffset() const
 {
-	return fData != NULL && fData->MatchCount() > 0
-		? fData->Matches()[0].rm_eo : 0;
+	return fData != NULL && fData->MatchCount() > 0 ? fData->Matches()[0].rm_eo
+													: 0;
 }
-
 
 size_t
 RegExp::MatchResult::GroupCount() const
@@ -379,22 +327,21 @@ RegExp::MatchResult::GroupCount() const
 	return matchCount > 0 ? matchCount - 1 : 0;
 }
 
-
 size_t
 RegExp::MatchResult::GroupStartOffsetAt(size_t index) const
 {
 	return fData != NULL && fData->MatchCount() > index + 1
-		? fData->Matches()[index + 1].rm_so : 0;
+		? fData->Matches()[index + 1].rm_so
+		: 0;
 }
-
 
 size_t
 RegExp::MatchResult::GroupEndOffsetAt(size_t index) const
 {
 	return fData != NULL && fData->MatchCount() > index + 1
-		? fData->Matches()[index + 1].rm_eo : 0;
+		? fData->Matches()[index + 1].rm_eo
+		: 0;
 }
-
 
 RegExp::MatchResult&
 RegExp::MatchResult::operator=(const MatchResult& other)
@@ -410,6 +357,5 @@ RegExp::MatchResult::operator=(const MatchResult& other)
 	return *this;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

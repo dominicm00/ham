@@ -5,17 +5,16 @@
 #ifndef HAM_CODE_DEFS_H
 #define HAM_CODE_DEFS_H
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 enum AssignmentOperator {
 	ASSIGNMENT_OPERATOR_ASSIGN,
 	ASSIGNMENT_OPERATOR_APPEND,
 	ASSIGNMENT_OPERATOR_DEFAULT
 };
-
 
 enum JumpCondition {
 	JUMP_CONDITION_NONE,
@@ -26,9 +25,7 @@ enum JumpCondition {
 	JUMP_CONDITION_EXIT
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_DEFS_H
+#endif // HAM_CODE_DEFS_H

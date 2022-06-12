@@ -5,31 +5,32 @@
 #ifndef HAM_TESTS_REG_EXP_TEST_H
 #define HAM_TESTS_REG_EXP_TEST_H
 
-
 #include "test/TestFixture.h"
 
+namespace ham
+{
+namespace tests
+{
 
-namespace ham {
-namespace tests {
-
-
-class RegExpTest : public test::TestFixture {
-public:
-			void				Constructor();
-			void				MatchRegularExpression();
-			void				MatchWildcard();
+class RegExpTest : public test::TestFixture
+{
+  public:
+	void Constructor();
+	void MatchRegularExpression();
+	void MatchWildcard();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(RegExpTest, 3,
-		Constructor, MatchRegularExpression, MatchWildcard)
+	HAM_ADD_TEST_CASES(RegExpTest,
+					   3,
+					   Constructor,
+					   MatchRegularExpression,
+					   MatchWildcard)
 
-private:
+  private:
 	struct Matches;
 };
 
-
 } // namespace tests
 } // namespace ham
-
 
 #endif // HAM_TESTS_REG_EXP_TEST_H

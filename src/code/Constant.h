@@ -5,30 +5,28 @@
 #ifndef HAM_CODE_CONSTANT_H
 #define HAM_CODE_CONSTANT_H
 
-
 #include "code/Node.h"
 
+namespace ham
+{
+namespace code
+{
 
-namespace ham {
-namespace code {
+class Constant : public Node
+{
+  public:
+	Constant(const StringList& value);
+	virtual ~Constant();
 
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-class Constant : public Node {
-public:
-								Constant(const StringList& value);
-	virtual						~Constant();
-
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
-
-private:
-			StringList			fValue;
+  private:
+	StringList fValue;
 };
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_CONSTANT_H
+#endif // HAM_CODE_CONSTANT_H

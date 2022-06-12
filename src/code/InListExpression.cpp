@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/InListExpression.h"
 
 #include <algorithm>
@@ -11,27 +10,24 @@
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 InListExpression::InListExpression(Node* left, Node* right)
-	:
-	fLeft(left),
-	fRight(right)
+	: fLeft(left),
+	  fRight(right)
 {
 	fLeft->AcquireReference();
 	fRight->AcquireReference();
 }
-
 
 InListExpression::~InListExpression()
 {
 	fLeft->ReleaseReference();
 	fRight->ReleaseReference();
 }
-
 
 StringList
 InListExpression::Evaluate(EvaluationContext& context)
@@ -47,7 +43,6 @@ InListExpression::Evaluate(EvaluationContext& context)
 	return StringList::True();
 }
 
-
 code::Node*
 InListExpression::Visit(NodeVisitor& visitor)
 {
@@ -59,7 +54,6 @@ InListExpression::Visit(NodeVisitor& visitor)
 
 	return fRight->Visit(visitor);
 }
-
 
 void
 InListExpression::Dump(DumpContext& context) const
@@ -74,6 +68,5 @@ InListExpression::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

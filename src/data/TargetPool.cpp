@@ -3,23 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/TargetPool.h"
 
-
-namespace ham {
-namespace data {
-
-
-TargetPool::TargetPool()
+namespace ham
 {
-}
-
-
-TargetPool::~TargetPool()
+namespace data
 {
-}
 
+TargetPool::TargetPool() {}
+
+TargetPool::~TargetPool() {}
 
 Target*
 TargetPool::LookupOrCreate(const String& name)
@@ -35,7 +28,6 @@ TargetPool::LookupOrCreate(const String& name)
 	return &target;
 }
 
-
 void
 TargetPool::LookupOrCreate(const StringList& names, TargetList& _targets)
 {
@@ -43,6 +35,5 @@ TargetPool::LookupOrCreate(const StringList& names, TargetList& _targets)
 		_targets.push_back(LookupOrCreate(it.Next()));
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

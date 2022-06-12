@@ -3,33 +3,29 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/While.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 While::While(Node* expression, Node* block)
-	:
-	fExpression(expression),
-	fBlock(block)
+	: fExpression(expression),
+	  fBlock(block)
 {
 	fExpression->AcquireReference();
 	fBlock->AcquireReference();
 }
-
 
 While::~While()
 {
 	fExpression->ReleaseReference();
 	fBlock->ReleaseReference();
 }
-
 
 StringList
 While::Evaluate(EvaluationContext& context)
@@ -60,7 +56,6 @@ While::Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
 code::Node*
 While::Visit(NodeVisitor& visitor)
 {
@@ -72,7 +67,6 @@ While::Visit(NodeVisitor& visitor)
 
 	return fBlock->Visit(visitor);
 }
-
 
 void
 While::Dump(DumpContext& context) const
@@ -87,6 +81,5 @@ While::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

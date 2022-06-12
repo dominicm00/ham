@@ -3,28 +3,25 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/LocalVariableDeclaration.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
-	Node* initializer)
-	:
-	fVariables(variables),
-	fInitializer(initializer)
+												   Node* initializer)
+	: fVariables(variables),
+	  fInitializer(initializer)
 {
 	fVariables->AcquireReference();
 	if (fInitializer != NULL)
 		fInitializer->AcquireReference();
 }
-
 
 LocalVariableDeclaration::~LocalVariableDeclaration()
 {
@@ -32,7 +29,6 @@ LocalVariableDeclaration::~LocalVariableDeclaration()
 	if (fInitializer != NULL)
 		fInitializer->ReleaseReference();
 }
-
 
 StringList
 LocalVariableDeclaration::Evaluate(EvaluationContext& context)
@@ -57,7 +53,6 @@ LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 	return StringList::False();
 }
 
-
 code::Node*
 LocalVariableDeclaration::Visit(NodeVisitor& visitor)
 {
@@ -69,7 +64,6 @@ LocalVariableDeclaration::Visit(NodeVisitor& visitor)
 
 	return fInitializer != NULL ? fInitializer->Visit(visitor) : NULL;
 }
-
 
 void
 LocalVariableDeclaration::Dump(DumpContext& context) const
@@ -86,6 +80,5 @@ LocalVariableDeclaration::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

@@ -5,13 +5,12 @@
 #ifndef HAM_PARSER_TOKEN_H
 #define HAM_PARSER_TOKEN_H
 
-
 #include "data/String.h"
 
-
-namespace ham {
-namespace parser {
-
+namespace ham
+{
+namespace parser
+{
 
 enum TokenID {
 	TOKEN_STRING = 0,
@@ -68,21 +67,18 @@ enum TokenID {
 	TOKEN_EOF
 };
 
-
 struct Token : data::String {
 	typedef TokenID id_type;
 
-public:
+  public:
 	Token()
-		:
-		fID(TOKEN_STRING)
+		: fID(TOKEN_STRING)
 	{
 	}
 
 	Token(TokenID id, const data::String& value)
-		:
-		data::String(value),
-		fID(id)
+		: data::String(value),
+		  fID(id)
 	{
 	}
 
@@ -92,41 +88,29 @@ public:
 		fID = id;
 	}
 
-	TokenID ID() const
-	{
-		return fID;
-	}
+	TokenID ID() const { return fID; }
 
 	bool IsKeyword() const
 	{
 		return fID >= TOKEN_DELIMITERS_END && fID < TOKEN_KEYWORDS_END;
 	}
 
-	bool operator==(TokenID id) const
-	{
-		return fID == id;
-	}
+	bool operator==(TokenID id) const { return fID == id; }
 
-	bool operator!=(TokenID id) const
-	{
-		return !(*this == id);
-	}
+	bool operator!=(TokenID id) const { return !(*this == id); }
 
 	template<typename Stream>
-	friend
-	Stream& operator<<(Stream& stream, const Token& token)
+	friend Stream& operator<<(Stream& stream, const Token& token)
 	{
 		stream << '(' << token.fID << ", \"" << (const String&)token << "\")";
 		return stream;
 	}
 
-private:
-	TokenID	fID;
+  private:
+	TokenID fID;
 };
 
+} // namespace parser
+} // namespace ham
 
-}	// namespace parser
-}	// namespace ham
-
-
-#endif	// HAM_PARSER_TOKEN_H
+#endif // HAM_PARSER_TOKEN_H

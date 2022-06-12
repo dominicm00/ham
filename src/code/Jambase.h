@@ -5,16 +5,14 @@
 #ifndef HAM_CODE_JAMBASE_H
 #define HAM_CODE_JAMBASE_H
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 extern const char* const kJambase;
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_JAMBASE_H
+#endif // HAM_CODE_JAMBASE_H

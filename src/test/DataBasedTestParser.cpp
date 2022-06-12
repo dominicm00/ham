@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/DataBasedTestParser.h"
 
 #include <memory>
@@ -13,10 +12,10 @@
 #include "test/MultipleFilesDataBasedTest.h"
 #include "test/TemplateBasedTest.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 static const std::string kTestCaseSeparator("---");
 static const std::string kInputOutputSeparator("-");
@@ -24,7 +23,6 @@ static const std::string kVersionJam("jam");
 static const std::string kVersionBoostJam("boost");
 static const std::string kVersionHam("ham");
 static const std::string kCompatibilityNotHam("!ham");
-
 
 static std::vector<std::string>
 split_string(const std::string& string)
@@ -34,9 +32,11 @@ split_string(const std::string& string)
 	std::string remainder(string);
 	size_t index = 0;
 	while ((index = remainder.find_first_not_of(' ', index))
-			!= std::string::npos) {
+		   != std::string::npos) {
 		size_t end = remainder.find(' ', index);
-		std::string substring(remainder, index,
+		std::string substring(
+			remainder,
+			index,
 			end != std::string::npos ? end : remainder.length() - index);
 		result.push_back(substring);
 		index += substring.length();
@@ -45,14 +45,14 @@ split_string(const std::string& string)
 	return result;
 }
 
-
 static std::string
 join_file_content(const std::vector<std::string>& input)
 {
 	// If the input is code, join all input lines.
 	std::string inputCode;
 	for (std::vector<std::string>::const_iterator it = input.begin();
-		it != input.end(); ++it) {
+		 it != input.end();
+		 ++it) {
 		inputCode += *it;
 		inputCode += '\n';
 	}
@@ -60,69 +60,68 @@ join_file_content(const std::vector<std::string>& input)
 	return inputCode;
 }
 
-
 struct DataBasedTestParser::TestFile {
-public:
-	TestFile(const std::vector<std::string>& content, const std::string& file,
-		int fileAge, bool joinContent = true)
-		:
-		fFile(file),
-		fAge(fileAge),
-		fContent(content),
-		fJoinContent(joinContent)
+  public:
+	TestFile(const std::vector<std::string>& content,
+			 const std::string& file,
+			 int fileAge,
+			 bool joinContent = true)
+		: fFile(file),
+		  fAge(fileAge),
+		  fContent(content),
+		  fJoinContent(joinContent)
 	{
 	}
 
-public:
-	std::string					fFile;
-	int							fAge;
-	std::vector<std::string>	fContent;
-	bool						fJoinContent;
+  public:
+	std::string fFile;
+	int fAge;
+	std::vector<std::string> fContent;
+	bool fJoinContent;
 };
-
 
 struct DataBasedTestParser::TestCase {
 	TestCase(const std::vector<TestFile>& inputFiles,
-		const std::vector<TestFile>& outputFiles,
-		const std::set<std::string>& missingOutputFiles, bool outputIsException,
-		DataBasedTest::ExitState exitState, uint32_t compatibilityMask,
-		bool supportedByHam, uint32_t skipMask, size_t startLineIndex,
-		size_t endLineIndex)
-		:
-		fCompatibilityMask(compatibilityMask),
-		fSupportedByHam(supportedByHam),
-		fSkipMask(skipMask),
-		fInputFiles(inputFiles),
-		fOutputFiles(outputFiles),
-		fMissingOutputFiles(missingOutputFiles),
-		fOutputIsException(outputIsException),
-		fExitState(exitState),
-		fStartLineIndex(startLineIndex),
-		fEndLineIndex(endLineIndex)
+			 const std::vector<TestFile>& outputFiles,
+			 const std::set<std::string>& missingOutputFiles,
+			 bool outputIsException,
+			 DataBasedTest::ExitState exitState,
+			 uint32_t compatibilityMask,
+			 bool supportedByHam,
+			 uint32_t skipMask,
+			 size_t startLineIndex,
+			 size_t endLineIndex)
+		: fCompatibilityMask(compatibilityMask),
+		  fSupportedByHam(supportedByHam),
+		  fSkipMask(skipMask),
+		  fInputFiles(inputFiles),
+		  fOutputFiles(outputFiles),
+		  fMissingOutputFiles(missingOutputFiles),
+		  fOutputIsException(outputIsException),
+		  fExitState(exitState),
+		  fStartLineIndex(startLineIndex),
+		  fEndLineIndex(endLineIndex)
 	{
 	}
 
-public:
-	uint32_t					fCompatibilityMask;
-	bool						fSupportedByHam;
-	uint32_t					fSkipMask;
-	std::vector<TestFile>		fInputFiles;
-	std::vector<TestFile>		fOutputFiles;
-	std::set<std::string>		fMissingOutputFiles;
-	bool						fOutputIsException;
-	DataBasedTest::ExitState	fExitState;
-	size_t						fStartLineIndex;
-	size_t						fEndLineIndex;
+  public:
+	uint32_t fCompatibilityMask;
+	bool fSupportedByHam;
+	uint32_t fSkipMask;
+	std::vector<TestFile> fInputFiles;
+	std::vector<TestFile> fOutputFiles;
+	std::set<std::string> fMissingOutputFiles;
+	bool fOutputIsException;
+	DataBasedTest::ExitState fExitState;
+	size_t fStartLineIndex;
+	size_t fEndLineIndex;
 };
 
-
 DataBasedTestParser::DataBasedTestParser()
-	:
-	fInput(),
-	fLineIndex(0)
+	: fInput(),
+	  fLineIndex(0)
 {
 }
-
 
 Test*
 DataBasedTestParser::Parse(const char* fileName)
@@ -145,8 +144,8 @@ DataBasedTestParser::Parse(const char* fileName)
 		std::string directive;
 		if (!_ReadLine(line, directive)) {
 			_Throw(std::string("Unexpected end of file while reading test "
-				"code, was expecting separator \"") + kTestCaseSeparator
-				+ "\"");
+							   "code, was expecting separator \"")
+				   + kTestCaseSeparator + "\"");
 		}
 
 		if (!directive.empty()) {
@@ -161,8 +160,9 @@ DataBasedTestParser::Parse(const char* fileName)
 				continue;
 			}
 
-			_Throw(std::string("Unsupported directive \"#!" + line + "\" in "
-				"test code"));
+			_Throw(std::string("Unsupported directive \"#!" + line
+							   + "\" in "
+								 "test code"));
 		}
 
 		if (line == kTestCaseSeparator)
@@ -207,14 +207,15 @@ DataBasedTestParser::Parse(const char* fileName)
 				}
 
 				_Throw(std::string("Unexpected end of file while reading test "
-					"case input, was expecting separator \"")
-					+ kInputOutputSeparator + "\"");
+								   "case input, was expecting separator \"")
+					   + kInputOutputSeparator + "\"");
 			}
 
 			if (!directive.empty()) {
 				if (directive == "repeat") {
 					if (input.size() >= previousInput.size()) {
-						_Throw(std::string("Repeat directive in test case "
+						_Throw(std::string(
+							"Repeat directive in test case "
 							"input doesn't refer to existing previous input"));
 					}
 
@@ -225,25 +226,26 @@ DataBasedTestParser::Parse(const char* fileName)
 				if (directive == "compat") {
 					compatibilityMask = 0;
 					std::vector<std::string> arguments = split_string(line);
-					for (std::vector<std::string>::iterator it
-							= arguments.begin();
-						it != arguments.end(); ++it) {
+					for (std::vector<std::string>::iterator it =
+							 arguments.begin();
+						 it != arguments.end();
+						 ++it) {
 						std::string versionString = *it;
 						if (versionString == kVersionJam) {
-							compatibilityMask
-								|= 1 << behavior::COMPATIBILITY_JAM;
+							compatibilityMask |= 1
+								<< behavior::COMPATIBILITY_JAM;
 						} else if (versionString == kVersionBoostJam) {
-							compatibilityMask
-								|= 1 << behavior::COMPATIBILITY_BOOST_JAM;
+							compatibilityMask |= 1
+								<< behavior::COMPATIBILITY_BOOST_JAM;
 						} else if (versionString == kVersionHam) {
-							compatibilityMask
-								|= 1 << behavior::COMPATIBILITY_HAM;
+							compatibilityMask |= 1
+								<< behavior::COMPATIBILITY_HAM;
 						} else if (versionString == kCompatibilityNotHam) {
 							supportedByHam = false;
 						} else {
 							_Throw(std::string("Invalid argument for "
-								"\"#!compat\" directive: \"" + versionString
-								+ "\""));
+											   "\"#!compat\" directive: \""
+											   + versionString + "\""));
 						}
 					}
 					continue;
@@ -252,9 +254,10 @@ DataBasedTestParser::Parse(const char* fileName)
 				if (directive == "skip") {
 					skipMask = 0;
 					std::vector<std::string> arguments = split_string(line);
-					for (std::vector<std::string>::iterator it
-							= arguments.begin();
-						it != arguments.end(); ++it) {
+					for (std::vector<std::string>::iterator it =
+							 arguments.begin();
+						 it != arguments.end();
+						 ++it) {
 						std::string versionString = *it;
 						if (versionString == kVersionJam) {
 							skipMask |= 1 << behavior::COMPATIBILITY_JAM;
@@ -264,8 +267,8 @@ DataBasedTestParser::Parse(const char* fileName)
 							skipMask |= 1 << behavior::COMPATIBILITY_HAM;
 						} else {
 							_Throw(std::string("Invalid argument for "
-								"\"#!skip\" directive: \"" + versionString
-								+ "\""));
+											   "\"#!skip\" directive: \""
+											   + versionString + "\""));
 						}
 					}
 					continue;
@@ -273,7 +276,8 @@ DataBasedTestParser::Parse(const char* fileName)
 
 				if (directive == "file") {
 					if (!multipleFiles) {
-						_Throw(std::string("\"#!file\" directive requires "
+						_Throw(std::string(
+							"\"#!file\" directive requires "
 							"#!multipleFiles directive before first test"
 							" case"));
 					}
@@ -282,25 +286,26 @@ DataBasedTestParser::Parse(const char* fileName)
 
 					if (arguments.empty() || arguments[0].empty()) {
 						_Throw(std::string("\"#!file\" directive requires "
-							"file name argument"));
+										   "file name argument"));
 					}
 
 					// commit the previous file
 					if (!inputFile.empty()) {
-						inputFiles.push_back(
-							TestFile(input, inputFile, inputFileAge,
-								inputIsCode));
+						inputFiles.push_back(TestFile(input,
+													  inputFile,
+													  inputFileAge,
+													  inputIsCode));
 						input.clear();
 					}
 
 					inputFile = arguments[0];
-					inputFileAge = arguments.size() > 1
-						? atoi(arguments[1].c_str()) : 0;
+					inputFileAge =
+						arguments.size() > 1 ? atoi(arguments[1].c_str()) : 0;
 					continue;
 				}
 
 				_Throw(std::string("Unsupported directive \"#!" + directive
-					+ "\" in test case input"));
+								   + "\" in test case input"));
 			}
 
 			if (line == kInputOutputSeparator) {
@@ -311,9 +316,10 @@ DataBasedTestParser::Parse(const char* fileName)
 
 			if (line == kTestCaseSeparator) {
 				_Throw(std::string("Unexpected test case separator \"")
-					+ kTestCaseSeparator + "\" while reading test "
-					"case input, was expecting separator \""
-					+ kInputOutputSeparator + "\"");
+					   + kTestCaseSeparator
+					   + "\" while reading test "
+						 "case input, was expecting separator \""
+					   + kInputOutputSeparator + "\"");
 			}
 
 			input.push_back(line);
@@ -333,14 +339,15 @@ DataBasedTestParser::Parse(const char* fileName)
 			std::string directive;
 			if (!_ReadLine(line, directive)) {
 				_Throw(std::string("Unexpected end of file while reading test "
-					"case output, was expecting separator \"")
-					+ kTestCaseSeparator + "\"");
+								   "case output, was expecting separator \"")
+					   + kTestCaseSeparator + "\"");
 			}
 
 			if (!directive.empty()) {
 				if (directive == "repeat") {
 					if (output.size() >= previousOutput.size()) {
-						_Throw(std::string("Repeat directive in test case "
+						_Throw(std::string(
+							"Repeat directive in test case "
 							"output doesn't refer to existing previous "
 							"output"));
 					}
@@ -359,7 +366,7 @@ DataBasedTestParser::Parse(const char* fileName)
 				if (directive == "error") {
 					if (line.empty()) {
 						_Throw(std::string("\"#!error\" directive requires "
-							"argument"));
+										   "argument"));
 					}
 
 					if (line == "evaluation") {
@@ -370,7 +377,7 @@ DataBasedTestParser::Parse(const char* fileName)
 						exitState = DataBasedTest::EXIT_MAKE_ERROR;
 					} else {
 						_Throw(std::string("Invalid argument \"") + line
-							+ "\" for \"#!error\" directive");
+							   + "\" for \"#!error\" directive");
 					}
 
 					continue;
@@ -378,7 +385,8 @@ DataBasedTestParser::Parse(const char* fileName)
 
 				if (directive == "file") {
 					if (!multipleFiles) {
-						_Throw(std::string("\"#!file\" directive requires "
+						_Throw(std::string(
+							"\"#!file\" directive requires "
 							"#!multipleFiles directive before first test "
 							"case"));
 					}
@@ -387,7 +395,7 @@ DataBasedTestParser::Parse(const char* fileName)
 
 					if (arguments.empty()) {
 						_Throw(std::string("\"#!file\" directive requires "
-							"file name argument"));
+										   "file name argument"));
 					}
 
 					// commit the previous file
@@ -400,8 +408,8 @@ DataBasedTestParser::Parse(const char* fileName)
 						if (arguments[1] == "missing") {
 							missingOutputFiles.insert(arguments[0]);
 						} else {
-							_Throw(std::string("Invalid second argument \""
-								+ arguments[1]
+							_Throw(std::string(
+								"Invalid second argument \"" + arguments[1]
 								+ "\" for \"#!file\" directive"));
 						}
 					}
@@ -410,7 +418,7 @@ DataBasedTestParser::Parse(const char* fileName)
 				}
 
 				_Throw(std::string("Unsupported directive \"#!" + directive
-					+ "\" in test case output"));
+								   + "\" in test case output"));
 			}
 
 			if (line == kTestCaseSeparator) {
@@ -426,50 +434,65 @@ DataBasedTestParser::Parse(const char* fileName)
 		previousOutputIsException = outputIsException;
 		previousExitState = exitState;
 
-		testCases.push_back(TestCase(inputFiles, outputFiles,
-			missingOutputFiles, outputIsException, exitState,
-			compatibilityMask & ~skipMask, supportedByHam, skipMask,
-			dataSetLineIndex, fLineIndex - 1));
+		testCases.push_back(TestCase(inputFiles,
+									 outputFiles,
+									 missingOutputFiles,
+									 outputIsException,
+									 exitState,
+									 compatibilityMask & ~skipMask,
+									 supportedByHam,
+									 skipMask,
+									 dataSetLineIndex,
+									 fLineIndex - 1));
 	}
 
 	if (multipleFiles) {
 		std::auto_ptr<MultipleFilesDataBasedTest> test(
 			new MultipleFilesDataBasedTest(testName));
 		for (std::vector<TestCase>::iterator it = testCases.begin();
-			it != testCases.end(); ++it) {
+			 it != testCases.end();
+			 ++it) {
 			const TestCase& testCase = *it;
 
 			// prepare input files map
 			std::map<std::string, std::string> inputFiles;
 			std::map<std::string, int> inputFileAges;
-			for (std::vector<TestFile>::const_iterator inputFileIt
-					= testCase.fInputFiles.begin();
-				inputFileIt != testCase.fInputFiles.end(); ++inputFileIt) {
+			for (std::vector<TestFile>::const_iterator inputFileIt =
+					 testCase.fInputFiles.begin();
+				 inputFileIt != testCase.fInputFiles.end();
+				 ++inputFileIt) {
 				const TestFile& inputFile = *inputFileIt;
-				inputFiles[inputFile.fFile]
-					= join_file_content(inputFile.fContent);
+				inputFiles[inputFile.fFile] =
+					join_file_content(inputFile.fContent);
 				if (inputFile.fAge != 0)
 					inputFileAges[inputFile.fFile] = inputFile.fAge;
 			}
 
 			// prepare output files map
 			std::map<std::string, std::string> outputFiles;
-			for (std::vector<TestFile>::const_iterator outputFileIt
-					= testCase.fOutputFiles.begin();
-				outputFileIt != testCase.fOutputFiles.end(); ++outputFileIt) {
+			for (std::vector<TestFile>::const_iterator outputFileIt =
+					 testCase.fOutputFiles.begin();
+				 outputFileIt != testCase.fOutputFiles.end();
+				 ++outputFileIt) {
 				const TestFile& outputFile = *outputFileIt;
 				if (testCase.fMissingOutputFiles.find(outputFile.fFile)
-						== testCase.fMissingOutputFiles.end()) {
-					outputFiles[outputFile.fFile]
-						= join_file_content(outputFile.fContent);
+					== testCase.fMissingOutputFiles.end()) {
+					outputFiles[outputFile.fFile] =
+						join_file_content(outputFile.fContent);
 				}
 			}
 
-			test->AddDataSet(inputFiles, inputFileAges, outputFiles,
-				testCase.fMissingOutputFiles, testCase.fOutputIsException,
-				testCase.fExitState, testCase.fCompatibilityMask,
-				testCase.fSupportedByHam, testCase.fSkipMask,
-				testCase.fStartLineIndex, testCase.fEndLineIndex);
+			test->AddDataSet(inputFiles,
+							 inputFileAges,
+							 outputFiles,
+							 testCase.fMissingOutputFiles,
+							 testCase.fOutputIsException,
+							 testCase.fExitState,
+							 testCase.fCompatibilityMask,
+							 testCase.fSupportedByHam,
+							 testCase.fSkipMask,
+							 testCase.fStartLineIndex,
+							 testCase.fEndLineIndex);
 		}
 
 		return test.release();
@@ -478,19 +501,21 @@ DataBasedTestParser::Parse(const char* fileName)
 	std::auto_ptr<TemplateBasedTest> test(
 		new TemplateBasedTest(testName, code));
 	for (std::vector<TestCase>::iterator it = testCases.begin();
-		it != testCases.end(); ++it) {
+		 it != testCases.end();
+		 ++it) {
 		const TestCase& testCase = *it;
 
 		// prepare output files map
 		std::map<std::string, std::string> outputFiles;
-		for (std::vector<TestFile>::const_iterator outputFileIt
-				= testCase.fOutputFiles.begin();
-			outputFileIt != testCase.fOutputFiles.end(); ++outputFileIt) {
+		for (std::vector<TestFile>::const_iterator outputFileIt =
+				 testCase.fOutputFiles.begin();
+			 outputFileIt != testCase.fOutputFiles.end();
+			 ++outputFileIt) {
 			const TestFile& outputFile = *outputFileIt;
 			if (testCase.fMissingOutputFiles.find(outputFile.fFile)
-					== testCase.fMissingOutputFiles.end()) {
-				outputFiles[outputFile.fFile]
-					= join_file_content(outputFile.fContent);
+				== testCase.fMissingOutputFiles.end()) {
+				outputFiles[outputFile.fFile] =
+					join_file_content(outputFile.fContent);
 			}
 		}
 
@@ -502,16 +527,19 @@ DataBasedTestParser::Parse(const char* fileName)
 		}
 
 		test->AddDataSet(content,
-			outputFiles, testCase.fMissingOutputFiles,
-			testCase.fOutputIsException, testCase.fExitState,
-			testCase.fCompatibilityMask, testCase.fSupportedByHam,
-			testCase.fSkipMask, testCase.fStartLineIndex,
-			testCase.fEndLineIndex);
+						 outputFiles,
+						 testCase.fMissingOutputFiles,
+						 testCase.fOutputIsException,
+						 testCase.fExitState,
+						 testCase.fCompatibilityMask,
+						 testCase.fSupportedByHam,
+						 testCase.fSkipMask,
+						 testCase.fStartLineIndex,
+						 testCase.fEndLineIndex);
 	}
 
 	return test.release();
 }
-
 
 bool
 DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
@@ -528,7 +556,7 @@ DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
 		if (!std::getline(fInput, line)) {
 			if (multiLine) {
 				_Throw(std::string("Unexpected end of file while reading "
-					"multi-line argument"));
+								   "multi-line argument"));
 			}
 			return false;
 		}
@@ -566,7 +594,7 @@ DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
 		} else if (line[2] == '}') {
 			if (!multiLine) {
 				_Throw(std::string("Unmatched end of multi-line argument "
-					"directive ('#}')"));
+								   "directive ('#}')"));
 			}
 			multiLine = false;
 		} else {
@@ -589,14 +617,13 @@ DataBasedTestParser::_ReadLine(std::string& _line, std::string& _directive)
 	return true;
 }
 
-
 void
 DataBasedTestParser::_Throw(const std::string& message, size_t column)
 {
-	throw parser::ParseException(message, fFileName,
-		parser::ParsePosition(fLineIndex, column));
+	throw parser::ParseException(message,
+								 fFileName,
+								 parser::ParsePosition(fLineIndex, column));
 }
-
 
 } // namespace test
 } // namespace ham

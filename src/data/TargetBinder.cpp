@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/TargetBinder.h"
 
 #include "data/FileStatus.h"
@@ -11,18 +10,19 @@
 #include "data/Target.h"
 #include "data/VariableDomain.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 static const String kLocateVariableName("LOCATE");
 static const String kSearchVariableName("SEARCH");
 
-
 /*static*/ void
 TargetBinder::Bind(const VariableDomain& globalVariables,
-	const Target* target, String& _boundPath, FileStatus& _fileStatus)
+				   const Target* target,
+				   String& _boundPath,
+				   FileStatus& _fileStatus)
 {
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).
@@ -80,6 +80,5 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

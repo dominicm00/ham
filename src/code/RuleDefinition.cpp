@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/RuleDefinition.h"
 
 #include "code/Block.h"
@@ -12,18 +11,18 @@
 #include "code/RulePool.h"
 #include "code/UserRuleInstructions.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 RuleDefinition::RuleDefinition(const String& ruleName,
-	const StringList& parameterNames, Block* block)
-	:
-	fRuleName(ruleName),
-	fParameterNames(parameterNames),
-	fBlock(block),
-	fInstructions(NULL)
+							   const StringList& parameterNames,
+							   Block* block)
+	: fRuleName(ruleName),
+	  fParameterNames(parameterNames),
+	  fBlock(block),
+	  fInstructions(NULL)
 {
 	fBlock->AcquireReference();
 
@@ -34,13 +33,11 @@ RuleDefinition::RuleDefinition(const String& ruleName,
 	fInstructions = new UserRuleInstructions(fParameterNames, fBlock);
 }
 
-
 RuleDefinition::~RuleDefinition()
 {
 	fInstructions->ReleaseReference();
 	fBlock->ReleaseReference();
 }
-
 
 StringList
 RuleDefinition::Evaluate(EvaluationContext& context)
@@ -49,7 +46,6 @@ RuleDefinition::Evaluate(EvaluationContext& context)
 	rule.SetInstructions(fInstructions);
 	return StringList::False();
 }
-
 
 code::Node*
 RuleDefinition::Visit(NodeVisitor& visitor)
@@ -60,12 +56,11 @@ RuleDefinition::Visit(NodeVisitor& visitor)
 	return fBlock->Visit(visitor);
 }
 
-
 void
 RuleDefinition::Dump(DumpContext& context) const
 {
 	context << "RuleDefinition(\"" << fRuleName << "\", " << fParameterNames
-		<< ")\n";
+			<< ")\n";
 
 	context.BeginChildren();
 
@@ -75,6 +70,5 @@ RuleDefinition::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

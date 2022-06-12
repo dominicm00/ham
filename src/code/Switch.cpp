@@ -3,36 +3,32 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/Switch.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 Switch::Switch(Node* argument)
-	:
-	fArgument(argument),
-	fCases()
+	: fArgument(argument),
+	  fCases()
 {
 	fArgument->AcquireReference();
 }
-
 
 Switch::~Switch()
 {
 	fArgument->ReleaseReference();
 
-	for (CaseList::const_iterator it = fCases.begin();
-			it != fCases.end(); ++it) {
+	for (CaseList::const_iterator it = fCases.begin(); it != fCases.end();
+		 ++it) {
 		(*it)->ReleaseReference();
 	}
 }
-
 
 StringList
 Switch::Evaluate(EvaluationContext& context)
@@ -56,7 +52,6 @@ Switch::Evaluate(EvaluationContext& context)
 	return StringList::False();
 }
 
-
 code::Node*
 Switch::Visit(NodeVisitor& visitor)
 {
@@ -66,15 +61,14 @@ Switch::Visit(NodeVisitor& visitor)
 	if (Node* result = fArgument->Visit(visitor))
 		return result;
 
-	for (CaseList::const_iterator it = fCases.begin();
-			it != fCases.end(); ++it) {
+	for (CaseList::const_iterator it = fCases.begin(); it != fCases.end();
+		 ++it) {
 		if (Node* result = (*it)->Visit(visitor))
 			return result;
 	}
 
 	return NULL;
 }
-
 
 void
 Switch::Dump(DumpContext& context) const
@@ -84,8 +78,8 @@ Switch::Dump(DumpContext& context) const
 
 	fArgument->Dump(context);
 
-	for (CaseList::const_iterator it = fCases.begin();
-			it != fCases.end(); ++it) {
+	for (CaseList::const_iterator it = fCases.begin(); it != fCases.end();
+		 ++it) {
 		(*it)->Dump(context);
 	}
 
@@ -93,6 +87,5 @@ Switch::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

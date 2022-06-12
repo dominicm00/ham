@@ -5,78 +5,64 @@
 #ifndef HAM_DATA_STRING_BUFFER_H
 #define HAM_DATA_STRING_BUFFER_H
 
-
 #include <string>
 
 #include "data/String.h"
 
+namespace ham
+{
+namespace data
+{
 
-namespace ham {
-namespace data {
+class StringBuffer
+{
+  public:
+	inline StringBuffer();
+	inline StringBuffer(const StringBuffer& other);
+	inline ~StringBuffer();
 
+	inline const char* Data() const;
+	inline char* Data();
+	inline size_t Length() const;
 
-class StringBuffer {
-public:
-	inline						StringBuffer();
-	inline						StringBuffer(const StringBuffer& other);
-	inline						~StringBuffer();
+	inline StringBuffer& Append(const char* string, size_t length);
 
-	inline	const char*			Data() const;
-	inline	char*				Data();
-	inline	size_t				Length() const;
+	inline StringBuffer& operator=(const StringBuffer& other);
+	inline StringBuffer& operator=(const StringPart& string);
+	inline StringBuffer& operator=(const String& string);
 
-	inline	StringBuffer&		Append(const char* string, size_t length);
+	inline StringBuffer& operator+=(char c);
+	inline StringBuffer& operator+=(const StringBuffer& other);
+	inline StringBuffer& operator+=(const StringPart& string);
+	inline StringBuffer& operator+=(const String& string);
 
-	inline	StringBuffer&		operator=(const StringBuffer& other);
-	inline	StringBuffer&		operator=(const StringPart& string);
-	inline	StringBuffer&		operator=(const String& string);
+	inline bool operator==(const StringBuffer& other) const;
+	inline bool operator!=(const StringBuffer& other) const;
 
-	inline	StringBuffer&		operator+=(char c);
-	inline	StringBuffer&		operator+=(const StringBuffer& other);
-	inline	StringBuffer&		operator+=(const StringPart& string);
-	inline	StringBuffer&		operator+=(const String& string);
+	inline char operator[](int index) const;
 
-	inline	bool				operator==(const StringBuffer& other) const;
-	inline	bool				operator!=(const StringBuffer& other) const;
-
-	inline	char				operator[](int index) const;
-
-//	inline						operator std::string() const;
-	inline						operator String() const;
-	inline						operator const char*() const;
+	//	inline						operator std::string() const;
+	inline operator String() const;
+	inline operator const char*() const;
 
 	template<typename Output>
-	friend inline Output&		operator<<(Output& out,
-									const StringBuffer& buffer);
+	friend inline Output& operator<<(Output& out, const StringBuffer& buffer);
 
-private:
-			enum {
-				MIN_BUFFER_SIZE = 256
-			};
+  private:
+	enum { MIN_BUFFER_SIZE = 256 };
 
-private:
-			std::string			fData;
+  private:
+	std::string fData;
 };
 
-
-
-
-StringBuffer::StringBuffer()
-{
-}
-
+StringBuffer::StringBuffer() {}
 
 StringBuffer::StringBuffer(const StringBuffer& other)
-	:
-	fData(other.fData)
+	: fData(other.fData)
 {
 }
 
-
-StringBuffer::~StringBuffer()
-{
-}
-
+StringBuffer::~StringBuffer() {}
 
 const char*
 StringBuffer::Data() const
@@ -84,20 +70,17 @@ StringBuffer::Data() const
 	return fData.c_str();
 }
 
-
 char*
 StringBuffer::Data()
 {
 	return &fData[0];
 }
 
-
 size_t
 StringBuffer::Length() const
 {
 	return fData.length();
 }
-
 
 StringBuffer&
 StringBuffer::Append(const char* string, size_t length)
@@ -113,14 +96,12 @@ StringBuffer::Append(const char* string, size_t length)
 	return *this;
 }
 
-
 StringBuffer&
 StringBuffer::operator=(const StringBuffer& other)
 {
 	fData = other.fData;
 	return *this;
 }
-
 
 StringBuffer&
 StringBuffer::operator=(const StringPart& string)
@@ -129,14 +110,12 @@ StringBuffer::operator=(const StringPart& string)
 	return *this;
 }
 
-
 StringBuffer&
 StringBuffer::operator=(const String& string)
 {
 	fData = string.ToStlString();
 	return *this;
 }
-
 
 StringBuffer&
 StringBuffer::operator+=(char c)
@@ -149,13 +128,11 @@ StringBuffer::operator+=(char c)
 	return *this;
 }
 
-
 StringBuffer&
 StringBuffer::operator+=(const StringBuffer& other)
 {
 	return Append(other.Data(), other.Length());
 }
-
 
 StringBuffer&
 StringBuffer::operator+=(const StringPart& string)
@@ -163,13 +140,11 @@ StringBuffer::operator+=(const StringPart& string)
 	return Append(string.Start(), string.Length());
 }
 
-
 StringBuffer&
 StringBuffer::operator+=(const String& string)
 {
 	return Append(string.ToCString(), string.Length());
 }
-
 
 bool
 StringBuffer::operator==(const StringBuffer& other) const
@@ -177,13 +152,11 @@ StringBuffer::operator==(const StringBuffer& other) const
 	return fData == other.fData;
 }
 
-
 bool
 StringBuffer::operator!=(const StringBuffer& other) const
 {
 	return fData != other.fData;
 }
-
 
 char
 StringBuffer::operator[](int index) const
@@ -191,24 +164,20 @@ StringBuffer::operator[](int index) const
 	return fData[index];
 }
 
-
-//StringBuffer::operator std::string() const
+// StringBuffer::operator std::string() const
 //{
 //	return std::string(Data());
-//}
-
+// }
 
 StringBuffer::operator String() const
 {
 	return String(Data());
 }
 
-
 StringBuffer::operator const char*() const
 {
 	return Data();
 }
-
 
 template<typename Output>
 inline Output&
@@ -217,14 +186,10 @@ operator<<(Output& out, const StringBuffer& buffer)
 	return out << buffer.fData;
 }
 
-
-}	// namespace data
-
+} // namespace data
 
 using data::StringBuffer;
 
+} // namespace ham
 
-}	// namespace ham
-
-
-#endif	// HAM_DATA_STRING_BUFFER_H
+#endif // HAM_DATA_STRING_BUFFER_H

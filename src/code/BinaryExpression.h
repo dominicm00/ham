@@ -5,34 +5,33 @@
 #ifndef HAM_CODE_BINARY_EXPRESSION_H
 #define HAM_CODE_BINARY_EXPRESSION_H
 
-
 #include "code/Node.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 template<typename Operator>
-class BinaryExpression : public Node {
-public:
-								BinaryExpression(Node* left, Node* right);
-	virtual						~BinaryExpression();
+class BinaryExpression : public Node
+{
+  public:
+	BinaryExpression(Node* left, Node* right);
+	virtual ~BinaryExpression();
 
-	virtual	StringList			Evaluate(EvaluationContext& context);
-	virtual	Node*				Visit(NodeVisitor& visitor);
-	virtual	void				Dump(DumpContext& context) const;
+	virtual StringList Evaluate(EvaluationContext& context);
+	virtual Node* Visit(NodeVisitor& visitor);
+	virtual void Dump(DumpContext& context) const;
 
-private:
-			Node*				fLeft;
-			Node*				fRight;
+  private:
+	Node* fLeft;
+	Node* fRight;
 };
-
 
 // declare the specializations
 
-#define HAM_DECLARE_OPERATOR_EXPRESSION(name)					\
-	struct name##Operator;										\
+#define HAM_DECLARE_OPERATOR_EXPRESSION(name)                                  \
+	struct name##Operator;                                                     \
 	typedef BinaryExpression<name##Operator> name##Expression;
 
 HAM_DECLARE_OPERATOR_EXPRESSION(Equal)
@@ -46,9 +45,7 @@ HAM_DECLARE_OPERATOR_EXPRESSION(Or)
 
 #undef HAM_DECLARE_OPERATOR_EXPRESSION
 
+} // namespace code
+} // namespace ham
 
-}	// namespace code
-}	// namespace ham
-
-
-#endif	// HAM_CODE_BINARY_EXPRESSION_H
+#endif // HAM_CODE_BINARY_EXPRESSION_H

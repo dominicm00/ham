@@ -5,77 +5,62 @@
 #ifndef HAM_DATA_TIME_H
 #define HAM_DATA_TIME_H
 
-
 #include <stddef.h>
 #include <stdint.h>
 
 #include "String.h"
 
+namespace ham
+{
+namespace data
+{
 
-namespace ham {
-namespace data {
+class Time
+{
+  public:
+	static const uint32_t kNanoFactor = 1000000000;
 
+  public:
+	inline Time();
+	inline Time(int64_t nanoSeconds);
+	inline Time(uint32_t seconds, uint32_t nanoSeconds);
 
-class Time {
-public:
-	static	const uint32_t		kNanoFactor = 1000000000;
+	bool IsValid() const { return fNanoSeconds >= 0; }
 
-public:
-	inline						Time();
-	inline						Time(int64_t nanoSeconds);
-	inline						Time(uint32_t seconds,
-									uint32_t nanoSeconds);
+	uint32_t Seconds() const { return fNanoSeconds / kNanoFactor; }
+	uint32_t NanoSeconds() const { return fNanoSeconds % kNanoFactor; }
 
-			bool				IsValid() const
-									{ return fNanoSeconds >= 0; }
+	String ToString(bool includeNanoSeconds = true) const;
 
-			uint32_t			Seconds() const
-									{ return fNanoSeconds / kNanoFactor; }
-			uint32_t			NanoSeconds() const
-									{ return fNanoSeconds % kNanoFactor; }
+	static Time Now();
 
-			String				ToString(bool includeNanoSeconds = true) const;
+	inline bool operator==(const Time& other) const;
+	bool operator!=(const Time& other) const { return !(*this == other); }
 
-	static	Time				Now();
+	inline bool operator<(const Time& other) const;
+	bool operator>(const Time& other) const { return other < *this; }
+	bool operator<=(const Time& other) const { return !(*this > other); }
+	bool operator>=(const Time& other) const { return other <= *this; }
 
-	inline	bool				operator==(const Time& other) const;
-			bool				operator!=(const Time& other) const
-									{ return !(*this == other); }
-
-	inline	bool				operator<(const Time& other) const;
-			bool				operator>(const Time& other) const
-									{ return other < *this; }
-			bool				operator<=(const Time& other) const
-									{ return !(*this > other); }
-			bool				operator>=(const Time& other) const
-									{ return other <= *this; }
-
-private:
-			int64_t				fNanoSeconds;
-									// nanoseconds since the Epoch
+  private:
+	int64_t fNanoSeconds;
+	// nanoseconds since the Epoch
 };
 
-
 Time::Time()
-	:
-	fNanoSeconds(-1)
+	: fNanoSeconds(-1)
 {
 }
-
 
 Time::Time(int64_t nanoSeconds)
-	:
-	fNanoSeconds(nanoSeconds)
+	: fNanoSeconds(nanoSeconds)
 {
 }
-
 
 Time::Time(uint32_t seconds, uint32_t nanoSeconds)
-	:
-	fNanoSeconds((int64_t)seconds * 1000000000 + nanoSeconds)
+	: fNanoSeconds((int64_t)seconds * 1000000000 + nanoSeconds)
 {
 }
-
 
 bool
 Time::operator==(const Time& other) const
@@ -83,16 +68,13 @@ Time::operator==(const Time& other) const
 	return fNanoSeconds == other.fNanoSeconds;
 }
 
-
 bool
 Time::operator<(const Time& other) const
 {
 	return fNanoSeconds < other.fNanoSeconds;
 }
 
-
-}	// namespace data
-}	// namespace ham
-
+} // namespace data
+} // namespace ham
 
 #endif // HAM_DATA_TIME_H

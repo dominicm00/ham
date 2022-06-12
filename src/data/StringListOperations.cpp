@@ -3,33 +3,29 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "data/StringListOperations.h"
 
 #include "data/Path.h"
 
-
-namespace ham {
-namespace data {
-
+namespace ham
+{
+namespace data
+{
 
 // #pragma mark - StringListOperations
 
-
 StringListOperations::StringListOperations()
-	:
-	fOperations(0),
-	fGristParameter(),
-	fDirectoryParameter(),
-	fBaseNameParameter(),
-	fSuffixParameter(),
-	fArchiveMemberParameter(),
-	fRootParameter(),
-	fEmptyParameter(),
-	fJoinParameter()
+	: fOperations(0),
+	  fGristParameter(),
+	  fDirectoryParameter(),
+	  fBaseNameParameter(),
+	  fSuffixParameter(),
+	  fArchiveMemberParameter(),
+	  fRootParameter(),
+	  fEmptyParameter(),
+	  fJoinParameter()
 {
 }
-
 
 void
 StringListOperations::Parse(const char* start, const char* end)
@@ -75,8 +71,8 @@ StringListOperations::Parse(const char* start, const char* end)
 				pendingParameter = &fSuffixParameter;
 				break;
 			case 'M':
-				pendingOperation = SELECT_ARCHIVE_MEMBER
-					| REPLACE_ARCHIVE_MEMBER;
+				pendingOperation =
+					SELECT_ARCHIVE_MEMBER | REPLACE_ARCHIVE_MEMBER;
 				pendingParameter = &fArchiveMemberParameter;
 				break;
 			case 'U':
@@ -118,10 +114,10 @@ StringListOperations::Parse(const char* start, const char* end)
 	}
 }
 
-
 StringList
-StringListOperations::Apply(const StringList& inputList, size_t maxSize,
-	const behavior::Behavior& behavior) const
+StringListOperations::Apply(const StringList& inputList,
+							size_t maxSize,
+							const behavior::Behavior& behavior) const
 {
 	if (!HasOperations())
 		return inputList.SubList(0, maxSize);
@@ -139,8 +135,7 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	// the join parameter first and join as usual afterwards.
 	String joinParameterBuffer;
 	StringPart joinParameter = fJoinParameter;
-	if (!joinParameter.IsEmpty()
-		&& (operations & (TO_UPPER | TO_LOWER)) != 0
+	if (!joinParameter.IsEmpty() && (operations & (TO_UPPER | TO_LOWER)) != 0
 		&& behavior.GetJoinCaseOperator()
 			== behavior::Behavior::JOIN_BEFORE_CASE_OPERATOR) {
 		joinParameterBuffer = joinParameter;
@@ -154,9 +149,10 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	StringList resultList;
 	StringBuffer buffer;
 
-	const StringList& list
-		= inputList.IsEmpty() && (operations & REPLACE_EMPTY) != 0
-			? StringList(String(fEmptyParameter)) : inputList;
+	const StringList& list =
+		inputList.IsEmpty() && (operations & REPLACE_EMPTY) != 0
+		? StringList(String(fEmptyParameter))
+		: inputList;
 
 	size_t count = std::min(list.Size(), maxSize);
 	for (size_t i = 0; i < count; i++) {
@@ -242,6 +238,5 @@ StringListOperations::Apply(const StringList& inputList, size_t maxSize,
 	return resultList;
 }
 
-
-}	// namespace data
-}	// namespace ham
+} // namespace data
+} // namespace ham

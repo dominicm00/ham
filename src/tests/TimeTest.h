@@ -5,28 +5,25 @@
 #ifndef HAM_TESTS_TIME_TEST_H
 #define HAM_TESTS_TIME_TEST_H
 
-
 #include "test/TestFixture.h"
 
+namespace ham
+{
+namespace tests
+{
 
-namespace ham {
-namespace tests {
-
-
-class TimeTest : public test::TestFixture {
-public:
-			void				Constructor();
-			void				Comparison();
-			void				Now();
+class TimeTest : public test::TestFixture
+{
+  public:
+	void Constructor();
+	void Comparison();
+	void Now();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(TimeTest, 3,
-		Constructor, Comparison, Now)
+	HAM_ADD_TEST_CASES(TimeTest, 3, Constructor, Comparison, Now)
 };
-
 
 } // namespace tests
 } // namespace ham
-
 
 #endif // HAM_TESTS_TIME_TEST_H

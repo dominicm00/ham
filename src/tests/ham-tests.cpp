@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,9 +25,7 @@
 #include "tests/TimeTest.h"
 #include "tests/VariableExpansionTest.h"
 
-
 using namespace ham;
-
 
 static void
 print_usage(const char* programName, bool error)
@@ -37,24 +34,28 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "Usage: %s [ <options> ] [ <tests> ]\n", programName);
 	fprintf(out, "Options:\n");
 	fprintf(out, "  -c <version>, --compatibility <version>\n");
-	fprintf(out, "      Behave compatible to <version>, which is either of "
-		"\"jam\" (plain jam\n");
-	fprintf(out, "      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
-		"default).\n");
+	fprintf(out,
+			"      Behave compatible to <version>, which is either of "
+			"\"jam\" (plain jam\n");
+	fprintf(out,
+			"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
+			"default).\n");
 	fprintf(out, "  -d <directory>, --data <directory>\n");
-	fprintf(out, "      Use test data directory <directory>. By default the "
-		"program tries to\n");
-	fprintf(out, "      find the test data directory relative to the current "
-		"working directory.\n");
+	fprintf(out,
+			"      Use test data directory <directory>. By default the "
+			"program tries to\n");
+	fprintf(out,
+			"      find the test data directory relative to the current "
+			"working directory.\n");
 	fprintf(out, "  -h, --help\n");
 	fprintf(out, "      Print this usage message.\n");
 	fprintf(out, "  -j <executable>, --jam <executable>\n");
-	fprintf(out, "      Use the jam executable <executable> to run the tests "
-		"supporting it.\n");
+	fprintf(out,
+			"      Use the jam executable <executable> to run the tests "
+			"supporting it.\n");
 	fprintf(out, "  -l, --list\n");
 	fprintf(out, "      List all available tests and exit.\n");
 }
-
 
 static void
 print_usage_end_exit(const char* programName, bool error)
@@ -62,7 +63,6 @@ print_usage_end_exit(const char* programName, bool error)
 	print_usage(programName, error);
 	exit(error ? 1 : 0);
 }
-
 
 static void
 list_tests(test::Test* test, int level = 0)
@@ -76,16 +76,17 @@ list_tests(test::Test* test, int level = 0)
 		int count = testSuite->CountTests();
 		for (int i = 0; i < count; i++)
 			list_tests(testSuite->TestAt(i), level + 1);
-	} else if (test::RunnableTest* runnableTest
-			= dynamic_cast<test::RunnableTest*>(test)) {
+	} else if (test::RunnableTest* runnableTest =
+				   dynamic_cast<test::RunnableTest*>(test)) {
 		int count = runnableTest->CountTestCases();
 		for (int i = 0; i < count; i++) {
-			printf("%*s%s\n", 2 * (level + 1), "",
-				runnableTest->TestCaseAt(i).c_str());
+			printf("%*s%s\n",
+				   2 * (level + 1),
+				   "",
+				   runnableTest->TestCaseAt(i).c_str());
 		}
 	}
 }
-
 
 static std::string
 find_test_data_directory()
@@ -112,10 +113,9 @@ find_test_data_directory()
 	}
 }
 
-
 static void
 add_data_based_tests_recursive(test::TestSuite& testSuite,
-	const std::string& directory)
+							   const std::string& directory)
 {
 	DIR* dir = opendir(directory.c_str());
 	if (dir == NULL)
@@ -144,10 +144,13 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 				testSuite.AddTest(
 					test::DataBasedTestParser().Parse(path.c_str()));
 			} catch (parser::ParseException& exception) {
-				fprintf(stderr, "add_data_based_tests_recursive(): %s:%zu:%zu "
-					"Parse exception: %s\n", path.c_str(),
-					exception.Position().Line() + 1,
-					exception.Position().Column() + 1, exception.Message());
+				fprintf(stderr,
+						"add_data_based_tests_recursive(): %s:%zu:%zu "
+						"Parse exception: %s\n",
+						path.c_str(),
+						exception.Position().Line() + 1,
+						exception.Position().Column() + 1,
+						exception.Message());
 				exit(1);
 			}
 		}
@@ -155,7 +158,6 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 
 	closedir(dir);
 }
-
 
 static void
 add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
@@ -170,7 +172,6 @@ add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
 	}
 }
 
-
 int
 main(int argc, const char* const* argv)
 {
@@ -179,16 +180,16 @@ main(int argc, const char* const* argv)
 	test::TestSuite testSuite;
 	test::TestSuiteBuilder(testSuite)
 		.AddSuite("Data")
-			.Add<PathTest>()
-			.Add<RegExpTest>()
-			.Add<StringListTest>()
-			.Add<StringPartTest>()
-			.Add<StringTest>()
-			.Add<TargetBinderTest>()
-			.Add<TimeTest>()
+		.Add<PathTest>()
+		.Add<RegExpTest>()
+		.Add<StringListTest>()
+		.Add<StringPartTest>()
+		.Add<StringTest>()
+		.Add<TargetBinderTest>()
+		.Add<TimeTest>()
 		.End()
 		.AddSuite("Code")
-			.Add<VariableExpansionTest>()
+		.Add<VariableExpansionTest>()
 		.End();
 
 	// parse arguments
@@ -226,8 +227,7 @@ main(int argc, const char* const* argv)
 		// short ("-") option(s)
 		for (; *arg != '\0'; arg++) {
 			switch (*arg) {
-				case 'c':
-				{
+				case 'c': {
 					if (argi == argc)
 						print_usage_end_exit(argv[0], true);
 
@@ -239,9 +239,10 @@ main(int argc, const char* const* argv)
 					} else if (strcmp(compatibilityString, "ham") == 0) {
 						compatibility = behavior::COMPATIBILITY_HAM;
 					} else {
-						fprintf(stderr, "Error: Invalid argument for "
-							"compatibility option: \"%s\"\n",
-							compatibilityString);
+						fprintf(stderr,
+								"Error: Invalid argument for "
+								"compatibility option: \"%s\"\n",
+								compatibilityString);
 						exit(1);
 					}
 					explicitCompatibility = true;
@@ -262,8 +263,8 @@ main(int argc, const char* const* argv)
 					// If not explicitly given, guess the jam version.
 					if (!explicitCompatibility) {
 						const char* slash = strrchr(jamExecutable.c_str(), '/');
-						const char* baseName = slash != NULL
-							? slash + 1 : jamExecutable.c_str();
+						const char* baseName =
+							slash != NULL ? slash + 1 : jamExecutable.c_str();
 						if (strcmp(baseName, "jam") == 0)
 							compatibility = behavior::COMPATIBILITY_JAM;
 						else if (strcmp(baseName, "bjam") == 0)
@@ -296,8 +297,10 @@ main(int argc, const char* const* argv)
 		while (argi < argc) {
 			const char* testName = argv[argi++];
 			if (!testRunner.AddTest(&testSuite, testName)) {
-				fprintf(stderr, "Unknown test \"%s\". Use option \"--list\" to "
-					"list available tests.\n", testName);
+				fprintf(stderr,
+						"Unknown test \"%s\". Use option \"--list\" to "
+						"list available tests.\n",
+						testName);
 				exit(1);
 			}
 		}

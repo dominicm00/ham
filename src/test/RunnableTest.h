@@ -5,56 +5,51 @@
 #ifndef HAM_TEST_RUNNABLE_TEST_H
 #define HAM_TEST_RUNNABLE_TEST_H
 
-
 #include <memory>
 #include <vector>
 
 #include "test/Test.h"
 #include "test/TestEnvironment.h"
 
+namespace ham
+{
+namespace test
+{
 
-namespace ham {
-namespace test {
+class RunnableTest : public Test
+{
+  public:
+	RunnableTest(const std::string& name, bool isJammable = false);
 
+	bool IsJammable() const { return fIsJammable; }
 
-class RunnableTest : public Test {
-public:
-								RunnableTest(const std::string& name,
-									bool isJammable = false);
+	int CountTestCases() const { return fTestCaseNames.size(); }
+	std::string TestCaseAt(int index, bool fullyQualified = false) const;
+	int IndexOfTestCase(const std::string& testCase) const;
 
-			bool				IsJammable() const
-									{ return fIsJammable; }
+	virtual void* CreateFixture(TestEnvironment* environment) = 0;
+	virtual void DeleteFixture(TestEnvironment* environment, void* fixture) = 0;
+	virtual uint32_t TestCaseCompatibility(int index,
+										   bool& _supportedByHam,
+										   uint32_t& _skipMask);
+	virtual void RunTestCase(TestEnvironment* environment,
+							 void* fixture,
+							 int index) = 0;
 
-			int					CountTestCases() const
-									{ return fTestCaseNames.size(); }
-			std::string			TestCaseAt(int index,
-									bool fullyQualified = false) const;
-			int					IndexOfTestCase(const std::string& testCase)
-									const;
+  protected:
+	typedef std::vector<std::string> TestCaseNameList;
 
-	virtual	void*				CreateFixture(TestEnvironment* environment) = 0;
-	virtual	void				DeleteFixture(TestEnvironment* environment,
-									void* fixture) = 0;
-	virtual	uint32_t			TestCaseCompatibility(int index,
-									bool& _supportedByHam, uint32_t& _skipMask);
-	virtual	void				RunTestCase(TestEnvironment* environment,
-									void* fixture, int index) = 0;
-
-protected:
-			typedef std::vector<std::string> TestCaseNameList;
-
-protected:
-			TestCaseNameList	fTestCaseNames;
-			bool				fIsJammable;
+  protected:
+	TestCaseNameList fTestCaseNames;
+	bool fIsJammable;
 };
 
-
 template<typename TestFixture>
-class GenericRunnableTest : public RunnableTest {
-public:
+class GenericRunnableTest : public RunnableTest
+{
+  public:
 	GenericRunnableTest()
-		:
-		RunnableTest(TestFixture::TestFixtureName())
+		: RunnableTest(TestFixture::TestFixtureName())
 	{
 		AddTestCaseVisitor visitor(this);
 		TestFixture::VisitTestCases(visitor);
@@ -70,8 +65,9 @@ public:
 		delete (TestFixture*)fixture;
 	}
 
-	virtual void RunTestCase(TestEnvironment* /*environment*/, void* _fixture,
-		int index)
+	virtual void RunTestCase(TestEnvironment* /*environment*/,
+							 void* _fixture,
+							 int index)
 	{
 		TestCaseMethod method = fTestCaseMethods[index];
 		TestFixture* fixture = (TestFixture*)_fixture;
@@ -87,14 +83,13 @@ public:
 		CleanupTestCase(fixture, 0);
 	}
 
-private:
+  private:
 	typedef void (TestFixture::*TestCaseMethod)();
 	typedef std::vector<TestCaseMethod> TestCaseMethodList;
 
 	struct AddTestCaseVisitor {
 		AddTestCaseVisitor(GenericRunnableTest<TestFixture>* test)
-			:
-			fTest(test)
+			: fTest(test)
 		{
 		}
 
@@ -103,11 +98,11 @@ private:
 			fTest->_AddTestCase(name, method);
 		}
 
-	private:
-		GenericRunnableTest<TestFixture>*	fTest;
+	  private:
+		GenericRunnableTest<TestFixture>* fTest;
 	};
 
-private:
+  private:
 	void _AddTestCase(const std::string& name, void (TestFixture::*method)())
 	{
 		fTestCaseMethods.push_back(method);
@@ -115,37 +110,36 @@ private:
 	}
 
 	template<typename Type>
-//	static void InitTestCase(Type* fixture, char[sizeof(& Type::InitTestCase)])
-	static void InitTestCase(Type* fixture, decltype(& Type::InitTestCase))
+	//	static void InitTestCase(Type* fixture, char[sizeof(&
+	//Type::InitTestCase)])
+	static void InitTestCase(Type* fixture, decltype(&Type::InitTestCase))
 	{
 		fixture->InitTestCase();
 	}
 
 	template<typename Type>
-	static void InitTestCase(Type* /*fixture*/,...)
+	static void InitTestCase(Type* /*fixture*/, ...)
 	{
 	}
 
 	template<typename Type>
 	static void CleanupTestCase(Type* fixture,
-//		char[sizeof(Type::CleanupTestCase)])
-		decltype(&Type::CleanupTestCase))
+								//		char[sizeof(Type::CleanupTestCase)])
+								decltype(&Type::CleanupTestCase))
 	{
 		fixture->CleanupTestCase();
 	}
 
 	template<typename Type>
-	static void CleanupTestCase(Type* /*fixture*/,...)
+	static void CleanupTestCase(Type* /*fixture*/, ...)
 	{
 	}
 
-private:
-	TestCaseMethodList	fTestCaseMethods;
+  private:
+	TestCaseMethodList fTestCaseMethods;
 };
-
 
 } // namespace test
 } // namespace ham
-
 
 #endif // HAM_TEST_RUNNABLE_TEST_H

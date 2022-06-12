@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/FunctionCall.h"
 
 #include "code/DumpContext.h"
@@ -14,44 +13,39 @@
 #include "data/TargetPool.h"
 #include "util/Constants.h"
 
-
-namespace ham {
-namespace code {
-
+namespace ham
+{
+namespace code
+{
 
 FunctionCall::FunctionCall(Node* function)
-	:
-	fFunction(function),
-	fArguments()
+	: fFunction(function),
+	  fArguments()
 {
 	fFunction->AcquireReference();
 }
 
-
 FunctionCall::FunctionCall(Node* function, const NodeList& arguments)
-	:
-	fFunction(function),
-	fArguments(arguments)
+	: fFunction(function),
+	  fArguments(arguments)
 {
 	fFunction->AcquireReference();
 
 	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
-		++it) {
+		 ++it) {
 		(*it)->AcquireReference();
 	}
 }
-
 
 FunctionCall::~FunctionCall()
 {
 	fFunction->ReleaseReference();
 
 	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
-		++it) {
+		 ++it) {
 		(*it)->ReleaseReference();
 	}
 }
-
 
 StringList
 FunctionCall::Evaluate(EvaluationContext& context)
@@ -61,7 +55,7 @@ FunctionCall::Evaluate(EvaluationContext& context)
 	if (callDepth >= util::kRuleCallDepthLimit) {
 		std::stringstream message;
 		message << "Reached rule call depth limit ("
-			<< util::kRuleCallDepthLimit << ")";
+				<< util::kRuleCallDepthLimit << ")";
 		throw EvaluationException(message.str());
 	}
 	context.SetRuleCallDepth(callDepth + 1);
@@ -73,7 +67,7 @@ FunctionCall::Evaluate(EvaluationContext& context)
 
 	size_t argumentIndex = 0;
 	for (ArgumentList::iterator it = fArguments.begin(); it != fArguments.end();
-		++it) {
+		 ++it) {
 		arguments[argumentIndex++] = (*it)->Evaluate(context);
 	}
 
@@ -83,15 +77,15 @@ FunctionCall::Evaluate(EvaluationContext& context)
 	size_t functionCount = functions.Size();
 	RulePool& rulePool = context.Rules();
 	data::TargetList targets;
-		// lazily initialized when needed
+	// lazily initialized when needed
 	data::TargetList sourceTargets;
-		// lazily initialized when needed
+	// lazily initialized when needed
 
 	for (size_t i = 0; i < functionCount; i++) {
 		Rule* function = rulePool.Lookup(functions.ElementAt(i));
 		if (function == NULL) {
 			context.ErrorOutput() << "warning: unknown rule "
-				<< functions.ElementAt(i) << std::endl;
+								  << functions.ElementAt(i) << std::endl;
 			continue;
 		}
 
@@ -111,7 +105,8 @@ FunctionCall::Evaluate(EvaluationContext& context)
 				new data::RuleActionsCall(actions, targets, sourceTargets),
 				true);
 			for (data::TargetList::iterator it = targets.begin();
-				it != targets.end(); ++it) {
+				 it != targets.end();
+				 ++it) {
 				(*it)->AddActionsCall(actionsCall.Get());
 			}
 		}
@@ -127,7 +122,6 @@ FunctionCall::Evaluate(EvaluationContext& context)
 	return result;
 }
 
-
 code::Node*
 FunctionCall::Visit(NodeVisitor& visitor)
 {
@@ -138,14 +132,14 @@ FunctionCall::Visit(NodeVisitor& visitor)
 		return result;
 
 	for (ArgumentList::const_iterator it = fArguments.begin();
-			it != fArguments.end(); ++it) {
+		 it != fArguments.end();
+		 ++it) {
 		if (Node* result = (*it)->Visit(visitor))
 			return result;
 	}
 
 	return NULL;
 }
-
 
 void
 FunctionCall::Dump(DumpContext& context) const
@@ -156,7 +150,8 @@ FunctionCall::Dump(DumpContext& context) const
 	fFunction->Dump(context);
 
 	for (ArgumentList::const_iterator it = fArguments.begin();
-			it != fArguments.end(); ++it) {
+		 it != fArguments.end();
+		 ++it) {
 		(*it)->Dump(context);
 	}
 
@@ -164,6 +159,5 @@ FunctionCall::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

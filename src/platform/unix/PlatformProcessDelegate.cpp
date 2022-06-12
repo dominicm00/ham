@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "platform/unix/PlatformProcessDelegate.h"
 
 #include <errno.h>
@@ -15,17 +14,15 @@
 
 #include "process/ChildInfo.h"
 
-
-namespace ham {
-namespace process {
-
+namespace ham
+{
+namespace process
+{
 
 PlatformProcessDelegate::PlatformProcessDelegate()
-	:
-	fPid(-1)
+	: fPid(-1)
 {
 }
-
 
 void
 PlatformProcessDelegate::Unset()
@@ -33,10 +30,10 @@ PlatformProcessDelegate::Unset()
 	fPid = -1;
 }
 
-
 bool
 PlatformProcessDelegate::Launch(const char* command,
-	const char* const* arguments, size_t /*argumentCount*/)
+								const char* const* arguments,
+								size_t /*argumentCount*/)
 {
 	Unset();
 
@@ -58,7 +55,6 @@ PlatformProcessDelegate::Launch(const char* command,
 	return true;
 }
 
-
 /*static*/ bool
 PlatformProcessDelegate::WaitForChild(ChildInfo& _childInfo)
 {
@@ -78,7 +74,6 @@ PlatformProcessDelegate::WaitForChild(ChildInfo& _childInfo)
 	_childInfo.fExited = true;
 	return true;
 }
-
 
 } // namespace process
 } // namespace ham

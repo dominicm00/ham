@@ -5,34 +5,39 @@
 #ifndef HAM_TESTS_PATH_TEST_H
 #define HAM_TESTS_PATH_TEST_H
 
-
 #include "test/TestFixture.h"
 
+namespace ham
+{
+namespace tests
+{
 
-namespace ham {
-namespace tests {
-
-
-class PathTest : public test::TestFixture {
-public:
-			void				IsAbsolute();
-			void				RemoveGrist();
-			void				Make();
-			void				GetFileStatus();
-			void				PartsConstructor();
-			void				PartsSetters();
-			void				PartsPath();
-			void				PartsIsAbsolute();
+class PathTest : public test::TestFixture
+{
+  public:
+	void IsAbsolute();
+	void RemoveGrist();
+	void Make();
+	void GetFileStatus();
+	void PartsConstructor();
+	void PartsSetters();
+	void PartsPath();
+	void PartsIsAbsolute();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(PathTest, 8,
-		IsAbsolute, RemoveGrist, Make, GetFileStatus, PartsConstructor,
-		PartsSetters, PartsPath, PartsIsAbsolute)
+	HAM_ADD_TEST_CASES(PathTest,
+					   8,
+					   IsAbsolute,
+					   RemoveGrist,
+					   Make,
+					   GetFileStatus,
+					   PartsConstructor,
+					   PartsSetters,
+					   PartsPath,
+					   PartsIsAbsolute)
 };
-
 
 } // namespace tests
 } // namespace ham
-
 
 #endif // HAM_TESTS_PATH_TEST_H

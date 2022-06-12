@@ -3,22 +3,22 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "TestException.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 
+namespace ham
+{
+namespace test
+{
 
-namespace ham {
-namespace test {
-
-
-TestException::TestException(const char* file, int line,
-	const char* message,...)
-	:
-	fFile(file),
-	fLine(line)
+TestException::TestException(const char* file,
+							 int line,
+							 const char* message,
+							 ...)
+	: fFile(file),
+	  fLine(line)
 {
 	char buffer[4096];
 
@@ -30,9 +30,8 @@ TestException::TestException(const char* file, int line,
 	fMessage = buffer;
 }
 
-
 void
-TestException::ThrowWithExtendedMessage(const char* message,...)
+TestException::ThrowWithExtendedMessage(const char* message, ...)
 {
 	char buffer[4096];
 
@@ -44,6 +43,5 @@ TestException::ThrowWithExtendedMessage(const char* message,...)
 	throw TestException(fFile, fLine, "%s\n%s", fMessage.c_str(), buffer);
 }
 
-
-}	// namespace test
-}	// namespace ham
+} // namespace test
+} // namespace ham

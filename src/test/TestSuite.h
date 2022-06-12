@@ -5,43 +5,39 @@
 #ifndef HAM_TEST_TEST_SUITE_H
 #define HAM_TEST_TEST_SUITE_H
 
-
 #include <vector>
 
-#include "test/Test.h"
 #include "test/RunnableTest.h"
+#include "test/Test.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 typedef std::vector<Test*> TestList;
 
+class TestSuite : public Test
+{
+  public:
+	TestSuite(const std::string& name = "");
+	virtual ~TestSuite();
 
-class TestSuite : public Test {
-public:
-								TestSuite(const std::string& name = "");
-	virtual						~TestSuite();
+	int CountTests() const { return fTests.size(); }
+	Test* TestAt(int index) const;
+	Test* GetTest(const std::string& name) const;
 
-			int					CountTests() const
-									{ return fTests.size(); }
-			Test*				TestAt(int index) const;
-			Test*				GetTest(const std::string& name) const;
+	void AddTest(Test* test);
 
-			void				AddTest(Test* test);
-
-private:
-			TestList			fTests;
+  private:
+	TestList fTests;
 };
-
 
 struct TestSuiteBuilder {
 	TestSuiteBuilder(TestSuite& testSuite,
-		TestSuiteBuilder* parentBuilder = NULL)
-		:
-		fTestSuite(testSuite),
-		fParentBuilder(parentBuilder)
+					 TestSuiteBuilder* parentBuilder = NULL)
+		: fTestSuite(testSuite),
+		  fParentBuilder(parentBuilder)
 	{
 	}
 
@@ -64,19 +60,14 @@ struct TestSuiteBuilder {
 		return TestSuiteBuilder(*testSuite, this);
 	}
 
-	TestSuiteBuilder& End()
-	{
-		return *fParentBuilder;
-	}
+	TestSuiteBuilder& End() { return *fParentBuilder; }
 
-private:
-	TestSuite&			fTestSuite;
-	TestSuiteBuilder*	fParentBuilder;
+  private:
+	TestSuite& fTestSuite;
+	TestSuiteBuilder* fParentBuilder;
 };
-
 
 } // namespace test
 } // namespace ham
-
 
 #endif // HAM_TEST_TEST_SUITE_H

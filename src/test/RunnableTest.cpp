@@ -3,21 +3,18 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "test/RunnableTest.h"
 
-
-namespace ham {
-namespace test {
-
+namespace ham
+{
+namespace test
+{
 
 RunnableTest::RunnableTest(const std::string& name, bool isJammable)
-	:
-	Test(name),
-	fIsJammable(isJammable)
+	: Test(name),
+	  fIsJammable(isJammable)
 {
 }
-
 
 std::string
 RunnableTest::TestCaseAt(int index, bool fullyQualified) const
@@ -33,7 +30,6 @@ RunnableTest::TestCaseAt(int index, bool fullyQualified) const
 	return testCaseName.empty() ? testName : testName + "::" + testCaseName;
 }
 
-
 int
 RunnableTest::IndexOfTestCase(const std::string& testCase) const
 {
@@ -46,10 +42,10 @@ RunnableTest::IndexOfTestCase(const std::string& testCase) const
 	return -1;
 }
 
-
 uint32_t
-RunnableTest::TestCaseCompatibility(int index, bool& _supportedByHam,
-	uint32_t& _skipMask)
+RunnableTest::TestCaseCompatibility(int index,
+									bool& _supportedByHam,
+									uint32_t& _skipMask)
 {
 	_supportedByHam = true;
 	_skipMask = 0;
@@ -57,6 +53,5 @@ RunnableTest::TestCaseCompatibility(int index, bool& _supportedByHam,
 	return behavior::COMPATIBILITY_MASK_ALL;
 }
 
-
-}	// namespace test
-}	// namespace ham
+} // namespace test
+} // namespace ham

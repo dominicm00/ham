@@ -3,21 +3,17 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/List.h"
 
 #include "code/DumpContext.h"
 #include "code/EvaluationContext.h"
 
-
-namespace ham {
-namespace code {
-
-
-List::List()
+namespace ham
 {
-}
+namespace code
+{
 
+List::List() {}
 
 List::~List()
 {
@@ -25,7 +21,6 @@ List::~List()
 	for (size_t i = 0; i < childCount; i++)
 		fChildren[i]->ReleaseReference();
 }
-
 
 StringList
 List::Evaluate(EvaluationContext& context)
@@ -37,7 +32,6 @@ List::Evaluate(EvaluationContext& context)
 
 	return result;
 }
-
 
 code::Node*
 List::Visit(NodeVisitor& visitor)
@@ -54,7 +48,6 @@ List::Visit(NodeVisitor& visitor)
 	return NULL;
 }
 
-
 void
 List::Dump(DumpContext& context) const
 {
@@ -69,6 +62,5 @@ List::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham

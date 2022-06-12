@@ -3,18 +3,14 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "code/RuleInstructions.h"
 
-
-namespace ham {
-namespace code {
-
-
-RuleInstructions::~RuleInstructions()
+namespace ham
 {
-}
+namespace code
+{
 
+RuleInstructions::~RuleInstructions() {}
 
-}	// namespace code
-}	// namespace ham
+} // namespace code
+} // namespace ham
