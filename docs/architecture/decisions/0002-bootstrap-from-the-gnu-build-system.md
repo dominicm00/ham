@@ -1,4 +1,4 @@
-# 3. Bootstrap from the GNU build system
+# 2. Bootstrap from the GNU build system
 
 Date: 2022-06-10
 
