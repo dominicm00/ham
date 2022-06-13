@@ -10,12 +10,17 @@ namespace ham
 namespace behavior
 {
 
+/**
+ * Available compatability modes. Includes other intepreters and
+ * current/previous Ham versions.
+ */
 enum Compatibility {
-	COMPATIBILITY_JAM,		 // plain jam 2.5
-	COMPATIBILITY_BOOST_JAM, // Boost.Jam (version?)
-	COMPATIBILITY_HAM_1,	 // Ham 1.0
+	COMPATIBILITY_JAM,		 ///< Perforce Jam 2.5
+	COMPATIBILITY_BOOST_JAM, ///< Boost.Jam
+	COMPATIBILITY_HAM_1,	 ///< Ham 1.0
 
 	COMPATIBILITY_HAM = COMPATIBILITY_HAM_1
+	///< Current Ham version
 };
 
 enum {
