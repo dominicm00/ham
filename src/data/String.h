@@ -21,6 +21,7 @@ namespace data
 
 class StringList;
 
+// TODO: This should be replaced with std::string.
 class String
 {
   public:

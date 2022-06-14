@@ -22,6 +22,7 @@ namespace data
 class StringList;
 typedef std::vector<StringList> StringListList;
 
+// TODO: Should be replaced with ranges and std::string
 class StringList
 {
   public:

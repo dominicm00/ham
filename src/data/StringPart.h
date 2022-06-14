@@ -15,6 +15,7 @@ namespace ham
 namespace data
 {
 
+// TODO: This should be replaced by `std::string_view`
 class StringPart
 {
   public:

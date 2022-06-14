@@ -14,6 +14,7 @@ namespace ham
 namespace data
 {
 
+// TODO: This should be replaced with std::string.
 class StringBuffer
 {
   public:
