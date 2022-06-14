@@ -40,6 +40,9 @@ Path::RemoveGrist(const StringPart& path)
 	return path;
 }
 
+/**
+ * Concatenates `head` onto `tail`, if `tail` is not already an absolute path.
+ */
 String
 Path::Make(const StringPart& head, const StringPart& tail)
 {
@@ -98,6 +101,9 @@ Path::Parts::IsAbsolute() const
 	return Path::IsAbsolute(fDirectory) || Path::IsAbsolute(fRoot);
 }
 
+/**
+ * Decomposes a string into Path::Parts.
+ */
 void
 Path::Parts::SetTo(const StringPart& path)
 {
@@ -152,6 +158,9 @@ Path::Parts::SetTo(const StringPart& path)
 	fBaseName.SetTo(remainder, fileNameEnd);
 }
 
+/**
+ * Insert the string representation of the path into `buffer`.
+ */
 void
 Path::Parts::GetPath(StringBuffer& buffer,
 					 const behavior::Behavior& behavior) const
