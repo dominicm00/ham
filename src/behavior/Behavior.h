@@ -97,8 +97,7 @@ class Behavior
 	enum JoinCaseOperator {
 		/**
 		 * Execute joins before to-upper or to-lower operators. The join
-		 parameter
-		 * will be affected by the case operator.
+		 * parameter will be affected by the case operator.
 
 		 \verbatim
 		 my_list = Ham is super fun ;
@@ -111,8 +110,7 @@ class Behavior
 
 		/**
 		 * Execute joins after to-upper or to-lower operators. The join
-		 parameter
-		 * will not be affected by the case operator.
+		 * parameter will not be affected by the case operator.
 
 		 \verbatim
 		 my_list = Ham is super fun ;
