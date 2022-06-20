@@ -26,6 +26,9 @@ namespace code
 class EvaluationContext
 {
   public:
+	// XXX: Giving compatibility and behavior default values makes it easy to
+	// end up with inconsistent compatibility behavior. This constructor should
+	// probably require a compatibility value.
 	EvaluationContext(data::VariableDomain& globalVariables,
 					  data::TargetPool& targets);
 
