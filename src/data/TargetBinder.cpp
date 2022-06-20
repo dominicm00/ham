@@ -26,6 +26,7 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 {
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).
+	// TODO: This isn't a valid path since it doesn't strip member archives.
 	StringPart targetPath(Path::RemoveGrist(target->Name()));
 	if (Path::IsAbsolute(targetPath)) {
 		_boundPath = targetPath;
