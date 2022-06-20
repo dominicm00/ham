@@ -12,6 +12,8 @@ namespace behavior
 
 /**
  * Given a compatability mode, sets the appropriate behaviors.
+ *
+ * \param[in] compatibility The tool/version to emulate.
  */
 Behavior::Behavior(Compatibility compatibility)
 	: fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
