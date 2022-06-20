@@ -23,6 +23,9 @@ class TargetPool;
 namespace code
 {
 
+/**
+ * Complete context where variables are evaluated.
+ */
 class EvaluationContext
 {
   public:
