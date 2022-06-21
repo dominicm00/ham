@@ -9,11 +9,11 @@
 #include <memory>
 #include <stdarg.h>
 
+#include "behavior/Compatibility.h"
 #include "code/Block.h"
 #include "code/BuiltInRules.h"
 #include "code/Constant.h"
 #include "code/FunctionCall.h"
-#include "code/Jambase.h"
 #include "code/Leaf.h"
 #include "code/OnExpression.h"
 #include "data/RegExp.h"
@@ -23,6 +23,8 @@
 #include "make/TargetBuildInfo.h"
 #include "make/TargetBuilder.h"
 #include "parser/Parser.h"
+#include "ruleset/HamRuleset.h"
+#include "ruleset/JamRuleset.h"
 
 namespace ham
 {
@@ -123,8 +125,24 @@ Processor::ProcessJambase()
 	util::Reference<code::Block> block;
 
 	if (fOptions.JambaseFile().IsEmpty()) {
-		parser.SetFileName("Jambase");
-		block.SetTo(parser.Parse(code::kJambase), true);
+		parser.SetFileName("InternalRuleset");
+
+		// Choose Jambase based on compatibility
+		std::string ruleset;
+		switch (fEvaluationContext.GetCompatibility()) {
+			case behavior::COMPATIBILITY_BOOST_JAM:
+				// TODO: Add Boost Jam's ruleset!
+			case behavior::COMPATIBILITY_JAM:
+				ruleset = ruleset::kJamRuleset;
+				break;
+			case behavior::COMPATIBILITY_HAM:
+				ruleset = ruleset::kHamRuleset;
+				break;
+			default:
+				throw MakeException("Unknown compatibility mode");
+		}
+
+		block.SetTo(parser.Parse(ruleset), true);
 	} else {
 		parser.SetFileName(fOptions.JambaseFile().ToStlString());
 		block.SetTo(parser.ParseFile(fOptions.JambaseFile().ToCString()), true);

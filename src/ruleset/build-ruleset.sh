@@ -8,8 +8,8 @@
 EOF
 
 { header_template=$(cat) ; }<<'EOF'
-#ifndef HAM_RULESET_rulesetu_H
-#define HAM_RULESET_rulesetu_H
+#ifndef HAM_RULESET_ruleset_upper_H
+#define HAM_RULESET_ruleset_upper_H
 
 #include <string>
 
@@ -18,12 +18,12 @@ namespace ham
 namespace ruleset
 {
 
-extern const std::string rulesetc;
+extern const std::string ruleset_variable;
 
 } // namespace ruleset
 } // namespace ham
 
-#endif // HAM_RULESET_rulesetu_H
+#endif // HAM_RULESET_ruleset_upper_H
 EOF
 
 file="$1"
@@ -31,6 +31,7 @@ ruleset_file="$2"
 
 ruleset_path=${2%%.*}
 ruleset=${ruleset_path##*/}
+ruleset_variable=k${ruleset}
 header_file=ruleset/${ruleset}.h
 suffix=${1##*.}
 
@@ -48,8 +49,8 @@ if [ "$suffix" = "h" ]; then
 	{
 		printf "%s\n" "$copyright" ;
 		printf "%s" "$header_template" \
-			| sed -e "s/rulesetu/${ruleset_upper}/" \
-				  -e "s/rulesetc/${ruleset}/" ;
+			| sed -e "s/ruleset_upper/${ruleset_upper}/" \
+				  -e "s/ruleset_variable/${ruleset_variable}/" ;
 	} > "$file"
 
 	created=1
@@ -61,7 +62,7 @@ if [ "$suffix" = "cpp" ]; then
 		printf "%s\n" "$copyright" ;
 		printf "#include \"%s\"\n\n" "$header_file" ;
 		printf "#include <string>\n\n" ;
-		printf "const std::string ham::ruleset::%s =\n" "$ruleset" ;
+		printf "const std::string ham::ruleset::%s =\n" "$ruleset_variable" ;
 		sed -e '/^$/d' \
 			-e '/^#/d' \
 			-e 's/\\/\\\\/g' \
