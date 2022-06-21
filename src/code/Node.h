@@ -55,7 +55,8 @@ class Node : public Referenceable
 	 * \param[in] context Context to evaluate node under.
 	 *
 	 * \result If the current node is an expression, return the StringList
-	 * associated with the expression result, otherwise return `nullptr`.
+	 * associated with the expression result, otherwise return
+	 * StringList::kFalse.
 	 */
 	virtual StringList Evaluate(EvaluationContext& context) = 0;
 
