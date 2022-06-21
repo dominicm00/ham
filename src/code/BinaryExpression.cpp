@@ -79,10 +79,10 @@ BinaryExpression<Operator>::Dump(DumpContext& context) const
                                                                                \
 	template class BinaryExpression<name##Operator>;
 
-#define HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(name, symbol, operator)      \
-	HAM_DEFINE_OPERATOR_EXPRESSION(name,                                       \
-								   symbol,                                     \
-								   a.CompareWith(b, true) operator0)
+#define HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(name, symbol, oper)	\
+	HAM_DEFINE_OPERATOR_EXPRESSION(name,								\
+								   symbol,								\
+								   a.CompareWith(b, true) oper 0)
 
 HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(Equal, =, ==)
 HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(NotEqual, !=, !=)
