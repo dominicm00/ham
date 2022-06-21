@@ -26,7 +26,7 @@ class RegExp
 	RegExp(const RegExp& other);
 	~RegExp();
 
-	bool IsValid() const { return fData != NULL; }
+	bool IsValid() const { return fData != nullptr; }
 
 	bool SetPattern(const char* pattern,
 					PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION);

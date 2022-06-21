@@ -14,7 +14,7 @@ namespace test
 
 Test::Test(const std::string& name)
 	: fName(name),
-	  fTestSuite(NULL)
+	  fTestSuite(nullptr)
 {
 }
 
@@ -23,7 +23,7 @@ Test::~Test() {}
 std::string
 Test::FullyQualifiedName() const
 {
-	if (fTestSuite == NULL)
+	if (fTestSuite == nullptr)
 		return fName;
 
 	std::string name = fTestSuite->FullyQualifiedName();

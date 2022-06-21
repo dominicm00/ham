@@ -18,16 +18,16 @@ namespace test
 
 TestRunner::TestRunner()
 	: fTestsToRun(),
-	  fEnvironment(NULL),
-	  fCurrentTest(NULL),
-	  fCurrentTestFixture(NULL)
+	  fEnvironment(nullptr),
+	  fCurrentTest(nullptr),
+	  fCurrentTestFixture(nullptr)
 {
 }
 
 bool
 TestRunner::AddTest(Test* test, const std::string& testCasePath)
 {
-	if (test == NULL)
+	if (test == nullptr)
 		return false;
 
 	if (testCasePath.empty()) {
@@ -38,7 +38,7 @@ TestRunner::AddTest(Test* test, const std::string& testCasePath)
 	size_t separatorIndex = testCasePath.find("::");
 	if (separatorIndex == std::string::npos) {
 		RunnableTest* runnableTest = dynamic_cast<RunnableTest*>(test);
-		if (runnableTest != NULL) {
+		if (runnableTest != nullptr) {
 			int testCaseIndex = runnableTest->IndexOfTestCase(testCasePath);
 			if (testCaseIndex < 0)
 				return false;
@@ -49,12 +49,12 @@ TestRunner::AddTest(Test* test, const std::string& testCasePath)
 	}
 
 	TestSuite* testSuite = dynamic_cast<TestSuite*>(test);
-	if (testSuite == NULL)
+	if (testSuite == nullptr)
 		return false;
 
 	Test* subTest =
 		testSuite->GetTest(std::string(testCasePath, 0, separatorIndex));
-	if (subTest == NULL)
+	if (subTest == nullptr)
 		return false;
 
 	return AddTest(subTest,
@@ -81,7 +81,7 @@ TestRunner::Run(TestEnvironment* environment)
 
 	_CleanupFixture();
 
-	fEnvironment = NULL;
+	fEnvironment = nullptr;
 
 	size_t totalTests =
 		fPassedTests + fFailedTests.size() + fExpectedlyFailedTests;
@@ -135,7 +135,7 @@ TestRunner::_RunTest(Test* test, int testCase)
 
 	// run the whole test suite
 	TestSuite* testSuite = dynamic_cast<TestSuite*>(test);
-	if (testSuite == NULL)
+	if (testSuite == nullptr)
 		return;
 
 	int count = testSuite->CountTests();
@@ -203,10 +203,10 @@ TestRunner::_InitFixture(RunnableTest* test)
 void
 TestRunner::_CleanupFixture()
 {
-	if (fCurrentTest != NULL && fCurrentTestFixture != NULL)
+	if (fCurrentTest != nullptr && fCurrentTestFixture != nullptr)
 		fCurrentTest->DeleteFixture(fEnvironment, fCurrentTestFixture);
-	fCurrentTest = NULL;
-	fCurrentTestFixture = NULL;
+	fCurrentTest = nullptr;
+	fCurrentTestFixture = nullptr;
 }
 
 } // namespace test

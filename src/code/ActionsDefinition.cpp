@@ -24,13 +24,13 @@ ActionsDefinition::ActionsDefinition(uint32_t flags,
 	  fActions(actions),
 	  fFlags(flags)
 {
-	if (fVariables != NULL)
+	if (fVariables != nullptr)
 		fVariables->AcquireReference();
 }
 
 ActionsDefinition::~ActionsDefinition()
 {
-	if (fVariables != NULL)
+	if (fVariables != nullptr)
 		fVariables->ReleaseReference();
 }
 
@@ -39,7 +39,7 @@ ActionsDefinition::Evaluate(EvaluationContext& context)
 {
 	// get the variables
 	StringList variables;
-	if (fVariables != NULL)
+	if (fVariables != nullptr)
 		variables = fVariables->Evaluate(context);
 
 	// create and add the actions to the rule
@@ -66,7 +66,7 @@ ActionsDefinition::Dump(DumpContext& context) const
 	context << "ActionsDefinition(\"" << fRuleName << ", " << fFlags << ",\n";
 	context.BeginChildren();
 
-	if (fVariables != NULL)
+	if (fVariables != nullptr)
 		fVariables->Dump(context);
 
 	context << "actions:\n";

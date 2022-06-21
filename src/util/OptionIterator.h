@@ -24,7 +24,7 @@ class OptionSpecification
 
   public:
 	OptionSpecification& Add(int shortOption,
-							 const char* longOption = NULL,
+							 const char* longOption = nullptr,
 							 bool hasArgument = false);
 	// shortOption is the the short option char,
 	// if there is one,  or a unique int >= 256,

@@ -19,14 +19,14 @@ LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
 	  fInitializer(initializer)
 {
 	fVariables->AcquireReference();
-	if (fInitializer != NULL)
+	if (fInitializer != nullptr)
 		fInitializer->AcquireReference();
 }
 
 LocalVariableDeclaration::~LocalVariableDeclaration()
 {
 	fVariables->ReleaseReference();
-	if (fInitializer != NULL)
+	if (fInitializer != nullptr)
 		fInitializer->ReleaseReference();
 }
 
@@ -36,7 +36,7 @@ LocalVariableDeclaration::Evaluate(EvaluationContext& context)
 	// get the variables
 	const StringList& variables = fVariables->Evaluate(context);
 
-	if (fInitializer != NULL) {
+	if (fInitializer != nullptr) {
 		// we have an initializer -- get the value and init the variables
 		const StringList& value = fInitializer->Evaluate(context);
 
@@ -62,7 +62,7 @@ LocalVariableDeclaration::Visit(NodeVisitor& visitor)
 	if (Node* result = fVariables->Visit(visitor))
 		return result;
 
-	return fInitializer != NULL ? fInitializer->Visit(visitor) : NULL;
+	return fInitializer != nullptr ? fInitializer->Visit(visitor) : nullptr;
 }
 
 void
@@ -73,7 +73,7 @@ LocalVariableDeclaration::Dump(DumpContext& context) const
 
 	fVariables->Dump(context);
 
-	if (fInitializer != NULL)
+	if (fInitializer != nullptr)
 		fInitializer->Dump(context);
 
 	context.EndChildren();

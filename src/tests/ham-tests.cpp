@@ -93,7 +93,7 @@ find_test_data_directory()
 {
 	// get the current working directory
 	char buffer[10240];
-	if (getcwd(buffer, sizeof(buffer)) == NULL)
+	if (getcwd(buffer, sizeof(buffer)) == nullptr)
 		return std::string();
 
 	std::string directory = buffer;
@@ -118,7 +118,7 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 							   const std::string& directory)
 {
 	DIR* dir = opendir(directory.c_str());
-	if (dir == NULL)
+	if (dir == nullptr)
 		return;
 
 	while (struct dirent* entry = readdir(dir)) {
@@ -264,7 +264,7 @@ main(int argc, const char* const* argv)
 					if (!explicitCompatibility) {
 						const char* slash = strrchr(jamExecutable.c_str(), '/');
 						const char* baseName =
-							slash != NULL ? slash + 1 : jamExecutable.c_str();
+							slash != nullptr ? slash + 1 : jamExecutable.c_str();
 						if (strcmp(baseName, "jam") == 0)
 							compatibility = behavior::COMPATIBILITY_JAM;
 						else if (strcmp(baseName, "bjam") == 0)

@@ -25,7 +25,7 @@ Assignment::Assignment(Node* left,
 {
 	fLeft->AcquireReference();
 	fRight->AcquireReference();
-	if (fOnTargets != NULL)
+	if (fOnTargets != nullptr)
 		fOnTargets->AcquireReference();
 }
 
@@ -33,7 +33,7 @@ Assignment::~Assignment()
 {
 	fLeft->ReleaseReference();
 	fRight->ReleaseReference();
-	if (fOnTargets != NULL)
+	if (fOnTargets != nullptr)
 		fOnTargets->ReleaseReference();
 }
 
@@ -43,7 +43,7 @@ Assignment::Evaluate(EvaluationContext& context)
 	const StringList& lhs = fLeft->Evaluate(context);
 	const StringList& rhs = fRight->Evaluate(context);
 
-	if (fOnTargets != NULL) {
+	if (fOnTargets != nullptr) {
 		// Set the variables on the given targets.
 		StringList targets = fOnTargets->Evaluate(context);
 		for (StringList::Iterator it = targets.GetIterator(); it.HasNext();) {
@@ -63,7 +63,7 @@ Assignment::Evaluate(EvaluationContext& context)
 						domain->LookupOrCreate(variable).Append(rhs);
 						break;
 					case ASSIGNMENT_OPERATOR_DEFAULT:
-						if (domain->Lookup(variable) == NULL)
+						if (domain->Lookup(variable) == nullptr)
 							domain->Set(variable, rhs);
 						break;
 				}
@@ -77,7 +77,7 @@ Assignment::Evaluate(EvaluationContext& context)
 
 			// look for a local variable
 			StringList* data = context.LocalScope()->Lookup(variable);
-			if (data == NULL) {
+			if (data == nullptr) {
 				// no local variable -- check for a global one and create, if
 				// there isn't one yet either.
 				data = &context.GlobalVariables()->LookupOrCreate(variable);
@@ -113,7 +113,7 @@ Assignment::Visit(NodeVisitor& visitor)
 	if (Node* result = fRight->Visit(visitor))
 		return result;
 
-	return fOnTargets != NULL ? fOnTargets->Visit(visitor) : NULL;
+	return fOnTargets != nullptr ? fOnTargets->Visit(visitor) : nullptr;
 }
 
 void
@@ -137,7 +137,7 @@ Assignment::Dump(DumpContext& context) const
 	fLeft->Dump(context);
 	fRight->Dump(context);
 
-	if (fOnTargets != NULL)
+	if (fOnTargets != nullptr)
 		fOnTargets->Dump(context);
 
 	context.EndChildren();

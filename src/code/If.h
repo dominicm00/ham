@@ -15,7 +15,7 @@ namespace code
 class If : public Node
 {
   public:
-	If(Node* expression, Node* block, Node* elseBlock = NULL);
+	If(Node* expression, Node* block, Node* elseBlock = nullptr);
 	virtual ~If();
 
 	virtual StringList Evaluate(EvaluationContext& context);

@@ -19,7 +19,7 @@ class Assignment : public Node
 	Assignment(Node* left,
 			   AssignmentOperator operatorType,
 			   Node* right,
-			   Node* onTargets = NULL);
+			   Node* onTargets = nullptr);
 	virtual ~Assignment();
 
 	virtual StringList Evaluate(EvaluationContext& context);

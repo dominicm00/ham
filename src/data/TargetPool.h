@@ -35,7 +35,7 @@ Target*
 TargetPool::Lookup(const String& name)
 {
 	TargetMap::iterator it = fTargets.find(name);
-	return it == fTargets.end() ? NULL : &it->second;
+	return it == fTargets.end() ? nullptr : &it->second;
 }
 
 } // namespace data

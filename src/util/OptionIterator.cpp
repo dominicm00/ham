@@ -19,7 +19,7 @@ OptionSpecification::Add(int shortOption,
 {
 	Option option = {shortOption, longOption, hasArgument};
 	fShortOptions[shortOption] = option;
-	if (longOption != NULL)
+	if (longOption != nullptr)
 		fLongOptions[longOption] = option;
 	return *this;
 }
@@ -28,7 +28,7 @@ const OptionSpecification::Option*
 OptionSpecification::ShortOption(int option) const
 {
 	std::map<int, Option>::const_iterator it = fShortOptions.find(option);
-	return it != fShortOptions.end() ? &it->second : NULL;
+	return it != fShortOptions.end() ? &it->second : nullptr;
 }
 
 const OptionSpecification::Option*
@@ -36,7 +36,7 @@ OptionSpecification::LongOption(const std::string option) const
 {
 	std::map<std::string, Option>::const_iterator it =
 		fLongOptions.find(option);
-	return it != fLongOptions.end() ? &it->second : NULL;
+	return it != fLongOptions.end() ? &it->second : nullptr;
 }
 
 // #pragma mark - OptionIterator
@@ -48,9 +48,9 @@ OptionIterator::OptionIterator(int argumentCount,
 	  fArguments(arguments),
 	  fArgumentCount(argumentCount),
 	  fIndex(1),
-	  fCurrentOption(NULL),
-	  fOptionArgument(NULL),
-	  fRemainingShortOptions(NULL),
+	  fCurrentOption(nullptr),
+	  fOptionArgument(nullptr),
+	  fRemainingShortOptions(nullptr),
 	  fStatus(MORE_OPTIONS)
 {
 	_FindNext();
@@ -63,7 +63,7 @@ OptionIterator::Next(std::string& argument)
 		return '\0';
 
 	char option = fCurrentOption->fShortOption;
-	argument = fOptionArgument != NULL ? fOptionArgument : "";
+	argument = fOptionArgument != nullptr ? fOptionArgument : "";
 
 	_FindNext();
 	return option;
@@ -78,7 +78,7 @@ OptionIterator::_FindNextInternal()
 	if (fIndex >= fArgumentCount)
 		return NO_MORE_OPTIONS;
 
-	if (fRemainingShortOptions == NULL) {
+	if (fRemainingShortOptions == nullptr) {
 		const char* argument = fArguments[fIndex];
 		if (argument[0] != '-')
 			return NO_MORE_OPTIONS;
@@ -93,7 +93,7 @@ OptionIterator::_FindNextInternal()
 		if (argument[1] == '-') {
 			// long option
 			fCurrentOption = fOptions.LongOption(argument);
-			if (fCurrentOption == NULL) {
+			if (fCurrentOption == nullptr) {
 				// unknown long option
 				return ERROR;
 			}
@@ -106,7 +106,7 @@ OptionIterator::_FindNextInternal()
 
 				fOptionArgument = fArguments[fIndex++];
 			} else
-				fOptionArgument = NULL;
+				fOptionArgument = nullptr;
 
 			return MORE_OPTIONS;
 		}
@@ -120,18 +120,18 @@ OptionIterator::_FindNextInternal()
 
 	fRemainingShortOptions++;
 	if (fRemainingShortOptions[0] == '\0')
-		fRemainingShortOptions = NULL;
+		fRemainingShortOptions = nullptr;
 
-	if (fCurrentOption == NULL) {
+	if (fCurrentOption == nullptr) {
 		// unknown short option
 		return ERROR;
 	}
 
 	if (fCurrentOption->fHasArgument) {
-		if (fRemainingShortOptions != NULL) {
+		if (fRemainingShortOptions != nullptr) {
 			// no space between option and argument
 			fOptionArgument = fRemainingShortOptions;
-			fRemainingShortOptions = NULL;
+			fRemainingShortOptions = nullptr;
 		} else {
 			// option argument is separate argument
 			if (fIndex >= fArgumentCount) {
@@ -142,7 +142,7 @@ OptionIterator::_FindNextInternal()
 			fOptionArgument = fArguments[fIndex++];
 		}
 	} else
-		fOptionArgument = NULL;
+		fOptionArgument = nullptr;
 
 	return MORE_OPTIONS;
 }

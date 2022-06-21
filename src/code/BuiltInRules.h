@@ -24,8 +24,8 @@ class BuiltInRules
 	static void _AddRuleConsumeReference(RulePool& rulePool,
 										 const char* name,
 										 RuleInstructions* instructions,
-										 const char* alias1 = NULL,
-										 const char* alias2 = NULL);
+										 const char* alias1 = nullptr,
+										 const char* alias2 = nullptr);
 	// consumes instructions reference
 	static inline void _AddRule(RulePool& rulePool,
 								const char* name,

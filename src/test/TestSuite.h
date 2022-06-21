@@ -35,7 +35,7 @@ class TestSuite : public Test
 
 struct TestSuiteBuilder {
 	TestSuiteBuilder(TestSuite& testSuite,
-					 TestSuiteBuilder* parentBuilder = NULL)
+					 TestSuiteBuilder* parentBuilder = nullptr)
 		: fTestSuite(testSuite),
 		  fParentBuilder(parentBuilder)
 	{

@@ -42,7 +42,7 @@ Command*
 TargetBuildInfo::NextCommand()
 {
 	if (fCommandIndex >= fCommands.size())
-		return NULL;
+		return nullptr;
 	return fCommands[fCommandIndex++];
 }
 

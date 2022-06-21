@@ -37,14 +37,14 @@ const StringList*
 VariableDomain::Lookup(const String& variable) const
 {
 	VariableMap::const_iterator it = fVariables.find(variable);
-	return it == fVariables.end() ? NULL : &it->second;
+	return it == fVariables.end() ? nullptr : &it->second;
 }
 
 StringList*
 VariableDomain::Lookup(const String& variable)
 {
 	VariableMap::iterator it = fVariables.find(variable);
-	return it == fVariables.end() ? NULL : &it->second;
+	return it == fVariables.end() ? nullptr : &it->second;
 }
 
 StringList&

@@ -13,9 +13,9 @@ namespace tests
 {
 
 VariableExpansionTest::VariableExpansionTest()
-	: fGlobalVariables(NULL),
-	  fTargets(NULL),
-	  fEvaluationContext(NULL)
+	: fGlobalVariables(nullptr),
+	  fTargets(nullptr),
+	  fEvaluationContext(nullptr)
 {
 }
 

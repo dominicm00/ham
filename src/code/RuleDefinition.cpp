@@ -22,7 +22,7 @@ RuleDefinition::RuleDefinition(const String& ruleName,
 	: fRuleName(ruleName),
 	  fParameterNames(parameterNames),
 	  fBlock(block),
-	  fInstructions(NULL)
+	  fInstructions(nullptr)
 {
 	fBlock->AcquireReference();
 

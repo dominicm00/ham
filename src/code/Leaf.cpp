@@ -38,7 +38,7 @@ Leaf::Visit(NodeVisitor& visitor)
 	if (visitor.VisitNode(this))
 		return this;
 
-	return NULL;
+	return nullptr;
 }
 
 void
@@ -92,8 +92,8 @@ Leaf::EvaluateString(EvaluationContext& context,
 		// Find the matching closing ")". While at it also find the containing
 		// special characters (":", "[", "]") at the top level.
 		std::vector<const char*> colons;
-		const char* openingBracket = NULL;
-		const char* closingBracket = NULL;
+		const char* openingBracket = nullptr;
+		const char* closingBracket = nullptr;
 		bool recursive = false;
 		int matchCount = 1;
 		while (matchCount != 0 && stringRemainder != stringEnd) {
@@ -113,11 +113,11 @@ Leaf::EvaluateString(EvaluationContext& context,
 						colons.push_back(stringRemainder);
 					break;
 				case '[':
-					if (matchCount == 1 && openingBracket == NULL)
+					if (matchCount == 1 && openingBracket == nullptr)
 						openingBracket = stringRemainder;
 					break;
 				case ']':
-					if (matchCount == 1 && closingBracket == NULL)
+					if (matchCount == 1 && closingBracket == nullptr)
 						closingBracket = stringRemainder;
 					break;
 				default:
@@ -151,7 +151,7 @@ Leaf::EvaluateString(EvaluationContext& context,
 
 	// If we haven't encountered any variable, just return the original string.
 	if (resultFactors.empty()) {
-		if (originalString != NULL)
+		if (originalString != nullptr)
 			return StringList(*originalString);
 		return StringList(String(stringStart, stringEnd - stringStart));
 	}
@@ -197,28 +197,28 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// invalid syntax and ignores ":B".
 
 	const char* variableNameEnd = variableEnd;
-	const char* firstColon = colons.empty() ? NULL : colons[0];
+	const char* firstColon = colons.empty() ? nullptr : colons[0];
 
-	if (firstColon != NULL) {
+	if (firstColon != nullptr) {
 		// Ignore brackets after the first colon.
-		if (openingBracket != NULL && firstColon < openingBracket)
-			openingBracket = NULL;
-		if (closingBracket != NULL && firstColon < closingBracket)
-			closingBracket = NULL;
+		if (openingBracket != nullptr && firstColon < openingBracket)
+			openingBracket = nullptr;
+		if (closingBracket != nullptr && firstColon < closingBracket)
+			closingBracket = nullptr;
 
 		variableNameEnd = firstColon;
 	}
 
-	if (openingBracket != NULL || closingBracket != NULL) {
+	if (openingBracket != nullptr || closingBracket != nullptr) {
 		// If we only have a closing bracket, consider the expression invalid
 		// and return an empty list.
-		if (openingBracket == NULL)
+		if (openingBracket == nullptr)
 			return StringList();
 
 		// If the closing bracket is missing, we use the next "natural
 		// boundary", i.e. the first colon or the variable end.
-		if (closingBracket == NULL)
-			closingBracket = firstColon != NULL ? firstColon : variableEnd;
+		if (closingBracket == nullptr)
+			closingBracket = firstColon != nullptr ? firstColon : variableEnd;
 
 		variableNameEnd = openingBracket;
 	}
@@ -238,7 +238,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 		// subscript a maximum list size is computed, which is applied only
 		// after the "E=..." operation has been applied.
 		size_t maxSize;
-		if (openingBracket != NULL) {
+		if (openingBracket != nullptr) {
 			size_t firstIndex;
 			size_t endIndex;
 			if (!_ParseSubscripts(openingBracket + 1,
@@ -259,7 +259,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			maxSize = std::numeric_limits<size_t>::max();
 
 		// colon
-		if (firstColon != NULL) {
+		if (firstColon != nullptr) {
 			data::StringListOperations operations;
 			const char* colon = firstColon;
 			std::vector<const char*>::const_iterator colonIt = colons.begin();
@@ -286,14 +286,14 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 
 	// Expand the variable names.
 	StringList variableNames =
-		EvaluateString(context, variableStart, variableNameEnd, NULL);
+		EvaluateString(context, variableStart, variableNameEnd, nullptr);
 	size_t variableCount = variableNames.Size();
 
 	// Expand and parse the subscripts.
 	std::vector<std::pair<size_t, size_t>> subscripts;
-	if (openingBracket != NULL) {
+	if (openingBracket != nullptr) {
 		StringList subscriptStrings =
-			EvaluateString(context, openingBracket + 1, closingBracket, NULL);
+			EvaluateString(context, openingBracket + 1, closingBracket, nullptr);
 		if (subscriptStrings.IsEmpty())
 			return StringList();
 
@@ -327,7 +327,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	std::vector<StringList> operationsStringsList;
 	// referenced by operationsList, so it needs to exist at least as long
 	std::vector<data::StringListOperations> operationsList;
-	if (firstColon != NULL) {
+	if (firstColon != nullptr) {
 		const char* segmentStart = firstColon + 1;
 		std::vector<const char*>::const_iterator colonIt = colons.begin();
 		for (;;) {
@@ -335,7 +335,7 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			const char* segmentEnd =
 				colonIt != colons.end() ? *colonIt : variableEnd;
 			StringList operationsStrings =
-				EvaluateString(context, segmentStart, segmentEnd, NULL);
+				EvaluateString(context, segmentStart, segmentEnd, nullptr);
 			if (operationsStrings.IsEmpty())
 				return StringList();
 

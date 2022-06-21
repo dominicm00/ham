@@ -81,7 +81,7 @@ class Target
 VariableDomain*
 Target::Variables(bool create)
 {
-	if (fVariables == NULL && create)
+	if (fVariables == nullptr && create)
 		fVariables = new VariableDomain;
 
 	return fVariables;

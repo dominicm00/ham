@@ -140,7 +140,7 @@ struct GlobInstructions : RuleInstructions {
 				continue;
 
 			DIR* dir = opendir(directory.ToCString());
-			if (dir == NULL)
+			if (dir == nullptr)
 				continue;
 
 			try {
@@ -298,10 +298,10 @@ BuiltInRules::_AddRuleConsumeReference(RulePool& rulePool,
 	util::Reference<RuleInstructions> instructionsReference(instructions, true);
 	_AddRule(rulePool, name, instructions);
 
-	if (alias1 != NULL)
+	if (alias1 != nullptr)
 		_AddRule(rulePool, alias1, instructions);
 
-	if (alias2 != NULL)
+	if (alias2 != nullptr)
 		_AddRule(rulePool, alias2, instructions);
 }
 

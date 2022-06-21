@@ -57,25 +57,25 @@ class Reference
 {
   public:
 	Reference()
-		: fObject(NULL)
+		: fObject(nullptr)
 	{
 	}
 
 	Reference(Type* object, bool alreadyHasReference = false)
-		: fObject(NULL)
+		: fObject(nullptr)
 	{
 		SetTo(object, alreadyHasReference);
 	}
 
 	Reference(const Reference<Type>& other)
-		: fObject(NULL)
+		: fObject(nullptr)
 	{
 		SetTo(other.fObject);
 	}
 
 	template<typename OtherType>
 	Reference(const Reference<OtherType>& other)
-		: fObject(NULL)
+		: fObject(nullptr)
 	{
 		SetTo(other.Get());
 	}
@@ -84,7 +84,7 @@ class Reference
 
 	void SetTo(Type* object, bool alreadyHasReference = false)
 	{
-		if (object != NULL && !alreadyHasReference)
+		if (object != nullptr && !alreadyHasReference)
 			object->AcquireReference();
 
 		Unset();
@@ -96,7 +96,7 @@ class Reference
 	{
 		if (fObject) {
 			fObject->ReleaseReference();
-			fObject = NULL;
+			fObject = nullptr;
 		}
 	}
 
@@ -105,7 +105,7 @@ class Reference
 	Type* Detach()
 	{
 		Type* object = fObject;
-		fObject = NULL;
+		fObject = nullptr;
 		return object;
 	}
 

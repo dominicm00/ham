@@ -74,7 +74,7 @@ class String
 		static Buffer* Create(size_t length)
 		{
 			void* memory = malloc(sizeof(Buffer) + length);
-			if (memory == NULL)
+			if (memory == nullptr)
 				throw std::bad_alloc();
 			return new (memory) Buffer(length);
 		}

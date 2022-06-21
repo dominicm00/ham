@@ -91,12 +91,12 @@ class EvaluationContext
 inline const StringList*
 EvaluationContext::LookupVariable(const String& variable) const
 {
-	if (fBuiltInVariables != NULL) {
+	if (fBuiltInVariables != nullptr) {
 		if (const StringList* result = fBuiltInVariables->Lookup(variable))
 			return result;
 	}
 
-	if (fLocalScope != NULL) {
+	if (fLocalScope != nullptr) {
 		if (const StringList* result = fLocalScope->Lookup(variable))
 			return result;
 	}

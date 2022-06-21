@@ -48,7 +48,7 @@ StringList::StringList(const String& string)
 
 StringList::StringList(const StringList* other)
 {
-	if (other != NULL) {
+	if (other != nullptr) {
 		fData = other->fData;
 		fOffset = other->fOffset;
 		fSize = other->fSize;

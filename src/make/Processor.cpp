@@ -148,7 +148,7 @@ Processor::PrepareTargets()
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
 		const Target* target = fTargets.Lookup(targetName);
-		if (target == NULL) {
+		if (target == nullptr) {
 			throw MakeException(std::string("Unknown target \"")
 								+ targetName.ToCString() + "\"");
 		}
@@ -255,7 +255,7 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 		return it->second;
 
 	if (!create)
-		return NULL;
+		return nullptr;
 
 	std::auto_ptr<MakeTarget> makeTarget(new MakeTarget(target));
 	fMakeTargets[target] = makeTarget.get();
@@ -267,7 +267,7 @@ Processor::_GetMakeTarget(const String& targetName, bool create)
 {
 	const Target* target = create ? fTargets.LookupOrCreate(targetName)
 								  : fTargets.Lookup(targetName);
-	return target != NULL ? _GetMakeTarget(target, create) : NULL;
+	return target != nullptr ? _GetMakeTarget(target, create) : nullptr;
 }
 
 bool
@@ -453,7 +453,7 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 		makeTarget->SetFate(MakeTarget::MAKE);
 
 	if (fOptions.IsPrintMakeTree()) {
-		_PrintMakeTreeStep(makeTarget, "make", NULL, NULL);
+		_PrintMakeTreeStep(makeTarget, "make", nullptr, nullptr);
 		_PrintMakeTreeBinding(makeTarget);
 	}
 
@@ -500,12 +500,12 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 	// globally.
 	const Target* target = makeTarget->GetTarget();
 	const data::VariableDomain* variables = target->Variables();
-	if (variables == NULL)
+	if (variables == nullptr)
 		return;
 
 	const StringList* scanPattern = variables->Lookup(kHeaderScanVariableName);
 	const StringList* scanRule = variables->Lookup(kHeaderRuleVariableName);
-	if (scanPattern == NULL || scanRule == NULL || scanPattern->IsEmpty()
+	if (scanPattern == nullptr || scanRule == nullptr || scanPattern->IsEmpty()
 		|| scanRule->IsEmpty()) {
 		return;
 	}
@@ -605,7 +605,7 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 	const Target* target = makeTarget->GetTarget();
 	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
@@ -653,7 +653,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 			break;
 		case MakeTarget::SKIPPED: {
 			// get the first dependency that couldn't be made
-			MakeTarget* lackingDependency = NULL;
+			MakeTarget* lackingDependency = nullptr;
 			for (MakeTargetSet::Iterator it =
 					 makeTarget->Dependencies().GetIterator();
 				 it.HasNext();) {
@@ -666,7 +666,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 
 			printf("...skipped %s for lack of %s...\n",
 				   makeTarget->Name().ToCString(),
-				   lackingDependency != NULL
+				   lackingDependency != nullptr
 					   ? lackingDependency->Name().ToCString()
 					   : "???");
 			skippedCount++;
@@ -727,7 +727,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// new local scope
 	const Target* target = *actionsCall->Targets().begin();
 	data::VariableDomain localVariables;
-	if (target->Variables() != NULL)
+	if (target->Variables() != nullptr)
 		localVariables = *target->Variables();
 	data::VariableScope* oldLocalScope = fEvaluationContext.LocalScope();
 	data::VariableScope localScope(localVariables, oldLocalScope);
@@ -790,7 +790,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			StringList result = code::Leaf::EvaluateString(fEvaluationContext,
 														   wordStart,
 														   remainder,
-														   NULL);
+														   nullptr);
 			bool isFirst = true;
 			for (StringList::Iterator it = result.GetIterator();
 				 it.HasNext();) {
@@ -818,7 +818,7 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 	if (makeTarget->FileExists()) {
 		_PrintMakeTreeStep(makeTarget,
 						   "bind",
-						   NULL,
+						   nullptr,
 						   ": %s",
 						   makeTarget->BoundPath().ToCString());
 		timeString = makeTarget->GetOriginalTime().ToString().ToCString();
@@ -830,7 +830,7 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 	}
 
 	// TODO: In Jam binding might also be "parent".
-	_PrintMakeTreeStep(makeTarget, "time", NULL, ": %s", timeString);
+	_PrintMakeTreeStep(makeTarget, "time", nullptr, ": %s", timeString);
 }
 
 void
@@ -843,7 +843,7 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 	char& flag = madeString[4];
 
 	if (makeTarget->FileExists())
-		stateString = NULL;
+		stateString = nullptr;
 	else if (_IsPseudoTarget(makeTarget))
 		stateString = "pseudo";
 	else
@@ -851,13 +851,13 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
-			if (stateString == NULL)
+			if (stateString == nullptr)
 				stateString = "update";
 			if (!_IsPseudoTarget(makeTarget) && target->HasActionsCalls())
 				flag = '+';
 			break;
 		case MakeTarget::MAKE_IF_NEEDED:
-			if (stateString == NULL)
+			if (stateString == nullptr)
 				stateString = "no update";
 			flag = '-';
 			break;
@@ -873,7 +873,7 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 			break;
 	}
 
-	_PrintMakeTreeStep(makeTarget, madeString, stateString, NULL);
+	_PrintMakeTreeStep(makeTarget, madeString, stateString, nullptr);
 }
 
 void
@@ -885,11 +885,11 @@ Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget,
 {
 	printf("%-7s %-10s %*s%s",
 		   step,
-		   state != NULL ? state : "--",
+		   state != nullptr ? state : "--",
 		   fMakeLevel,
 		   "",
 		   makeTarget->Name().ToCString());
-	if (pattern != NULL) {
+	if (pattern != nullptr) {
 		char buffer[1024];
 		va_list args;
 		va_start(args, pattern);

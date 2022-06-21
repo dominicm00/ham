@@ -45,7 +45,7 @@ List::Visit(NodeVisitor& visitor)
 			return result;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void

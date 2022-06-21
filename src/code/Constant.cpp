@@ -32,7 +32,7 @@ Constant::Visit(NodeVisitor& visitor)
 	if (visitor.VisitNode(this))
 		return this;
 
-	return NULL;
+	return nullptr;
 }
 
 void

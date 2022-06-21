@@ -23,7 +23,7 @@ struct TargetBuilder::JobSlot {
   public:
 	JobSlot()
 		: fProcess(),
-		  fCommand(NULL)
+		  fCommand(nullptr)
 	{
 	}
 };
@@ -122,7 +122,7 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 		}
 
 		if (!canWait || fBuildInfos.empty())
-			return NULL;
+			return nullptr;
 
 		// wait for some running command to finish
 		process::ChildInfo processInfo;
@@ -136,7 +136,7 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 			continue;
 
 		Command* command = fJobSlots[jobSlot].fCommand;
-		fJobSlots[jobSlot].fCommand = NULL;
+		fJobSlots[jobSlot].fCommand = nullptr;
 		fJobSlots[jobSlot].fProcess.Unset();
 
 		fFinishedCommands.push_back(command);
@@ -156,7 +156,7 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 {
 	for (;;) {
 		Command* command = buildInfo->NextCommand();
-		if (command == NULL) {
+		if (command == nullptr) {
 			fFinishedBuildInfos.push_back(buildInfo);
 			fBuildInfos.erase(
 				std::find(fBuildInfos.begin(), fBuildInfos.end(), buildInfo));
@@ -227,7 +227,7 @@ TargetBuilder::_ExecuteCommand(Command* command)
 		else
 			arguments[i] = argument.ToCString();
 	}
-	arguments[argumentCount] = NULL;
+	arguments[argumentCount] = nullptr;
 
 	// launch the command
 	bool launched = fJobSlots[jobSlot].fProcess.Launch(arguments[0],
@@ -250,7 +250,7 @@ int
 TargetBuilder::_FindFreeJobSlot() const
 {
 	for (size_t i = 0; i < fMaxJobCount; i++) {
-		if (fJobSlots[i].fCommand == NULL)
+		if (fJobSlots[i].fCommand == nullptr)
 			return (int)i;
 	}
 

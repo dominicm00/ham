@@ -14,15 +14,15 @@ StringList*
 VariableScope::Lookup(const String& variable) const
 {
 	const VariableScope* scope = this;
-	while (scope != NULL) {
+	while (scope != nullptr) {
 		StringList* value = scope->fDomain.Lookup(variable);
-		if (value != NULL)
+		if (value != nullptr)
 			return value;
 
 		scope = scope->fParent;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 } // namespace data

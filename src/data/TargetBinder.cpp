@@ -38,15 +38,15 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	// the target name.
 	const VariableDomain* variables = target->Variables();
 
-	const StringList* locatePaths = NULL;
+	const StringList* locatePaths = nullptr;
 
-	if (variables != NULL)
+	if (variables != nullptr)
 		locatePaths = variables->Lookup(kLocateVariableName);
 
-	if (locatePaths == NULL || locatePaths->IsEmpty())
+	if (locatePaths == nullptr || locatePaths->IsEmpty())
 		locatePaths = globalVariables.Lookup(kLocateVariableName);
 
-	if (locatePaths != NULL && !locatePaths->IsEmpty()) {
+	if (locatePaths != nullptr && !locatePaths->IsEmpty()) {
 		// prepend the LOCATE path
 		_boundPath = Path::Make(locatePaths->Head(), targetPath);
 		Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
@@ -56,15 +56,15 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	// If SEARCH is set on the target or globally, we iterate through the list,
 	// composing a path with each element, until we've found a path that refers
 	// to an existing entry.
-	const StringList* searchPaths = NULL;
+	const StringList* searchPaths = nullptr;
 
-	if (variables != NULL)
+	if (variables != nullptr)
 		searchPaths = variables->Lookup(kSearchVariableName);
 
-	if (searchPaths == NULL || searchPaths->IsEmpty())
+	if (searchPaths == nullptr || searchPaths->IsEmpty())
 		searchPaths = globalVariables.Lookup(kSearchVariableName);
 
-	if (searchPaths != NULL && !searchPaths->IsEmpty()) {
+	if (searchPaths != nullptr && !searchPaths->IsEmpty()) {
 		size_t pathCount = searchPaths->Size();
 		for (size_t i = 0; i < pathCount; i++) {
 			// prepend the LOCATE path

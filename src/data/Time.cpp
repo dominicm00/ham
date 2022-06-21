@@ -17,7 +17,7 @@ namespace data
 Time::Now()
 {
 	timeval time;
-	gettimeofday(&time, NULL);
+	gettimeofday(&time, nullptr);
 	return Time(time.tv_sec, time.tv_usec * 1000);
 }
 

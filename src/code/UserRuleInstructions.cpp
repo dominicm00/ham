@@ -61,7 +61,7 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	data::VariableDomain localVariables;
 	data::VariableScope localScope(localVariables, oldLocalScope);
 	// TODO: This is jam compatible behavior. It would be more logical to
-	// have a NULL parent for the new scope, so the previous local variables
+	// have a null parent for the new scope, so the previous local variables
 	// cannot be seen in the rule block.
 
 	// set the named parameters

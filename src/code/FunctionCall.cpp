@@ -83,7 +83,7 @@ FunctionCall::Evaluate(EvaluationContext& context)
 
 	for (size_t i = 0; i < functionCount; i++) {
 		Rule* function = rulePool.Lookup(functions.ElementAt(i));
-		if (function == NULL) {
+		if (function == nullptr) {
 			context.ErrorOutput() << "warning: unknown rule "
 								  << functions.ElementAt(i) << std::endl;
 			continue;
@@ -138,7 +138,7 @@ FunctionCall::Visit(NodeVisitor& visitor)
 			return result;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void

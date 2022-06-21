@@ -116,7 +116,7 @@ TestFixture::CodeExecuter::Execute(
 	std::ostream& errorOutput)
 {
 	fTemporaryDirectoryCreator.Delete();
-	fOutputPipe = NULL;
+	fOutputPipe = nullptr;
 
 	// create a temporary test directory and change into it
 	fTemporaryDirectoryCreator.Create(true);
@@ -144,10 +144,10 @@ TestFixture::CodeExecuter::Execute(
 		}
 	}
 
-	if (jamExecutable != NULL) {
+	if (jamExecutable != nullptr) {
 		// run the executable
 		fOutputPipe = popen(jamExecutable, "r");
-		if (fOutputPipe == NULL) {
+		if (fOutputPipe == nullptr) {
 			HAM_TEST_THROW("Failed to execute \"%s\": %s",
 						   jamExecutable,
 						   strerror(errno))
@@ -202,7 +202,7 @@ TestFixture::CodeExecuter::Execute(
 	std::ostream& errorOutput)
 {
 	std::string jamExecutable = environment->JamExecutable();
-	return Execute(jamExecutable.empty() ? NULL : jamExecutable.c_str(),
+	return Execute(jamExecutable.empty() ? nullptr : jamExecutable.c_str(),
 				   environment->GetCompatibility(),
 				   code,
 				   codeAge,
@@ -214,9 +214,9 @@ void
 TestFixture::CodeExecuter::Cleanup()
 {
 	// close pipe to jam process
-	if (fOutputPipe != NULL) {
+	if (fOutputPipe != nullptr) {
 		pclose(fOutputPipe);
-		fOutputPipe = NULL;
+		fOutputPipe = nullptr;
 	}
 
 	// change the directory back to the original directory and delete the
@@ -256,7 +256,7 @@ TestFixture::MakeStringList(const char* element1,
 
 	data::StringList list;
 	for (size_t i = 0; i < sizeof(elements) / sizeof(elements[0]); i++) {
-		if (elements[i] == NULL)
+		if (elements[i] == nullptr)
 			break;
 		list.Append(data::String(elements[i]));
 	}
@@ -318,14 +318,14 @@ TestFixture::CurrentWorkingDirectory()
 	char* buffer = new char[size];
 
 	try {
-		if (getcwd(buffer, (size_t)size) == NULL) {
+		if (getcwd(buffer, (size_t)size) == nullptr) {
 			HAM_TEST_THROW("Failed to get current working directory: %s",
 						   strerror(errno))
 		}
 
 		std::string result(buffer);
 		delete[] buffer;
-		buffer = NULL;
+		buffer = nullptr;
 		return result;
 	} catch (...) {
 		delete[] buffer;
@@ -340,7 +340,7 @@ TestFixture::CreateTemporaryDirectory(std::string& _path)
 	char temporaryDirectoryBuffer[sizeof(kDirectoryNameTemplate)];
 	strcpy(temporaryDirectoryBuffer, kDirectoryNameTemplate);
 	char* temporaryDirectory = mkdtemp(temporaryDirectoryBuffer);
-	if (temporaryDirectory == NULL) {
+	if (temporaryDirectory == nullptr) {
 		HAM_TEST_THROW("mkdtemp() failed to create a new temporary directory: "
 					   "%s",
 					   strerror(errno))
@@ -355,7 +355,7 @@ TestFixture::CreateParentDirectory(const char* path, bool createAncestors)
 	// TODO: Path delimiter!
 	const char* lastSlash = strrchr(path, '/');
 	// TODO: Platform specific (root path).
-	if (lastSlash == NULL || lastSlash == path)
+	if (lastSlash == nullptr || lastSlash == path)
 		return;
 
 	std::string parentPath(path, lastSlash - path);
@@ -419,7 +419,7 @@ TestFixture::RemoveRecursively(std::string entry)
 	if (S_ISDIR(st.st_mode)) {
 		// recursively remove all entries in the directory
 		DIR* dir = opendir(entry.c_str());
-		if (dir == NULL) {
+		if (dir == nullptr) {
 			HAM_TEST_THROW("Failed to open directory \"%s\" for removal: %s",
 						   entry.c_str(),
 						   strerror(errno))

@@ -117,7 +117,7 @@ ham::tests::StringListTest::Constructor()
 
 	// (const StringList*) constructor
 	{
-		StringList list2((const StringList*)NULL);
+		StringList list2(nullptr);
 		LIST_EQUAL(list2, TestList())
 	}
 

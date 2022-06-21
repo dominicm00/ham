@@ -12,7 +12,7 @@ namespace data
 
 Target::Target()
 	: fName(),
-	  fVariables(NULL),
+	  fVariables(nullptr),
 	  fFlags(0),
 	  fDependencies(),
 	  fIncludes(),
@@ -22,7 +22,7 @@ Target::Target()
 
 Target::Target(const String& name)
 	: fName(name),
-	  fVariables(NULL),
+	  fVariables(nullptr),
 	  fFlags(0),
 	  fDependencies(),
 	  fIncludes(),

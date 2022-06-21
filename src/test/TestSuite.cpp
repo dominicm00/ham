@@ -24,7 +24,7 @@ TestSuite::~TestSuite()
 test::Test*
 TestSuite::TestAt(int index) const
 {
-	return index >= 0 && (size_t)index < fTests.size() ? fTests[index] : NULL;
+	return index >= 0 && (size_t)index < fTests.size() ? fTests[index] : nullptr;
 }
 
 test::Test*
@@ -37,7 +37,7 @@ TestSuite::GetTest(const std::string& name) const
 			return test;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void

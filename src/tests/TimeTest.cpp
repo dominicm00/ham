@@ -147,12 +147,12 @@ TimeTest::Now()
 	// Difficult to test. We fetch the time before and after and see, if the
 	// Time::Now() lies in between.
 	timeval startTime;
-	gettimeofday(&startTime, NULL);
+	gettimeofday(&startTime, nullptr);
 
 	Time time = Time::Now();
 
 	timeval endTime;
-	gettimeofday(&endTime, NULL);
+	gettimeofday(&endTime, nullptr);
 
 	HAM_TEST_VERIFY(startTime.tv_sec <= time.Seconds())
 	HAM_TEST_VERIFY(endTime.tv_sec >= time.Seconds())

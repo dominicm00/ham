@@ -21,11 +21,11 @@ find_grist_end(const StringPart& path)
 	const char* pathEnd = path.End();
 
 	if (*remainder != '<')
-		return NULL;
+		return nullptr;
 
 	remainder = std::find(remainder + 1, pathEnd, '>');
 	if (remainder == pathEnd)
-		return NULL;
+		return nullptr;
 
 	return remainder + 1;
 }
@@ -125,17 +125,17 @@ Path::Parts::SetTo(const StringPart& path)
 		fDirectory.Unset();
 
 	// archive member
-	const char* archiveMemberStart = NULL;
+	const char* archiveMemberStart = nullptr;
 	if (remainder != pathEnd && pathEnd[-1] == ')')
 		archiveMemberStart = strchr(remainder, '(');
-	if (archiveMemberStart != NULL)
+	if (archiveMemberStart != nullptr)
 		fArchiveMember.SetTo(archiveMemberStart + 1, pathEnd - 1);
 	else
 		fArchiveMember.Unset();
 
 	// suffix
 	const char* fileNameEnd =
-		archiveMemberStart != NULL ? archiveMemberStart : pathEnd;
+		archiveMemberStart != nullptr ? archiveMemberStart : pathEnd;
 	typedef std::reverse_iterator<const char*> ReverseStringIterator;
 	const char* lastDot = std::find(ReverseStringIterator(fileNameEnd),
 									ReverseStringIterator(remainder),

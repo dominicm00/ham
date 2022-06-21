@@ -106,7 +106,7 @@ struct Parser::ListenerNotifier {
 	ListenerNotifier(Parser::Listener* listener, const char* name)
 		: fListener(listener)
 	{
-		if (fListener != NULL) {
+		if (fListener != nullptr) {
 			fName = name;
 			fListener->NonterminalStart(fName);
 		}
@@ -114,7 +114,7 @@ struct Parser::ListenerNotifier {
 
 	~ListenerNotifier()
 	{
-		if (fListener != NULL)
+		if (fListener != nullptr)
 			fListener->NonterminalEnd(fName);
 	}
 
@@ -161,7 +161,7 @@ struct Parser::DumpListener : Parser::Listener {
 // #pragma mark - Parser
 
 Parser::Parser()
-	: fListener(NULL)
+	: fListener(nullptr)
 {
 }
 
@@ -245,7 +245,7 @@ Parser::Test(int argc, const char* const* argv)
 		printf("Parser::Test(): Caught exception\n");
 	}
 
-	fListener = NULL;
+	fListener = nullptr;
 }
 
 code::Block*
@@ -574,8 +574,8 @@ Parser::_TryParseStatement()
 
 			// each case starts with an argument
 			code::NodeReference argument(_TryParseArgument(), true);
-			if (argument.Get() == NULL)
-				return NULL;
+			if (argument.Get() == nullptr)
+				return nullptr;
 
 			switch (_Token().ID()) {
 				case TOKEN_ON: {
@@ -703,7 +703,7 @@ Parser::_TryParseArgument(bool allowKeyword)
 		return result;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 code::Node*
@@ -720,7 +720,7 @@ Parser::_ParseBracketExpression()
 
 	_ThrowExpected("Expected statement or local variable declaration");
 
-	return NULL;
+	return nullptr;
 }
 
 code::Node*
@@ -730,7 +730,7 @@ Parser::_TryParseBracketOnExpression()
 	PARSER_NONTERMINAL("bracket on expression");
 
 	if (!_TrySkipToken(TOKEN_ON))
-		return NULL;
+		return nullptr;
 
 	code::NodeReference onTarget(
 		_Expect(_TryParseArgument(), "Expected target argument after 'on'"),
@@ -742,7 +742,7 @@ Parser::_TryParseBracketOnExpression()
 		expression.SetTo(_ParseList(), true);
 	} else {
 		expression.SetTo(_TryParseFunctionCall(), true);
-		if (expression.Get() == NULL) {
+		if (expression.Get() == nullptr) {
 			_ThrowExpected(
 				"Expected 'return' or function call in 'on' expression");
 		}
@@ -759,8 +759,8 @@ Parser::_TryParseFunctionCall()
 	PARSER_NONTERMINAL("function call expression");
 
 	code::NodeReference function(_TryParseArgument(), true);
-	if (function.Get() == NULL)
-		return NULL;
+	if (function.Get() == nullptr)
+		return nullptr;
 
 	// list of lists of arguments
 	NodeListContainer nodes;

@@ -79,7 +79,7 @@ set_variable(std::map<data::String, data::String>& variables,
 	const char* variable)
 {
 	const char* equalSign = strchr(variable, '=');
-	if (equalSign == NULL)
+	if (equalSign == nullptr)
 		return false;
 
 	variables[data::String(variable, equalSign - variable)]
@@ -102,7 +102,7 @@ main(int argc, const char* const* argv)
 
 	// import environment
 // TODO: Platform specific!
-	for (size_t i = 0; environ[i] != NULL; i++)
+	for (size_t i = 0; environ[i] != nullptr; i++)
 		set_variable(variables, environ[i]);
 
 	// parse arguments
@@ -300,7 +300,7 @@ main(int argc, const char* const* argv)
 	// name.
 	if (!compatibilitySpecified) {
 		const char* slash = strrchr(programName, '/');
-		const char* baseName = slash != NULL ? slash + 1 : programName;
+		const char* baseName = slash != nullptr ? slash + 1 : programName;
 		if (strcmp(baseName, "jam") == 0)
 			compatibility = behavior::COMPATIBILITY_JAM;
 		else if (strcmp(baseName, "bjam") == 0)

@@ -101,7 +101,7 @@ Parser::_NextToken()
 {
 	const Token& token = fLexer.NextToken();
 
-	if (fListener != NULL)
+	if (fListener != nullptr)
 		fListener->NextToken(token);
 
 	return token;
@@ -128,7 +128,7 @@ template<typename NodeType>
 NodeType*
 Parser::_Expect(NodeType* node, const char* expected)
 {
-	if (node == NULL)
+	if (node == nullptr)
 		_ThrowExpected(expected);
 	return node;
 }

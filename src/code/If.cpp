@@ -20,7 +20,7 @@ If::If(Node* expression, Node* block, Node* elseBlock)
 {
 	fExpression->AcquireReference();
 	fBlock->AcquireReference();
-	if (fElseBlock != NULL)
+	if (fElseBlock != nullptr)
 		fElseBlock->AcquireReference();
 }
 
@@ -28,7 +28,7 @@ If::~If()
 {
 	fExpression->ReleaseReference();
 	fBlock->ReleaseReference();
-	if (fElseBlock != NULL)
+	if (fElseBlock != nullptr)
 		fElseBlock->ReleaseReference();
 }
 
@@ -37,7 +37,7 @@ If::Evaluate(EvaluationContext& context)
 {
 	return fExpression->Evaluate(context).IsTrue()
 		? fBlock->Evaluate(context)
-		: (fElseBlock != NULL ? fElseBlock->Evaluate(context)
+		: (fElseBlock != nullptr ? fElseBlock->Evaluate(context)
 							  : StringList::False());
 }
 
@@ -53,7 +53,7 @@ If::Visit(NodeVisitor& visitor)
 	if (Node* result = fBlock->Visit(visitor))
 		return result;
 
-	return fElseBlock != NULL ? fElseBlock->Visit(visitor) : NULL;
+	return fElseBlock != nullptr ? fElseBlock->Visit(visitor) : nullptr;
 }
 
 void
@@ -64,7 +64,7 @@ If::Dump(DumpContext& context) const
 
 	fExpression->Dump(context);
 	fBlock->Dump(context);
-	if (fElseBlock != NULL)
+	if (fElseBlock != nullptr)
 		fElseBlock->Dump(context);
 
 	context.EndChildren();

@@ -41,10 +41,10 @@ For::Evaluate(EvaluationContext& context)
 
 	// look for a local variable
 	StringList* variableValue = context.LocalScope()->Lookup(variables.Head());
-	if (variableValue == NULL) {
+	if (variableValue == nullptr) {
 		// no local variable -- check for a global one
 		variableValue = context.GlobalVariables()->Lookup(variables.Head());
-		if (variableValue == NULL) {
+		if (variableValue == nullptr) {
 			// no existing global variable either -- create one
 			variableValue =
 				&context.GlobalVariables()->LookupOrCreate(variables.Head());

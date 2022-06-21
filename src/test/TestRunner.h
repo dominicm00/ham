@@ -29,13 +29,13 @@ class TestRunner
 
   private:
 	struct TestIdentifier {
-		TestIdentifier(Test* test = NULL, int testCaseIndex = -1)
+		TestIdentifier(Test* test = nullptr, int testCaseIndex = -1)
 			: fTest(test),
 			  fTestCaseIndex(testCaseIndex)
 		{
 		}
 
-		bool IsValid() const { return fTest != NULL; }
+		bool IsValid() const { return fTest != nullptr; }
 
 		Test* GetTest() const { return fTest; }
 

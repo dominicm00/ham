@@ -85,7 +85,7 @@ class StringList
 		static Data* Create(size_t capacity)
 		{
 			void* memory = malloc(sizeof(Data) + sizeof(String) * capacity);
-			if (memory == NULL)
+			if (memory == nullptr)
 				throw std::bad_alloc();
 			return new (memory) Data(capacity);
 		}
@@ -145,7 +145,7 @@ class StringList::Iterator
 {
   public:
 	Iterator()
-		: fList(NULL),
+		: fList(nullptr),
 		  fNextIndex(0)
 	{
 	}
@@ -156,7 +156,7 @@ class StringList::Iterator
 	{
 	}
 
-	bool HasNext() const { return fList != NULL && fNextIndex < fList->fSize; }
+	bool HasNext() const { return fList != nullptr && fNextIndex < fList->fSize; }
 
 	String Next()
 	{

@@ -77,7 +77,7 @@ class SequentialSet<Element>::Iterator
 {
   public:
 	Iterator()
-		: fSet(NULL),
+		: fSet(nullptr),
 		  fNextIndex(0)
 	{
 	}
@@ -88,7 +88,7 @@ class SequentialSet<Element>::Iterator
 	{
 	}
 
-	bool HasNext() const { return fSet != NULL && fNextIndex < fSet->Size(); }
+	bool HasNext() const { return fSet != nullptr && fNextIndex < fSet->Size(); }
 
 	const Element& Next() { return fSet->ElementAt(fNextIndex++); }
 

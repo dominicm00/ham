@@ -145,7 +145,7 @@ struct RegExp::MatchResultData {
 	MatchResultData(const regex_t* compiledExpression, const char* string)
 		: fReferenceCount(1),
 		  fMatchCount(0),
-		  fMatches(NULL)
+		  fMatches(nullptr)
 	{
 		// Do the matching: Since we need to provide a buffer for the matches
 		// for regexec() to fill in, but don't know the number of matches
@@ -157,7 +157,7 @@ struct RegExp::MatchResultData {
 			if (regexec(compiledExpression, string, maxMatchCount, fMatches, 0)
 				!= 0) {
 				delete[] fMatches;
-				fMatches = NULL;
+				fMatches = nullptr;
 				fMatchCount = 0;
 				break;
 			}
@@ -179,7 +179,7 @@ struct RegExp::MatchResultData {
 
 			// buffer too small -- try again with larger buffer
 			delete[] fMatches;
-			fMatches = NULL;
+			fMatches = nullptr;
 			maxMatchCount *= 2;
 		}
 	}
@@ -207,12 +207,12 @@ struct RegExp::MatchResultData {
 // #pragma mark - RegExp
 
 RegExp::RegExp()
-	: fData(NULL)
+	: fData(nullptr)
 {
 }
 
 RegExp::RegExp(const char* pattern, PatternType patternType)
-	: fData(NULL)
+	: fData(nullptr)
 {
 	SetPattern(pattern, patternType);
 }
@@ -220,28 +220,28 @@ RegExp::RegExp(const char* pattern, PatternType patternType)
 RegExp::RegExp(const RegExp& other)
 	: fData(other.fData)
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Acquire();
 }
 
 RegExp::~RegExp()
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Release();
 }
 
 bool
 RegExp::SetPattern(const char* pattern, PatternType patternType)
 {
-	if (fData != NULL) {
+	if (fData != nullptr) {
 		fData->Release();
-		fData = NULL;
+		fData = nullptr;
 	}
 
 	fData = new Data(pattern, patternType);
 	if (!fData->IsValid()) {
 		delete fData;
-		fData = NULL;
+		fData = nullptr;
 		return false;
 	}
 
@@ -261,12 +261,12 @@ RegExp::Match(const char* string) const
 RegExp&
 RegExp::operator=(const RegExp& other)
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Release();
 
 	fData = other.fData;
 
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Acquire();
 
 	return *this;
@@ -275,7 +275,7 @@ RegExp::operator=(const RegExp& other)
 // #pragma mark - RegExp::MatchResult
 
 RegExp::MatchResult::MatchResult()
-	: fData(NULL)
+	: fData(nullptr)
 {
 }
 
@@ -287,40 +287,40 @@ RegExp::MatchResult::MatchResult(MatchResultData* data)
 RegExp::MatchResult::MatchResult(const MatchResult& other)
 	: fData(other.fData)
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Acquire();
 }
 
 RegExp::MatchResult::~MatchResult()
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Release();
 }
 
 bool
 RegExp::MatchResult::HasMatched() const
 {
-	return fData != NULL && fData->MatchCount() > 0;
+	return fData != nullptr && fData->MatchCount() > 0;
 }
 
 size_t
 RegExp::MatchResult::StartOffset() const
 {
-	return fData != NULL && fData->MatchCount() > 0 ? fData->Matches()[0].rm_so
+	return fData != nullptr && fData->MatchCount() > 0 ? fData->Matches()[0].rm_so
 													: 0;
 }
 
 size_t
 RegExp::MatchResult::EndOffset() const
 {
-	return fData != NULL && fData->MatchCount() > 0 ? fData->Matches()[0].rm_eo
+	return fData != nullptr && fData->MatchCount() > 0 ? fData->Matches()[0].rm_eo
 													: 0;
 }
 
 size_t
 RegExp::MatchResult::GroupCount() const
 {
-	if (fData == NULL)
+	if (fData == nullptr)
 		return 0;
 
 	size_t matchCount = fData->MatchCount();
@@ -330,7 +330,7 @@ RegExp::MatchResult::GroupCount() const
 size_t
 RegExp::MatchResult::GroupStartOffsetAt(size_t index) const
 {
-	return fData != NULL && fData->MatchCount() > index + 1
+	return fData != nullptr && fData->MatchCount() > index + 1
 		? fData->Matches()[index + 1].rm_so
 		: 0;
 }
@@ -338,7 +338,7 @@ RegExp::MatchResult::GroupStartOffsetAt(size_t index) const
 size_t
 RegExp::MatchResult::GroupEndOffsetAt(size_t index) const
 {
-	return fData != NULL && fData->MatchCount() > index + 1
+	return fData != nullptr && fData->MatchCount() > index + 1
 		? fData->Matches()[index + 1].rm_eo
 		: 0;
 }
@@ -346,12 +346,12 @@ RegExp::MatchResult::GroupEndOffsetAt(size_t index) const
 RegExp::MatchResult&
 RegExp::MatchResult::operator=(const MatchResult& other)
 {
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Release();
 
 	fData = other.fData;
 
-	if (fData != NULL)
+	if (fData != nullptr)
 		fData->Acquire();
 
 	return *this;

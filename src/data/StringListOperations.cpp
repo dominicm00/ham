@@ -31,11 +31,11 @@ void
 StringListOperations::Parse(const char* start, const char* end)
 {
 	uint32_t pendingOperation = 0;
-	StringPart* pendingParameter = NULL;
+	StringPart* pendingParameter = nullptr;
 
 	for (; start < end; start++) {
 		if (*start == '=') {
-			if (pendingParameter != NULL) {
+			if (pendingParameter != nullptr) {
 				pendingParameter->SetTo(start + 1, end);
 				AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 			}
@@ -44,7 +44,7 @@ StringListOperations::Parse(const char* start, const char* end)
 
 		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 		pendingOperation = 0;
-		pendingParameter = NULL;
+		pendingParameter = nullptr;
 
 		switch (*start) {
 			case 'G':
@@ -108,7 +108,7 @@ StringListOperations::Parse(const char* start, const char* end)
 		}
 
 		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
-	} else if (pendingParameter != NULL) {
+	} else if (pendingParameter != nullptr) {
 		pendingParameter->SetTo(end, end);
 		AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 	}

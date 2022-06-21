@@ -82,8 +82,8 @@ StringPart::SetTo(const char* start, size_t length)
 inline void
 StringPart::Unset()
 {
-	fStart = NULL;
-	fEnd = NULL;
+	fStart = nullptr;
+	fEnd = nullptr;
 }
 
 inline std::string

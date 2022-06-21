@@ -34,7 +34,7 @@ Rule*
 RulePool::Lookup(const String& name)
 {
 	RuleMap::iterator it = fRules.find(name);
-	return it == fRules.end() ? NULL : &it->second;
+	return it == fRules.end() ? nullptr : &it->second;
 }
 
 Rule&

@@ -39,40 +39,40 @@ class Rule
 
 Rule::Rule()
 	: fName(),
-	  fInstructions(NULL),
-	  fActions(NULL)
+	  fInstructions(nullptr),
+	  fActions(nullptr)
 {
 }
 
 Rule::~Rule()
 {
-	if (fInstructions != NULL)
+	if (fInstructions != nullptr)
 		fInstructions->ReleaseReference();
-	if (fActions != NULL)
+	if (fActions != nullptr)
 		fActions->ReleaseReference();
 }
 
 void
 Rule::SetInstructions(RuleInstructions* instructions)
 {
-	if (fInstructions != NULL)
+	if (fInstructions != nullptr)
 		fInstructions->ReleaseReference();
 
 	fInstructions = instructions;
 
-	if (fInstructions != NULL)
+	if (fInstructions != nullptr)
 		fInstructions->AcquireReference();
 }
 
 void
 Rule::SetActions(data::RuleActions* actions)
 {
-	if (fActions != NULL)
+	if (fActions != nullptr)
 		fActions->ReleaseReference();
 
 	fActions = actions;
 
-	if (fActions != NULL)
+	if (fActions != nullptr)
 		fActions->AcquireReference();
 }
 
