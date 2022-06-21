@@ -54,14 +54,13 @@ for ruleset; do
 		printf "#include \"ruleset/%s\"\n\n" "$header" ;
 		printf "#include <string>\n\n" ;
 		printf "const std::string ham::ruleset::%s =\n" "$ruleset" ;
+		sed -e '/^$/d' \
+			-e '/^#/d' \
+			-e 's/\\/\\\\/g' \
+			-e 's/"/\\"/g' \
+			-e 's/^/  "/' \
+			-e 's/$/\\n"/' \
+			< "$ruleset" ;
+		printf ";\n" ;
 	} > "$file"
-
-	sed -e '/^$/d' \
-		-e '/^#/d' \
-		-e 's/\\/\\\\/g' \
-		-e 's/"/\\"/g' \
-		-e 's/^/  "/' \
-		-e 's/$/\\n"/' \
-		< "$ruleset" >> "$file"
-	printf ";\n" >> "$file"
 done
