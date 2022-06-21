@@ -26,13 +26,17 @@ extern const std::string rulesetc;
 #endif // HAM_RULESET_rulesetu_H
 EOF
 
-# rulesets
-set -- HamRuleset JamRuleset
+file="$1"
+ruleset_file="$2"
 
-for ruleset; do
-	file="${ruleset}.cpp"
-	header="${ruleset}.h"
+ruleset_path=${2%%.*}
+ruleset=${ruleset_path##*/}
+header_file=ruleset/${ruleset}.h
+suffix=${1##*.}
 
+created=0
+
+if [ "$suffix" = "h" ]; then
 	# get UPPER_CASE version of ruleset
 	ruleset_upper=$(echo "$ruleset" \
 						| sed -e 's/\([A-Z]\)/-\1/g' \
@@ -46,12 +50,16 @@ for ruleset; do
 		printf "%s" "$header_template" \
 			| sed -e "s/rulesetu/${ruleset_upper}/" \
 				  -e "s/rulesetc/${ruleset}/" ;
-	} > "$header"
+	} > "$file"
 
+	created=1
+fi
+
+if [ "$suffix" = "cpp" ]; then
 	# create data file
 	{
 		printf "%s\n" "$copyright" ;
-		printf "#include \"ruleset/%s\"\n\n" "$header" ;
+		printf "#include \"%s\"\n\n" "$header_file" ;
 		printf "#include <string>\n\n" ;
 		printf "const std::string ham::ruleset::%s =\n" "$ruleset" ;
 		sed -e '/^$/d' \
@@ -60,7 +68,14 @@ for ruleset; do
 			-e 's/"/\\"/g' \
 			-e 's/^/  "/' \
 			-e 's/$/\\n"/' \
-			< "$ruleset" ;
+			< "$ruleset_file" ;
 		printf ";\n" ;
 	} > "$file"
-done
+
+	created=1
+fi
+
+if [ $created -eq 0 ]; then
+	echo "Invalid file suffix."
+	exit 1
+fi

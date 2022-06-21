@@ -13,8 +13,41 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) parser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) platform unix ] ;
 	# TODO: Handle different platforms!
 SEARCH_SOURCE += [ FDirName $(SUBDIR) process ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) ruleset ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
+RULESET_DIR = [ FDirName $(SUBDIR) ruleset ] ;
+
+rule Ruleset
+{
+	# Ruleset <ruleset> ;
+	# Builds ruleset files so they can be included into C++ code.
+
+	local ruleset = [ FGristFiles $(1) ] ;
+	local header = [ FGristFiles $(ruleset:S=.h) ] ;
+	local source = [ FGristFiles $(ruleset:S=.cpp) ] ;
+
+	SEARCH on $(ruleset) = $(RULESET_DIR) ;
+
+	DEPENDS $(source) : $(header) ;
+	BuildRulesetObject $(header) : $(1) ;
+	BuildRulesetObject $(source) : $(1) ;
+}
+
+rule BuildRulesetObject
+{
+	MakeLocate $(1) : $(RULESET_DIR) ;
+	LocalClean clean : $(1) ;
+	BuildRulesetObject1 $(1) : $(2) ;
+}
+
+actions BuildRulesetObject1
+{
+	$(RULESET_DIR)/build-ruleset.sh "$(1)" "$(2)"
+}
+
+Ruleset HamRuleset.ham ;
+Ruleset JamRuleset.ham ;
 
 SharedLibrary libham.so
 	:
@@ -84,6 +117,10 @@ SharedLibrary libham.so
 	OptionIterator.cpp
 	Referenceable.cpp
 
+	# ruleset
+	HamRuleset.cpp
+	JamRuleset.cpp
+
 	:
 	$(TARGET_LIBSTDC++)
 ;
@@ -133,4 +170,3 @@ BinCommand ham-tests
 	libham.so
 	$(TARGET_LIBSTDC++)
 ;
-

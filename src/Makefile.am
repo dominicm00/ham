@@ -1,3 +1,17 @@
+BUILT_SOURCES =					\
+	ruleset/HamRuleset.cpp		\
+	ruleset/HamRuleset.h		\
+	ruleset/JamRuleset.cpp		\
+	ruleset/JamRuleset.h
+CLEANFILES = $(BUILT_SOURCES)
+
+ruleset/HamRuleset.cpp ruleset/HamRuleset.h: ruleset/HamRuleset.ham
+	./ruleset/build-ruleset.sh $@ ruleset/HamRuleset.ham
+
+ruleset/JamRuleset.cpp ruleset/JamRuleset.h: ruleset/JamRuleset.ham
+	./ruleset/build-ruleset.sh $@ ruleset/JamRuleset.ham
+
+
 lib_LTLIBRARIES = libham.la
 libham_la_SOURCES =								\
 	behavior/Behavior.cpp						\
