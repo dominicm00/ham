@@ -53,6 +53,30 @@ libham_la_SOURCES =								\
 	util/OptionIterator.cpp						\
 	util/Referenceable.cpp
 
+check_PROGRAMS = hamtest
+TESTS = hamtest
+hamtest_LDADD = libham.la
+hamtest_SOURCES = 						\
+	tests/ham-tests.cpp					\
+	tests/PathTest.cpp					\
+	tests/RegExpTest.cpp				\
+	tests/StringListTest.cpp			\
+	tests/StringPartTest.cpp			\
+	tests/StringTest.cpp				\
+	tests/TargetBinderTest.cpp			\
+	tests/TimeTest.cpp					\
+	tests/VariableExpansionTest.cpp		\
+	test/DataBasedTest.cpp				\
+	test/DataBasedTestParser.cpp		\
+	test/MultipleFilesDataBasedTest.cpp	\
+	test/RunnableTest.cpp				\
+	test/TemplateBasedTest.cpp			\
+	test/Test.cpp						\
+	test/TestException.cpp				\
+	test/TestFixture.cpp				\
+	test/TestRunner.cpp					\
+	test/TestSuite.cpp
+
 # TODO: define private/public headers
 nobase_dist_include_HEADERS =				\
 	behavior/Behavior.h						\
