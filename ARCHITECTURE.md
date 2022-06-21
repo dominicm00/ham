@@ -8,7 +8,7 @@ Compatibility-related code; describes the behavioral differences between differe
 their behavior as closely as possible.
 
 ### src/code
-Defines the Ham (Jam) language and how to evaluate it. Includes [nodes](@ref ham::code::Node) that define basic language constructs, language behavior like [variables](@ref ham::code::LocalVariableDeclaration) and [blocks](@ref ham::code::Block), and the [evaluation context](ham::code::EvaluationContext).
+Defines the Ham (Jam) language and how to evaluate it. Includes [nodes](@ref ham::code::Node) that define basic language constructs, language behavior like [variables](@ref ham::code::LocalVariableDeclaration) and [blocks](@ref ham::code::Block), and the [evaluation context](@ref ham::code::EvaluationContext).
 
 ### src/data
 Data-types used throughout the codebase. The primary types to take note of are [paths](@ref ham::data::Path) and [targets](@ref ham::data::Target).
@@ -46,3 +46,8 @@ General utilities used throughout the codebase
 
 ### testdata
 Data based end-to-end tests.
+
+## Core Concepts
+
+### Nodes
+Nodes are the fundamental units that make up Ham code. The parser outputs a tree of nodes. Each node defines its relationship to subnodes and its operation through the [Evaluate](@ref ham::code::Node::Evaluate) method. Upon evaluation, a node evaluates its subnodes (possibly modifying the [evaluation context](@ref ham::code::EvaluationContext) in the process), and then produces a [StringList](@ref ham::data::StringList). 
