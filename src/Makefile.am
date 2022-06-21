@@ -29,7 +29,6 @@ libham_la_SOURCES =								\
 	code/If.cpp									\
 	code/InListExpression.cpp					\
 	code/Include.cpp							\
-	code/Jambase.cpp							\
 	code/Jump.cpp								\
 	code/Leaf.cpp								\
 	code/List.cpp								\
@@ -65,7 +64,9 @@ libham_la_SOURCES =								\
 	process/Process.cpp							\
 	util/Constants.cpp							\
 	util/OptionIterator.cpp						\
-	util/Referenceable.cpp
+	util/Referenceable.cpp						\
+	ruleset/HamRuleset.cpp						\
+	ruleset/JamRuleset.cpp
 
 check_PROGRAMS = hamtest
 TESTS = hamtest
@@ -111,7 +112,6 @@ nobase_dist_include_HEADERS =				\
 	code/If.h								\
 	code/InListExpression.h					\
 	code/Include.h							\
-	code/Jambase.h							\
 	code/Jump.h								\
 	code/Leaf.h								\
 	code/List.h								\
@@ -165,4 +165,6 @@ nobase_dist_include_HEADERS =				\
 	util/Referenceable.h					\
 	util/SequentialSet.h					\
 	util/TextFileException.h				\
-	util/TextFilePosition.h
+	util/TextFilePosition.h					\
+	ruleset/HamRuleset.h					\
+	ruleset/JamRuleset.h
