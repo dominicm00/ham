@@ -56,7 +56,7 @@ for ruleset; do
 		printf "const std::string ham::ruleset::%s =\n" "$ruleset" ;
 	} > "$file"
 
-    sed -e '/^$/d' \
+	sed -e '/^$/d' \
 		-e '/^#/d' \
 		-e 's/\\/\\\\/g' \
 		-e 's/"/\\"/g' \
