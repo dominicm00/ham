@@ -1,8 +1,7 @@
 SubDir HAM_TOP src ;
 
 
-C++FLAGS += -std=c++0x ;
-#C++FLAGS += -std=c++11 ;
+C++FLAGS += -std=c++20 ;
 
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) behavior ] ;
