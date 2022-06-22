@@ -25,7 +25,7 @@ Case::~Case()
 }
 
 bool
-Case::Matches(EvaluationContext& context, const StringList& value) const
+Case::Matches(EvaluationContext&, const StringList& value) const
 {
 	using data::RegExp;
 

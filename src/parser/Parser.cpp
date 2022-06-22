@@ -62,17 +62,17 @@ static ActionsFlagMap sActionsFlags;
 Parser::Listener::~Listener() {}
 
 void
-Parser::Listener::NonterminalStart(const char* name)
+Parser::Listener::NonterminalStart(const char* /* name */)
 {
 }
 
 void
-Parser::Listener::NonterminalEnd(const char* name)
+Parser::Listener::NonterminalEnd(const char* /* name */)
 {
 }
 
 void
-Parser::Listener::NextToken(const Token& token)
+Parser::Listener::NextToken(const Token& /* token */)
 {
 }
 

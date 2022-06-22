@@ -19,7 +19,7 @@ Constant::Constant(const StringList& value)
 Constant::~Constant() {}
 
 StringList
-Constant::Evaluate(EvaluationContext& context)
+Constant::Evaluate(EvaluationContext&)
 {
 	return fValue;
 }

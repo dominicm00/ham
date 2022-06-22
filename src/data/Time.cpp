@@ -20,7 +20,7 @@ Time::Now()
 }
 
 String
-Time::ToString(bool includeNanoSeconds) const
+Time::ToString(bool /* includeNanoSeconds */) const
 {
 	// TODO: Support parameter
 	char buffer[32];

@@ -109,7 +109,7 @@ Processor::SetPrimaryTargets(const StringList& targets)
 }
 
 void
-Processor::SetForceUpdateTargets(const StringList& targets)
+Processor::SetForceUpdateTargets(const StringList& /* targets */)
 {
 	// TODO:...
 }

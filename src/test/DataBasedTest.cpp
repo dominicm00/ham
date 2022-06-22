@@ -50,14 +50,14 @@ DataBasedTest::~DataBasedTest()
 }
 
 void*
-DataBasedTest::CreateFixture(TestEnvironment* environment)
+DataBasedTest::CreateFixture(TestEnvironment* /* environment */)
 {
 	// dummy fixture
 	return this;
 }
 
 void
-DataBasedTest::DeleteFixture(TestEnvironment* environment, void* fixture)
+DataBasedTest::DeleteFixture(TestEnvironment* /* environment */, void* /* fixture */)
 {
 }
 
@@ -74,7 +74,7 @@ DataBasedTest::TestCaseCompatibility(int index,
 
 void
 DataBasedTest::RunTestCase(TestEnvironment* environment,
-						   void* fixture,
+						   void* /* fixture */,
 						   int index)
 {
 	_RunTest(environment, fDataSets[index]);

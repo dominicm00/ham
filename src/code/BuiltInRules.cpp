@@ -43,8 +43,8 @@ echo_string_list_list(EvaluationContext& context,
 
 struct EchoInstructions : RuleInstructions {
   public:
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+	StringList Evaluate(EvaluationContext& context,
+						const StringListList& parameters) override
 	{
 		echo_string_list_list(context, parameters);
 		return StringList::False();
@@ -53,8 +53,8 @@ struct EchoInstructions : RuleInstructions {
 
 struct ExitInstructions : RuleInstructions {
   public:
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+	StringList Evaluate(EvaluationContext& context,
+						const StringListList& parameters) override
 	{
 		echo_string_list_list(context, parameters);
 		context.SetJumpCondition(JUMP_CONDITION_EXIT);
@@ -64,8 +64,8 @@ struct ExitInstructions : RuleInstructions {
 
 struct MatchInstructions : RuleInstructions {
   public:
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+	StringList Evaluate(EvaluationContext&,
+						const StringListList& parameters) override
 	{
 		using data::RegExp;
 
@@ -105,8 +105,8 @@ struct MatchInstructions : RuleInstructions {
 
 struct GlobInstructions : RuleInstructions {
   public:
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+    StringList Evaluate(EvaluationContext&,
+						const StringListList& parameters) override
 	{
 		using data::RegExp;
 
@@ -185,8 +185,8 @@ struct GlobInstructions : RuleInstructions {
 template<bool kIncludes>
 struct DependsInstructions : RuleInstructions {
   public:
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+	StringList Evaluate(EvaluationContext& context,
+						const StringListList& parameters) override
 	{
 		if (parameters.size() < 2)
 			return StringList::False();
@@ -219,8 +219,8 @@ struct DependsInstructions : RuleInstructions {
 
 template<uint32_t kFlags>
 struct AddTargetFlagsRule : public RuleInstructions {
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters)
+    StringList Evaluate(EvaluationContext& context,
+						const StringListList& parameters) override
 	{
 		if (!parameters.empty()) {
 			const StringList& targetNames = parameters[0];
