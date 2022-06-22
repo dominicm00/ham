@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev.
+# Distributed under the terms of the MIT License.
 
 { copyright=$(cat) ; } <<'EOF'
 /*
