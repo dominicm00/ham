@@ -71,10 +71,9 @@ To build Ham from this repository, the following dependencies are required:
 - [Autoconf](https://www.gnu.org/software/autoconf/)
 - [Automake](https://www.gnu.org/software/automake/)
 - [Libtool](https://www.gnu.org/software/libtool/)
-- A C++ compiler with support for C++14
+- A C++ compiler with support for C++20
 
 **NOTE:** Ham plans to take the following dependencies in the near future:
-- A C++ compiler with support for C++20 (specifically [concepts](https://en.cppreference.com/w/cpp/concepts))
 - [Flex](https://github.com/westes/flex) (not required with distribution tarball)
 - [Bison](https://www.gnu.org/software/bison/) (not required with distribution tarball)
 
