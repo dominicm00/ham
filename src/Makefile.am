@@ -78,6 +78,7 @@ hamtest_SOURCES = 						\
 	tests/ham-tests.cpp					\
 	tests/PathTest.cpp					\
 	tests/RegExpTest.cpp				\
+	tests/RulesetTest.cpp				\
 	tests/StringListTest.cpp			\
 	tests/StringPartTest.cpp			\
 	tests/StringTest.cpp				\

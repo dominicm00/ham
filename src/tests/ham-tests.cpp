@@ -18,6 +18,7 @@
 #include "test/TestSuite.h"
 #include "tests/PathTest.h"
 #include "tests/RegExpTest.h"
+#include "tests/RulesetTest.h"
 #include "tests/StringListTest.h"
 #include "tests/StringPartTest.h"
 #include "tests/StringTest.h"
@@ -184,6 +185,7 @@ main(int argc, const char* const* argv)
 		.AddSuite("Data")
 		.Add<PathTest>()
 		.Add<RegExpTest>()
+		.Add<RulesetTest>()
 		.Add<StringListTest>()
 		.Add<StringPartTest>()
 		.Add<StringTest>()
