@@ -17,8 +17,8 @@ class Options
   public:
 	Options();
 
-	String JambaseFile() const { return fJambaseFile; }
-	void SetJambaseFile(const String& fileName) { fJambaseFile = fileName; }
+	String RulesetFile() const { return fRulesetFile; }
+	void SetRulesetFile(const String& fileName) { fRulesetFile = fileName; }
 
 	String ActionsOutputFile() const { return fActionsOutputFile; }
 	void SetActionsOutputFile(const String& fileName)
@@ -51,7 +51,7 @@ class Options
 	void SetQuitOnError(bool quitOnError) { fQuitOnError = quitOnError; }
 
   public:
-	String fJambaseFile;
+	String fRulesetFile;
 	String fActionsOutputFile;
 	bool fDryRun;
 	bool fPrintMakeTree;

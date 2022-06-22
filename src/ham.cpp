@@ -41,8 +41,8 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "      m     -  Print the make tree\n");
 	fprintf(out, "      x     -  Print the make commands\n");
 	fprintf(out, "      0..9  -  Set debug level.\n");
-	fprintf(out, "  -f <file>, --jambase <file>\n");
-	fprintf(out, "      Execute <file> instead of the built-in Jambase.\n");
+	fprintf(out, "  -f <file>, --ruleset <file>\n");
+	fprintf(out, "      Execute <file> instead of the built-in ruleset.\n");
 	fprintf(out, "  -g, --from-newest\n");
 	fprintf(out, "      Build from the newest sources first.\n");
 	fprintf(out, "  -h, --help\n");
@@ -106,8 +106,8 @@ main(int argc, const char* const* argv)
 		set_variable(variables, environ[i]);
 
 	// parse arguments
-	std::string jambaseFile;
-	bool jambaseFileSpecified = false;
+	std::string rulesetFile;
+	bool rulesetFileSpecified = false;
 	std::string actionsOutputFile;
 	bool actionsOutputFileSpecified = false;
 	behavior::Compatibility compatibility = behavior::COMPATIBILITY_HAM;
@@ -127,7 +127,7 @@ main(int argc, const char* const* argv)
 			.Add('a', "--all")
 			.Add('c', "--compatibility", true)
 			.Add('d', "--debug", true)
-			.Add('f', "--jambase", true)
+			.Add('f', "--ruleset", true)
 			.Add('g', "--from-newest")
 			.Add('h', "--help")
 			.Add('j', "--jobs", true)
@@ -216,8 +216,8 @@ main(int argc, const char* const* argv)
 			}
 
 			case 'f':
-				jambaseFile = argument;
-				jambaseFileSpecified = true;
+				rulesetFile = argument;
+				rulesetFileSpecified = true;
 				break;
 
 			case 'g':
@@ -311,8 +311,8 @@ main(int argc, const char* const* argv)
 
 	// set other options
 	make::Options options;
-	if (jambaseFileSpecified)
-		options.SetJambaseFile(jambaseFile.c_str());
+	if (rulesetFileSpecified)
+		options.SetRulesetFile(rulesetFile.c_str());
 	options.SetBuildFromNewest(buildFromNewest);
 	options.SetJobCount(jobCount);
 	options.SetDryRun(dryRun);
@@ -328,7 +328,7 @@ main(int argc, const char* const* argv)
 
 	try {
 		// execute the jam code
-		processor.ProcessJambase();
+		processor.ProcessRuleset();
 
 		// Set the targets that shall be made, even if up-to-date.
 		processor.SetForceUpdateTargets(forceUpdateTargets);

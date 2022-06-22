@@ -11,7 +11,7 @@ namespace make
 {
 
 Options::Options()
-	: fJambaseFile(),
+	: fRulesetFile(),
 	  fActionsOutputFile(),
 	  fDryRun(false),
 	  fPrintMakeTree(false),

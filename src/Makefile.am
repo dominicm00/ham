@@ -1,3 +1,20 @@
+AM_CPPFLAGS = -I./src
+AM_CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic
+
+BUILT_SOURCES =					\
+	ruleset/HamRuleset.cpp		\
+	ruleset/HamRuleset.h		\
+	ruleset/JamRuleset.cpp		\
+	ruleset/JamRuleset.h
+CLEANFILES = $(BUILT_SOURCES)
+
+ruleset/HamRuleset.cpp ruleset/HamRuleset.h: ruleset/HamRuleset.ham
+	./ruleset/build-ruleset.sh $@ ruleset/HamRuleset.ham
+
+ruleset/JamRuleset.cpp ruleset/JamRuleset.h: ruleset/JamRuleset.ham
+	./ruleset/build-ruleset.sh $@ ruleset/JamRuleset.ham
+
+
 lib_LTLIBRARIES = libham.la
 libham_la_SOURCES =								\
 	behavior/Behavior.cpp						\
@@ -15,7 +32,6 @@ libham_la_SOURCES =								\
 	code/If.cpp									\
 	code/InListExpression.cpp					\
 	code/Include.cpp							\
-	code/Jambase.cpp							\
 	code/Jump.cpp								\
 	code/Leaf.cpp								\
 	code/List.cpp								\
@@ -51,7 +67,9 @@ libham_la_SOURCES =								\
 	process/Process.cpp							\
 	util/Constants.cpp							\
 	util/OptionIterator.cpp						\
-	util/Referenceable.cpp
+	util/Referenceable.cpp						\
+	ruleset/HamRuleset.cpp						\
+	ruleset/JamRuleset.cpp
 
 check_PROGRAMS = hamtest
 TESTS = hamtest
@@ -60,6 +78,7 @@ hamtest_SOURCES = 						\
 	tests/ham-tests.cpp					\
 	tests/PathTest.cpp					\
 	tests/RegExpTest.cpp				\
+	tests/RulesetTest.cpp				\
 	tests/StringListTest.cpp			\
 	tests/StringPartTest.cpp			\
 	tests/StringTest.cpp				\
@@ -97,7 +116,6 @@ nobase_dist_include_HEADERS =				\
 	code/If.h								\
 	code/InListExpression.h					\
 	code/Include.h							\
-	code/Jambase.h							\
 	code/Jump.h								\
 	code/Leaf.h								\
 	code/List.h								\
@@ -151,4 +169,6 @@ nobase_dist_include_HEADERS =				\
 	util/Referenceable.h					\
 	util/SequentialSet.h					\
 	util/TextFileException.h				\
-	util/TextFilePosition.h
+	util/TextFilePosition.h					\
+	ruleset/HamRuleset.h					\
+	ruleset/JamRuleset.h

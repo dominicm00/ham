@@ -42,7 +42,7 @@ tool. For convienence, Ham provides aliases for many commands. A compatability m
 |:---------------------|:-------------------------------|:-----:|:---------:|:-----------:|:-----:|:-------------:|
 | `-a`                 | build all                      | P     | **X**     | P           | **X** | P             |
 | `-dX`                | debug info                     | P[^1] | **X**     | P[^1]       | **X** | P[^1]         |
-| `-fX`                | select Jambase                 | P     | **X**     | P           | **X** | P             |
+| `-fX`                | select ruleset                 | P     | **X**     | P           | **X** | P             |
 | `-g`                 | new sources first              | P     | **X**     | P           | **X** | P             |
 | `-jX`                | run actions concurrently       | P     | **X[^2]** | P           | **X** | P             |
 | `-n`                 | dry run                        | P     | **X**     | P           | **X** | P             |
@@ -71,10 +71,9 @@ To build Ham from this repository, the following dependencies are required:
 - [Autoconf](https://www.gnu.org/software/autoconf/)
 - [Automake](https://www.gnu.org/software/automake/)
 - [Libtool](https://www.gnu.org/software/libtool/)
-- A C++ compiler with support for C++14
+- A C++ compiler with support for C++20
 
 **NOTE:** Ham plans to take the following dependencies in the near future:
-- A C++ compiler with support for C++20 (specifically [concepts](https://en.cppreference.com/w/cpp/concepts))
 - [Flex](https://github.com/westes/flex) (not required with distribution tarball)
 - [Bison](https://www.gnu.org/software/bison/) (not required with distribution tarball)
 

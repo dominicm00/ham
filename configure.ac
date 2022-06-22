@@ -19,8 +19,4 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 AM_SILENT_RULES([yes])
 
-dnl TODO: fix warnings
-dnl AC_SUBST([warnings], ["-Wall -Wextra -Wpedantic -Werror"])
-AC_SUBST([warnings], ["-Wall -Wextra -Wpedantic"])
-
 AC_OUTPUT
