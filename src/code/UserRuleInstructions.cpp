@@ -11,9 +11,7 @@
 #include "code/Node.hpp"
 #include "data/VariableScope.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Node;
@@ -88,5 +86,4 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	return result;
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

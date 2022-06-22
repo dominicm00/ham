@@ -7,9 +7,7 @@
 
 #include <stddef.h>
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class RegExp
@@ -72,7 +70,6 @@ class RegExp::MatchResult
 	MatchResultData* fData;
 };
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_REG_EXP_HPP

@@ -5,9 +5,7 @@
 
 #include "data/Target.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 Target::Target()
@@ -41,5 +39,4 @@ Target::~Target()
 	delete fVariables;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

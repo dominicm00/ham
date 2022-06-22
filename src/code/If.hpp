@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class If : public Node
@@ -28,7 +26,6 @@ class If : public Node
 	Node* fElseBlock;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_IF_HPP

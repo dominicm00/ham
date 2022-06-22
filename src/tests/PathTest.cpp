@@ -9,9 +9,7 @@
 #include "data/Path.hpp"
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::Path;
@@ -1126,5 +1124,4 @@ PathTest::PartsIsAbsolute()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

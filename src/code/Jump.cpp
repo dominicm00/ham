@@ -8,9 +8,7 @@
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 template<typename JumpType>
@@ -81,5 +79,4 @@ HAM_DEFINE_JUMP_STATEMENT(JumpToEof, JUMP_CONDITION_JUMP_TO_EOF)
 
 #undef HAM_DEFINE_JUMP_NODE
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

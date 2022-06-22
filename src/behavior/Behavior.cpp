@@ -5,9 +5,7 @@
 
 #include "behavior/Behavior.hpp"
 
-namespace ham
-{
-namespace behavior
+namespace ham::behavior
 {
 
 /**
@@ -36,5 +34,4 @@ Behavior::Behavior(Compatibility compatibility)
 	}
 }
 
-} // namespace behavior
-} // namespace ham
+} // namespace ham::behavior

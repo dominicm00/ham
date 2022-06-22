@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class StringPartTest : public test::TestFixture
@@ -29,7 +27,6 @@ class StringPartTest : public test::TestFixture
 					   Assignment)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_STRING_PART_TEST_HPP

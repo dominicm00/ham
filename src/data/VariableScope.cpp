@@ -5,9 +5,7 @@
 
 #include "VariableScope.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 StringList*
@@ -25,5 +23,4 @@ VariableScope::Lookup(const String& variable) const
 	return nullptr;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

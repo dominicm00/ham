@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class For : public Node
@@ -28,7 +26,6 @@ class For : public Node
 	Node* fBlock;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_FOR_HPP

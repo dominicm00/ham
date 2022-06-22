@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class StringListTest : public test::TestFixture
@@ -49,7 +47,6 @@ class StringListTest : public test::TestFixture
 					   Iteration)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_STRING_LIST_TEST_HPP

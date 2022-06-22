@@ -7,9 +7,7 @@
 
 #include "code/Leaf.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 VariableExpansionTest::VariableExpansionTest()
@@ -142,5 +140,4 @@ VariableExpansionTest::_Evaluate(const String& string)
 	return leaf.Evaluate(*fEvaluationContext);
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

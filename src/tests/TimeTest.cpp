@@ -9,9 +9,7 @@
 
 #include "data/Time.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::Time;
@@ -164,5 +162,4 @@ TimeTest::Now()
 		HAM_TEST_VERIFY(endTime.tv_usec * 1000 >= time.NanoSeconds())
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

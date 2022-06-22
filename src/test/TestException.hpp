@@ -7,9 +7,7 @@
 
 #include <string>
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class TestException
@@ -29,7 +27,6 @@ class TestException
 	std::string fMessage;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEST_EXCEPTION_HPP

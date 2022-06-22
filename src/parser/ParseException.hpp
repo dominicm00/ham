@@ -10,9 +10,7 @@
 #include "parser/ParsePosition.hpp"
 #include "util/TextFileException.hpp"
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 class ParseException : public util::TextFileException
@@ -29,7 +27,6 @@ class ParseException : public util::TextFileException
 	}
 };
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser
 
 #endif // HAM_PARSER_PARSE_EXCEPTION_HPP

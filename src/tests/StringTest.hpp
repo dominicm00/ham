@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class StringTest : public test::TestFixture
@@ -35,7 +33,6 @@ class StringTest : public test::TestFixture
 					   SubString)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_STRING_TEST_HPP

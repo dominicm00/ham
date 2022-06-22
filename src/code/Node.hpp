@@ -10,9 +10,7 @@
 #include "data/StringList.hpp"
 #include "util/Referenceable.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class DumpContext;
@@ -111,7 +109,6 @@ class Node : public Referenceable
 typedef std::list<Node*> NodeList;
 typedef Reference<Node> NodeReference;
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_CODE_HPP

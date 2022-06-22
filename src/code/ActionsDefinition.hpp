@@ -9,9 +9,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class ActionsDefinition : public Node
@@ -34,7 +32,6 @@ class ActionsDefinition : public Node
 	uint32_t fFlags;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_ACTIONS_DEFINITION_HPP

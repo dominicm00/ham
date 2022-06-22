@@ -5,12 +5,9 @@
 
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 const char* const kJamfileName = "Jamfile";
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util

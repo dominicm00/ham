@@ -7,9 +7,7 @@
 
 #include <fstream>
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class Test;
@@ -35,7 +33,6 @@ class DataBasedTestParser
 	size_t fLineIndex;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_DATA_BASED_TEST_PARSER_HPP

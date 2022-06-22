@@ -10,9 +10,7 @@
 #include "data/Target.hpp"
 #include "data/VariableDomain.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 static const String kLocateVariableName("LOCATE");
@@ -89,5 +87,4 @@ TargetBinder::Bind(const VariableDomain& globalVariables,
 	Path::GetFileStatus(_boundPath.ToCString(), _fileStatus);
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

@@ -10,9 +10,7 @@
 
 #include "data/RegExp.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::RegExp;
@@ -314,5 +312,4 @@ RegExpTest::MatchWildcard()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

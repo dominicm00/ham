@@ -9,9 +9,7 @@
 #include "data/StringBuffer.hpp"
 #include "data/StringPart.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class FileStatus;
@@ -110,7 +108,6 @@ Path::Parts::ToPath(const behavior::Behavior& behavior) const
 	return buffer;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_PATH_HPP

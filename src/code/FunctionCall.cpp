@@ -13,9 +13,7 @@
 #include "data/TargetPool.hpp"
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 FunctionCall::FunctionCall(Node* function)
@@ -159,5 +157,4 @@ FunctionCall::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

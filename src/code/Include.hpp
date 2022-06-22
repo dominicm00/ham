@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Include : public Node
@@ -26,7 +24,6 @@ class Include : public Node
 	Node* fFileNames;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_INCLUDE_HPP

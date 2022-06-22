@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Case : public Node
@@ -29,7 +27,6 @@ class Case : public Node
 	Node* fBlock;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_CASE_HPP

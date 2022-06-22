@@ -10,9 +10,7 @@
 
 #include "util/Exception.hpp"
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 template<typename Element>
@@ -104,7 +102,6 @@ class SequentialSet<Element>::Iterator
 	size_t fNextIndex;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_SEQUENTIAL_SET_HPP

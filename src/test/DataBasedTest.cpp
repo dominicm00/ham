@@ -13,9 +13,7 @@
 #include "test/TestFixture.hpp"
 #include "util/TextFileException.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 static std::vector<std::string>
@@ -298,5 +296,4 @@ DataBasedTest::_CodeToString(const std::map<std::string, std::string>& code)
 	return string;
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

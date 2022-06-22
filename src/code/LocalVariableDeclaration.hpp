@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class LocalVariableDeclaration : public Node
@@ -27,7 +25,6 @@ class LocalVariableDeclaration : public Node
 	Node* fInitializer;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_LOCAL_VARIABLE_DECLARATION_HPP

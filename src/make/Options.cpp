@@ -5,9 +5,7 @@
 
 #include "make/Options.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 Options::Options()
@@ -23,5 +21,4 @@ Options::Options()
 {
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

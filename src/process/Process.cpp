@@ -5,9 +5,7 @@
 
 #include "process/Process.hpp"
 
-namespace ham
-{
-namespace process
+namespace ham::process
 {
 
 class ChildInfo;
@@ -31,5 +29,4 @@ Process::WaitForChild(ChildInfo& _childInfo)
 	return PlatformProcessDelegate::WaitForChild(_childInfo);
 }
 
-} // namespace process
-} // namespace ham
+} // namespace ham::process

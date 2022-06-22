@@ -11,9 +11,7 @@
 
 #include "data/StringList.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::String;
@@ -681,5 +679,4 @@ StringListTest::Iteration()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

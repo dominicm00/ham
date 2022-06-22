@@ -10,9 +10,7 @@
 
 #include "String.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class Time
@@ -74,7 +72,6 @@ Time::operator<(const Time& other) const
 	return fNanoSeconds < other.fNanoSeconds;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_TIME_HPP

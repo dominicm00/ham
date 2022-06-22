@@ -8,9 +8,7 @@
 #include "data/StringList.hpp"
 #include "util/Referenceable.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class EvaluationContext;
@@ -24,7 +22,6 @@ class RuleInstructions : public util::Referenceable
 								const StringListList& parameters) = 0;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_RULE_INSTRUCTIONS_HPP

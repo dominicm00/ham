@@ -5,9 +5,7 @@
 
 #include "util/Referenceable.hpp"
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 Referenceable::Referenceable()
@@ -46,5 +44,4 @@ Referenceable::LastReferenceReleased()
 	delete this;
 }
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util

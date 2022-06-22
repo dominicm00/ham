@@ -7,9 +7,7 @@
 
 #include "data/Time.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class FileStatus
@@ -30,7 +28,6 @@ class FileStatus
 	Time fLastModifiedTime;
 };
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_FILE_STATUS_HPP

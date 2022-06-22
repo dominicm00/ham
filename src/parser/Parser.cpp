@@ -36,9 +36,7 @@
 #include "data/RuleActions.hpp"
 #include "parser/ParseException.hpp"
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 namespace
@@ -975,5 +973,4 @@ Parser::_ThrowExpected(const char* expected)
 	_Throw(message.c_str());
 }
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser

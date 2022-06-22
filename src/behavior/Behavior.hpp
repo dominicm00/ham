@@ -7,9 +7,7 @@
 
 #include "behavior/Compatibility.hpp"
 
-namespace ham
-{
-namespace behavior
+namespace ham::behavior
 {
 
 /**
@@ -146,7 +144,6 @@ class Behavior
 	JoinCaseOperator fJoinCaseOperator;
 };
 
-} // namespace behavior
-} // namespace ham
+} // namespace ham::behavior
 
 #endif // HAM_BEHAVIOR_BEHAVIOR_HPP

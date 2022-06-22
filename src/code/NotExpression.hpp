@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class NotExpression : public Node
@@ -26,7 +24,6 @@ class NotExpression : public Node
 	Node* fChild;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_NOT_EXPRESSION_HPP

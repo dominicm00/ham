@@ -5,9 +5,7 @@
 
 #include "make/MakeTarget.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 MakeTarget::MakeTarget(const data::Target* target)
@@ -37,5 +35,4 @@ MakeTarget::SetFileStatus(const data::FileStatus& fileStatus)
 	fOriginalTime = fFileExists ? fileStatus.LastModifiedTime() : data::Time();
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

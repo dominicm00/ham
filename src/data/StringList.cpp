@@ -8,9 +8,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 StringList::Data StringList::Data::sEmptyData(0);
@@ -379,5 +377,4 @@ StringList::_CapacityForSize(size_t size)
 	return capacity;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

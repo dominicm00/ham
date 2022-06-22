@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class TargetBinderTest : public test::TestFixture
@@ -21,7 +19,6 @@ class TargetBinderTest : public test::TestFixture
 	HAM_ADD_TEST_CASES(TargetBinderTest, 1, Bind)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_TARGET_BINDER_TEST_HPP

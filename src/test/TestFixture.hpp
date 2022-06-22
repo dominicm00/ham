@@ -14,9 +14,7 @@
 #include "data/StringList.hpp"
 #include "test/TestException.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class TestEnvironment;
@@ -260,7 +258,6 @@ struct GetNonReferenceType<const Type&> {
 		exception.ThrowWithExtendedMessage(message, __VA_ARGS__);              \
 	}
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEST_FIXTURE_HPP

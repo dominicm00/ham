@@ -21,9 +21,7 @@
 #include "test/TestEnvironment.hpp"
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 template<typename Container>
@@ -600,5 +598,4 @@ TestFixture::ValueToString<data::FileStatus::Type>(
 	return "invalid";
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

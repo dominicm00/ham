@@ -7,9 +7,7 @@
 
 #include "util/Exception.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class MakeException : public util::Exception
@@ -21,7 +19,6 @@ class MakeException : public util::Exception
 	}
 };
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_MAKE_MAKE_EXCEPTION_HPP

@@ -11,9 +11,7 @@
 
 #include "test/RunnableTest.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class DataBasedTest : public RunnableTest
@@ -98,7 +96,6 @@ class DataBasedTest : public RunnableTest
 	std::vector<DataSetBase*> fDataSets;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_DATA_BASED_TEST_HPP

@@ -7,9 +7,7 @@
 
 #include "platform/PlatformProcessDelegate.hpp"
 
-namespace ham
-{
-namespace process
+namespace ham::process
 {
 
 class ChildInfo;
@@ -38,7 +36,6 @@ class Process
 	PlatformProcessDelegate fPlatformDelegate;
 };
 
-} // namespace process
-} // namespace ham
+} // namespace ham:process
 
 #endif // HAM_PROCESS_PROCESS_HPP

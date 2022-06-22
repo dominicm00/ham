@@ -11,9 +11,7 @@
 #include "test/TestException.hpp"
 #include "test/TestSuite.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 TestRunner::TestRunner()
@@ -209,5 +207,4 @@ TestRunner::_CleanupFixture()
 	fCurrentTestFixture = nullptr;
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

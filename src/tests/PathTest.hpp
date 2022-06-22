@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class PathTest : public test::TestFixture
@@ -37,7 +35,6 @@ class PathTest : public test::TestFixture
 					   PartsIsAbsolute)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_PATH_TEST_HPP

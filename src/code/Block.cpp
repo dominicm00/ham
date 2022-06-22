@@ -8,9 +8,7 @@
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 Block::Block()
@@ -100,5 +98,4 @@ Block::_Evaluate(EvaluationContext& context)
 	return result;
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

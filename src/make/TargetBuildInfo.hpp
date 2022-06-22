@@ -7,9 +7,7 @@
 
 #include "data/StringList.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class Command;
@@ -38,7 +36,6 @@ class TargetBuildInfo
 	bool fFailed;
 };
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_MAKE_TARGET_BUILD_INFO_HPP

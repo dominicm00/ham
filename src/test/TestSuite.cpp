@@ -5,9 +5,7 @@
 
 #include "test/TestSuite.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 TestSuite::TestSuite(const std::string& name)
@@ -47,5 +45,4 @@ TestSuite::AddTest(Test* test)
 	test->SetTestSuite(this);
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

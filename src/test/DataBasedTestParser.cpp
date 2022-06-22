@@ -12,9 +12,7 @@
 #include "test/MultipleFilesDataBasedTest.hpp"
 #include "test/TemplateBasedTest.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 static const std::string kTestCaseSeparator("---");
@@ -625,5 +623,4 @@ DataBasedTestParser::_Throw(const std::string& message, size_t column)
 								 parser::ParsePosition(fLineIndex, column));
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

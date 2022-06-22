@@ -9,9 +9,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class DumpContext
@@ -56,7 +54,6 @@ DumpContext::operator<<(const Type& value)
 	return PrintString(stream.str());
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_DUMP_CONTEXT_HPP

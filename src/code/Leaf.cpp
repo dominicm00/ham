@@ -13,9 +13,7 @@
 #include "code/EvaluationContext.hpp"
 #include "data/StringListOperations.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 Leaf::Leaf(const String& string)
@@ -495,5 +493,4 @@ Leaf::_ParseStringListOperationsRecursive(
 	}
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

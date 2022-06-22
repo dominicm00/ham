@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class TimeTest : public test::TestFixture
@@ -23,7 +21,6 @@ class TimeTest : public test::TestFixture
 	HAM_ADD_TEST_CASES(TimeTest, 3, Constructor, Comparison, Now)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_TIME_TEST_HPP

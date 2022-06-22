@@ -9,9 +9,7 @@
 
 #include "data/Target.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class TargetPool
@@ -38,7 +36,6 @@ TargetPool::Lookup(const String& name)
 	return it == fTargets.end() ? nullptr : &it->second;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_TARGET_POOL_HPP

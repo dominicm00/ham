@@ -7,9 +7,7 @@
 
 #include <stddef.h>
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 struct ParsePosition {
@@ -40,7 +38,6 @@ struct ParsePosition {
 	size_t fColumn;
 };
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser
 
 #endif // HAM_PARSER_PARSE_POSITION_HPP

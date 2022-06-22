@@ -9,9 +9,7 @@
 #include "data/RuleActions.hpp"
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 using data::String;
@@ -76,7 +74,6 @@ Rule::SetActions(data::RuleActions* actions)
 		fActions->AcquireReference();
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_RULE_HPP

@@ -8,9 +8,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 TestException::TestException(const char* file,
@@ -43,5 +41,4 @@ TestException::ThrowWithExtendedMessage(const char* message, ...)
 	throw TestException(fFile, fLine, "%s\n%s", fMessage.c_str(), buffer);
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

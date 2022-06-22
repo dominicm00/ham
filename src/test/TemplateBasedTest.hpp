@@ -7,9 +7,7 @@
 
 #include "test/DataBasedTest.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class TemplateBasedTest : public DataBasedTest
@@ -68,7 +66,6 @@ class TemplateBasedTest : public DataBasedTest
 	std::string fCode;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEMPLATE_BASED_TEST_HPP

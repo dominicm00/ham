@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class FunctionCall : public Node
@@ -39,7 +37,6 @@ FunctionCall::AddArgument(Node* argument)
 	argument->AcquireReference();
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_FUNCTION_CALL_HPP

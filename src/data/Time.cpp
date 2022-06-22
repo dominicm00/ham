@@ -8,9 +8,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 /*static*/ Time
@@ -36,5 +34,4 @@ Time::ToString(bool includeNanoSeconds) const
 	return String(buffer);
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

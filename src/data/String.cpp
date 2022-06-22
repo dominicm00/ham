@@ -5,9 +5,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 String::Buffer String::Buffer::sEmptyBuffer(0);
@@ -157,5 +155,4 @@ String::_CopyOnWriteBuffer()
 	fBuffer = buffer;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

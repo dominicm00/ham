@@ -7,9 +7,7 @@
 
 #include "data/RuleActions.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 Command::Command(data::RuleActionsCall* actions,
@@ -29,5 +27,4 @@ Command::~Command()
 	fActions->ReleaseReference();
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

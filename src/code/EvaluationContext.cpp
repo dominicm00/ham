@@ -7,9 +7,7 @@
 
 #include <iostream>
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
@@ -35,5 +33,4 @@ EvaluationContext::SetCompatibility(behavior::Compatibility compatibility)
 	fBehavior = behavior::Behavior(fCompatibility);
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

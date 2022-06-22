@@ -9,9 +9,7 @@
 
 #include "data/FileStatus.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 static const char*
@@ -217,5 +215,4 @@ Path::Parts::GetPath(StringBuffer& buffer,
 	}
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

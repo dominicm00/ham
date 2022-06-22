@@ -8,9 +8,7 @@
 #include <list>
 #include <string>
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class RunnableTest;
@@ -66,7 +64,6 @@ class TestRunner
 	TestIdentifierList fUnexpectedlyPassedTests;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEST_RUNNER_HPP

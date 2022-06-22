@@ -5,9 +5,7 @@
 
 #include "test/RunnableTest.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 RunnableTest::RunnableTest(const std::string& name, bool isJammable)
@@ -53,5 +51,4 @@ RunnableTest::TestCaseCompatibility(int index,
 	return behavior::COMPATIBILITY_MASK_ALL;
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

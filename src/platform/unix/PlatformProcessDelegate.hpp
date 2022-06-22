@@ -7,9 +7,7 @@
 
 #include <unistd.h>
 
-namespace ham
-{
-namespace process
+namespace ham::process
 {
 
 class ChildInfo;
@@ -38,7 +36,6 @@ class PlatformProcessDelegate
 	pid_t fPid;
 };
 
-} // namespace process
-} // namespace ham
+} // namespace ham::process
 
 #endif // HAM_PLATFORM_UNIX_PLATFORM_PROCESS_DELEGATE_HPP

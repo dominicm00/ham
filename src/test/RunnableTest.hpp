@@ -11,9 +11,7 @@
 #include "test/Test.hpp"
 #include "test/TestEnvironment.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class RunnableTest : public Test
@@ -139,7 +137,6 @@ class GenericRunnableTest : public RunnableTest
 	TestCaseMethodList fTestCaseMethods;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_RUNNABLE_TEST_HPP

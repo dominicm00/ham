@@ -8,9 +8,7 @@
 #include "code/Defs.hpp"
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Assignment : public Node
@@ -33,7 +31,6 @@ class Assignment : public Node
 	AssignmentOperator fOperator;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_ASSIGMENT_HPP

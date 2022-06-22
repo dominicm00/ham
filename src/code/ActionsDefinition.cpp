@@ -10,9 +10,7 @@
 #include "code/Rule.hpp"
 #include "data/RuleActions.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 ActionsDefinition::ActionsDefinition(uint32_t flags,
@@ -78,5 +76,4 @@ ActionsDefinition::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

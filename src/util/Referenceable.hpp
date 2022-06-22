@@ -8,9 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 // #pragma mark - support functions
@@ -152,7 +150,6 @@ class Reference
 	Type* fObject;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_REFERENCEABLE_HPP

@@ -8,9 +8,7 @@
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 Constant::Constant(const StringList& value)
@@ -41,5 +39,4 @@ Constant::Dump(DumpContext& context) const
 	context << "Constant(\"" << fValue << "\")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

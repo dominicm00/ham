@@ -13,9 +13,7 @@
 #include "test/TestFixture.hpp"
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 TemplateBasedTest::TemplateBasedTest(const std::string& name,
@@ -118,5 +116,4 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 	_codeAge.clear();
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

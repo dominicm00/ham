@@ -7,9 +7,7 @@
 
 #include "process/Process.hpp"
 
-namespace ham
-{
-namespace process
+namespace ham::process
 {
 
 struct ChildInfo {
@@ -18,7 +16,6 @@ struct ChildInfo {
 	int fExitCode;
 };
 
-} // namespace process
-} // namespace ham
+} // namespace ham::process
 
 #endif // HAM_PROCESS_CHILD_INFO_HPP

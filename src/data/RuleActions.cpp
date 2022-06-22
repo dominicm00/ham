@@ -5,9 +5,7 @@
 
 #include "data/RuleActions.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 RuleActions::RuleActions(const String& ruleName,
@@ -24,5 +22,4 @@ RuleActions::RuleActions(const String& ruleName,
 
 RuleActions::~RuleActions() {}
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

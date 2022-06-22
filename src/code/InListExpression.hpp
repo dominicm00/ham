@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class InListExpression : public Node
@@ -27,7 +25,6 @@ class InListExpression : public Node
 	Node* fRight;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_IN_LIST_EXPRESSION_HPP

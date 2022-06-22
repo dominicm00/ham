@@ -8,9 +8,7 @@
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 If::If(Node* expression, Node* block, Node* elseBlock)
@@ -71,5 +69,4 @@ If::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

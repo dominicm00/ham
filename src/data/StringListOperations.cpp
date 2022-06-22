@@ -7,9 +7,7 @@
 
 #include "data/Path.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 // #pragma mark - StringListOperations
@@ -238,5 +236,4 @@ StringListOperations::Apply(const StringList& inputList,
 	return resultList;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

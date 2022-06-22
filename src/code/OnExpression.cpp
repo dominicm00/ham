@@ -9,9 +9,7 @@
 #include "code/EvaluationContext.hpp"
 #include "data/TargetPool.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 OnExpression::OnExpression(Node* object, Node* expression)
@@ -77,5 +75,4 @@ OnExpression::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

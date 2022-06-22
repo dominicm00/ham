@@ -10,9 +10,7 @@
 #include "data/TargetPool.hpp"
 #include "data/VariableDomain.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::FileStatus;
@@ -283,5 +281,4 @@ TargetBinderTest::Bind()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

@@ -10,9 +10,7 @@
 #include "data/VariableDomain.hpp"
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class VariableExpansionTest : public test::TestFixture
@@ -38,7 +36,6 @@ class VariableExpansionTest : public test::TestFixture
 	code::EvaluationContext* fEvaluationContext;
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_VARIABLE_EXPANSION_TEST_HPP

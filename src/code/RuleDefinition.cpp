@@ -11,9 +11,7 @@
 #include "code/RulePool.hpp"
 #include "code/UserRuleInstructions.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 RuleDefinition::RuleDefinition(const String& ruleName,
@@ -70,5 +68,4 @@ RuleDefinition::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

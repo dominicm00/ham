@@ -9,9 +9,7 @@
 #include "data/TargetContainers.hpp"
 #include "data/VariableDomain.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class Target
@@ -120,7 +118,6 @@ Target::AddActionsCall(RuleActionsCall* actionsCall)
 	actionsCall->AcquireReference();
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_TARGET_HPP

@@ -26,9 +26,7 @@
 #include "ruleset/HamRuleset.hpp"
 #include "ruleset/JamRuleset.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 using data::Time;
@@ -919,5 +917,4 @@ Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget,
 	printf("\n");
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

@@ -21,9 +21,7 @@
 	} while (false)
 #endif
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 template<typename BaseIterator>
@@ -303,8 +301,7 @@ class Lexer
 	ParsePosition fFilePosition;
 };
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser
 
 #undef TRACE
 

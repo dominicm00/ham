@@ -9,9 +9,7 @@
 #include "code/EvaluationContext.hpp"
 #include "data/RegExp.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 Case::Case(const String& pattern, Node* block)
@@ -70,5 +68,4 @@ Case::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

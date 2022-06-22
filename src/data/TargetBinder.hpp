@@ -7,9 +7,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class FileStatus;
@@ -25,7 +23,6 @@ class TargetBinder
 					 FileStatus& _fileStatus);
 };
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_TARGET_BINDER_HPP

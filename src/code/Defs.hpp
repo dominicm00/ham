@@ -5,9 +5,7 @@
 #ifndef HAM_CODE_DEFS_HPP
 #define HAM_CODE_DEFS_HPP
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 enum AssignmentOperator {
@@ -25,7 +23,6 @@ enum JumpCondition {
 	JUMP_CONDITION_EXIT
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_DEFS_HPP

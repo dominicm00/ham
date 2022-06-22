@@ -5,14 +5,11 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 NodeVisitor::~NodeVisitor() {}
 
 Node::~Node() {}
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

@@ -9,9 +9,7 @@
 
 #include "StringList.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class VariableDomain
@@ -59,7 +57,6 @@ VariableDomain::Set(const String& variable, const StringList& value)
 	fVariables[variable] = value;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_VARIABLE_DOMAIN_HPP

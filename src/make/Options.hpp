@@ -7,9 +7,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class Options
@@ -62,7 +60,6 @@ class Options
 	bool fQuitOnError;
 };
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_MAKE_OPTIONS_HPP

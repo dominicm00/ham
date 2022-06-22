@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 template<typename JumpType>
@@ -40,7 +38,6 @@ HAM_DECLARE_JUMP_STATEMENT(JumpToEof)
 
 #undef HAM_DECLARE_JUMP_STATEMENT
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_JUMP_HPP

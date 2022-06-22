@@ -13,9 +13,7 @@
 #include "data/StringList.hpp"
 #include "data/StringPart.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class StringListOperations
@@ -84,7 +82,6 @@ class StringListOperations
 	StringPart fJoinParameter;
 };
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_STRING_LIST_OPERATIONS_HPP

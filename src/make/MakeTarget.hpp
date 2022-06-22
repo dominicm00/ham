@@ -8,9 +8,7 @@
 #include "data/FileStatus.hpp"
 #include "data/Target.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class MakeTarget;
@@ -121,7 +119,6 @@ MakeTarget::AddIncludes(const MakeTargetSet& includes)
 		AddInclude(it.Next());
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_MAKE_MAKE_TARGET_HPP

@@ -7,9 +7,7 @@
 
 #include "util/TextFileException.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class EvaluationException : public util::TextFileException
@@ -24,7 +22,6 @@ class EvaluationException : public util::TextFileException
 	}
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_EVALUATION_EXCEPTION_HPP

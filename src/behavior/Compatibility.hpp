@@ -5,9 +5,7 @@
 #ifndef HAM_BEHAVIOR_COMPATIBILITY_HPP
 #define HAM_BEHAVIOR_COMPATIBILITY_HPP
 
-namespace ham
-{
-namespace behavior
+namespace ham::behavior
 {
 
 /**
@@ -28,7 +26,6 @@ enum {
 		| (1 << COMPATIBILITY_BOOST_JAM) | (1 << COMPATIBILITY_HAM_1)
 };
 
-} // namespace behavior
-} // namespace ham
+} // namespace ham::behavior
 
 #endif // HAM_BEHAVIOR_COMPATIBILITY_HPP

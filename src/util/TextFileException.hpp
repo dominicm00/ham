@@ -10,9 +10,7 @@
 #include "util/Exception.hpp"
 #include "util/TextFilePosition.hpp"
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 class TextFileException : public Exception
@@ -31,7 +29,6 @@ class TextFileException : public Exception
 	TextFilePosition fPosition;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_TEXT_FILE_EXCEPTION_HPP

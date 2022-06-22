@@ -5,9 +5,7 @@
 
 #include "data/FileStatus.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 FileStatus::FileStatus()
@@ -22,5 +20,4 @@ FileStatus::FileStatus(Type type, const Time& lastModifiedTime)
 {
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

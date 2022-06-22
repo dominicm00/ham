@@ -5,9 +5,7 @@
 
 #include "data/TargetPool.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 TargetPool::TargetPool() {}
@@ -35,5 +33,4 @@ TargetPool::LookupOrCreate(const StringList& names, TargetList& _targets)
 		_targets.push_back(LookupOrCreate(it.Next()));
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

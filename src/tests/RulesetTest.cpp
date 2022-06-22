@@ -13,9 +13,7 @@
 #include <fstream>
 #include <string>
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 void
@@ -76,5 +74,4 @@ RulesetTest::HamRuleset()
 				  ruleset::kHamRuleset);
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

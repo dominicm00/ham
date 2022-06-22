@@ -7,9 +7,7 @@
 
 #include "data/VariableDomain.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class VariableScope
@@ -39,7 +37,6 @@ VariableScope::Set(const String& variable, const StringList& value)
 	fDomain.Set(variable, value);
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_VARIABLE_SCOPE_HPP

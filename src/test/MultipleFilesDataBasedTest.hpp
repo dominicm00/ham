@@ -9,9 +9,7 @@
 
 #include <map>
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class MultipleFilesDataBasedTest : public DataBasedTest
@@ -71,7 +69,6 @@ class MultipleFilesDataBasedTest : public DataBasedTest
 	};
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_MULTIPLE_FILES_DATA_BASED_TEST_HPP

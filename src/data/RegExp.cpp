@@ -12,9 +12,7 @@
 
 #include <vector>
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 // #pragma mark - RegExp::Data
@@ -357,5 +355,4 @@ RegExp::MatchResult::operator=(const MatchResult& other)
 	return *this;
 }
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data

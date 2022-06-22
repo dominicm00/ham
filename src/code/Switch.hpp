@@ -9,9 +9,7 @@
 
 #include "code/Case.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Switch : public Node
@@ -45,7 +43,6 @@ Switch::AddCase(const String& pattern, Node* block)
 	}
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_SWITCH_HPP

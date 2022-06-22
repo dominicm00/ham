@@ -14,9 +14,7 @@
 #include "data/StringBuffer.hpp"
 #include "data/TargetPool.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 static void
@@ -314,5 +312,4 @@ BuiltInRules::_AddRule(RulePool& rulePool,
 	rule.SetInstructions(instructions);
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

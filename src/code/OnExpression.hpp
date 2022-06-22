@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class OnExpression : public Node
@@ -27,7 +25,6 @@ class OnExpression : public Node
 	Node* fExpression;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_ON_EXPRESSION_HPP

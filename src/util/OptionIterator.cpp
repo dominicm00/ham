@@ -5,9 +5,7 @@
 
 #include "util/OptionIterator.hpp"
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 // #pragma mark - OptionSpecification
@@ -147,5 +145,4 @@ OptionIterator::_FindNextInternal()
 	return MORE_OPTIONS;
 }
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util

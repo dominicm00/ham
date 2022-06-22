@@ -7,9 +7,7 @@
 
 #include <string>
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 struct TextFilePosition {
@@ -45,7 +43,6 @@ struct TextFilePosition {
 	size_t fColumn;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_TEXT_FILE_POSITION_HPP

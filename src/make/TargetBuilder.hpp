@@ -12,9 +12,7 @@
 #include "data/StringList.hpp"
 #include "process/Process.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class Command;
@@ -53,7 +51,6 @@ class TargetBuilder
 	JobSlot* fJobSlots;
 };
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_MAKE_TARGET_BUILDER_HPP

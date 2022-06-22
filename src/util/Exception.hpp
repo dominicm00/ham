@@ -7,9 +7,7 @@
 
 #include <string>
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 class Exception
@@ -26,7 +24,6 @@ class Exception
 	std::string fMessage;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_EXCEPTION_HPP

@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 template<typename Operator>
@@ -45,7 +43,6 @@ HAM_DECLARE_OPERATOR_EXPRESSION(Or)
 
 #undef HAM_DECLARE_OPERATOR_EXPRESSION
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_BINARY_EXPRESSION_HPP

@@ -7,9 +7,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 enum TokenID {
@@ -110,7 +108,6 @@ struct Token : data::String {
 	TokenID fID;
 };
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser
 
 #endif // HAM_PARSER_TOKEN_HPP

@@ -8,9 +8,7 @@
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 template<typename Operator>
@@ -97,5 +95,4 @@ HAM_DEFINE_OPERATOR_EXPRESSION(Or, ||, a.IsTrue() || b.IsTrue())
 #undef HAM_DEFINE_OPERATOR_EXPRESSION
 #undef HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

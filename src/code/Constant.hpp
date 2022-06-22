@@ -7,9 +7,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Constant : public Node
@@ -26,7 +24,6 @@ class Constant : public Node
 	StringList fValue;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_CONSTANT_HPP

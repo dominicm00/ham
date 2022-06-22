@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 class RegExpTest : public test::TestFixture
@@ -30,7 +28,6 @@ class RegExpTest : public test::TestFixture
 	struct Matches;
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_REG_EXP_TEST_HPP

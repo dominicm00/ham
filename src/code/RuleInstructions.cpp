@@ -5,12 +5,9 @@
 
 #include "code/RuleInstructions.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 RuleInstructions::~RuleInstructions() {}
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

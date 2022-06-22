@@ -12,9 +12,7 @@
 #include "make/MakeTarget.hpp"
 #include "make/Options.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 using data::StringList;
@@ -97,7 +95,6 @@ class Processor
 	size_t fTargetsToUpdateCount;
 };
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make
 
 #endif // HAM_CODE_PROCESSOR_HPP

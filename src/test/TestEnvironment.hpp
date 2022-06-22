@@ -9,9 +9,7 @@
 
 #include "behavior/Compatibility.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 class TestEnvironment
@@ -42,7 +40,6 @@ class TestEnvironment
 	std::string fJamExecutable;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEST_ENVIRONMENT_HPP

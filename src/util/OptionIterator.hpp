@@ -8,9 +8,7 @@
 #include <map>
 #include <string>
 
-namespace ham
-{
-namespace util
+namespace ham::util
 {
 
 class OptionSpecification
@@ -73,7 +71,6 @@ class OptionIterator
 	Status fStatus;
 };
 
-} // namespace util
-} // namespace ham
+} // namespace ham::util
 
 #endif // HAM_UTIL_OPTION_ITERATOR_HPP

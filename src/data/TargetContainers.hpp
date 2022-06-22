@@ -7,9 +7,7 @@
 
 #include "util/SequentialSet.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class Target;
@@ -17,7 +15,6 @@ class Target;
 typedef util::SequentialSet<Target*> TargetSet;
 typedef std::vector<Target*> TargetList;
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_TARGET_CONTAINERS_HPP

@@ -6,9 +6,7 @@
 #include "make/TargetBuildInfo.hpp"
 #include "make/Command.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 class Command;
@@ -46,5 +44,4 @@ TargetBuildInfo::NextCommand()
 	return fCommands[fCommandIndex++];
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

@@ -7,9 +7,7 @@
 
 #include <stddef.h>
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class RuleInstructions;
@@ -33,7 +31,6 @@ class BuiltInRules
 	// caller keeps instructions reference
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_BUILT_IN_RULES_HPP

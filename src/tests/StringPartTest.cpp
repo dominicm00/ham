@@ -9,9 +9,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::String;
@@ -297,5 +295,4 @@ StringPartTest::Assignment()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

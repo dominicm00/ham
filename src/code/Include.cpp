@@ -19,9 +19,7 @@
 #include "parser/Parser.hpp"
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 Include::Include(Node* fileNames)
@@ -110,5 +108,4 @@ Include::Dump(DumpContext& context) const
 	context << ")\n";
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code

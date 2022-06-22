@@ -10,9 +10,7 @@
 #include "test/RunnableTest.hpp"
 #include "test/Test.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 typedef std::vector<Test*> TestList;
@@ -67,7 +65,6 @@ struct TestSuiteBuilder {
 	TestSuiteBuilder* fParentBuilder;
 };
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test
 
 #endif // HAM_TEST_TEST_SUITE_HPP

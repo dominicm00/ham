@@ -11,9 +11,7 @@
 #include "make/TargetBuildInfo.hpp"
 #include "process/ChildInfo.hpp"
 
-namespace ham
-{
-namespace make
+namespace ham::make
 {
 
 struct TargetBuilder::JobSlot {
@@ -270,5 +268,4 @@ TargetBuilder::_FindJobSlot(process::Process::Id id) const
 	return -1;
 }
 
-} // namespace make
-} // namespace ham
+} // namespace ham::make

@@ -9,9 +9,7 @@
 
 #include "data/String.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 using data::String;
@@ -388,5 +386,4 @@ StringTest::SubString()
 	}
 }
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests

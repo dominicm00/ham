@@ -7,9 +7,7 @@
 
 #include "code/RuleInstructions.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class Node;
@@ -28,7 +26,6 @@ class UserRuleInstructions : public RuleInstructions
 	Node* fBlock;
 };
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_USER_RULE_INSTRUCTIONS_HPP

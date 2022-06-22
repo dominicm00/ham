@@ -9,9 +9,7 @@
 
 #include "code/Rule.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class RulePool
@@ -51,7 +49,6 @@ RulePool::LookupOrCreate(const String& name)
 	return rule;
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_RULE_POOL_HPP

@@ -13,9 +13,7 @@
 #include "test/TestFixture.hpp"
 #include "util/Constants.hpp"
 
-namespace ham
-{
-namespace test
+namespace ham::test
 {
 
 MultipleFilesDataBasedTest::MultipleFilesDataBasedTest(const std::string& name)
@@ -75,5 +73,4 @@ MultipleFilesDataBasedTest::PrepareCode(
 	it->second = outputPrefix + it->second + outputSuffix;
 }
 
-} // namespace test
-} // namespace ham
+} // namespace ham::test

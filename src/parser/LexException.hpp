@@ -9,9 +9,7 @@
 
 #include "parser/ParsePosition.hpp"
 
-namespace ham
-{
-namespace parser
+namespace ham::parser
 {
 
 class LexException
@@ -35,7 +33,6 @@ class LexException
 	ParsePosition fPosition;
 };
 
-} // namespace parser
-} // namespace ham
+} // namespace ham::parser
 
 #endif // HAM_PARSER_LEX_EXCEPTION_HPP

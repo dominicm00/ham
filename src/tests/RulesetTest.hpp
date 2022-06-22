@@ -7,9 +7,7 @@
 
 #include "test/TestFixture.hpp"
 
-namespace ham
-{
-namespace tests
+namespace ham::tests
 {
 
 /**
@@ -26,7 +24,6 @@ class RulesetTest : public test::TestFixture
 	HAM_ADD_TEST_CASES(RulesetTest, 2, JamRuleset, HamRuleset)
 };
 
-} // namespace tests
-} // namespace ham
+} // namespace ham::tests
 
 #endif // HAM_TESTS_RULESET_TEST_HPP

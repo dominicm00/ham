@@ -9,9 +9,7 @@
 #include "data/TargetContainers.hpp"
 #include "util/Referenceable.hpp"
 
-namespace ham
-{
-namespace data
+namespace ham::data
 {
 
 class EvaluationContext;
@@ -94,7 +92,6 @@ class RuleActionsCall : public util::Referenceable
 	TargetList fSourceTargets;
 };
 
-} // namespace data
-} // namespace ham
+} // namespace ham::data
 
 #endif // HAM_DATA_RULE_ACTIONS_HPP

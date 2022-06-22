@@ -9,9 +9,7 @@
 
 #include "code/Node.hpp"
 
-namespace ham
-{
-namespace code
+namespace ham::code
 {
 
 class List : public Node
@@ -40,7 +38,6 @@ List::AppendKeepReference(Node* child)
 	}
 }
 
-} // namespace code
-} // namespace ham
+} // namespace ham::code
 
 #endif // HAM_CODE_LIST_HPP
