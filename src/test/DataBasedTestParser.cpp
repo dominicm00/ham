@@ -445,7 +445,7 @@ DataBasedTestParser::Parse(const char* fileName)
 	}
 
 	if (multipleFiles) {
-		std::auto_ptr<MultipleFilesDataBasedTest> test(
+		std::unique_ptr<MultipleFilesDataBasedTest> test(
 			new MultipleFilesDataBasedTest(testName));
 		for (std::vector<TestCase>::iterator it = testCases.begin();
 			 it != testCases.end();
@@ -496,7 +496,7 @@ DataBasedTestParser::Parse(const char* fileName)
 		return test.release();
 	}
 
-	std::auto_ptr<TemplateBasedTest> test(
+	std::unique_ptr<TemplateBasedTest> test(
 		new TemplateBasedTest(testName, code));
 	for (std::vector<TestCase>::iterator it = testCases.begin();
 		 it != testCases.end();

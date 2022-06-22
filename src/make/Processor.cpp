@@ -273,7 +273,7 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 	if (!create)
 		return nullptr;
 
-	std::auto_ptr<MakeTarget> makeTarget(new MakeTarget(target));
+	std::unique_ptr<MakeTarget> makeTarget(new MakeTarget(target));
 	fMakeTargets[target] = makeTarget.get();
 	return makeTarget.release();
 }
@@ -624,7 +624,7 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 		return nullptr;
 	}
 
-	std::auto_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
+	std::unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
 
 	for (std::vector<data::RuleActionsCall*>::const_iterator it =
 			 target->ActionsCalls().begin();

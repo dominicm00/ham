@@ -135,7 +135,7 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 			continue;
 
 		if (S_ISDIR(st.st_mode)) {
-			std::auto_ptr<test::TestSuite> subTestSuite(
+			std::unique_ptr<test::TestSuite> subTestSuite(
 				new test::TestSuite(name));
 			add_data_based_tests_recursive(*subTestSuite, path);
 			if (subTestSuite->CountTests() > 0) {
@@ -166,7 +166,7 @@ static void
 add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
 {
 	// get the simple tests
-	std::auto_ptr<test::TestSuite> dataBasedTestSuite(
+	std::unique_ptr<test::TestSuite> dataBasedTestSuite(
 		new test::TestSuite("DataBased"));
 	add_data_based_tests_recursive(*dataBasedTestSuite, directory);
 	if (dataBasedTestSuite->CountTests() > 0) {
