@@ -18,6 +18,14 @@ namespace data
 static const String kLocateVariableName("LOCATE");
 static const String kSearchVariableName("SEARCH");
 
+/**
+ * Bind a target to a filesystem path and get the file status.
+ *
+ * \param[in] globalVariables Global variable domain.
+ * \param[in] target Target to bind.
+ * \param[out] _boundPath Filesystem path of target.
+ * \param[out] _fileStatus File status of bound path.
+ */
 /*static*/ void
 TargetBinder::Bind(const VariableDomain& globalVariables,
 				   const Target* target,

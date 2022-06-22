@@ -29,6 +29,24 @@ class Path
 	static bool GetFileStatus(const char* path, FileStatus& _status);
 };
 
+/**
+ * Represents a Ham path in terms of the following parts:
+ * - Grist: prefix enclosed in <> that differentiates targets with the same
+ *   name.
+ * - Root: initially empty, absolute root if given path is relative.
+ * - Directory: given directory path to target.
+ * - Base name: "file" name.
+ * - Suffix: final file suffix.
+ * - Archive member: a suffix enclosed in () that sets the archive target.
+ *
+ * Below is an example of a Ham path:
+ \verbatim
+ <grist>path/to/basename.suffix(member)
+
+ # If root was set to /some/root, then the final path would be:
+ <grist>/some/root/path/to/basename.suffix(member)
+ \endverbatim
+ */
 struct Path::Parts {
   public:
 	Parts() {}

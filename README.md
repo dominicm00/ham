@@ -1,4 +1,4 @@
-# Ham - WIP
+# Ham - WIP {#index}
 
 ## Disclaimer
 Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for

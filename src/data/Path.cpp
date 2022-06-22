@@ -40,6 +40,12 @@ Path::RemoveGrist(const StringPart& path)
 	return path;
 }
 
+/**
+ * Concatenates `head` onto `tail`, if `tail` is not already an absolute path.
+ *
+ * \param[in] head The string to use as the prefix.
+ * \param[in] tail The string to use as the suffix.
+ */
 String
 Path::Make(const StringPart& head, const StringPart& tail)
 {
@@ -98,6 +104,11 @@ Path::Parts::IsAbsolute() const
 	return Path::IsAbsolute(fDirectory) || Path::IsAbsolute(fRoot);
 }
 
+/**
+ * Decomposes a string into Path::Parts.
+ *
+ * \param[in] path String representation of a Path.
+ */
 void
 Path::Parts::SetTo(const StringPart& path)
 {
@@ -152,6 +163,16 @@ Path::Parts::SetTo(const StringPart& path)
 	fBaseName.SetTo(remainder, fileNameEnd);
 }
 
+/**
+ * Insert the string representation of the path into `buffer`.
+ *
+ * \deprecated This method is dangerous because we don't know the string length
+ * ahead of time. It will be replaced with a variant that returns a StringBuffer
+ * directly.
+ *
+ * \param[out] buffer   Buffer where path will be inserted.
+ * \param[in]  behavior Compatibility behavior to emulate.
+ */
 void
 Path::Parts::GetPath(StringBuffer& buffer,
 					 const behavior::Behavior& behavior) const

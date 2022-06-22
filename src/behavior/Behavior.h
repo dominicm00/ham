@@ -12,43 +12,114 @@ namespace ham
 namespace behavior
 {
 
+/**
+ * Encapulates language differences between Ham and other Jam interpreters. This
+ * is separate from Jambase compatability, which changes the default Jam rules
+ * available.
+ *
+ * Behaviors can include bugs, unintuitive behaviors, or changes to built-in
+ * rules (ones defined directly by the interpreter).
+ */
 class Behavior
 {
   public:
 	enum EchoTrailingSpace {
+		/**
+		 * Append a space at the end of an Echo'd string.
+		 */
 		ECHO_TRAILING_SPACE,
-		// Always append a slash at the end of an Echo line.
+
+		/**
+		 * Echo strings as-is, without appending a space.
+		 */
 		ECHO_NO_TRAILING_SPACE
-		// Don't append a slash at the end of an Echo line.
 	};
 
 	enum PathRootReplacerSlash {
+		/**
+		 * Always add a trailing slash when replacing a path's root component.
+		 * This causes duplicate slashes if the path has a trailing slash.
+
+		 \verbatim
+		 my_program = bash ;
+		 Echo $(my_program:R=/bin/) ;
+
+		 > /bin//bash
+		 \endverbatim
+		 */
 		PATH_ROOT_REPLACER_SLASH_ALWAYS,
-		// If the parameter is not empty, the root replacer always
-		// appends '/' after the root component. Leads to duplicate
-		// '/', when the parameter ends with a slash.
+
+		/**
+		 * Only add a trailing slash when one does not already exist. Avoids
+		 * duplicate slashes.
+
+		 \verbatim
+		 my_program = bash ;
+		 Echo $(my_program:R=/bin/) ;
+
+		 > /bin/bash
+		 \endverbatim
+		 */
 		PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE
-		// If the parameter is not empty and doesn't end with a '/',
-		// the root replacer appends a '/' after the root component.
 	};
 
 	enum BrokenSubscriptJoin {
+		/**
+		 * Return an empty list when a join operation has an end subscript less
+		 * than the list length. Emulates the broken behavior of Jam.
+
+		 \verbatim
+		 my_list = Ham is super fun ;
+		 Echo $(my_list[1-3]:J=-) ;
+		 Echo $(my_list[1-4]:J=-) ;
+
+		 >
+		 > Ham-is-super-fun
+		 \endverbatim
+		 */
 		BROKEN_SUBSCRIPT_JOIN,
-		// A join operation with an end subscript less than the
-		// number of list elements result in an empty list.
+
+		/**
+		 * Correctly handle joins with subscripts.
+
+		 \verbatim
+		 my_list = Ham is super fun ;
+		 Echo $(my_list[1-3]:J=-) ;
+		 Echo $(my_list[1-4]:J=-) ;
+
+		 > Ham-is-super
+		 > Ham-is-super-fun
+		 \endverbatim
+		 */
 		NO_BROKEN_SUBSCRIPT_JOIN
-		// Joins with subscripts work as expected.
 	};
 
 	enum JoinCaseOperator {
+		/**
+		 * Execute joins before to-upper or to-lower operators. The join
+		 * parameter will be affected by the case operator.
+
+		 \verbatim
+		 my_list = Ham is super fun ;
+		 Echo $(my_list:LJ=X) ;
+
+		 > hamxisxsuperxfun
+		 \endverbatim
+		 */
 		JOIN_BEFORE_CASE_OPERATOR,
-		// The join operator is executed before executing the
-		// to-lower or to-upper operator, i.e. the join parameter
-		// will be affected by the case operator as well.
+
+		/**
+		 * Execute joins after to-upper or to-lower operators. The join
+		 * parameter will not be affected by the case operator.
+
+		 \verbatim
+		 my_list = Ham is super fun ;
+		 Echo $(my_list:LJ=X) ;
+
+		 > hamXisXsuperXfun
+		 \endverbatim
+		 */
 		JOIN_AFTER_CASE_OPERATOR
-		// The join operator is executed after executing the
-		// to-lower or to-upper operator, i.e. the join parameter
-		// won't be affected by the case operator.
 	};
 
   public:
