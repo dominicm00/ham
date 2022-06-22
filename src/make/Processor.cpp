@@ -117,17 +117,17 @@ Processor::SetForceUpdateTargets(const StringList& targets)
 }
 
 void
-Processor::ProcessJambase()
+Processor::ProcessRuleset()
 {
 	// parse code
 	parser::Parser parser;
 
 	util::Reference<code::Block> block;
 
-	if (fOptions.JambaseFile().IsEmpty()) {
+	if (fOptions.RulesetFile().IsEmpty()) {
 		parser.SetFileName("InternalRuleset");
 
-		// Choose Jambase based on compatibility
+		// Choose ruleset based on compatibility
 		std::string ruleset;
 		switch (fEvaluationContext.GetCompatibility()) {
 			case behavior::COMPATIBILITY_BOOST_JAM:
@@ -144,8 +144,8 @@ Processor::ProcessJambase()
 
 		block.SetTo(parser.Parse(ruleset), true);
 	} else {
-		parser.SetFileName(fOptions.JambaseFile().ToStlString());
-		block.SetTo(parser.ParseFile(fOptions.JambaseFile().ToCString()), true);
+		parser.SetFileName(fOptions.RulesetFile().ToStlString());
+		block.SetTo(parser.ParseFile(fOptions.RulesetFile().ToCString()), true);
 	}
 
 	// execute the code

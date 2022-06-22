@@ -42,7 +42,7 @@ tool. For convienence, Ham provides aliases for many commands. A compatability m
 |:---------------------|:-------------------------------|:-----:|:---------:|:-----------:|:-----:|:-------------:|
 | `-a`                 | build all                      | P     | **X**     | P           | **X** | P             |
 | `-dX`                | debug info                     | P[^1] | **X**     | P[^1]       | **X** | P[^1]         |
-| `-fX`                | select Jambase                 | P     | **X**     | P           | **X** | P             |
+| `-fX`                | select ruleset                 | P     | **X**     | P           | **X** | P             |
 | `-g`                 | new sources first              | P     | **X**     | P           | **X** | P             |
 | `-jX`                | run actions concurrently       | P     | **X[^2]** | P           | **X** | P             |
 | `-n`                 | dry run                        | P     | **X**     | P           | **X** | P             |

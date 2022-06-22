@@ -171,7 +171,7 @@ TestFixture::CodeExecuter::Execute(
 		processor.SetCompatibility(compatibility);
 		processor.SetOutput(output);
 		processor.SetErrorOutput(errorOutput);
-		processor.ProcessJambase();
+		processor.ProcessRuleset();
 		processor.SetPrimaryTargets(StringList().Append(String("all")));
 		processor.PrepareTargets();
 		processor.BuildTargets();

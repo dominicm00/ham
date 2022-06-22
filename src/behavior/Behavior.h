@@ -14,7 +14,7 @@ namespace behavior
 
 /**
  * Encapulates language differences between Ham and other Jam interpreters. This
- * is separate from Jambase compatability, which changes the default Jam rules
+ * is separate from ruleset compatability, which changes the default Ham rules
  * available.
  *
  * Behaviors can include bugs, unintuitive behaviors, or changes to built-in

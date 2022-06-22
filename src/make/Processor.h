@@ -46,7 +46,7 @@ class Processor
 
 	void SetForceUpdateTargets(const StringList& targets);
 
-	void ProcessJambase();
+	void ProcessRuleset();
 	void PrepareTargets();
 	void BuildTargets();
 
