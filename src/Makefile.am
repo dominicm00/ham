@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I./src
-AM_CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic
+AM_CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic -Werror
 
 BUILT_SOURCES =					\
 	ruleset/HamRuleset.cpp		\

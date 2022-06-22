@@ -41,7 +41,7 @@ UserRuleInstructions::Evaluate(EvaluationContext& context,
 	size_t parameterCount = parameters.size();
 	for (size_t i = 0; i < parameterCount; i++) {
 		if (!parameters[i].IsEmpty()) {
-			char parameterName[16];
+			char parameterName[24];
 			snprintf(parameterName, sizeof(parameterName), "%zu", i + 1);
 			builtInVariables.Set(parameterName, parameters[i]);
 		}

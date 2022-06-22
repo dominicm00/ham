@@ -139,8 +139,7 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 				new test::TestSuite(name));
 			add_data_based_tests_recursive(*subTestSuite, path);
 			if (subTestSuite->CountTests() > 0) {
-				testSuite.AddTest(subTestSuite.get());
-				subTestSuite.release();
+				testSuite.AddTest(subTestSuite.release());
 			}
 		} else if (S_ISREG(st.st_mode)) {
 			try {
@@ -170,8 +169,7 @@ add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
 		new test::TestSuite("DataBased"));
 	add_data_based_tests_recursive(*dataBasedTestSuite, directory);
 	if (dataBasedTestSuite->CountTests() > 0) {
-		testSuite.AddTest(dataBasedTestSuite.get());
-		dataBasedTestSuite.release();
+		testSuite.AddTest(dataBasedTestSuite.release());
 	}
 }
 
@@ -259,6 +257,7 @@ main(int argc, const char* const* argv)
 					break;
 				case 'h':
 					print_usage_end_exit(argv[0], false);
+					break;
 				case 'j':
 					if (argi == argc)
 						print_usage_end_exit(argv[0], true);

@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <string.h>
 #include <unistd.h>
 
@@ -15,9 +14,7 @@
 #include "util/OptionIterator.hpp"
 #include "util/TextFileException.hpp"
 
-
 using namespace ham;
-
 
 static void
 print_usage(const char* programName, bool error)
@@ -26,13 +23,16 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "Usage: %s [ <options> ] [ <target> ... ]\n", programName);
 	fprintf(out, "Options:\n");
 	fprintf(out, "  -a, --all\n");
-	fprintf(out, "      Build all targets, even the ones that are "
-		"up-to-date.\n");
+	fprintf(out,
+			"      Build all targets, even the ones that are "
+			"up-to-date.\n");
 	fprintf(out, "  -c <version>, --compatibility <version>\n");
-	fprintf(out, "      Behave compatible to <version>, which is either of "
-		"\"jam\" (plain Jam\n");
-	fprintf(out, "      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
-		"default).\n");
+	fprintf(out,
+			"      Behave compatible to <version>, which is either of "
+			"\"jam\" (plain Jam\n");
+	fprintf(out,
+			"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
+			"default).\n");
 	fprintf(out, "  -d <option>, --debug <option>\n");
 	fprintf(out, "      Enable/set a debug option. Options are:\n");
 	fprintf(out, "      a     -  Print the actions\n");
@@ -48,8 +48,9 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "  -h, --help\n");
 	fprintf(out, "      Print this usage message.\n");
 	fprintf(out, "  -j <jobs>, --jobs <jobs>\n");
-	fprintf(out, "      Use up to <jobs> number of concurrent shell "
-		"processes.\n");
+	fprintf(out,
+			"      Use up to <jobs> number of concurrent shell "
+			"processes.\n");
 	fprintf(out, "  -n, --dry-run\n");
 	fprintf(out, "      Print actions and commands, but don't run them.\n");
 	fprintf(out, "  -o <file>, --actions <file>\n");
@@ -57,36 +58,34 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "  -q, --quit-on-error\n");
 	fprintf(out, "      Quit as soon as making a target fails.\n");
 	fprintf(out, "  -s <variable>=<value>, --set <variable>=<value>\n");
-	fprintf(out, "      Set variable <variable> to <value>, overriding the "
-		"environmental variable.\n");
+	fprintf(out,
+			"      Set variable <variable> to <value>, overriding the "
+			"environmental variable.\n");
 	fprintf(out, "  -t <target>, --target <target>\n");
 	fprintf(out, "      Rebuild target <target>, even if it is up-to-date.\n");
 	fprintf(out, "  -v, --version\n");
 	fprintf(out, "      Print the Ham version and exit.\n");
 }
 
-
-static void
+[[noreturn]] static void
 print_usage_end_exit(const char* programName, bool error)
 {
 	print_usage(programName, error);
 	exit(error ? 1 : 0);
 }
 
-
 static bool
 set_variable(std::map<data::String, data::String>& variables,
-	const char* variable)
+			 const char* variable)
 {
 	const char* equalSign = strchr(variable, '=');
 	if (equalSign == nullptr)
 		return false;
 
-	variables[data::String(variable, equalSign - variable)]
-		= data::String(equalSign + 1);
+	variables[data::String(variable, equalSign - variable)] =
+		data::String(equalSign + 1);
 	return true;
 }
-
 
 int
 main(int argc, const char* const* argv)
@@ -101,7 +100,7 @@ main(int argc, const char* const* argv)
 	set_variable(variables, "JAMVERSION=2.5-haiku-20111222");
 
 	// import environment
-// TODO: Platform specific!
+	// TODO: Platform specific!
 	for (size_t i = 0; environ[i] != nullptr; i++)
 		set_variable(variables, environ[i]);
 
@@ -122,29 +121,28 @@ main(int argc, const char* const* argv)
 	bool debugSpecified = false;
 	data::StringList forceUpdateTargets;
 
-	util::OptionIterator optionIterator(argc, argv,
-		util::OptionSpecification()
-			.Add('a', "--all")
-			.Add('c', "--compatibility", true)
-			.Add('d', "--debug", true)
-			.Add('f', "--ruleset", true)
-			.Add('g', "--from-newest")
-			.Add('h', "--help")
-			.Add('j', "--jobs", true)
-			.Add('n', "--dry-run")
-			.Add('o', "--actions", true)
-			.Add('q', "--quit-on-error")
-			.Add('s', "--set", true)
-			.Add('t', "--target", true)
-			.Add('v', "--version")
-	);
+	util::OptionIterator optionIterator(argc,
+										argv,
+										util::OptionSpecification()
+											.Add('a', "--all")
+											.Add('c', "--compatibility", true)
+											.Add('d', "--debug", true)
+											.Add('f', "--ruleset", true)
+											.Add('g', "--from-newest")
+											.Add('h', "--help")
+											.Add('j', "--jobs", true)
+											.Add('n', "--dry-run")
+											.Add('o', "--actions", true)
+											.Add('q', "--quit-on-error")
+											.Add('s', "--set", true)
+											.Add('t', "--target", true)
+											.Add('v', "--version"));
 
 	while (optionIterator.HasNext()) {
 		// short ("-") option(s)
 		std::string argument;
 		switch (optionIterator.Next(argument)) {
-			case 'c':
-			{
+			case 'c': {
 				if (argument == "jam") {
 					compatibility = behavior::COMPATIBILITY_JAM;
 				} else if (argument == "boost") {
@@ -152,16 +150,17 @@ main(int argc, const char* const* argv)
 				} else if (argument == "ham") {
 					compatibility = behavior::COMPATIBILITY_HAM;
 				} else {
-					fprintf(stderr, "Error: Invalid argument for "
-						"compatibility option: \"%s\"\n", argument.c_str());
+					fprintf(stderr,
+							"Error: Invalid argument for "
+							"compatibility option: \"%s\"\n",
+							argument.c_str());
 					exit(1);
 				}
 				compatibilitySpecified = true;
 				break;
 			}
 
-			case 'd':
-			{
+			case 'd': {
 				if (argument.empty())
 					print_usage_end_exit(programName, true);
 
@@ -177,13 +176,13 @@ main(int argc, const char* const* argv)
 						case 'a':
 							printActions = true;
 							break;
-// TODO:...
-//						case 'c':
-//							printCauses = true;
-//							break;
-//						case 'd':
-//							printDependencies = true;
-//							break;
+							// TODO:...
+							//						case 'c':
+							//							printCauses = true;
+							//							break;
+							//						case 'd':
+							//							printDependencies =
+							// true; 							break;
 						case 'm':
 							printMakeTree = true;
 							break;
@@ -194,7 +193,7 @@ main(int argc, const char* const* argv)
 							if (!isdigit(debugOption))
 								print_usage_end_exit(programName, true);
 							switch (debugOption - '0') {
-// TODO: Support all debug levels correctly!
+									// TODO: Support all debug levels correctly!
 								case 9:
 								case 8:
 								case 7:
@@ -202,11 +201,14 @@ main(int argc, const char* const* argv)
 								case 5:
 								case 4:
 									printCommands = true;
+									[[fallthrough]];
 								case 3:
 									printMakeTree = true;
+									[[fallthrough]];
 								case 2:
 								case 1:
 									printActions = true;
+									[[fallthrough]];
 								case 0:
 									break;
 							}
@@ -227,8 +229,7 @@ main(int argc, const char* const* argv)
 			case 'h':
 				print_usage_end_exit(programName, false);
 
-			case 'j':
-			{
+			case 'j': {
 				char* end;
 				jobCount = strtol(argument.c_str(), &end, 0);
 				if (*end != '\0')
@@ -249,8 +250,7 @@ main(int argc, const char* const* argv)
 				quitOnError = true;
 				break;
 
-			case 's':
-			{
+			case 's': {
 				if (!set_variable(variables, argument.c_str()))
 					print_usage_end_exit(programName, true);
 				break;
@@ -290,7 +290,8 @@ main(int argc, const char* const* argv)
 
 	// set explicitly specified variables
 	for (std::map<data::String, data::String>::iterator it = variables.begin();
-		it != variables.end(); ++it) {
+		 it != variables.end();
+		 ++it) {
 		data::StringList value;
 		value.Append(it->second);
 		processor.GlobalVariables().Set(it->first, value);
@@ -342,11 +343,15 @@ main(int argc, const char* const* argv)
 		fprintf(stderr, "%s.\n", exception.Message());
 	} catch (util::TextFileException& exception) {
 		const util::TextFilePosition& position = exception.Position();
-		fprintf(stderr, "%s:%zu:%zu: %s.\n", position.FileName(),
-			position.Line() + 1, position.Column() + 1, exception.Message());
+		fprintf(stderr,
+				"%s:%zu:%zu: %s.\n",
+				position.FileName(),
+				position.Line() + 1,
+				position.Column() + 1,
+				exception.Message());
 	}
 
-// TODO: Catch exceptions...
+	// TODO: Catch exceptions...
 
 	return 0;
 }
