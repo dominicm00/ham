@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "VariableExpansionTest.h"
+#include "VariableExpansionTest.hpp"
 
-#include "code/Leaf.h"
+#include "code/Leaf.hpp"
 
 namespace ham
 {

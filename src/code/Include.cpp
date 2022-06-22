@@ -3,21 +3,21 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Include.h"
+#include "code/Include.hpp"
 
 #include <fstream>
 #include <memory>
 #include <sstream>
 
-#include "code/Block.h"
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "code/EvaluationException.h"
-#include "data/FileStatus.h"
-#include "data/TargetBinder.h"
-#include "data/TargetPool.h"
-#include "parser/Parser.h"
-#include "util/Constants.h"
+#include "code/Block.hpp"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "code/EvaluationException.hpp"
+#include "data/FileStatus.hpp"
+#include "data/TargetBinder.hpp"
+#include "data/TargetPool.hpp"
+#include "parser/Parser.hpp"
+#include "util/Constants.hpp"
 
 namespace ham
 {

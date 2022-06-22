@@ -11,20 +11,20 @@
 
 #include <memory>
 
-#include "parser/ParseException.h"
-#include "test/DataBasedTestParser.h"
-#include "test/RunnableTest.h"
-#include "test/TestRunner.h"
-#include "test/TestSuite.h"
-#include "tests/PathTest.h"
-#include "tests/RegExpTest.h"
-#include "tests/RulesetTest.h"
-#include "tests/StringListTest.h"
-#include "tests/StringPartTest.h"
-#include "tests/StringTest.h"
-#include "tests/TargetBinderTest.h"
-#include "tests/TimeTest.h"
-#include "tests/VariableExpansionTest.h"
+#include "parser/ParseException.hpp"
+#include "test/DataBasedTestParser.hpp"
+#include "test/RunnableTest.hpp"
+#include "test/TestRunner.hpp"
+#include "test/TestSuite.hpp"
+#include "tests/PathTest.hpp"
+#include "tests/RegExpTest.hpp"
+#include "tests/RulesetTest.hpp"
+#include "tests/StringListTest.hpp"
+#include "tests/StringPartTest.hpp"
+#include "tests/StringTest.hpp"
+#include "tests/TargetBinderTest.hpp"
+#include "tests/TimeTest.hpp"
+#include "tests/VariableExpansionTest.hpp"
 
 using namespace ham;
 

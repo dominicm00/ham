@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/TargetBuilder.h"
+#include "make/TargetBuilder.hpp"
 
-#include "data/RuleActions.h"
-#include "make/Command.h"
-#include "make/Options.h"
-#include "make/TargetBuildInfo.h"
-#include "process/ChildInfo.h"
+#include "data/RuleActions.hpp"
+#include "make/Command.hpp"
+#include "make/Options.hpp"
+#include "make/TargetBuildInfo.hpp"
+#include "process/ChildInfo.hpp"
 
 namespace ham
 {

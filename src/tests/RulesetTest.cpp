@@ -3,10 +3,10 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/RulesetTest.h"
+#include "tests/RulesetTest.hpp"
 
-#include "ruleset/HamRuleset.h"
-#include "ruleset/JamRuleset.h"
+#include "ruleset/HamRuleset.hpp"
+#include "ruleset/JamRuleset.hpp"
 
 #include <exception>
 #include <filesystem>

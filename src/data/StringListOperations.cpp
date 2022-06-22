@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/StringListOperations.h"
+#include "data/StringListOperations.hpp"
 
-#include "data/Path.h"
+#include "data/Path.hpp"
 
 namespace ham
 {

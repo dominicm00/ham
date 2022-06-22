@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/DumpContext.h"
+#include "code/DumpContext.hpp"
 
 #include <iostream>
 

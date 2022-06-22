@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/TargetBinderTest.h"
+#include "tests/TargetBinderTest.hpp"
 
-#include "data/FileStatus.h"
-#include "data/TargetBinder.h"
-#include "data/TargetPool.h"
-#include "data/VariableDomain.h"
+#include "data/FileStatus.hpp"
+#include "data/TargetBinder.hpp"
+#include "data/TargetPool.hpp"
+#include "data/VariableDomain.hpp"
 
 namespace ham
 {

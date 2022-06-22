@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/Options.h"
+#include "make/Options.hpp"
 
 namespace ham
 {

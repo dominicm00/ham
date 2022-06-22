@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "VariableScope.h"
+#include "VariableScope.hpp"
 
 namespace ham
 {

@@ -9,11 +9,11 @@
 
 #include <map>
 
-#include "make/MakeException.h"
-#include "make/Options.h"
-#include "make/Processor.h"
-#include "util/OptionIterator.h"
-#include "util/TextFileException.h"
+#include "make/MakeException.hpp"
+#include "make/Options.hpp"
+#include "make/Processor.hpp"
+#include "util/OptionIterator.hpp"
+#include "util/TextFileException.hpp"
 
 
 using namespace ham;

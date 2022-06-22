@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/DataBasedTest.h"
+#include "test/DataBasedTest.hpp"
 
 #include <fstream>
 #include <sstream>
 
-#include "behavior/Behavior.h"
-#include "test/TestException.h"
-#include "test/TestFixture.h"
-#include "util/TextFileException.h"
+#include "behavior/Behavior.hpp"
+#include "test/TestException.hpp"
+#include "test/TestFixture.hpp"
+#include "util/TextFileException.hpp"
 
 namespace ham
 {

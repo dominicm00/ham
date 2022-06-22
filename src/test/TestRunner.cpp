@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/TestRunner.h"
+#include "test/TestRunner.hpp"
 
 #include <stdio.h>
 
-#include "test/RunnableTest.h"
-#include "test/TestException.h"
-#include "test/TestSuite.h"
+#include "test/RunnableTest.hpp"
+#include "test/TestException.hpp"
+#include "test/TestSuite.hpp"
 
 namespace ham
 {

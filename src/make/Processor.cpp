@@ -3,28 +3,28 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/Processor.h"
+#include "make/Processor.hpp"
 
 #include <fstream>
 #include <memory>
 #include <stdarg.h>
 
-#include "behavior/Compatibility.h"
-#include "code/Block.h"
-#include "code/BuiltInRules.h"
-#include "code/Constant.h"
-#include "code/FunctionCall.h"
-#include "code/Leaf.h"
-#include "code/OnExpression.h"
-#include "data/RegExp.h"
-#include "data/TargetBinder.h"
-#include "make/Command.h"
-#include "make/MakeException.h"
-#include "make/TargetBuildInfo.h"
-#include "make/TargetBuilder.h"
-#include "parser/Parser.h"
-#include "ruleset/HamRuleset.h"
-#include "ruleset/JamRuleset.h"
+#include "behavior/Compatibility.hpp"
+#include "code/Block.hpp"
+#include "code/BuiltInRules.hpp"
+#include "code/Constant.hpp"
+#include "code/FunctionCall.hpp"
+#include "code/Leaf.hpp"
+#include "code/OnExpression.hpp"
+#include "data/RegExp.hpp"
+#include "data/TargetBinder.hpp"
+#include "make/Command.hpp"
+#include "make/MakeException.hpp"
+#include "make/TargetBuildInfo.hpp"
+#include "make/TargetBuilder.hpp"
+#include "parser/Parser.hpp"
+#include "ruleset/HamRuleset.hpp"
+#include "ruleset/JamRuleset.hpp"
 
 namespace ham
 {

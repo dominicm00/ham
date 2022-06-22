@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/StringListTest.h"
+#include "tests/StringListTest.hpp"
 
 #include <numeric>
 #include <string>
 #include <vector>
 
-#include "data/StringList.h"
+#include "data/StringList.hpp"
 
 namespace ham
 {

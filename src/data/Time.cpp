@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/Time.h"
+#include "data/Time.hpp"
 
 #include <sys/time.h>
 #include <time.h>

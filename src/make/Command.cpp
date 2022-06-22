@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/Command.h"
+#include "make/Command.hpp"
 
-#include "data/RuleActions.h"
+#include "data/RuleActions.hpp"
 
 namespace ham
 {

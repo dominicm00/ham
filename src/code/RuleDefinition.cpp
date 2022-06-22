@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/RuleDefinition.h"
+#include "code/RuleDefinition.hpp"
 
-#include "code/Block.h"
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "code/RulePool.h"
-#include "code/UserRuleInstructions.h"
+#include "code/Block.hpp"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "code/RulePool.hpp"
+#include "code/UserRuleInstructions.hpp"
 
 namespace ham
 {

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/RuleInstructions.h"
+#include "code/RuleInstructions.hpp"
 
 namespace ham
 {

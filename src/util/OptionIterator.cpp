@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "util/OptionIterator.h"
+#include "util/OptionIterator.hpp"
 
 namespace ham
 {

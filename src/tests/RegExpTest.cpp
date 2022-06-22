@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/RegExpTest.h"
+#include "tests/RegExpTest.hpp"
 
 #include <utility>
 #include <vector>
 
-#include "data/RegExp.h"
+#include "data/RegExp.hpp"
 
 namespace ham
 {

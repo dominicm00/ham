@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/MakeTarget.h"
+#include "make/MakeTarget.hpp"
 
 namespace ham
 {

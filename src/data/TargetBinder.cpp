@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/TargetBinder.h"
+#include "data/TargetBinder.hpp"
 
-#include "data/FileStatus.h"
-#include "data/Path.h"
-#include "data/Target.h"
-#include "data/VariableDomain.h"
+#include "data/FileStatus.hpp"
+#include "data/Path.hpp"
+#include "data/Target.hpp"
+#include "data/VariableDomain.hpp"
 
 namespace ham
 {

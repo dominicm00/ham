@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/EvaluationContext.h"
+#include "code/EvaluationContext.hpp"
 
 #include <iostream>
 

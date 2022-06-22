@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "process/Process.h"
+#include "process/Process.hpp"
 
 namespace ham
 {

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/TestSuite.h"
+#include "test/TestSuite.hpp"
 
 namespace ham
 {

@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/StringTest.h"
+#include "tests/StringTest.hpp"
 
 #include <string>
 
-#include "data/String.h"
+#include "data/String.hpp"
 
 namespace ham
 {

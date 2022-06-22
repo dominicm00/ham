@@ -3,16 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/BuiltInRules.h"
+#include "code/BuiltInRules.hpp"
 
 #include <dirent.h>
 
-#include "code/EvaluationContext.h"
-#include "code/Rule.h"
-#include "code/RuleInstructions.h"
-#include "data/RegExp.h"
-#include "data/StringBuffer.h"
-#include "data/TargetPool.h"
+#include "code/EvaluationContext.hpp"
+#include "code/Rule.hpp"
+#include "code/RuleInstructions.hpp"
+#include "data/RegExp.hpp"
+#include "data/StringBuffer.hpp"
+#include "data/TargetPool.hpp"
 
 namespace ham
 {

@@ -34,7 +34,7 @@ ruleset_file="$2"
 ruleset_path=${2%%.*}
 ruleset=${ruleset_path##*/}
 ruleset_variable=k${ruleset}
-header_file=ruleset/${ruleset}.h
+header_file=ruleset/${ruleset}.hpp
 suffix=${1##*.}
 
 created=0

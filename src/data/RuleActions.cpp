@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/RuleActions.h"
+#include "data/RuleActions.hpp"
 
 namespace ham
 {

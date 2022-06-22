@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "platform/unix/PlatformProcessDelegate.h"
+#include "platform/unix/PlatformProcessDelegate.hpp"
 
 #include <errno.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "process/ChildInfo.h"
+#include "process/ChildInfo.hpp"
 
 namespace ham
 {

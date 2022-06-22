@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "util/Referenceable.h"
+#include "util/Referenceable.hpp"
 
 namespace ham
 {

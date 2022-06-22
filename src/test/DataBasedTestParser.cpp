@@ -3,14 +3,14 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/DataBasedTestParser.h"
+#include "test/DataBasedTestParser.hpp"
 
 #include <memory>
 #include <vector>
 
-#include "parser/ParseException.h"
-#include "test/MultipleFilesDataBasedTest.h"
-#include "test/TemplateBasedTest.h"
+#include "parser/ParseException.hpp"
+#include "test/MultipleFilesDataBasedTest.hpp"
+#include "test/TemplateBasedTest.hpp"
 
 namespace ham
 {

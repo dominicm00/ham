@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "TestException.h"
+#include "TestException.hpp"
 
 #include <stdarg.h>
 #include <stdio.h>

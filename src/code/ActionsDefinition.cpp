@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/ActionsDefinition.h"
+#include "code/ActionsDefinition.hpp"
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "code/Rule.h"
-#include "data/RuleActions.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "code/Rule.hpp"
+#include "data/RuleActions.hpp"
 
 namespace ham
 {

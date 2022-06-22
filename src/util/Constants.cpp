@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "util/Constants.h"
+#include "util/Constants.hpp"
 
 namespace ham
 {

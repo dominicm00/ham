@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Assignment.h"
+#include "code/Assignment.hpp"
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "data/TargetPool.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "data/TargetPool.hpp"
 
 namespace ham
 {

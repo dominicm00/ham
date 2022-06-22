@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/TargetPool.h"
+#include "data/TargetPool.hpp"
 
 namespace ham
 {

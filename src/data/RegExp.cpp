@@ -3,10 +3,10 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/RegExp.h"
+#include "data/RegExp.hpp"
 
-#include "data/StringBuffer.h"
-#include "util/Referenceable.h"
+#include "data/StringBuffer.hpp"
+#include "util/Referenceable.hpp"
 
 #include <regex.h>
 

@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/PathTest.h"
+#include "tests/PathTest.hpp"
 
-#include "data/FileStatus.h"
-#include "data/Path.h"
-#include "data/String.h"
+#include "data/FileStatus.hpp"
+#include "data/Path.hpp"
+#include "data/String.hpp"
 
 namespace ham
 {

@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/InListExpression.h"
+#include "code/InListExpression.hpp"
 
 #include <algorithm>
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
 
 namespace ham
 {

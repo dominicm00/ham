@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/UserRuleInstructions.h"
+#include "code/UserRuleInstructions.hpp"
 
 #include <stdio.h>
 
-#include "code/EvaluationContext.h"
-#include "code/Node.h"
-#include "data/VariableScope.h"
+#include "code/EvaluationContext.hpp"
+#include "code/Node.hpp"
+#include "data/VariableScope.hpp"
 
 namespace ham
 {

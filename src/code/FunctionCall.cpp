@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/FunctionCall.h"
+#include "code/FunctionCall.hpp"
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "code/EvaluationException.h"
-#include "code/Rule.h"
-#include "code/RuleInstructions.h"
-#include "data/TargetPool.h"
-#include "util/Constants.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "code/EvaluationException.hpp"
+#include "code/Rule.hpp"
+#include "code/RuleInstructions.hpp"
+#include "data/TargetPool.hpp"
+#include "util/Constants.hpp"
 
 namespace ham
 {

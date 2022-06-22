@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/TestFixture.h"
+#include "test/TestFixture.hpp"
 #include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
@@ -16,10 +16,10 @@
 #include <iterator>
 #include <sstream>
 
-#include "data/FileStatus.h"
-#include "make/Processor.h"
-#include "test/TestEnvironment.h"
-#include "util/Constants.h"
+#include "data/FileStatus.hpp"
+#include "make/Processor.hpp"
+#include "test/TestEnvironment.hpp"
+#include "util/Constants.hpp"
 
 namespace ham
 {

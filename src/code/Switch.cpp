@@ -3,10 +3,10 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Switch.h"
+#include "code/Switch.hpp"
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
 
 namespace ham
 {

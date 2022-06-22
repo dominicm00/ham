@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tests/TimeTest.h"
+#include "tests/TimeTest.hpp"
 
 #include <sys/time.h>
 
-#include "data/Time.h"
+#include "data/Time.hpp"
 
 namespace ham
 {

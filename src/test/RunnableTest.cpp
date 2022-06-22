@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/RunnableTest.h"
+#include "test/RunnableTest.hpp"
 
 namespace ham
 {

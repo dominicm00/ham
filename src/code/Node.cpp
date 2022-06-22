@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Node.h"
+#include "code/Node.hpp"
 
 namespace ham
 {

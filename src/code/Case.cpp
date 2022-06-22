@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Case.h"
+#include "code/Case.hpp"
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "data/RegExp.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "data/RegExp.hpp"
 
 namespace ham
 {

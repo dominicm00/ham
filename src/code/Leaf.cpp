@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "code/Leaf.h"
+#include "code/Leaf.hpp"
 
 #include <algorithm>
 #include <limits>
 #include <utility>
 
-#include "code/DumpContext.h"
-#include "code/EvaluationContext.h"
-#include "data/StringListOperations.h"
+#include "code/DumpContext.hpp"
+#include "code/EvaluationContext.hpp"
+#include "data/StringListOperations.hpp"
 
 namespace ham
 {

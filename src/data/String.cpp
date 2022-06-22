@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/String.h"
+#include "data/String.hpp"
 
 namespace ham
 {

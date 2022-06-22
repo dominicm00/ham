@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "test/Test.h"
+#include "test/Test.hpp"
 
-#include "test/TestSuite.h"
+#include "test/TestSuite.hpp"
 
 namespace ham
 {

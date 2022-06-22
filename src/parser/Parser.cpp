@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "parser/Parser.h"
+#include "parser/Parser.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,28 +13,28 @@
 #include <memory>
 #include <sstream>
 
-#include "code/ActionsDefinition.h"
-#include "code/Assignment.h"
-#include "code/BinaryExpression.h"
-#include "code/Block.h"
-#include "code/Case.h"
-#include "code/DumpContext.h"
-#include "code/For.h"
-#include "code/FunctionCall.h"
-#include "code/If.h"
-#include "code/InListExpression.h"
-#include "code/Include.h"
-#include "code/Jump.h"
-#include "code/Leaf.h"
-#include "code/List.h"
-#include "code/LocalVariableDeclaration.h"
-#include "code/NotExpression.h"
-#include "code/OnExpression.h"
-#include "code/RuleDefinition.h"
-#include "code/Switch.h"
-#include "code/While.h"
-#include "data/RuleActions.h"
-#include "parser/ParseException.h"
+#include "code/ActionsDefinition.hpp"
+#include "code/Assignment.hpp"
+#include "code/BinaryExpression.hpp"
+#include "code/Block.hpp"
+#include "code/Case.hpp"
+#include "code/DumpContext.hpp"
+#include "code/For.hpp"
+#include "code/FunctionCall.hpp"
+#include "code/If.hpp"
+#include "code/InListExpression.hpp"
+#include "code/Include.hpp"
+#include "code/Jump.hpp"
+#include "code/Leaf.hpp"
+#include "code/List.hpp"
+#include "code/LocalVariableDeclaration.hpp"
+#include "code/NotExpression.hpp"
+#include "code/OnExpression.hpp"
+#include "code/RuleDefinition.hpp"
+#include "code/Switch.hpp"
+#include "code/While.hpp"
+#include "data/RuleActions.hpp"
+#include "parser/ParseException.hpp"
 
 namespace ham
 {

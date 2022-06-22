@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "make/TargetBuildInfo.h"
-#include "make/Command.h"
+#include "make/TargetBuildInfo.hpp"
+#include "make/Command.hpp"
 
 namespace ham
 {

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "StringList.h"
+#include "StringList.hpp"
 
 #include <algorithm>
 #include <vector>

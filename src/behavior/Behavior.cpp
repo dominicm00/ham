@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "behavior/Behavior.h"
+#include "behavior/Behavior.hpp"
 
 namespace ham
 {

@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "data/Path.h"
+#include "data/Path.hpp"
 
 #include <sys/stat.h>
 
-#include "data/FileStatus.h"
+#include "data/FileStatus.hpp"
 
 namespace ham
 {
