@@ -8,10 +8,10 @@ BUILT_SOURCES =					\
 	ruleset/JamRuleset.hpp
 CLEANFILES = $(BUILT_SOURCES)
 
-ruleset/HamRuleset.cpp ruleset/HamRuleset.h: ruleset/HamRuleset.ham
+ruleset/HamRuleset.cpp ruleset/HamRuleset.hpp: ruleset/HamRuleset.ham
 	./ruleset/build-ruleset.sh $@ ruleset/HamRuleset.ham
 
-ruleset/JamRuleset.cpp ruleset/JamRuleset.h: ruleset/JamRuleset.ham
+ruleset/JamRuleset.cpp ruleset/JamRuleset.hpp: ruleset/JamRuleset.ham
 	./ruleset/build-ruleset.sh $@ ruleset/JamRuleset.ham
 
 

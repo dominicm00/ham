@@ -39,7 +39,7 @@ suffix=${1##*.}
 
 created=0
 
-if [ "$suffix" = "h" ]; then
+if [ "$suffix" = "hpp" ]; then
 	# get UPPER_CASE version of ruleset
 	ruleset_upper=$(echo "$ruleset" \
 						| sed -e 's/\([A-Z]\)/-\1/g' \
