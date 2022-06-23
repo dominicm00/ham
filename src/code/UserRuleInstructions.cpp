@@ -16,8 +16,10 @@ namespace ham::code
 
 class Node;
 
-UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
-										   Node* block)
+UserRuleInstructions::UserRuleInstructions(
+	const StringList& parameterNames,
+	Node* block
+)
 	: fParameterNames(parameterNames),
 	  fBlock(block)
 {
@@ -27,8 +29,10 @@ UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
 UserRuleInstructions::~UserRuleInstructions() { fBlock->ReleaseReference(); }
 
 StringList
-UserRuleInstructions::Evaluate(EvaluationContext& context,
-							   const StringListList& parameters)
+UserRuleInstructions::Evaluate(
+	EvaluationContext& context,
+	const StringListList& parameters
+)
 {
 	// create a variable domain for the built-in variables (the numbered ones
 	// and "<" and ">")

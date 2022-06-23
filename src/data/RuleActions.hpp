@@ -29,10 +29,12 @@ class RuleActions : public util::Referenceable
 	};
 
   public:
-	RuleActions(const String& ruleName,
-				const StringList& variables,
-				const String& actions,
-				uint32_t flags);
+	RuleActions(
+		const String& ruleName,
+		const StringList& variables,
+		const String& actions,
+		uint32_t flags
+	);
 	~RuleActions();
 
 	const String& RuleName() const { return fRuleName; }
@@ -50,9 +52,11 @@ class RuleActions : public util::Referenceable
 class RuleActionsCall : public util::Referenceable
 {
   public:
-	RuleActionsCall(RuleActions* actions,
-					const TargetList& targets,
-					const TargetList& sourceTargets)
+	RuleActionsCall(
+		RuleActions* actions,
+		const TargetList& targets,
+		const TargetList& sourceTargets
+	)
 		: fActions(actions),
 		  fTargets(targets),
 		  fSourceTargets(sourceTargets)

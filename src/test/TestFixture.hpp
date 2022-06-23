@@ -26,50 +26,58 @@ class TestFixture
 	class CodeExecuter;
 
   public:
-	static data::StringList MakeStringList(const char* element1,
-										   const char* element2 = nullptr,
-										   const char* element3 = nullptr,
-										   const char* element4 = nullptr,
-										   const char* element5 = nullptr,
-										   const char* element6 = nullptr,
-										   const char* element7 = nullptr,
-										   const char* element8 = nullptr,
-										   const char* element9 = nullptr,
-										   const char* element10 = nullptr,
-										   const char* element11 = nullptr,
-										   const char* element12 = nullptr,
-										   const char* element13 = nullptr,
-										   const char* element14 = nullptr,
-										   const char* element15 = nullptr,
-										   const char* element16 = nullptr,
-										   const char* element17 = nullptr,
-										   const char* element18 = nullptr,
-										   const char* element19 = nullptr,
-										   const char* element20 = nullptr);
 	static data::StringList MakeStringList(
-		const std::vector<std::string>& testList);
+		const char* element1,
+		const char* element2 = nullptr,
+		const char* element3 = nullptr,
+		const char* element4 = nullptr,
+		const char* element5 = nullptr,
+		const char* element6 = nullptr,
+		const char* element7 = nullptr,
+		const char* element8 = nullptr,
+		const char* element9 = nullptr,
+		const char* element10 = nullptr,
+		const char* element11 = nullptr,
+		const char* element12 = nullptr,
+		const char* element13 = nullptr,
+		const char* element14 = nullptr,
+		const char* element15 = nullptr,
+		const char* element16 = nullptr,
+		const char* element17 = nullptr,
+		const char* element18 = nullptr,
+		const char* element19 = nullptr,
+		const char* element20 = nullptr
+	);
+	static data::StringList MakeStringList(
+		const std::vector<std::string>& testList
+	);
 	static data::StringListList MakeStringListList(
-		const std::vector<std::vector<std::string>>& testListList);
+		const std::vector<std::vector<std::string>>& testListList
+	);
 
 	template<typename Type>
 	static std::string ValueToString(const Type& value);
 
-	static void ExecuteCode(TestEnvironment* environment,
-							const std::string& code,
-							std::ostream& output,
-							std::ostream& errorOutput);
-	static void ExecuteCode(TestEnvironment* environment,
-							const std::map<std::string, std::string>& code,
-							const std::map<std::string, int>& codeAge,
-							std::ostream& output,
-							std::ostream& errorOutput);
+	static void ExecuteCode(
+		TestEnvironment* environment,
+		const std::string& code,
+		std::ostream& output,
+		std::ostream& errorOutput
+	);
+	static void ExecuteCode(
+		TestEnvironment* environment,
+		const std::map<std::string, std::string>& code,
+		const std::map<std::string, int>& codeAge,
+		std::ostream& output,
+		std::ostream& errorOutput
+	);
 	// code: file name -> file content
 	// codeAge: file name -> age in seconds
 
 	static std::string CurrentWorkingDirectory();
 	static void CreateTemporaryDirectory(std::string& _path);
-	static void CreateParentDirectory(const char* path,
-									  bool createAncestors = true);
+	static void
+	CreateParentDirectory(const char* path, bool createAncestors = true);
 	static void CreateDirectory(const char* path, bool createAncestors = true);
 	static void CreateFile(const char* path, const char* content);
 	static void RemoveRecursively(std::string entry);
@@ -100,21 +108,27 @@ class TestFixture::CodeExecuter
 	CodeExecuter();
 	~CodeExecuter();
 
-	void Execute(const char* jamExecutable,
-				 behavior::Compatibility compatibility,
-				 const std::map<std::string, std::string>& code,
-				 const std::map<std::string, int>& codeAge,
-				 std::ostream& output,
-				 std::ostream& errorOutput);
-	void Execute(TestEnvironment* environment,
-				 const std::string& code,
-				 std::ostream& output,
-				 std::ostream& errorOutput);
-	void Execute(TestEnvironment* environment,
-				 const std::map<std::string, std::string>& code,
-				 const std::map<std::string, int>& codeAge,
-				 std::ostream& output,
-				 std::ostream& errorOutput);
+	void Execute(
+		const char* jamExecutable,
+		behavior::Compatibility compatibility,
+		const std::map<std::string, std::string>& code,
+		const std::map<std::string, int>& codeAge,
+		std::ostream& output,
+		std::ostream& errorOutput
+	);
+	void Execute(
+		TestEnvironment* environment,
+		const std::string& code,
+		std::ostream& output,
+		std::ostream& errorOutput
+	);
+	void Execute(
+		TestEnvironment* environment,
+		const std::map<std::string, std::string>& code,
+		const std::map<std::string, int>& codeAge,
+		std::ostream& output,
+		std::ostream& errorOutput
+	);
 	// code: file name -> file content
 	// codeAge: file name -> age in seconds
 
@@ -147,10 +161,12 @@ struct GetNonReferenceType<const Type&> {
 	template<typename Visitor>                                \
 	static void VisitTestCases(Visitor& visitor)              \
 	{                                                         \
-		HAM_CALL_MACRO1(testCount,                            \
-						HAM_ADD_TEST_CASES_VISIT,             \
-						fixture,                              \
-						__VA_ARGS__)                          \
+		HAM_CALL_MACRO1(                                      \
+			testCount,                                        \
+			HAM_ADD_TEST_CASES_VISIT,                         \
+			fixture,                                          \
+			__VA_ARGS__                                       \
+		)                                                     \
 	}
 
 #define HAM_ADD_TEST_CASES_VISIT(fixture, testCase) \
@@ -232,8 +248,8 @@ struct GetNonReferenceType<const Type&> {
 		typedef                                                               \
 			typename ham::test::GetNonReferenceType<decltype((actual))>::type \
 				_TestActualType;                                              \
-		typedef typename ham::test::GetNonReferenceType<decltype((            \
-			expected))>::type _TestExpectedType;                              \
+		typedef typename ham::test::GetNonReferenceType<decltype((expected)   \
+		)>::type _TestExpectedType;                                           \
 		const _TestActualType& _testActual = actual;                          \
 		const _TestExpectedType& _testExpected = expected;                    \
 		if (_testActual != _testExpected) {                                   \
@@ -244,7 +260,8 @@ struct GetNonReferenceType<const Type&> {
 				"  actual:   \"%s\" (\"%s\")",                                \
 				test::TestFixture::ValueToString(_testExpected).c_str(),      \
 				test::TestFixture::ValueToString(_testActual).c_str(),        \
-				#actual);                                                     \
+				#actual                                                       \
+			);                                                                \
 		}                                                                     \
 	}
 

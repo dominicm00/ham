@@ -17,8 +17,10 @@ class LexException
   public:
 	LexException() {}
 
-	LexException(const std::string& message,
-				 const ParsePosition& position = ParsePosition())
+	LexException(
+		const std::string& message,
+		const ParsePosition& position = ParsePosition()
+	)
 		: fMessage(message),
 		  fPosition(position)
 	{

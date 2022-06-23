@@ -24,9 +24,11 @@ class Process
 
 	bool IsValid() const { return fPlatformDelegate.IsValid(); }
 
-	bool Launch(const char* command,
-				const char* const* arguments,
-				size_t argumentCount);
+	bool Launch(
+		const char* command,
+		const char* const* arguments,
+		size_t argumentCount
+	);
 
 	Id GetId() const { return fPlatformDelegate.GetId(); }
 

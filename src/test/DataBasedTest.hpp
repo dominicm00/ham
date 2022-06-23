@@ -30,24 +30,27 @@ class DataBasedTest : public RunnableTest
 
 	virtual void* CreateFixture(TestEnvironment* environment);
 	virtual void DeleteFixture(TestEnvironment* environment, void* fixture);
-	virtual uint32_t TestCaseCompatibility(int index,
-										   bool& _supportedByHam,
-										   uint32_t& _skipMask);
-	virtual void RunTestCase(TestEnvironment* environment,
-							 void* fixture,
-							 int index);
+	virtual uint32_t TestCaseCompatibility(
+		int index,
+		bool& _supportedByHam,
+		uint32_t& _skipMask
+	);
+	virtual void
+	RunTestCase(TestEnvironment* environment, void* fixture, int index);
 
   protected:
 	struct DataSetBase {
-		DataSetBase(const std::map<std::string, std::string>& outputFiles,
-					const std::set<std::string>& missingOutputFiles,
-					bool outputIsException,
-					ExitState exitState,
-					uint32_t compatibilityMask,
-					bool supportedByHam,
-					uint32_t skipMask,
-					size_t startLineIndex,
-					size_t endLineIndex)
+		DataSetBase(
+			const std::map<std::string, std::string>& outputFiles,
+			const std::set<std::string>& missingOutputFiles,
+			bool outputIsException,
+			ExitState exitState,
+			uint32_t compatibilityMask,
+			bool supportedByHam,
+			uint32_t skipMask,
+			size_t startLineIndex,
+			size_t endLineIndex
+		)
 			: fOutputFiles(outputFiles),
 			  fMissingOutputFiles(missingOutputFiles),
 			  fOutputIsException(outputIsException),
@@ -77,20 +80,25 @@ class DataBasedTest : public RunnableTest
   protected:
 	void AddDataSet(DataSetBase* dataSet);
 
-	virtual void PrepareCode(const DataSetBase* dataSet,
-							 const std::string& outputPrefix,
-							 const std::string& outputSuffix,
-							 std::map<std::string, std::string>& _code,
-							 std::map<std::string, int>& _codeAge) const = 0;
+	virtual void PrepareCode(
+		const DataSetBase* dataSet,
+		const std::string& outputPrefix,
+		const std::string& outputSuffix,
+		std::map<std::string, std::string>& _code,
+		std::map<std::string, int>& _codeAge
+	) const = 0;
 
   private:
-	void _RunTest(TestEnvironment* environment,
-				  const DataSetBase* dataSet) const;
-	static bool _ReadEchoLine(TestEnvironment* environment,
-							  std::istream& input,
-							  std::string& _line);
+	void _RunTest(TestEnvironment* environment, const DataSetBase* dataSet)
+		const;
+	static bool _ReadEchoLine(
+		TestEnvironment* environment,
+		std::istream& input,
+		std::string& _line
+	);
 	static std::string _CodeToString(
-		const std::map<std::string, std::string>& code);
+		const std::map<std::string, std::string>& code
+	);
 
   private:
 	std::vector<DataSetBase*> fDataSets;

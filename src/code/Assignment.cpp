@@ -12,10 +12,12 @@
 namespace ham::code
 {
 
-Assignment::Assignment(Node* left,
-					   AssignmentOperator operatorType,
-					   Node* right,
-					   Node* onTargets)
+Assignment::Assignment(
+	Node* left,
+	AssignmentOperator operatorType,
+	Node* right,
+	Node* onTargets
+)
 	: fLeft(left),
 	  fRight(right),
 	  fOnTargets(onTargets),

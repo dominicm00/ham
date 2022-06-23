@@ -21,9 +21,11 @@ class OptionSpecification
 	};
 
   public:
-	OptionSpecification& Add(int shortOption,
-							 const char* longOption = nullptr,
-							 bool hasArgument = false);
+	OptionSpecification& Add(
+		int shortOption,
+		const char* longOption = nullptr,
+		bool hasArgument = false
+	);
 	// shortOption is the the short option char,
 	// if there is one,  or a unique int >= 256,
 	// if there's only a long option. The value
@@ -41,9 +43,11 @@ class OptionSpecification
 class OptionIterator
 {
   public:
-	OptionIterator(int argumentCount,
-				   const char* const* arguments,
-				   const OptionSpecification& options);
+	OptionIterator(
+		int argumentCount,
+		const char* const* arguments,
+		const OptionSpecification& options
+	);
 
 	bool HasNext() const { return fStatus == MORE_OPTIONS; }
 	int Next(std::string& argument);

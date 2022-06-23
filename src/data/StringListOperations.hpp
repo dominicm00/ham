@@ -66,9 +66,11 @@ class StringListOperations
 		fOperations |= operations;
 	}
 
-	StringList Apply(const StringList& list,
-					 size_t maxSize,
-					 const behavior::Behavior& behavior) const;
+	StringList Apply(
+		const StringList& list,
+		size_t maxSize,
+		const behavior::Behavior& behavior
+	) const;
 
   private:
 	uint32_t fOperations;

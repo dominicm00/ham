@@ -138,13 +138,14 @@ StringTest::Comparison()
 		int compare;
 	};
 
-	const TestData testData[] = {{"", "", 0},
-								 {"foo", "", 1},
-								 {"foo", "foo", 0},
-								 {"foobar", "foo", 1},
-								 {"foo", "bar", 1},
-								 {"foo", "barfoo", 1},
-								 {"foobar", "bar", 1}};
+	const TestData testData[] = {
+		{"", "", 0},
+		{"foo", "", 1},
+		{"foo", "foo", 0},
+		{"foobar", "foo", 1},
+		{"foo", "bar", 1},
+		{"foo", "barfoo", 1},
+		{"foobar", "bar", 1}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		String string1(testData[i].string1);
@@ -161,11 +162,12 @@ StringTest::Assignment()
 		const char* string2;
 	};
 
-	const TestData testData[] = {{"", ""},
-								 {"foo", ""},
-								 {"foo", "foo"},
-								 {"foo", "bar"},
-								 {"foobar", "foo"}};
+	const TestData testData[] = {
+		{"", ""},
+		{"foo", ""},
+		{"foo", "foo"},
+		{"foo", "bar"},
+		{"foobar", "foo"}};
 
 	// =(const String&)
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
@@ -213,11 +215,12 @@ StringTest::Concatenation()
 		const char* string2;
 	};
 
-	const TestData testData[] = {{"", ""},
-								 {"foo", ""},
-								 {"foo", "foo"},
-								 {"foo", "bar"},
-								 {"foobar", "foo"}};
+	const TestData testData[] = {
+		{"", ""},
+		{"foo", ""},
+		{"foo", "foo"},
+		{"foo", "bar"},
+		{"foobar", "foo"}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* testString1 = testData[i].string1;
@@ -378,11 +381,13 @@ StringTest::SubString()
 		String string(testData[i].string);
 		String subString =
 			string.SubString(testData[i].startOffset, testData[i].endOffset);
-		HAM_TEST_ADD_INFO(STRING_EQUAL(subString, testData[i].result),
-						  "string: \"%s\", offsets: %zu - %zu",
-						  testData[i].string,
-						  testData[i].startOffset,
-						  testData[i].endOffset)
+		HAM_TEST_ADD_INFO(
+			STRING_EQUAL(subString, testData[i].result),
+			"string: \"%s\", offsets: %zu - %zu",
+			testData[i].string,
+			testData[i].startOffset,
+			testData[i].endOffset
+		)
 	}
 }
 

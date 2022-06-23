@@ -19,15 +19,19 @@ class BuiltInRules
 	static void RegisterRules(RulePool& rulePool);
 
   private:
-	static void _AddRuleConsumeReference(RulePool& rulePool,
-										 const char* name,
-										 RuleInstructions* instructions,
-										 const char* alias1 = nullptr,
-										 const char* alias2 = nullptr);
+	static void _AddRuleConsumeReference(
+		RulePool& rulePool,
+		const char* name,
+		RuleInstructions* instructions,
+		const char* alias1 = nullptr,
+		const char* alias2 = nullptr
+	);
 	// consumes instructions reference
-	static inline void _AddRule(RulePool& rulePool,
-								const char* name,
-								RuleInstructions* instructions);
+	static inline void _AddRule(
+		RulePool& rulePool,
+		const char* name,
+		RuleInstructions* instructions
+	);
 	// caller keeps instructions reference
 };
 

@@ -18,11 +18,13 @@ class RegExpTest : public test::TestFixture
 	void MatchWildcard();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(RegExpTest,
-					   3,
-					   Constructor,
-					   MatchRegularExpression,
-					   MatchWildcard)
+	HAM_ADD_TEST_CASES(
+		RegExpTest,
+		3,
+		Constructor,
+		MatchRegularExpression,
+		MatchWildcard
+	)
 
   private:
 	struct Matches;

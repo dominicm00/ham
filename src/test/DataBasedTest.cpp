@@ -57,15 +57,17 @@ DataBasedTest::CreateFixture(TestEnvironment* /* environment */)
 }
 
 void
-DataBasedTest::DeleteFixture(TestEnvironment* /* environment */,
-							 void* /* fixture */)
+DataBasedTest::
+	DeleteFixture(TestEnvironment* /* environment */, void* /* fixture */)
 {
 }
 
 uint32_t
-DataBasedTest::TestCaseCompatibility(int index,
-									 bool& _supportedByHam,
-									 uint32_t& _skipMask)
+DataBasedTest::TestCaseCompatibility(
+	int index,
+	bool& _supportedByHam,
+	uint32_t& _skipMask
+)
 {
 	const DataSetBase* dataSet = fDataSets[index];
 	_supportedByHam = dataSet->fSupportedByHam;
@@ -74,9 +76,11 @@ DataBasedTest::TestCaseCompatibility(int index,
 }
 
 void
-DataBasedTest::RunTestCase(TestEnvironment* environment,
-						   void* /* fixture */,
-						   int index)
+DataBasedTest::RunTestCase(
+	TestEnvironment* environment,
+	void* /* fixture */,
+	int index
+)
 {
 	_RunTest(environment, fDataSets[index]);
 }
@@ -97,30 +101,31 @@ DataBasedTest::AddDataSet(DataSetBase* dataSet)
 }
 
 void
-DataBasedTest::_RunTest(TestEnvironment* environment,
-						const DataSetBase* dataSet) const
+DataBasedTest::_RunTest(
+	TestEnvironment* environment,
+	const DataSetBase* dataSet
+) const
 {
 	static const char* const kOutputPrefix = "---test-output-start---";
 	static const char* const kOutputSuffix = "---test-output-end---";
 
 	std::map<std::string, std::string> code;
 	std::map<std::string, int> codeAge;
-	PrepareCode(dataSet,
-				std::string("Echo ") + kOutputPrefix + " ;\n",
-				std::string("Echo ") + kOutputSuffix + " ;\n",
-				code,
-				codeAge);
+	PrepareCode(
+		dataSet,
+		std::string("Echo ") + kOutputPrefix + " ;\n",
+		std::string("Echo ") + kOutputSuffix + " ;\n",
+		code,
+		codeAge
+	);
 
 	// execute the code
 	std::string expectedOutput = dataSet->fOutputFiles.at("");
 	std::stringstream outputStream;
 	TestFixture::CodeExecuter codeExecuter;
 	try {
-		codeExecuter.Execute(environment,
-							 code,
-							 codeAge,
-							 outputStream,
-							 outputStream);
+		codeExecuter
+			.Execute(environment, code, codeAge, outputStream, outputStream);
 	} catch (util::TextFileException& exception) {
 		if (dataSet->fOutputIsException) {
 			// and check the exception message against what's expected
@@ -131,7 +136,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 				"code:\n%s\nlines: %zu-%zu",
 				_CodeToString(code).c_str(),
 				dataSet->fStartLineIndex + 1,
-				dataSet->fEndLineIndex)
+				dataSet->fEndLineIndex
+			)
 			return;
 		}
 
@@ -143,7 +149,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 			exception.Position().FileName(),
 			_CodeToString(code).c_str(),
 			dataSet->fStartLineIndex + 1,
-			dataSet->fEndLineIndex)
+			dataSet->fEndLineIndex
+		)
 	} catch (util::Exception& exception) {
 		if (dataSet->fOutputIsException) {
 			// and check the exception message against what's expected
@@ -154,27 +161,32 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 				"code:\n%s\nlines: %zu-%zu",
 				_CodeToString(code).c_str(),
 				dataSet->fStartLineIndex + 1,
-				dataSet->fEndLineIndex)
+				dataSet->fEndLineIndex
+			)
 			return;
 		}
 
-		HAM_TEST_THROW("%s.\n%s\ntest case lines: %zu-%zu",
-					   exception.Message(),
-					   _CodeToString(code).c_str(),
-					   dataSet->fStartLineIndex + 1,
-					   dataSet->fEndLineIndex)
+		HAM_TEST_THROW(
+			"%s.\n%s\ntest case lines: %zu-%zu",
+			exception.Message(),
+			_CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex
+		)
 	}
 
 	if (dataSet->fOutputIsException) {
 		std::string expectedExceptionMessage =
 			split_lines(expectedOutput).at(0);
-		HAM_TEST_THROW("Expected exception: \"%s\"\nActual output: \"%s\"\n"
-					   "code:\n%s\nlines: %zu-%zu",
-					   expectedExceptionMessage.c_str(),
-					   outputStream.str().c_str(),
-					   _CodeToString(code).c_str(),
-					   dataSet->fStartLineIndex + 1,
-					   dataSet->fEndLineIndex)
+		HAM_TEST_THROW(
+			"Expected exception: \"%s\"\nActual output: \"%s\"\n"
+			"code:\n%s\nlines: %zu-%zu",
+			expectedExceptionMessage.c_str(),
+			outputStream.str().c_str(),
+			_CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex
+		)
 	}
 
 	// extract the output
@@ -186,7 +198,8 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 			"output: \"%s\"\nlines: %zu-%zu",
 			outputStream.str().c_str(),
 			dataSet->fStartLineIndex + 1,
-			dataSet->fEndLineIndex)
+			dataSet->fEndLineIndex
+		)
 		if (line == kOutputPrefix)
 			break;
 	}
@@ -196,11 +209,13 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 		if (!_ReadEchoLine(environment, outputStream, line)) {
 			if (dataSet->fExitState == EXIT_EVALUATION_ERROR)
 				break;
-			HAM_TEST_THROW("Unexpected end of output (looking for end of "
-						   "output marker).\noutput: \"%s\"\nlines: %zu-%zu",
-						   outputStream.str().c_str(),
-						   dataSet->fStartLineIndex + 1,
-						   dataSet->fEndLineIndex)
+			HAM_TEST_THROW(
+				"Unexpected end of output (looking for end of "
+				"output marker).\noutput: \"%s\"\nlines: %zu-%zu",
+				outputStream.str().c_str(),
+				dataSet->fStartLineIndex + 1,
+				dataSet->fEndLineIndex
+			)
 		}
 		if (line == kOutputSuffix)
 			break;
@@ -208,11 +223,13 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 	}
 
 	// and check the output against what's expected
-	HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(output, split_lines(expectedOutput)),
-					  "code:\n%s\nlines: %zu-%zu",
-					  _CodeToString(code).c_str(),
-					  dataSet->fStartLineIndex + 1,
-					  dataSet->fEndLineIndex)
+	HAM_TEST_ADD_INFO(
+		HAM_TEST_EQUAL(output, split_lines(expectedOutput)),
+		"code:\n%s\nlines: %zu-%zu",
+		_CodeToString(code).c_str(),
+		dataSet->fStartLineIndex + 1,
+		dataSet->fEndLineIndex
+	)
 
 	// check the expected output files
 	for (std::map<std::string, std::string>::const_iterator it =
@@ -224,12 +241,14 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 			continue;
 
 		std::ifstream file(fileName);
-		HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(!file.fail()),
-						  "output file: %s\ncode:\n%s\nlines: %zu-%zu",
-						  fileName.c_str(),
-						  _CodeToString(code).c_str(),
-						  dataSet->fStartLineIndex + 1,
-						  dataSet->fEndLineIndex)
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_VERIFY(!file.fail()),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu",
+			fileName.c_str(),
+			_CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex
+		)
 
 		std::string content;
 		std::string line;
@@ -238,12 +257,14 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 			content += '\n';
 		}
 
-		HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(content, it->second),
-						  "output file: %s\ncode:\n%s\nlines: %zu-%zu",
-						  fileName.c_str(),
-						  _CodeToString(code).c_str(),
-						  dataSet->fStartLineIndex + 1,
-						  dataSet->fEndLineIndex)
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_EQUAL(content, it->second),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu",
+			fileName.c_str(),
+			_CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex
+		)
 	}
 
 	// check the expected missing files
@@ -252,19 +273,23 @@ DataBasedTest::_RunTest(TestEnvironment* environment,
 		 it != dataSet->fMissingOutputFiles.end();
 		 ++it) {
 		const std::string& fileName = *it;
-		HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(!TestFixture::FileExists(fileName)),
-						  "output file: %s\ncode:\n%s\nlines: %zu-%zu",
-						  fileName.c_str(),
-						  _CodeToString(code).c_str(),
-						  dataSet->fStartLineIndex + 1,
-						  dataSet->fEndLineIndex)
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_VERIFY(!TestFixture::FileExists(fileName)),
+			"output file: %s\ncode:\n%s\nlines: %zu-%zu",
+			fileName.c_str(),
+			_CodeToString(code).c_str(),
+			dataSet->fStartLineIndex + 1,
+			dataSet->fEndLineIndex
+		)
 	}
 }
 
 /*static*/ bool
-DataBasedTest::_ReadEchoLine(TestEnvironment* environment,
-							 std::istream& input,
-							 std::string& _line)
+DataBasedTest::_ReadEchoLine(
+	TestEnvironment* environment,
+	std::istream& input,
+	std::string& _line
+)
 {
 	if (!std::getline(input, _line))
 		return false;

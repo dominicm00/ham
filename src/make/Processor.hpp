@@ -59,9 +59,11 @@ class Processor
 	bool _IsPseudoTarget(const MakeTarget* makeTarget) const;
 
 	void _PrepareTargetRecursively(MakeTarget* makeTarget);
-	void _SealTargetFateRecursively(MakeTarget* makeTarget,
-									data::Time parentTime,
-									bool makeParent);
+	void _SealTargetFateRecursively(
+		MakeTarget* makeTarget,
+		data::Time parentTime,
+		bool makeParent
+	);
 	void _BindTarget(MakeTarget* makeTarget);
 	void _ScanForHeaders(MakeTarget* makeTarget);
 
@@ -71,13 +73,15 @@ class Processor
 	Command* _BuildCommand(data::RuleActionsCall* actionsCall);
 
 	void _PrintMakeTreeBinding(const MakeTarget* makeTarget);
-	void _PrintMakeTreeState(const MakeTarget* makeTarget,
-							 data::Time parentTime);
-	void _PrintMakeTreeStep(const MakeTarget* makeTarget,
-							const char* step,
-							const char* state,
-							const char* pattern,
-							...);
+	void
+	_PrintMakeTreeState(const MakeTarget* makeTarget, data::Time parentTime);
+	void _PrintMakeTreeStep(
+		const MakeTarget* makeTarget,
+		const char* step,
+		const char* state,
+		const char* pattern,
+		...
+	);
 
   private:
 	data::VariableDomain fGlobalVariables;

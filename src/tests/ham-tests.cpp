@@ -34,25 +34,35 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "Usage: %s [ <options> ] [ <tests> ]\n", programName);
 	fprintf(out, "Options:\n");
 	fprintf(out, "  -c <version>, --compatibility <version>\n");
-	fprintf(out,
-			"      Behave compatible to <version>, which is either of "
-			"\"jam\" (plain jam\n");
-	fprintf(out,
-			"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
-			"default).\n");
+	fprintf(
+		out,
+		"      Behave compatible to <version>, which is either of "
+		"\"jam\" (plain jam\n"
+	);
+	fprintf(
+		out,
+		"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
+		"default).\n"
+	);
 	fprintf(out, "  -d <directory>, --data <directory>\n");
-	fprintf(out,
-			"      Use test data directory <directory>. By default the "
-			"program tries to\n");
-	fprintf(out,
-			"      find the test data directory relative to the current "
-			"working directory.\n");
+	fprintf(
+		out,
+		"      Use test data directory <directory>. By default the "
+		"program tries to\n"
+	);
+	fprintf(
+		out,
+		"      find the test data directory relative to the current "
+		"working directory.\n"
+	);
 	fprintf(out, "  -h, --help\n");
 	fprintf(out, "      Print this usage message.\n");
 	fprintf(out, "  -j <executable>, --jam <executable>\n");
-	fprintf(out,
-			"      Use the jam executable <executable> to run the tests "
-			"supporting it.\n");
+	fprintf(
+		out,
+		"      Use the jam executable <executable> to run the tests "
+		"supporting it.\n"
+	);
 	fprintf(out, "  -l, --list\n");
 	fprintf(out, "      List all available tests and exit.\n");
 }
@@ -76,14 +86,15 @@ list_tests(test::Test* test, int level = 0)
 		int count = testSuite->CountTests();
 		for (int i = 0; i < count; i++)
 			list_tests(testSuite->TestAt(i), level + 1);
-	} else if (test::RunnableTest* runnableTest =
-				   dynamic_cast<test::RunnableTest*>(test)) {
+	} else if (test::RunnableTest* runnableTest = dynamic_cast<test::RunnableTest*>(test)) {
 		int count = runnableTest->CountTestCases();
 		for (int i = 0; i < count; i++) {
-			printf("%*s%s\n",
-				   2 * (level + 1),
-				   "",
-				   runnableTest->TestCaseAt(i).c_str());
+			printf(
+				"%*s%s\n",
+				2 * (level + 1),
+				"",
+				runnableTest->TestCaseAt(i).c_str()
+			);
 		}
 	}
 }
@@ -114,8 +125,10 @@ find_test_data_directory()
 }
 
 static void
-add_data_based_tests_recursive(test::TestSuite& testSuite,
-							   const std::string& directory)
+add_data_based_tests_recursive(
+	test::TestSuite& testSuite,
+	const std::string& directory
+)
 {
 	DIR* dir = opendir(directory.c_str());
 	if (dir == nullptr)
@@ -135,23 +148,26 @@ add_data_based_tests_recursive(test::TestSuite& testSuite,
 
 		if (S_ISDIR(st.st_mode)) {
 			std::unique_ptr<test::TestSuite> subTestSuite(
-				new test::TestSuite(name));
+				new test::TestSuite(name)
+			);
 			add_data_based_tests_recursive(*subTestSuite, path);
 			if (subTestSuite->CountTests() > 0) {
 				testSuite.AddTest(subTestSuite.release());
 			}
 		} else if (S_ISREG(st.st_mode)) {
 			try {
-				testSuite.AddTest(
-					test::DataBasedTestParser().Parse(path.c_str()));
+				testSuite.AddTest(test::DataBasedTestParser().Parse(path.c_str()
+				));
 			} catch (parser::ParseException& exception) {
-				fprintf(stderr,
-						"add_data_based_tests_recursive(): %s:%zu:%zu "
-						"Parse exception: %s\n",
-						path.c_str(),
-						exception.Position().Line() + 1,
-						exception.Position().Column() + 1,
-						exception.Message());
+				fprintf(
+					stderr,
+					"add_data_based_tests_recursive(): %s:%zu:%zu "
+					"Parse exception: %s\n",
+					path.c_str(),
+					exception.Position().Line() + 1,
+					exception.Position().Column() + 1,
+					exception.Message()
+				);
 				exit(1);
 			}
 		}
@@ -165,7 +181,8 @@ add_data_based_tests(test::TestSuite& testSuite, const std::string& directory)
 {
 	// get the simple tests
 	std::unique_ptr<test::TestSuite> dataBasedTestSuite(
-		new test::TestSuite("DataBased"));
+		new test::TestSuite("DataBased")
+	);
 	add_data_based_tests_recursive(*dataBasedTestSuite, directory);
 	if (dataBasedTestSuite->CountTests() > 0) {
 		testSuite.AddTest(dataBasedTestSuite.release());
@@ -240,10 +257,12 @@ main(int argc, const char* const* argv)
 					} else if (strcmp(compatibilityString, "ham") == 0) {
 						compatibility = behavior::COMPATIBILITY_HAM;
 					} else {
-						fprintf(stderr,
-								"Error: Invalid argument for "
-								"compatibility option: \"%s\"\n",
-								compatibilityString);
+						fprintf(
+							stderr,
+							"Error: Invalid argument for "
+							"compatibility option: \"%s\"\n",
+							compatibilityString
+						);
 						exit(1);
 					}
 					explicitCompatibility = true;
@@ -300,10 +319,12 @@ main(int argc, const char* const* argv)
 		while (argi < argc) {
 			const char* testName = argv[argi++];
 			if (!testRunner.AddTest(&testSuite, testName)) {
-				fprintf(stderr,
-						"Unknown test \"%s\". Use option \"--list\" to "
-						"list available tests.\n",
-						testName);
+				fprintf(
+					stderr,
+					"Unknown test \"%s\". Use option \"--list\" to "
+					"list available tests.\n",
+					testName
+				);
 				exit(1);
 			}
 		}

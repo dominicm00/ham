@@ -17,9 +17,11 @@ namespace ham::tests
 {
 
 void
-_CheckRuleset(const std::string& pathString,
-			  const std::string& path2String,
-			  const std::string& ruleset)
+_CheckRuleset(
+	const std::string& pathString,
+	const std::string& path2String,
+	const std::string& ruleset
+)
 {
 	std::filesystem::path path{pathString};
 	std::ifstream file{path};
@@ -47,7 +49,8 @@ _CheckRuleset(const std::string& pathString,
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_VERIFY(std::getline(rulesetStream, rulesetLine)),
 			"ruleset ended unexpectedly at line %d",
-			lines)
+			lines
+		)
 
 		HAM_TEST_EQUAL(fileLine, rulesetLine)
 	}
@@ -61,17 +64,21 @@ _CheckRuleset(const std::string& pathString,
 void
 RulesetTest::JamRuleset()
 {
-	_CheckRuleset("src/ruleset/JamRuleset.ham",
-				  "ruleset/JamRuleset.ham",
-				  ruleset::kJamRuleset);
+	_CheckRuleset(
+		"src/ruleset/JamRuleset.ham",
+		"ruleset/JamRuleset.ham",
+		ruleset::kJamRuleset
+	);
 }
 
 void
 RulesetTest::HamRuleset()
 {
-	_CheckRuleset("src/ruleset/HamRuleset.ham",
-				  "ruleset/HamRuleset.ham",
-				  ruleset::kHamRuleset);
+	_CheckRuleset(
+		"src/ruleset/HamRuleset.ham",
+		"ruleset/HamRuleset.ham",
+		ruleset::kHamRuleset
+	);
 }
 
 } // namespace ham::tests

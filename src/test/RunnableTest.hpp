@@ -27,12 +27,13 @@ class RunnableTest : public Test
 
 	virtual void* CreateFixture(TestEnvironment* environment) = 0;
 	virtual void DeleteFixture(TestEnvironment* environment, void* fixture) = 0;
-	virtual uint32_t TestCaseCompatibility(int index,
-										   bool& _supportedByHam,
-										   uint32_t& _skipMask);
-	virtual void RunTestCase(TestEnvironment* environment,
-							 void* fixture,
-							 int index) = 0;
+	virtual uint32_t TestCaseCompatibility(
+		int index,
+		bool& _supportedByHam,
+		uint32_t& _skipMask
+	);
+	virtual void
+	RunTestCase(TestEnvironment* environment, void* fixture, int index) = 0;
 
   protected:
 	typedef std::vector<std::string> TestCaseNameList;
@@ -63,9 +64,8 @@ class GenericRunnableTest : public RunnableTest
 		delete (TestFixture*)fixture;
 	}
 
-	virtual void RunTestCase(TestEnvironment* /*environment*/,
-							 void* _fixture,
-							 int index)
+	virtual void
+	RunTestCase(TestEnvironment* /*environment*/, void* _fixture, int index)
 	{
 		TestCaseMethod method = fTestCaseMethods[index];
 		TestFixture* fixture = (TestFixture*)_fixture;
@@ -121,9 +121,11 @@ class GenericRunnableTest : public RunnableTest
 	}
 
 	template<typename Type>
-	static void CleanupTestCase(Type* fixture,
-								//		char[sizeof(Type::CleanupTestCase)])
-								decltype(&Type::CleanupTestCase))
+	static void CleanupTestCase(
+		Type* fixture,
+		//		char[sizeof(Type::CleanupTestCase)])
+		decltype(&Type::CleanupTestCase)
+	)
 	{
 		fixture->CleanupTestCase();
 	}

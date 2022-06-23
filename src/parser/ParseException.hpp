@@ -16,13 +16,15 @@ namespace ham::parser
 class ParseException : public util::TextFileException
 {
   public:
-	ParseException(const std::string& message = std::string(),
-				   const std::string& fileName = std::string(),
-				   const ParsePosition& position = ParsePosition())
-		: util::TextFileException(message,
-								  util::TextFilePosition(fileName,
-														 position.Line(),
-														 position.Column()))
+	ParseException(
+		const std::string& message = std::string(),
+		const std::string& fileName = std::string(),
+		const ParsePosition& position = ParsePosition()
+	)
+		: util::TextFileException(
+			message,
+			util::TextFilePosition(fileName, position.Line(), position.Column())
+		)
 	{
 	}
 };

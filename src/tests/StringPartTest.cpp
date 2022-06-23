@@ -221,13 +221,14 @@ StringPartTest::Comparison()
 		int compare;
 	};
 
-	const TestData testData[] = {{"", "", 0},
-								 {"foo", "", 1},
-								 {"foo", "foo", 0},
-								 {"foobar", "foo", 1},
-								 {"foo", "bar", 1},
-								 {"foo", "barfoo", 1},
-								 {"foobar", "bar", 1}};
+	const TestData testData[] = {
+		{"", "", 0},
+		{"foo", "", 1},
+		{"foo", "foo", 0},
+		{"foobar", "foo", 1},
+		{"foo", "bar", 1},
+		{"foo", "barfoo", 1},
+		{"foobar", "bar", 1}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		StringPart string1(testData[i].string1);
@@ -252,11 +253,12 @@ StringPartTest::Assignment()
 		const char* string2;
 	};
 
-	const TestData testData[] = {{"", ""},
-								 {"foo", ""},
-								 {"foo", "foo"},
-								 {"foo", "bar"},
-								 {"foobar", "foo"}};
+	const TestData testData[] = {
+		{"", ""},
+		{"foo", ""},
+		{"foo", "foo"},
+		{"foo", "bar"},
+		{"foobar", "foo"}};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		const char* testString1 = testData[i].string1;

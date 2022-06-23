@@ -25,10 +25,12 @@ static const String kSearchVariableName("SEARCH");
  * \param[out] _fileStatus File status of bound path.
  */
 /*static*/ void
-TargetBinder::Bind(const VariableDomain& globalVariables,
-				   const Target* target,
-				   String& _boundPath,
-				   FileStatus& _fileStatus)
+TargetBinder::Bind(
+	const VariableDomain& globalVariables,
+	const Target* target,
+	String& _boundPath,
+	FileStatus& _fileStatus
+)
 {
 	// If the target name is an absolute path, that's also the bound path (minus
 	// the grist).

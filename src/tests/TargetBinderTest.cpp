@@ -83,8 +83,10 @@ TargetBinderTest::Bind()
 		 baseDirectory + "/subdir2/subdir3/foo",
 		 FileStatus::FILE},
 		{"foo",
-		 MakeStringList((baseDirectory + "/subdir1").c_str(),
-						(baseDirectory + "/subdir2/subdir3").c_str()),
+		 MakeStringList(
+			 (baseDirectory + "/subdir1").c_str(),
+			 (baseDirectory + "/subdir2/subdir3").c_str()
+		 ),
 		 StringList(),
 		 StringList(),
 		 StringList(),
@@ -99,8 +101,10 @@ TargetBinderTest::Bind()
 		 FileStatus::FILE},
 		{"foo",
 		 StringList(),
-		 MakeStringList((baseDirectory + "/subdir1").c_str(),
-						(baseDirectory + "/subdir2/subdir3").c_str()),
+		 MakeStringList(
+			 (baseDirectory + "/subdir1").c_str(),
+			 (baseDirectory + "/subdir2/subdir3").c_str()
+		 ),
 		 StringList(),
 		 StringList(),
 		 baseDirectory + "/subdir2/subdir3/foo",
@@ -136,8 +140,10 @@ TargetBinderTest::Bind()
 		{"foo",
 		 StringList(),
 		 StringList(),
-		 MakeStringList((baseDirectory + "/subdir1").c_str(),
-						(baseDirectory + "/subdir2/subdir3").c_str()),
+		 MakeStringList(
+			 (baseDirectory + "/subdir1").c_str(),
+			 (baseDirectory + "/subdir2/subdir3").c_str()
+		 ),
 		 StringList(),
 		 baseDirectory + "/subdir1/foo",
 		 FileStatus::NONE},
@@ -152,8 +158,10 @@ TargetBinderTest::Bind()
 		 StringList(),
 		 StringList(),
 		 StringList(),
-		 MakeStringList((baseDirectory + "/subdir1").c_str(),
-						(baseDirectory + "/subdir2/subdir3").c_str()),
+		 MakeStringList(
+			 (baseDirectory + "/subdir1").c_str(),
+			 (baseDirectory + "/subdir2/subdir3").c_str()
+		 ),
 		 baseDirectory + "/subdir2/subdir3/foo",
 		 FileStatus::FILE},
 		{"foo",
@@ -254,7 +262,8 @@ TargetBinderTest::Bind()
 				ValueToString(testData[i].targetLocate).c_str(),
 				ValueToString(testData[i].targetSearch).c_str(),
 				ValueToString(testData[i].globalLocate).c_str(),
-				ValueToString(testData[i].globalSearch).c_str())
+				ValueToString(testData[i].globalSearch).c_str()
+			)
 
 			if (testData[i].type != FileStatus::NONE) {
 				HAM_TEST_ADD_INFO(
@@ -264,10 +273,14 @@ TargetBinderTest::Bind()
 					//>= startTime)
 					// HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
 					//<= endTime),
-					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
-									>= startTime.Seconds())
-						HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
-										<= endTime.Seconds()),
+					HAM_TEST_VERIFY(
+						fileStatus.LastModifiedTime().Seconds()
+						>= startTime.Seconds()
+					)
+						HAM_TEST_VERIFY(
+							fileStatus.LastModifiedTime().Seconds()
+							<= endTime.Seconds()
+						),
 					"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
 					"end time: (%u, %u)",
 					boundPath.ToCString(),
@@ -276,7 +289,8 @@ TargetBinderTest::Bind()
 					(unsigned)startTime.Seconds(),
 					(unsigned)startTime.NanoSeconds(),
 					(unsigned)endTime.Seconds(),
-					(unsigned)endTime.NanoSeconds())
+					(unsigned)endTime.NanoSeconds()
+				)
 			}
 		}
 	}

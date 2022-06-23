@@ -24,9 +24,11 @@ class PlatformProcessDelegate
 
 	bool IsValid() const { return fPid >= 0; }
 
-	bool Launch(const char* command,
-				const char* const* arguments,
-				size_t argumentCount);
+	bool Launch(
+		const char* command,
+		const char* const* arguments,
+		size_t argumentCount
+	);
 
 	Id GetId() const { return fPid; }
 

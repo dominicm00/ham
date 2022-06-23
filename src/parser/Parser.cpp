@@ -144,11 +144,13 @@ struct Parser::DumpListener : Parser::Listener {
 
 	virtual void NextToken(const Token& token)
 	{
-		printf("%*s(%d, \"%s\")\n",
-			   (int)fLevel * 2,
-			   "",
-			   token.ID(),
-			   token.ToCString());
+		printf(
+			"%*s(%d, \"%s\")\n",
+			(int)fLevel * 2,
+			"",
+			token.ID(),
+			token.ToCString()
+		);
 	}
 
   private:
@@ -199,8 +201,8 @@ Parser::ParseFile(const char* fileName)
 {
 	std::ifstream input(fileName);
 	if (input.fail()) {
-		_Throw(
-			(std::string("Failed to open file \"") + fileName + "\"").c_str());
+		_Throw((std::string("Failed to open file \"") + fileName + "\"").c_str()
+		);
 	}
 
 	return Parse(input);
@@ -229,15 +231,19 @@ Parser::Test(int argc, const char* const* argv)
 		code::DumpContext dumpContext;
 		//		block->Dump(dumpContext);
 	} catch (LexException& exception) {
-		printf("Parser::Test(): %zu:%zu Lex exception: %s\n",
-			   exception.Position().Line() + 1,
-			   exception.Position().Column() + 1,
-			   exception.Message());
+		printf(
+			"Parser::Test(): %zu:%zu Lex exception: %s\n",
+			exception.Position().Line() + 1,
+			exception.Position().Column() + 1,
+			exception.Message()
+		);
 	} catch (ParseException& exception) {
-		printf("Parser::Test(): %zu:%zu Parse exception: %s\n",
-			   exception.Position().Line() + 1,
-			   exception.Position().Column() + 1,
-			   exception.Message());
+		printf(
+			"Parser::Test(): %zu:%zu Parse exception: %s\n",
+			exception.Position().Line() + 1,
+			exception.Position().Column() + 1,
+			exception.Message()
+		);
 	} catch (...) {
 		printf("Parser::Test(): Caught exception\n");
 	}
@@ -288,8 +294,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference result(_ParseBlock(), true);
-			_SkipToken(TOKEN_RIGHT_BRACE,
-					   "Expected '}' at the end of the block");
+			_SkipToken(
+				TOKEN_RIGHT_BRACE,
+				"Expected '}' at the end of the block"
+			);
 			return result.Detach();
 		}
 
@@ -299,8 +307,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
-			_SkipToken(TOKEN_SEMICOLON,
-					   "Expected ';' at the end of the 'include' statement");
+			_SkipToken(
+				TOKEN_SEMICOLON,
+				"Expected ';' at the end of the 'include' statement"
+			);
 
 			// create node
 			return new code::Include(list.Get());
@@ -312,8 +322,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
-			_SkipToken(TOKEN_SEMICOLON,
-					   "Expected ';' at the end of the 'break' statement");
+			_SkipToken(
+				TOKEN_SEMICOLON,
+				"Expected ';' at the end of the 'break' statement"
+			);
 
 			// create node
 			return new code::Break(list.Get());
@@ -325,8 +337,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
-			_SkipToken(TOKEN_SEMICOLON,
-					   "Expected ';' at the end of the 'continue' statement");
+			_SkipToken(
+				TOKEN_SEMICOLON,
+				"Expected ';' at the end of the 'continue' statement"
+			);
 
 			// create node
 			return new code::Continue(list.Get());
@@ -338,8 +352,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
-			_SkipToken(TOKEN_SEMICOLON,
-					   "Expected ';' at the end of the 'return' statement");
+			_SkipToken(
+				TOKEN_SEMICOLON,
+				"Expected ';' at the end of the 'return' statement"
+			);
 
 			// create node
 			return new code::Return(list.Get());
@@ -351,8 +367,10 @@ Parser::_TryParseStatement()
 
 			_NextToken();
 			code::NodeReference list(_ParseList(), true);
-			_SkipToken(TOKEN_SEMICOLON,
-					   "Expected ';' at the end of the 'jumptoeof' statement");
+			_SkipToken(
+				TOKEN_SEMICOLON,
+				"Expected ';' at the end of the 'jumptoeof' statement"
+			);
 
 			// create node
 			return new code::JumpToEof(list.Get());
@@ -371,9 +389,13 @@ Parser::_TryParseStatement()
 			// optional 'else' branch
 			code::NodeReference elseBlock;
 			if (_TrySkipToken(TOKEN_ELSE)) {
-				elseBlock.SetTo(_Expect(_TryParseStatement(),
-										"Expected statement after 'else'"),
-								true);
+				elseBlock.SetTo(
+					_Expect(
+						_TryParseStatement(),
+						"Expected statement after 'else'"
+					),
+					true
+				);
 			}
 
 			// create node
@@ -387,7 +409,8 @@ Parser::_TryParseStatement()
 			_NextToken();
 			code::NodeReference argument(
 				_Expect(_TryParseArgument(), "Expected argument after 'for'"),
-				true);
+				true
+			);
 			_SkipToken(TOKEN_IN, "Expected 'in' after 'for' argument");
 			code::NodeReference list(_ParseList(), true);
 			_SkipToken(TOKEN_LEFT_BRACE, "Expected '{' after 'for' head");
@@ -423,7 +446,8 @@ Parser::_TryParseStatement()
 			// create node
 			util::Reference<code::Switch> switchNode(
 				new code::Switch(list.Get()),
-				true);
+				true
+			);
 
 			// each case: "case" identifier ":" block
 			while (_TrySkipToken(TOKEN_CASE)) {
@@ -440,8 +464,10 @@ Parser::_TryParseStatement()
 				switchNode->AddCase(pattern, block.Get());
 			}
 
-			_SkipToken(TOKEN_RIGHT_BRACE,
-					   "Expected '}' at the end of the 'switch' statement");
+			_SkipToken(
+				TOKEN_RIGHT_BRACE,
+				"Expected '}' at the end of the 'switch' statement"
+			);
 
 			return switchNode.Detach();
 		}
@@ -453,11 +479,15 @@ Parser::_TryParseStatement()
 			_NextToken();
 			code::NodeReference argument(
 				_Expect(_TryParseArgument(), "Expected argument after 'on'"),
-				true);
+				true
+			);
 			code::NodeReference statement(
-				_Expect(_TryParseStatement(),
-						"Expected statement after 'on' argument"),
-				true);
+				_Expect(
+					_TryParseStatement(),
+					"Expected statement after 'on' argument"
+				),
+				true
+			);
 
 			// create node
 			return new code::OnExpression(argument.Get(), statement.Get());
@@ -484,7 +514,8 @@ Parser::_TryParseStatement()
 				while (_TrySkipToken(TOKEN_COLON)) {
 					if (_Token() != TOKEN_STRING) {
 						_ThrowExpected(
-							"Expected 'rule' parameter name after ':'");
+							"Expected 'rule' parameter name after ':'"
+						);
 					}
 
 					parameterNames.Append(_Token());
@@ -498,9 +529,11 @@ Parser::_TryParseStatement()
 			_SkipToken(TOKEN_RIGHT_BRACE, "Expected '}' after 'while' block");
 
 			// create node
-			return new code::RuleDefinition(ruleName,
-											parameterNames,
-											block.Get());
+			return new code::RuleDefinition(
+				ruleName,
+				parameterNames,
+				block.Get()
+			);
 		}
 
 		case TOKEN_ACTIONS: {
@@ -524,7 +557,8 @@ Parser::_TryParseStatement()
 				if (flag == data::RuleActions::MAX_LINE_FACTOR) {
 					if (_Token() != TOKEN_STRING) {
 						_ThrowExpected(
-							"Expected number after 'actions' flag 'maxline'");
+							"Expected number after 'actions' flag 'maxline'"
+						);
 					}
 
 					actionsFlags = (actionsFlags & data::RuleActions::FLAG_MASK)
@@ -557,10 +591,12 @@ Parser::_TryParseStatement()
 			_SkipToken(TOKEN_RIGHT_BRACE, "Expected '}' after 'actions' block");
 
 			// create node
-			return new code::ActionsDefinition(actionsFlags,
-											   ruleName,
-											   bindList.Get(),
-											   commands);
+			return new code::ActionsDefinition(
+				actionsFlags,
+				ruleName,
+				bindList.Get(),
+				commands
+			);
 		}
 
 		default: {
@@ -588,13 +624,16 @@ Parser::_TryParseStatement()
 					code::NodeReference rhs(_ParseList(), true);
 					_SkipToken(
 						TOKEN_SEMICOLON,
-						"Expected ';' at the end of the assignment statement");
+						"Expected ';' at the end of the assignment statement"
+					);
 
 					// create node
-					return new code::Assignment(argument.Get(),
-												operatorType,
-												rhs.Get(),
-												onTargets.Get());
+					return new code::Assignment(
+						argument.Get(),
+						operatorType,
+						rhs.Get(),
+						onTargets.Get()
+					);
 				}
 
 				case TOKEN_ASSIGN:
@@ -609,12 +648,15 @@ Parser::_TryParseStatement()
 					code::NodeReference rhs(_ParseList(), true);
 					_SkipToken(
 						TOKEN_SEMICOLON,
-						"Expected ';' at the end of the assignment statement");
+						"Expected ';' at the end of the assignment statement"
+					);
 
 					// create node
-					return new code::Assignment(argument.Get(),
-												operatorType,
-												rhs.Get());
+					return new code::Assignment(
+						argument.Get(),
+						operatorType,
+						rhs.Get()
+					);
 				}
 
 				default: {
@@ -625,12 +667,14 @@ Parser::_TryParseStatement()
 					_ParseListOfLists(arguments);
 					_SkipToken(
 						TOKEN_SEMICOLON,
-						"Expected ';' at the end of the rule invocation");
+						"Expected ';' at the end of the rule invocation"
+					);
 
 					// create node
-					code::Node* result =
-						new code::FunctionCall(argument.Get(),
-											   arguments.fNodes);
+					code::Node* result = new code::FunctionCall(
+						argument.Get(),
+						arguments.fNodes
+					);
 
 					arguments.Detach();
 
@@ -659,12 +703,16 @@ Parser::_ParseLocalVariableDeclaration()
 		initializer.SetTo(_ParseList(), true);
 
 	// skip ";"
-	_SkipToken(TOKEN_SEMICOLON,
-			   "Expected ';' after local variable declaration");
+	_SkipToken(
+		TOKEN_SEMICOLON,
+		"Expected ';' after local variable declaration"
+	);
 
 	// create node
-	return new code::LocalVariableDeclaration(variables.Get(),
-											  initializer.Get());
+	return new code::LocalVariableDeclaration(
+		variables.Get(),
+		initializer.Get()
+	);
 }
 
 code::List*
@@ -689,8 +737,10 @@ Parser::_TryParseArgument(bool allowKeyword)
 
 	if (_TrySkipToken(TOKEN_LEFT_BRACKET)) {
 		code::NodeReference result(_ParseBracketExpression(), true);
-		_SkipToken(TOKEN_RIGHT_BRACKET,
-				   "Expected ']' at the end of a bracket expression");
+		_SkipToken(
+			TOKEN_RIGHT_BRACKET,
+			"Expected ']' at the end of a bracket expression"
+		);
 		return result.Detach();
 	}
 
@@ -731,7 +781,8 @@ Parser::_TryParseBracketOnExpression()
 
 	code::NodeReference onTarget(
 		_Expect(_TryParseArgument(), "Expected target argument after 'on'"),
-		true);
+		true
+	);
 
 	// either a "return ..." or a function call
 	code::NodeReference expression;
@@ -741,7 +792,8 @@ Parser::_TryParseBracketOnExpression()
 		expression.SetTo(_TryParseFunctionCall(), true);
 		if (expression.Get() == nullptr) {
 			_ThrowExpected(
-				"Expected 'return' or function call in 'on' expression");
+				"Expected 'return' or function call in 'on' expression"
+			);
 		}
 	}
 
@@ -832,8 +884,10 @@ Parser::_ParseComparison()
 			case TOKEN_EQUAL: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
-				result.SetTo(new code::EqualExpression(result.Get(), rhs.Get()),
-							 true);
+				result.SetTo(
+					new code::EqualExpression(result.Get(), rhs.Get()),
+					true
+				);
 				break;
 			}
 
@@ -842,7 +896,8 @@ Parser::_ParseComparison()
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
 					new code::NotEqualExpression(result.Get(), rhs.Get()),
-					true);
+					true
+				);
 				break;
 			}
 
@@ -851,15 +906,18 @@ Parser::_ParseComparison()
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
 					new code::LessOrEqualExpression(result.Get(), rhs.Get()),
-					true);
+					true
+				);
 				break;
 			}
 
 			case TOKEN_LESS: {
 				_NextToken();
 				code::NodeReference rhs(_ParseAtom(), true);
-				result.SetTo(new code::LessExpression(result.Get(), rhs.Get()),
-							 true);
+				result.SetTo(
+					new code::LessExpression(result.Get(), rhs.Get()),
+					true
+				);
 				break;
 			}
 
@@ -868,7 +926,8 @@ Parser::_ParseComparison()
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
 					new code::GreaterOrEqualExpression(result.Get(), rhs.Get()),
-					true);
+					true
+				);
 				break;
 			}
 
@@ -877,7 +936,8 @@ Parser::_ParseComparison()
 				code::NodeReference rhs(_ParseAtom(), true);
 				result.SetTo(
 					new code::GreaterExpression(result.Get(), rhs.Get()),
-					true);
+					true
+				);
 				break;
 			}
 
@@ -910,8 +970,10 @@ Parser::_ParseAtom()
 
 			_NextToken();
 			code::NodeReference expression(_ParseExpression(), true);
-			_SkipToken(TOKEN_RIGHT_PARENTHESIS,
-					   "Expected ')' after expression");
+			_SkipToken(
+				TOKEN_RIGHT_PARENTHESIS,
+				"Expected ')' after expression"
+			);
 			return expression.Detach();
 		}
 
@@ -921,7 +983,8 @@ Parser::_ParseAtom()
 
 			code::NodeReference argument(
 				_Expect(_TryParseArgument(), "Expected argument"),
-				true);
+				true
+			);
 
 			// the "in" part is optional
 			if (!_TrySkipToken(TOKEN_IN))

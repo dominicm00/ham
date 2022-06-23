@@ -79,20 +79,22 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 						// detection?
 						fFinishedBuildInfos.push_back(buildInfo);
 						buildInfo->SetFailed(true);
-						fBuildInfos.erase(std::find(fBuildInfos.begin(),
-													fBuildInfos.end(),
-													buildInfo));
+						fBuildInfos.erase(std::find(
+							fBuildInfos.begin(),
+							fBuildInfos.end(),
+							buildInfo
+						));
 
 						// print diagnostics
 						printf("%s\n", command->CommandLine().ToCString());
-						printf("...failed %s %s\n",
-							   command->Actions()
-								   ->Actions()
-								   ->RuleName()
-								   .ToCString(),
-							   command->BoundTargetPaths()
-								   .Join(StringPart(" "))
-								   .ToCString());
+						printf(
+							"...failed %s %s\n",
+							command->Actions()->Actions()->RuleName().ToCString(
+							),
+							command->BoundTargetPaths()
+								.Join(StringPart(" "))
+								.ToCString()
+						);
 
 						// remove the targets
 						for (StringList::Iterator it =
@@ -135,8 +137,9 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 		fJobSlots[jobSlot].fProcess.Unset();
 
 		fFinishedCommands.push_back(command);
-		command->SetState(processInfo.fExitCode == 0 ? Command::SUCCEEDED
-													 : Command::FAILED);
+		command->SetState(
+			processInfo.fExitCode == 0 ? Command::SUCCEEDED : Command::FAILED
+		);
 	}
 }
 
@@ -154,7 +157,8 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 		if (command == nullptr) {
 			fFinishedBuildInfos.push_back(buildInfo);
 			fBuildInfos.erase(
-				std::find(fBuildInfos.begin(), fBuildInfos.end(), buildInfo));
+				std::find(fBuildInfos.begin(), fBuildInfos.end(), buildInfo)
+			);
 			return;
 		}
 
@@ -175,9 +179,9 @@ TargetBuilder::_ExecuteNextCommand(TargetBuildInfo* buildInfo)
 				// TODO: Insert at head to allow for early error detection?
 				fFinishedBuildInfos.push_back(buildInfo);
 				buildInfo->SetFailed(true);
-				fBuildInfos.erase(std::find(fBuildInfos.begin(),
-											fBuildInfos.end(),
-											buildInfo));
+				fBuildInfos.erase(
+					std::find(fBuildInfos.begin(), fBuildInfos.end(), buildInfo)
+				);
 				return;
 		}
 	}
@@ -188,9 +192,11 @@ TargetBuilder::_ExecuteCommand(Command* command)
 {
 	if (fOptions.IsPrintActions()) {
 		data::RuleActionsCall* actions = command->Actions();
-		printf("%s %s\n",
-			   actions->Actions()->RuleName().ToCString(),
-			   command->BoundTargetPaths().Join(StringPart(" ")).ToCString());
+		printf(
+			"%s %s\n",
+			actions->Actions()->RuleName().ToCString(),
+			command->BoundTargetPaths().Join(StringPart(" ")).ToCString()
+		);
 	}
 
 	if (fOptions.IsPrintCommands()) {
@@ -225,9 +231,11 @@ TargetBuilder::_ExecuteCommand(Command* command)
 	arguments[argumentCount] = nullptr;
 
 	// launch the command
-	bool launched = fJobSlots[jobSlot].fProcess.Launch(arguments[0],
-													   arguments,
-													   argumentCount);
+	bool launched = fJobSlots[jobSlot].fProcess.Launch(
+		arguments[0],
+		arguments,
+		argumentCount
+	);
 
 	delete[] arguments;
 

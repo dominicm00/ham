@@ -46,10 +46,12 @@ Leaf::Dump(DumpContext& context) const
 }
 
 /*static*/ StringList
-Leaf::EvaluateString(EvaluationContext& context,
-					 const char* stringStart,
-					 const char* stringEnd,
-					 const String* originalString)
+Leaf::EvaluateString(
+	EvaluationContext& context,
+	const char* stringStart,
+	const char* stringEnd,
+	const String* originalString
+)
 {
 	// The string to evaluate is a alternating sequence of literal strings and
 	// variable expansion expressions. Each literal string can be considered a
@@ -80,9 +82,10 @@ Leaf::EvaluateString(EvaluationContext& context,
 		// Add the literal string segment before the current variable to the
 		// result factors.
 		if (literalStringStart < stringRemainder - 1) {
-			resultFactors.push_back(
-				StringList(String(literalStringStart,
-								  stringRemainder - 1 - literalStringStart)));
+			resultFactors.push_back(StringList(String(
+				literalStringStart,
+				stringRemainder - 1 - literalStringStart
+			)));
 		}
 
 		const char* variableStart = ++stringRemainder;
@@ -131,14 +134,15 @@ Leaf::EvaluateString(EvaluationContext& context,
 
 		// Evaluate the variable. If its value is empty, the end result will be
 		// empty, too.
-		StringList variableValue =
-			_EvaluateVariableExpression(context,
-										variableStart,
-										stringRemainder - 1,
-										colons,
-										openingBracket,
-										closingBracket,
-										recursive);
+		StringList variableValue = _EvaluateVariableExpression(
+			context,
+			variableStart,
+			stringRemainder - 1,
+			colons,
+			openingBracket,
+			closingBracket,
+			recursive
+		);
 		if (variableValue.IsEmpty())
 			return variableValue;
 
@@ -158,7 +162,8 @@ Leaf::EvaluateString(EvaluationContext& context,
 	// factors.
 	if (literalStringStart != stringEnd) {
 		resultFactors.push_back(StringList(
-			String(literalStringStart, stringEnd - literalStringStart)));
+			String(literalStringStart, stringEnd - literalStringStart)
+		));
 	}
 
 	// compute the result
@@ -166,13 +171,15 @@ Leaf::EvaluateString(EvaluationContext& context,
 }
 
 /*static*/ StringList
-Leaf::_EvaluateVariableExpression(EvaluationContext& context,
-								  const char* variableStart,
-								  const char* variableEnd,
-								  const std::vector<const char*>& colons,
-								  const char* openingBracket,
-								  const char* closingBracket,
-								  bool recursive)
+Leaf::_EvaluateVariableExpression(
+	EvaluationContext& context,
+	const char* variableStart,
+	const char* variableEnd,
+	const std::vector<const char*>& colons,
+	const char* openingBracket,
+	const char* closingBracket,
+	bool recursive
+)
 {
 	// The syntax is:
 	//
@@ -227,7 +234,8 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// Handle the common cases first, i.e. no recursive expansion.
 	if (!recursive) {
 		StringList variableValue = context.LookupVariable(
-			String(variableStart, variableNameEnd - variableStart));
+			String(variableStart, variableNameEnd - variableStart)
+		);
 
 		// range subscripts
 		// The logical implementation would be to just limit variableValue to
@@ -239,17 +247,20 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 		if (openingBracket != nullptr) {
 			size_t firstIndex;
 			size_t endIndex;
-			if (!_ParseSubscripts(openingBracket + 1,
-								  closingBracket,
-								  firstIndex,
-								  endIndex)) {
+			if (!_ParseSubscripts(
+					openingBracket + 1,
+					closingBracket,
+					firstIndex,
+					endIndex
+				)) {
 				return StringList();
 			}
 
 			if (firstIndex > 0) {
-				variableValue =
-					variableValue.SubList(firstIndex,
-										  std::numeric_limits<size_t>::max());
+				variableValue = variableValue.SubList(
+					firstIndex,
+					std::numeric_limits<size_t>::max()
+				);
 			}
 
 			maxSize = endIndex > firstIndex ? endIndex - firstIndex : 0;
@@ -290,10 +301,12 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// Expand and parse the subscripts.
 	std::vector<std::pair<size_t, size_t>> subscripts;
 	if (openingBracket != nullptr) {
-		StringList subscriptStrings = EvaluateString(context,
-													 openingBracket + 1,
-													 closingBracket,
-													 nullptr);
+		StringList subscriptStrings = EvaluateString(
+			context,
+			openingBracket + 1,
+			closingBracket,
+			nullptr
+		);
 		if (subscriptStrings.IsEmpty())
 			return StringList();
 
@@ -304,18 +317,20 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 			size_t endIndex;
 			String subscriptString =
 				subscriptStrings.ElementAt(subscriptsIndex);
-			if (!_ParseSubscripts(subscriptString.ToCString(),
-								  subscriptString.ToCString()
-									  + subscriptString.Length(),
-								  firstIndex,
-								  endIndex)) {
+			if (!_ParseSubscripts(
+					subscriptString.ToCString(),
+					subscriptString.ToCString() + subscriptString.Length(),
+					firstIndex,
+					endIndex
+				)) {
 				return StringList();
 			}
 			subscripts.push_back(std::make_pair(firstIndex, endIndex));
 		}
 	} else {
 		subscripts.push_back(
-			std::make_pair(size_t(0), std::numeric_limits<size_t>::max()));
+			std::make_pair(size_t(0), std::numeric_limits<size_t>::max())
+		);
 	}
 	size_t subscriptsCount = subscripts.size();
 
@@ -351,7 +366,8 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 				operationsStringsList,
 				0,
 				data::StringListOperations(),
-				operationsList)) {
+				operationsList
+			)) {
 			return StringList();
 		}
 	} else
@@ -376,16 +392,19 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 
 			StringList variableValue = originalVariableValue.SubList(
 				range.first,
-				std::numeric_limits<size_t>::max());
+				std::numeric_limits<size_t>::max()
+			);
 
 			// Iterate through the operations.
 			for (size_t operationsIndex = 0; operationsIndex < operationsCount;
 				 operationsIndex++) {
 				data::StringListOperations operations =
 					operationsList.at(operationsIndex);
-				resultValue.Append(operations.Apply(variableValue,
-													maxSize,
-													context.GetBehavior()));
+				resultValue.Append(operations.Apply(
+					variableValue,
+					maxSize,
+					context.GetBehavior()
+				));
 			}
 		}
 	}
@@ -394,10 +413,12 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 }
 
 /*static*/ bool
-Leaf::_ParseSubscripts(const char* start,
-					   const char* end,
-					   size_t& _firstIndex,
-					   size_t& _endIndex)
+Leaf::_ParseSubscripts(
+	const char* start,
+	const char* end,
+	size_t& _firstIndex,
+	size_t& _endIndex
+)
 {
 	// TODO: Since Jam doesn't do much sanity checking of what it parses, its
 	// behavior is weird for invalid input. We don't copy all of that behavior
@@ -447,7 +468,8 @@ Leaf::_ParseStringListOperationsRecursive(
 	const std::vector<StringList>& operationsStringsList,
 	size_t operationsStringsListIndex,
 	data::StringListOperations operations,
-	std::vector<data::StringListOperations>& _operationsList)
+	std::vector<data::StringListOperations>& _operationsList
+)
 {
 	// Note: operationsStrings.ElementAt() returns a new String object, but due
 	// to copy-on-write it refers to the same underlying buffer. So the
@@ -461,8 +483,10 @@ Leaf::_ParseStringListOperationsRecursive(
 		// common case: only one operations string
 		if (count == 1) {
 			String string = operationsStrings.ElementAt(0);
-			operations.Parse(string.ToCString(),
-							 string.ToCString() + string.Length());
+			operations.Parse(
+				string.ToCString(),
+				string.ToCString() + string.Length()
+			);
 
 			// no need to recurse, just iterate
 			if (++operationsStringsListIndex == operationsStringsList.size()) {
@@ -476,19 +500,22 @@ Leaf::_ParseStringListOperationsRecursive(
 		for (size_t i = 0; i < count; i++) {
 			String string = operationsStrings.ElementAt(i);
 			data::StringListOperations newOperations = operations;
-			newOperations.Parse(string.ToCString(),
-								string.ToCString() + string.Length());
+			newOperations.Parse(
+				string.ToCString(),
+				string.ToCString() + string.Length()
+			);
 
 			if (operationsStringsListIndex + 1
 				== operationsStringsList.size()) {
 				_operationsList.push_back(newOperations);
 			} else {
-				_ParseStringListOperationsRecursive(context,
-													operationsStringsList,
-													operationsStringsListIndex
-														+ 1,
-													newOperations,
-													_operationsList);
+				_ParseStringListOperationsRecursive(
+					context,
+					operationsStringsList,
+					operationsStringsListIndex + 1,
+					newOperations,
+					_operationsList
+				);
 			}
 		}
 		return true;

@@ -165,8 +165,9 @@ Processor::PrepareTargets()
 		String targetName = fPrimaryTargetNames.ElementAt(i);
 		const Target* target = fTargets.Lookup(targetName);
 		if (target == nullptr) {
-			throw MakeException(std::string("Unknown target \"")
-								+ targetName.ToCString() + "\"");
+			throw MakeException(
+				std::string("Unknown target \"") + targetName.ToCString() + "\""
+			);
 		}
 
 		_GetMakeTarget(target, true);
@@ -218,8 +219,8 @@ Processor::BuildTargets()
 		printf("...updating %zu target(s)...\n", fTargetsToUpdateCount);
 
 	// get the JAMSHELL variable
-	StringList jamShell(
-		fEvaluationContext.LookupVariable(kJamShellVariableName));
+	StringList jamShell(fEvaluationContext.LookupVariable(kJamShellVariableName)
+	);
 	if (!jamShell.IsTrue()) {
 		jamShell.Append(String("/bin/sh"));
 		jamShell.Append(String("-c"));
@@ -235,7 +236,8 @@ Processor::BuildTargets()
 
 	while (!fMakableTargets.IsEmpty() || builder.HasPendingBuildInfos()) {
 		while (TargetBuildInfo* buildInfo = builder.NextFinishedBuildInfo(
-				   !builder.HasSpareJobSlots() || fMakableTargets.IsEmpty())) {
+				   !builder.HasSpareJobSlots() || fMakableTargets.IsEmpty()
+			   )) {
 			if (buildInfo->HasFailed()) {
 				targetsFailed++;
 				targetsSkipped +=
@@ -307,9 +309,10 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	// and mark in-progress.
 	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
 		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
-			throw MakeException(std::string("Target \"")
-								+ makeTarget->Name().ToCString()
-								+ "\" depends on itself");
+			throw MakeException(
+				std::string("Target \"") + makeTarget->Name().ToCString()
+				+ "\" depends on itself"
+			);
 		}
 
 		// already done
@@ -445,17 +448,20 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 }
 
 void
-Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
-									  data::Time parentTime,
-									  bool makeParent)
+Processor::_SealTargetFateRecursively(
+	MakeTarget* makeTarget,
+	data::Time parentTime,
+	bool makeParent
+)
 {
 	// Check whether the target has already been processed (also detect cycles)
 	// and mark in-progress.
 	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
 		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
-			throw MakeException(std::string("Target \"")
-								+ makeTarget->Name().ToCString()
-								+ "\" depends on itself");
+			throw MakeException(
+				std::string("Target \"") + makeTarget->Name().ToCString()
+				+ "\" depends on itself"
+			);
 		}
 
 		// Already done, though we process it again, if its fate will change.
@@ -476,10 +482,12 @@ Processor::_SealTargetFateRecursively(MakeTarget* makeTarget,
 	for (size_t i = 0; i < makeTarget->Dependencies().Size(); i++) {
 		MakeTarget* dependency = makeTarget->Dependencies().ElementAt(i);
 		fMakeLevel++;
-		_SealTargetFateRecursively(dependency,
-								   makeTarget->GetOriginalTime(),
-								   makeTarget->GetFate() == MakeTarget::MAKE
-									   && !_IsPseudoTarget(makeTarget));
+		_SealTargetFateRecursively(
+			dependency,
+			makeTarget->GetOriginalTime(),
+			makeTarget->GetFate() == MakeTarget::MAKE
+				&& !_IsPseudoTarget(makeTarget)
+		);
 		fMakeLevel--;
 	}
 
@@ -499,10 +507,12 @@ Processor::_BindTarget(MakeTarget* makeTarget)
 
 	String boundPath;
 	data::FileStatus fileStatus;
-	data::TargetBinder::Bind(*fEvaluationContext.GlobalVariables(),
-							 target,
-							 boundPath,
-							 fileStatus);
+	data::TargetBinder::Bind(
+		*fEvaluationContext.GlobalVariables(),
+		target,
+		boundPath,
+		fileStatus
+	);
 	makeTarget->SetBoundPath(boundPath);
 	makeTarget->SetFileStatus(fileStatus);
 }
@@ -548,8 +558,10 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 			for (size_t i = 0; i < groupCount; i++) {
 				size_t startOffset = result.GroupStartOffsetAt(i);
 				size_t endOffset = result.GroupEndOffsetAt(i);
-				String headerName(line.c_str() + startOffset,
-								  endOffset - startOffset);
+				String headerName(
+					line.c_str() + startOffset,
+					endOffset - startOffset
+				);
 				if (!headerName.IsEmpty())
 					headersFound.Append(headerName);
 			}
@@ -562,18 +574,22 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 	if (!headersFound.IsEmpty()) {
 		// Construct the code to evaluate the rule under the influence of the
 		// target.
-		code::NodeReference targetNameNode(new code::Constant(target->Name()),
-										   true);
+		code::NodeReference targetNameNode(
+			new code::Constant(target->Name()),
+			true
+		);
 		code::NodeReference headersNode(new code::Constant(headersFound), true);
 		code::NodeReference callFunction(new code::Constant(scanRule), true);
 		util::Reference<code::FunctionCall> call(
 			new code::FunctionCall(callFunction.Get()),
-			true);
+			true
+		);
 		call->AddArgument(targetNameNode.Get());
 		call->AddArgument(headersNode.Get());
 		code::NodeReference onExpression(
 			new code::OnExpression(targetNameNode.Get(), call.Get()),
-			true);
+			true
+		);
 		onExpression->Evaluate(fEvaluationContext);
 	}
 }
@@ -680,11 +696,13 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 				}
 			}
 
-			printf("...skipped %s for lack of %s...\n",
-				   makeTarget->Name().ToCString(),
-				   lackingDependency != nullptr
-					   ? lackingDependency->Name().ToCString()
-					   : "???");
+			printf(
+				"...skipped %s for lack of %s...\n",
+				makeTarget->Name().ToCString(),
+				lackingDependency != nullptr
+					? lackingDependency->Name().ToCString()
+					: "???"
+			);
 			skippedCount++;
 			break;
 		}
@@ -803,10 +821,12 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
-			StringList result = code::Leaf::EvaluateString(fEvaluationContext,
-														   wordStart,
-														   remainder,
-														   nullptr);
+			StringList result = code::Leaf::EvaluateString(
+				fEvaluationContext,
+				wordStart,
+				remainder,
+				nullptr
+			);
 			bool isFirst = true;
 			for (StringList::Iterator it = result.GetIterator();
 				 it.HasNext();) {
@@ -832,11 +852,13 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 {
 	const char* timeString;
 	if (makeTarget->FileExists()) {
-		_PrintMakeTreeStep(makeTarget,
-						   "bind",
-						   nullptr,
-						   ": %s",
-						   makeTarget->BoundPath().ToCString());
+		_PrintMakeTreeStep(
+			makeTarget,
+			"bind",
+			nullptr,
+			": %s",
+			makeTarget->BoundPath().ToCString()
+		);
 		timeString = makeTarget->GetOriginalTime().ToString().ToCString();
 	} else {
 		if (_IsPseudoTarget(makeTarget))
@@ -850,8 +872,10 @@ Processor::_PrintMakeTreeBinding(const MakeTarget* makeTarget)
 }
 
 void
-Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
-							   data::Time parentTime)
+Processor::_PrintMakeTreeState(
+	const MakeTarget* makeTarget,
+	data::Time parentTime
+)
 {
 	const Target* target = makeTarget->GetTarget();
 	const char* stateString;
@@ -893,18 +917,22 @@ Processor::_PrintMakeTreeState(const MakeTarget* makeTarget,
 }
 
 void
-Processor::_PrintMakeTreeStep(const MakeTarget* makeTarget,
-							  const char* step,
-							  const char* state,
-							  const char* pattern,
-							  ...)
+Processor::_PrintMakeTreeStep(
+	const MakeTarget* makeTarget,
+	const char* step,
+	const char* state,
+	const char* pattern,
+	...
+)
 {
-	printf("%-7s %-10s %*s%s",
-		   step,
-		   state != nullptr ? state : "--",
-		   fMakeLevel,
-		   "",
-		   makeTarget->Name().ToCString());
+	printf(
+		"%-7s %-10s %*s%s",
+		step,
+		state != nullptr ? state : "--",
+		fMakeLevel,
+		"",
+		makeTarget->Name().ToCString()
+	);
 	if (pattern != nullptr) {
 		char buffer[1024];
 		va_list args;

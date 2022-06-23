@@ -11,10 +11,12 @@
 namespace ham::test
 {
 
-TestException::TestException(const char* file,
-							 int line,
-							 const char* message,
-							 ...)
+TestException::TestException(
+	const char* file,
+	int line,
+	const char* message,
+	...
+)
 	: fFile(file),
 	  fLine(line)
 {

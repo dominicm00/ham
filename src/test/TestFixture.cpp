@@ -67,8 +67,10 @@ TestFixture::TemporaryDirectoryCreator::Create(bool changeDirectory)
 		if (changeDirectory && chdir(fTemporaryDirectory.c_str()) < 0) {
 			fOldWorkingDirectory.clear();
 			// clear, since we don't need to chdir() back
-			HAM_TEST_THROW("Failed to cd into temporary directory: %s",
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to cd into temporary directory: %s",
+				strerror(errno)
+			)
 		}
 	} catch (...) {
 		Delete();
@@ -108,7 +110,8 @@ TestFixture::CodeExecuter::Execute(
 	const std::map<std::string, std::string>& code,
 	const std::map<std::string, int>& codeAge,
 	std::ostream& output,
-	std::ostream& errorOutput)
+	std::ostream& errorOutput
+)
 {
 	fTemporaryDirectoryCreator.Delete();
 	fOutputPipe = nullptr;
@@ -133,9 +136,11 @@ TestFixture::CodeExecuter::Execute(
 		utimbuf times;
 		times.actime = times.modtime = (time_t)now.Seconds() - age;
 		if (utime(it->first.c_str(), &times) != 0) {
-			HAM_TEST_THROW("Failed to set time on \"%s\": %s",
-						   it->first.c_str(),
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to set time on \"%s\": %s",
+				it->first.c_str(),
+				strerror(errno)
+			)
 		}
 	}
 
@@ -143,9 +148,11 @@ TestFixture::CodeExecuter::Execute(
 		// run the executable
 		fOutputPipe = popen(jamExecutable, "r");
 		if (fOutputPipe == nullptr) {
-			HAM_TEST_THROW("Failed to execute \"%s\": %s",
-						   jamExecutable,
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to execute \"%s\": %s",
+				jamExecutable,
+				strerror(errno)
+			)
 		}
 
 		// read input until done
@@ -174,18 +181,22 @@ TestFixture::CodeExecuter::Execute(
 }
 
 void
-TestFixture::CodeExecuter::Execute(TestEnvironment* environment,
-								   const std::string& code,
-								   std::ostream& output,
-								   std::ostream& errorOutput)
+TestFixture::CodeExecuter::Execute(
+	TestEnvironment* environment,
+	const std::string& code,
+	std::ostream& output,
+	std::ostream& errorOutput
+)
 {
 	std::map<std::string, std::string> codeFiles;
 	codeFiles[util::kJamfileName] = code;
-	return Execute(environment,
-				   codeFiles,
-				   std::map<std::string, int>(),
-				   output,
-				   errorOutput);
+	return Execute(
+		environment,
+		codeFiles,
+		std::map<std::string, int>(),
+		output,
+		errorOutput
+	);
 }
 
 void
@@ -194,15 +205,18 @@ TestFixture::CodeExecuter::Execute(
 	const std::map<std::string, std::string>& code,
 	const std::map<std::string, int>& codeAge,
 	std::ostream& output,
-	std::ostream& errorOutput)
+	std::ostream& errorOutput
+)
 {
 	std::string jamExecutable = environment->JamExecutable();
-	return Execute(jamExecutable.empty() ? nullptr : jamExecutable.c_str(),
-				   environment->GetCompatibility(),
-				   code,
-				   codeAge,
-				   output,
-				   errorOutput);
+	return Execute(
+		jamExecutable.empty() ? nullptr : jamExecutable.c_str(),
+		environment->GetCompatibility(),
+		code,
+		codeAge,
+		output,
+		errorOutput
+	);
 }
 
 void
@@ -222,26 +236,28 @@ TestFixture::CodeExecuter::Cleanup()
 // #pragma mark - TestFixture
 
 /*static*/ data::StringList
-TestFixture::MakeStringList(const char* element1,
-							const char* element2,
-							const char* element3,
-							const char* element4,
-							const char* element5,
-							const char* element6,
-							const char* element7,
-							const char* element8,
-							const char* element9,
-							const char* element10,
-							const char* element11,
-							const char* element12,
-							const char* element13,
-							const char* element14,
-							const char* element15,
-							const char* element16,
-							const char* element17,
-							const char* element18,
-							const char* element19,
-							const char* element20)
+TestFixture::MakeStringList(
+	const char* element1,
+	const char* element2,
+	const char* element3,
+	const char* element4,
+	const char* element5,
+	const char* element6,
+	const char* element7,
+	const char* element8,
+	const char* element9,
+	const char* element10,
+	const char* element11,
+	const char* element12,
+	const char* element13,
+	const char* element14,
+	const char* element15,
+	const char* element16,
+	const char* element17,
+	const char* element18,
+	const char* element19,
+	const char* element20
+)
 {
 	const char* const elements[] = {element1,  element2,  element3,	 element4,
 									element5,  element6,  element7,	 element8,
@@ -274,7 +290,8 @@ TestFixture::MakeStringList(const std::vector<std::string>& testList)
 
 /*static*/ data::StringListList
 TestFixture::MakeStringListList(
-	const std::vector<std::vector<std::string>>& testListList)
+	const std::vector<std::vector<std::string>>& testListList
+)
 {
 	StringListList listList;
 	for (std::vector<std::vector<std::string>>::const_iterator it =
@@ -288,20 +305,24 @@ TestFixture::MakeStringListList(
 }
 
 /*static*/ void
-TestFixture::ExecuteCode(TestEnvironment* environment,
-						 const std::string& code,
-						 std::ostream& output,
-						 std::ostream& errorOutput)
+TestFixture::ExecuteCode(
+	TestEnvironment* environment,
+	const std::string& code,
+	std::ostream& output,
+	std::ostream& errorOutput
+)
 {
 	CodeExecuter().Execute(environment, code, output, errorOutput);
 }
 
 /*static*/ void
-TestFixture::ExecuteCode(TestEnvironment* environment,
-						 const std::map<std::string, std::string>& code,
-						 const std::map<std::string, int>& codeAge,
-						 std::ostream& output,
-						 std::ostream& errorOutput)
+TestFixture::ExecuteCode(
+	TestEnvironment* environment,
+	const std::map<std::string, std::string>& code,
+	const std::map<std::string, int>& codeAge,
+	std::ostream& output,
+	std::ostream& errorOutput
+)
 {
 	CodeExecuter().Execute(environment, code, codeAge, output, errorOutput);
 }
@@ -314,8 +335,10 @@ TestFixture::CurrentWorkingDirectory()
 
 	try {
 		if (getcwd(buffer, (size_t)size) == nullptr) {
-			HAM_TEST_THROW("Failed to get current working directory: %s",
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to get current working directory: %s",
+				strerror(errno)
+			)
 		}
 
 		std::string result(buffer);
@@ -336,9 +359,11 @@ TestFixture::CreateTemporaryDirectory(std::string& _path)
 	strcpy(temporaryDirectoryBuffer, kDirectoryNameTemplate);
 	char* temporaryDirectory = mkdtemp(temporaryDirectoryBuffer);
 	if (temporaryDirectory == nullptr) {
-		HAM_TEST_THROW("mkdtemp() failed to create a new temporary directory: "
-					   "%s",
-					   strerror(errno))
+		HAM_TEST_THROW(
+			"mkdtemp() failed to create a new temporary directory: "
+			"%s",
+			strerror(errno)
+		)
 	}
 
 	_path = temporaryDirectory;
@@ -367,17 +392,21 @@ TestFixture::CreateDirectory(const char* path, bool createAncestors)
 		if (S_ISDIR(st.st_mode))
 			return;
 
-		HAM_TEST_THROW("Can't create directory \"%s\", a file is in the way",
-					   path)
+		HAM_TEST_THROW(
+			"Can't create directory \"%s\", a file is in the way",
+			path
+		)
 	}
 
 	if (createAncestors)
 		CreateParentDirectory(path, true);
 
 	if (mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
-		HAM_TEST_THROW("Failed to create directory \"%s\": %s",
-					   path,
-					   strerror(errno))
+		HAM_TEST_THROW(
+			"Failed to create directory \"%s\": %s",
+			path,
+			strerror(errno)
+		)
 	}
 }
 
@@ -391,13 +420,17 @@ TestFixture::CreateFile(const char* path, const char* content)
 		HAM_TEST_THROW("Failed to create temporary file \"%s\".", path)
 	}
 
-	std::copy(content,
-			  content + strlen(content),
-			  std::ostream_iterator<char>(file));
+	std::copy(
+		content,
+		content + strlen(content),
+		std::ostream_iterator<char>(file)
+	);
 
 	if (file.fail()) {
-		HAM_TEST_THROW("Failed to write content to temporary file \"%s\".",
-					   path)
+		HAM_TEST_THROW(
+			"Failed to write content to temporary file \"%s\".",
+			path
+		)
 	}
 }
 
@@ -407,17 +440,21 @@ TestFixture::RemoveRecursively(std::string entry)
 	// TODO: Platform dependent!
 	struct stat st;
 	if (lstat(entry.c_str(), &st) < 0) {
-		HAM_TEST_THROW("Failed to stat entry \"%s\" for removal: %s",
-					   strerror(errno))
+		HAM_TEST_THROW(
+			"Failed to stat entry \"%s\" for removal: %s",
+			strerror(errno)
+		)
 	}
 
 	if (S_ISDIR(st.st_mode)) {
 		// recursively remove all entries in the directory
 		DIR* dir = opendir(entry.c_str());
 		if (dir == nullptr) {
-			HAM_TEST_THROW("Failed to open directory \"%s\" for removal: %s",
-						   entry.c_str(),
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to open directory \"%s\" for removal: %s",
+				entry.c_str(),
+				strerror(errno)
+			)
 		}
 
 		try {
@@ -438,15 +475,19 @@ TestFixture::RemoveRecursively(std::string entry)
 
 		// remove the directory itself
 		if (rmdir(entry.c_str()) < 0) {
-			HAM_TEST_THROW("Failed to remove directory \"%s\": %s",
-						   entry.c_str(),
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to remove directory \"%s\": %s",
+				entry.c_str(),
+				strerror(errno)
+			)
 		}
 	} else {
 		if (unlink(entry.c_str()) < 0) {
-			HAM_TEST_THROW("Failed to remove entry \"%s\": %s",
-						   entry.c_str(),
-						   strerror(errno))
+			HAM_TEST_THROW(
+				"Failed to remove entry \"%s\": %s",
+				entry.c_str(),
+				strerror(errno)
+			)
 		}
 	}
 }
@@ -507,7 +548,8 @@ TestFixture::ValueToString<std::string>(const std::string& value)
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<std::list<std::string>>(
-	const std::list<std::string>& value)
+	const std::list<std::string>& value
+)
 {
 	return value_container_to_string(value);
 }
@@ -515,7 +557,8 @@ TestFixture::ValueToString<std::list<std::string>>(
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<std::vector<std::string>>(
-	const std::vector<std::string>& value)
+	const std::vector<std::string>& value
+)
 {
 	return value_container_to_string(value);
 }
@@ -551,7 +594,8 @@ TestFixture::ValueToString<data::StringList>(const data::StringList& value)
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<data::StringListList>(
-	const data::StringListList& value)
+	const data::StringListList& value
+)
 {
 	return value_container_to_string(value);
 }
@@ -559,7 +603,8 @@ TestFixture::ValueToString<data::StringListList>(
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<std::pair<size_t, size_t>>(
-	const std::pair<size_t, size_t>& value)
+	const std::pair<size_t, size_t>& value
+)
 {
 	std::ostringstream stream;
 	stream << "(" << value.first << ", " << value.second << ")";
@@ -569,7 +614,8 @@ TestFixture::ValueToString<std::pair<size_t, size_t>>(
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<std::vector<std::pair<size_t, size_t>>>(
-	const std::vector<std::pair<size_t, size_t>>& value)
+	const std::vector<std::pair<size_t, size_t>>& value
+)
 {
 	return value_container_to_string(value);
 }
@@ -577,7 +623,8 @@ TestFixture::ValueToString<std::vector<std::pair<size_t, size_t>>>(
 template<>
 /*static*/ std::string
 TestFixture::ValueToString<data::FileStatus::Type>(
-	const data::FileStatus::Type& value)
+	const data::FileStatus::Type& value
+)
 {
 	switch (value) {
 		case data::FileStatus::NONE:

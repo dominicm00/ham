@@ -233,8 +233,10 @@ class Lexer
 				quotedOrEscaped = true;
 
 				if (fPosition == fEnd) {
-					throw LexException("Backslash at end of file",
-									   fFilePosition);
+					throw LexException(
+						"Backslash at end of file",
+						fFilePosition
+					);
 				}
 
 				// fetch the escaped char
@@ -270,8 +272,10 @@ class Lexer
 				}
 
 				if (!foundEnd) {
-					throw LexException("Unterminated string literal",
-									   fFilePosition);
+					throw LexException(
+						"Unterminated string literal",
+						fFilePosition
+					);
 				}
 
 				continue;

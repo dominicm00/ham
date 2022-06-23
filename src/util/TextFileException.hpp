@@ -16,8 +16,10 @@ namespace ham::util
 class TextFileException : public Exception
 {
   public:
-	TextFileException(const std::string& message = std::string(),
-					  const TextFilePosition& position = TextFilePosition())
+	TextFileException(
+		const std::string& message = std::string(),
+		const TextFilePosition& position = TextFilePosition()
+	)
 		: Exception(message),
 		  fPosition(position)
 	{

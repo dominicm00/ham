@@ -15,10 +15,12 @@ namespace ham::code
 class ActionsDefinition : public Node
 {
   public:
-	ActionsDefinition(uint32_t flags,
-					  const String& ruleName,
-					  Node* variables,
-					  const String& actions);
+	ActionsDefinition(
+		uint32_t flags,
+		const String& ruleName,
+		Node* variables,
+		const String& actions
+	);
 	virtual ~ActionsDefinition();
 
 	virtual StringList Evaluate(EvaluationContext& context);

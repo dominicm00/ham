@@ -6,7 +6,7 @@ IndentWidth: 4
 Language: Cpp
 # RequiresClausePosition: OwnLine
 # Enable when clang-format v15 is available
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
 AlignArrayOfStructures: None
 AlignConsecutiveAssignments: None
 AlignConsecutiveBitFields: None

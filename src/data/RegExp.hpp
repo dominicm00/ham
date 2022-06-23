@@ -22,15 +22,19 @@ class RegExp
 
   public:
 	RegExp();
-	RegExp(const char* pattern,
-		   PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION);
+	RegExp(
+		const char* pattern,
+		PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION
+	);
 	RegExp(const RegExp& other);
 	~RegExp();
 
 	bool IsValid() const { return fData != nullptr; }
 
-	bool SetPattern(const char* pattern,
-					PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION);
+	bool SetPattern(
+		const char* pattern,
+		PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION
+	);
 
 	MatchResult Match(const char* string) const;
 

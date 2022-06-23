@@ -13,10 +13,12 @@
 namespace ham::code
 {
 
-ActionsDefinition::ActionsDefinition(uint32_t flags,
-									 const String& ruleName,
-									 Node* variables,
-									 const String& actions)
+ActionsDefinition::ActionsDefinition(
+	uint32_t flags,
+	const String& ruleName,
+	Node* variables,
+	const String& actions
+)
 	: fRuleName(ruleName),
 	  fVariables(variables),
 	  fActions(actions),
@@ -44,7 +46,8 @@ ActionsDefinition::Evaluate(EvaluationContext& context)
 	Rule& rule = context.Rules().LookupOrCreate(fRuleName);
 	util::Reference<data::RuleActions> actions(
 		new data::RuleActions(fRuleName, variables, fActions, fFlags),
-		true);
+		true
+	);
 	rule.SetActions(actions.Get());
 	return StringList::False();
 }

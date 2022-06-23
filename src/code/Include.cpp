@@ -52,10 +52,12 @@ Include::Evaluate(EvaluationContext& context)
 			context.Targets().LookupOrCreate(fileNames.ElementAt(0));
 		String filePath;
 		data::FileStatus fileStatus;
-		data::TargetBinder::Bind(*context.GlobalVariables(),
-								 target,
-								 filePath,
-								 fileStatus);
+		data::TargetBinder::Bind(
+			*context.GlobalVariables(),
+			target,
+			filePath,
+			fileStatus
+		);
 
 		// open the file
 		std::ifstream file(filePath.ToCString());
@@ -64,7 +66,8 @@ Include::Evaluate(EvaluationContext& context)
 				return StringList::False();
 			throw EvaluationException(
 				std::string("include: Failed to open file \"")
-				+ filePath.ToCString() + "\"");
+				+ filePath.ToCString() + "\""
+			);
 		}
 
 		// parse and evaluate it

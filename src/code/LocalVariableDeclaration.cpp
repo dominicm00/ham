@@ -11,8 +11,10 @@
 namespace ham::code
 {
 
-LocalVariableDeclaration::LocalVariableDeclaration(Node* variables,
-												   Node* initializer)
+LocalVariableDeclaration::LocalVariableDeclaration(
+	Node* variables,
+	Node* initializer
+)
 	: fVariables(variables),
 	  fInitializer(initializer)
 {

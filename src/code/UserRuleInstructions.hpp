@@ -18,8 +18,8 @@ class UserRuleInstructions : public RuleInstructions
 	UserRuleInstructions(const StringList& parameterNames, Node* block);
 	~UserRuleInstructions();
 
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters);
+	virtual StringList
+	Evaluate(EvaluationContext& context, const StringListList& parameters);
 
   private:
 	StringList fParameterNames;

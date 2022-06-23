@@ -41,17 +41,22 @@ PathTest::IsAbsolute()
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
-		HAM_TEST_VERIFY(strlen(testData[i].string)
-						>= testData[i].offset + testData[i].length)
+		HAM_TEST_VERIFY(
+			strlen(testData[i].string)
+			>= testData[i].offset + testData[i].length
+		)
 
-		StringPart path(testData[i].string + testData[i].offset,
-						testData[i].length);
+		StringPart path(
+			testData[i].string + testData[i].offset,
+			testData[i].length
+		);
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_EQUAL(Path::IsAbsolute(path), testData[i].isAbsolute),
 			"string: \"%s\", offset: %zu, length: %zu",
 			testData[i].string,
 			testData[i].offset,
-			testData[i].length)
+			testData[i].length
+		)
 	}
 }
 
@@ -91,17 +96,25 @@ PathTest::RemoveGrist()
 	};
 
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
-		HAM_TEST_VERIFY(strlen(testData[i].string)
-						>= testData[i].offset + testData[i].length)
+		HAM_TEST_VERIFY(
+			strlen(testData[i].string)
+			>= testData[i].offset + testData[i].length
+		)
 
-		StringPart path(testData[i].string + testData[i].offset,
-						testData[i].length);
-		HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(Path::RemoveGrist(path).ToStlString(),
-										 testData[i].result),
-						  "string: \"%s\", offset: %zu, length: %zu",
-						  testData[i].string,
-						  testData[i].offset,
-						  testData[i].length)
+		StringPart path(
+			testData[i].string + testData[i].offset,
+			testData[i].length
+		);
+		HAM_TEST_ADD_INFO(
+			HAM_TEST_EQUAL(
+				Path::RemoveGrist(path).ToStlString(),
+				testData[i].result
+			),
+			"string: \"%s\", offset: %zu, length: %zu",
+			testData[i].string,
+			testData[i].offset,
+			testData[i].length
+		)
 	}
 }
 
@@ -142,9 +155,10 @@ PathTest::Make()
 				std::string headString = std::string()
 					+ testDataContext[headPrefix] + testData[i].head
 					+ testDataContext[headSuffix];
-				StringPart head(headString.c_str()
-									+ strlen(testDataContext[headPrefix]),
-								strlen(testData[i].head));
+				StringPart head(
+					headString.c_str() + strlen(testDataContext[headPrefix]),
+					strlen(testData[i].head)
+				);
 				for (size_t tailPrefix = 0; tailPrefix < testDataContextCount;
 					 tailPrefix++) {
 					for (size_t tailSuffix = 0;
@@ -156,13 +170,17 @@ PathTest::Make()
 						StringPart tail(
 							tailString.c_str()
 								+ strlen(testDataContext[tailPrefix]),
-							strlen(testData[i].tail));
+							strlen(testData[i].tail)
+						);
 						HAM_TEST_ADD_INFO(
-							HAM_TEST_EQUAL(Path::Make(head, tail).ToStlString(),
-										   testData[i].result),
+							HAM_TEST_EQUAL(
+								Path::Make(head, tail).ToStlString(),
+								testData[i].result
+							),
 							"head: \"%s\", tail: \"%s\"",
 							testData[i].head,
-							testData[i].tail)
+							testData[i].tail
+						)
 					}
 				}
 			}
@@ -229,13 +247,17 @@ PathTest::GetFileStatus()
 
 		FileStatus fileStatus;
 		HAM_TEST_ADD_INFO(
-			HAM_TEST_EQUAL(Path::Exists(path),
-						   testData[i].type != FileStatus::NONE)
-				HAM_TEST_EQUAL(Path::GetFileStatus(path, fileStatus),
-							   testData[i].type != FileStatus::NONE)
-					HAM_TEST_EQUAL(fileStatus.GetType(), testData[i].type),
+			HAM_TEST_EQUAL(
+				Path::Exists(path),
+				testData[i].type != FileStatus::NONE
+			)
+				HAM_TEST_EQUAL(
+					Path::GetFileStatus(path, fileStatus),
+					testData[i].type != FileStatus::NONE
+				) HAM_TEST_EQUAL(fileStatus.GetType(), testData[i].type),
 			"path: \"%s\"",
-			path)
+			path
+		)
 
 		if (testData[i].type != FileStatus::NONE && testData[i].checkTime) {
 			HAM_TEST_ADD_INFO(
@@ -245,10 +267,14 @@ PathTest::GetFileStatus()
 				// startTime)
 				// HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
 				// <= endTime),
-				HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
-								>= startTime.Seconds())
-					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
-									<= endTime.Seconds()),
+				HAM_TEST_VERIFY(
+					fileStatus.LastModifiedTime().Seconds()
+					>= startTime.Seconds()
+				)
+					HAM_TEST_VERIFY(
+						fileStatus.LastModifiedTime().Seconds()
+						<= endTime.Seconds()
+					),
 				"path: \"%s\", time: (%u, %u), start time: (%u, %u), "
 				"end time: (%u, %u)",
 				path,
@@ -257,7 +283,8 @@ PathTest::GetFileStatus()
 				(unsigned)startTime.Seconds(),
 				(unsigned)startTime.NanoSeconds(),
 				(unsigned)endTime.Seconds(),
-				(unsigned)endTime.NanoSeconds())
+				(unsigned)endTime.NanoSeconds()
+			)
 		}
 	}
 }
@@ -381,17 +408,25 @@ PathTest::PartsConstructor()
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_EQUAL(parts.Grist().ToStlString(), testData[i].grist)
 					HAM_TEST_EQUAL(parts.Root().ToStlString(), testData[i].root)
-						HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-									   testData[i].directory)
-							HAM_TEST_EQUAL(parts.BaseName().ToStlString(),
-										   testData[i].baseName)
-								HAM_TEST_EQUAL(parts.Suffix().ToStlString(),
-											   testData[i].suffix)
+						HAM_TEST_EQUAL(
+							parts.Directory().ToStlString(),
+							testData[i].directory
+						)
+							HAM_TEST_EQUAL(
+								parts.BaseName().ToStlString(),
+								testData[i].baseName
+							)
+								HAM_TEST_EQUAL(
+									parts.Suffix().ToStlString(),
+									testData[i].suffix
+								)
 									HAM_TEST_EQUAL(
 										parts.ArchiveMember().ToStlString(),
-										testData[i].archiveMember),
+										testData[i].archiveMember
+									),
 				"path: \"%s\"",
-				testData[i].path);
+				testData[i].path
+			);
 		}
 
 		// SetTo()
@@ -401,17 +436,25 @@ PathTest::PartsConstructor()
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_EQUAL(parts.Grist().ToStlString(), testData[i].grist)
 					HAM_TEST_EQUAL(parts.Root().ToStlString(), testData[i].root)
-						HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-									   testData[i].directory)
-							HAM_TEST_EQUAL(parts.BaseName().ToStlString(),
-										   testData[i].baseName)
-								HAM_TEST_EQUAL(parts.Suffix().ToStlString(),
-											   testData[i].suffix)
+						HAM_TEST_EQUAL(
+							parts.Directory().ToStlString(),
+							testData[i].directory
+						)
+							HAM_TEST_EQUAL(
+								parts.BaseName().ToStlString(),
+								testData[i].baseName
+							)
+								HAM_TEST_EQUAL(
+									parts.Suffix().ToStlString(),
+									testData[i].suffix
+								)
 									HAM_TEST_EQUAL(
 										parts.ArchiveMember().ToStlString(),
-										testData[i].archiveMember),
+										testData[i].archiveMember
+									),
 				"path: \"%s\"",
-				testData[i].path);
+				testData[i].path
+			);
 		}
 
 		{
@@ -421,17 +464,25 @@ PathTest::PartsConstructor()
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_EQUAL(parts.Grist().ToStlString(), testData[i].grist)
 					HAM_TEST_EQUAL(parts.Root().ToStlString(), testData[i].root)
-						HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-									   testData[i].directory)
-							HAM_TEST_EQUAL(parts.BaseName().ToStlString(),
-										   testData[i].baseName)
-								HAM_TEST_EQUAL(parts.Suffix().ToStlString(),
-											   testData[i].suffix)
+						HAM_TEST_EQUAL(
+							parts.Directory().ToStlString(),
+							testData[i].directory
+						)
+							HAM_TEST_EQUAL(
+								parts.BaseName().ToStlString(),
+								testData[i].baseName
+							)
+								HAM_TEST_EQUAL(
+									parts.Suffix().ToStlString(),
+									testData[i].suffix
+								)
 									HAM_TEST_EQUAL(
 										parts.ArchiveMember().ToStlString(),
-										testData[i].archiveMember),
+										testData[i].archiveMember
+									),
 				"path: \"%s\"",
-				testData[i].path);
+				testData[i].path
+			);
 		}
 	}
 }
@@ -466,8 +517,10 @@ PathTest::PartsSetters()
 		parts.SetDirectory(StringPart("directory"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string());
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(), std::string());
@@ -503,8 +556,10 @@ PathTest::PartsSetters()
 		HAM_TEST_EQUAL(parts.Directory().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string());
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -517,72 +572,100 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetGrist(StringPart("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetRoot(StringPart("RoOt"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("RoOt"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetDirectory(StringPart("DiReCtOrY"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("RoOt"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("DiReCtOrY"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("DiReCtOrY")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetBaseName(StringPart("BaSe"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("RoOt"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("DiReCtOrY"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("DiReCtOrY")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("BaSe"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetSuffix(StringPart(".SuFfIx"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("RoOt"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("DiReCtOrY"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("DiReCtOrY")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("BaSe"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".SuFfIx"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.SetArchiveMember(StringPart("MeMbEr.x"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<GrIsT>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("RoOt"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("DiReCtOrY"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("DiReCtOrY")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("BaSe"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".SuFfIx"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("MeMbEr.x"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("MeMbEr.x")
+		);
 	}
 
 	{
@@ -595,22 +678,30 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetGrist();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -623,22 +714,30 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetRoot();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string());
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -651,12 +750,16 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetDirectory();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
@@ -664,8 +767,10 @@ PathTest::PartsSetters()
 		HAM_TEST_EQUAL(parts.Directory().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -678,22 +783,30 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetBaseName();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string());
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -706,22 +819,30 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetSuffix();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string());
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 	}
 
 	{
@@ -734,18 +855,24 @@ PathTest::PartsSetters()
 		parts.SetArchiveMember(StringPart("member.o"));
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
-		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(),
-					   std::string("member.o"));
+		HAM_TEST_EQUAL(
+			parts.ArchiveMember().ToStlString(),
+			std::string("member.o")
+		);
 
 		parts.UnsetArchiveMember();
 		HAM_TEST_EQUAL(parts.Grist().ToStlString(), std::string("<grist>"));
 		HAM_TEST_EQUAL(parts.Root().ToStlString(), std::string("root"));
-		HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-					   std::string("directory"));
+		HAM_TEST_EQUAL(
+			parts.Directory().ToStlString(),
+			std::string("directory")
+		);
 		HAM_TEST_EQUAL(parts.BaseName().ToStlString(), std::string("base"));
 		HAM_TEST_EQUAL(parts.Suffix().ToStlString(), std::string(".suffix"));
 		HAM_TEST_EQUAL(parts.ArchiveMember().ToStlString(), std::string());
@@ -1011,17 +1138,26 @@ PathTest::PartsPath()
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_EQUAL(parts.Grist().ToStlString(), testData[i].grist)
 				HAM_TEST_EQUAL(parts.Root().ToStlString(), testData[i].root)
-					HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-								   testData[i].directory)
-						HAM_TEST_EQUAL(parts.BaseName().ToStlString(),
-									   testData[i].baseName)
-							HAM_TEST_EQUAL(parts.Suffix().ToStlString(),
-										   testData[i].suffix)
+					HAM_TEST_EQUAL(
+						parts.Directory().ToStlString(),
+						testData[i].directory
+					)
+						HAM_TEST_EQUAL(
+							parts.BaseName().ToStlString(),
+							testData[i].baseName
+						)
+							HAM_TEST_EQUAL(
+								parts.Suffix().ToStlString(),
+								testData[i].suffix
+							)
 								HAM_TEST_EQUAL(
 									parts.ArchiveMember().ToStlString(),
-									testData[i].archiveMember)
-									HAM_TEST_EQUAL(parts.ToPath(behavior),
-												   testData[i].path),
+									testData[i].archiveMember
+								)
+									HAM_TEST_EQUAL(
+										parts.ToPath(behavior),
+										testData[i].path
+									),
 			"grist: \"%s\", root: \"%s\", directory: \"%s\", baseName: \"%s\", "
 			"suffix: \"%s\", archiveMember: \"%s\"",
 			testData[i].grist,
@@ -1029,7 +1165,8 @@ PathTest::PartsPath()
 			testData[i].directory,
 			testData[i].baseName,
 			testData[i].suffix,
-			testData[i].archiveMember);
+			testData[i].archiveMember
+		);
 
 		data::StringBuffer pathBuffer;
 		parts.GetPath(pathBuffer, behavior);
@@ -1042,7 +1179,8 @@ PathTest::PartsPath()
 			testData[i].directory,
 			testData[i].baseName,
 			testData[i].suffix,
-			testData[i].archiveMember);
+			testData[i].archiveMember
+		);
 	}
 }
 
@@ -1104,17 +1242,26 @@ PathTest::PartsIsAbsolute()
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_EQUAL(parts.Grist().ToStlString(), testData[i].grist)
 				HAM_TEST_EQUAL(parts.Root().ToStlString(), testData[i].root)
-					HAM_TEST_EQUAL(parts.Directory().ToStlString(),
-								   testData[i].directory)
-						HAM_TEST_EQUAL(parts.BaseName().ToStlString(),
-									   testData[i].baseName)
-							HAM_TEST_EQUAL(parts.Suffix().ToStlString(),
-										   testData[i].suffix)
+					HAM_TEST_EQUAL(
+						parts.Directory().ToStlString(),
+						testData[i].directory
+					)
+						HAM_TEST_EQUAL(
+							parts.BaseName().ToStlString(),
+							testData[i].baseName
+						)
+							HAM_TEST_EQUAL(
+								parts.Suffix().ToStlString(),
+								testData[i].suffix
+							)
 								HAM_TEST_EQUAL(
 									parts.ArchiveMember().ToStlString(),
-									testData[i].archiveMember)
-									HAM_TEST_EQUAL(parts.IsAbsolute(),
-												   testData[i].isAbsolute),
+									testData[i].archiveMember
+								)
+									HAM_TEST_EQUAL(
+										parts.IsAbsolute(),
+										testData[i].isAbsolute
+									),
 			"grist: \"%s\", root: \"%s\", directory: \"%s\", baseName: \"%s\", "
 			"suffix: \"%s\", archiveMember: \"%s\"",
 			testData[i].grist,
@@ -1122,7 +1269,8 @@ PathTest::PartsIsAbsolute()
 			testData[i].directory,
 			testData[i].baseName,
 			testData[i].suffix,
-			testData[i].archiveMember);
+			testData[i].archiveMember
+		);
 	}
 }
 

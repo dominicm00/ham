@@ -23,16 +23,18 @@ class PathTest : public test::TestFixture
 	void PartsIsAbsolute();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(PathTest,
-					   8,
-					   IsAbsolute,
-					   RemoveGrist,
-					   Make,
-					   GetFileStatus,
-					   PartsConstructor,
-					   PartsSetters,
-					   PartsPath,
-					   PartsIsAbsolute)
+	HAM_ADD_TEST_CASES(
+		PathTest,
+		8,
+		IsAbsolute,
+		RemoveGrist,
+		Make,
+		GetFileStatus,
+		PartsConstructor,
+		PartsSetters,
+		PartsPath,
+		PartsIsAbsolute
+	)
 };
 
 } // namespace ham::tests

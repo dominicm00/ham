@@ -17,10 +17,12 @@ class VariableDomain;
 class TargetBinder
 {
   public:
-	static void Bind(const VariableDomain& globalVariables,
-					 const Target* target,
-					 String& _boundPath,
-					 FileStatus& _fileStatus);
+	static void Bind(
+		const VariableDomain& globalVariables,
+		const Target* target,
+		String& _boundPath,
+		FileStatus& _fileStatus
+	);
 };
 
 } // namespace ham::data

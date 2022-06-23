@@ -14,10 +14,12 @@ namespace ham::code
 class Assignment : public Node
 {
   public:
-	Assignment(Node* left,
-			   AssignmentOperator operatorType,
-			   Node* right,
-			   Node* onTargets = nullptr);
+	Assignment(
+		Node* left,
+		AssignmentOperator operatorType,
+		Node* right,
+		Node* onTargets = nullptr
+	);
 	virtual ~Assignment();
 
 	virtual StringList Evaluate(EvaluationContext& context);

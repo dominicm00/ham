@@ -127,8 +127,10 @@ Path::Parts::SetTo(const StringPart& path)
 
 	// directory path
 	if (const char* lastSlash = strrchr(remainder, '/')) {
-		fDirectory.SetTo(remainder,
-						 lastSlash == remainder ? remainder + 1 : lastSlash);
+		fDirectory.SetTo(
+			remainder,
+			lastSlash == remainder ? remainder + 1 : lastSlash
+		);
 		remainder = lastSlash + 1;
 	} else
 		fDirectory.Unset();
@@ -146,9 +148,11 @@ Path::Parts::SetTo(const StringPart& path)
 	const char* fileNameEnd =
 		archiveMemberStart != nullptr ? archiveMemberStart : pathEnd;
 	typedef std::reverse_iterator<const char*> ReverseStringIterator;
-	const char* lastDot = std::find(ReverseStringIterator(fileNameEnd),
-									ReverseStringIterator(remainder),
-									'.')
+	const char* lastDot = std::find(
+							  ReverseStringIterator(fileNameEnd),
+							  ReverseStringIterator(remainder),
+							  '.'
+						  )
 							  .base()
 		- 1;
 	if (lastDot != remainder - 1) {
@@ -172,8 +176,8 @@ Path::Parts::SetTo(const StringPart& path)
  * \param[in]  behavior Compatibility behavior to emulate.
  */
 void
-Path::Parts::GetPath(StringBuffer& buffer,
-					 const behavior::Behavior& behavior) const
+Path::Parts::GetPath(StringBuffer& buffer, const behavior::Behavior& behavior)
+	const
 {
 	// TODO: This is platform dependent!
 

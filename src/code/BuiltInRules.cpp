@@ -18,8 +18,10 @@ namespace ham::code
 {
 
 static void
-echo_string_list_list(EvaluationContext& context,
-					  const StringListList& parameters)
+echo_string_list_list(
+	EvaluationContext& context,
+	const StringListList& parameters
+)
 {
 	std::ostream& output = context.Output();
 
@@ -43,8 +45,10 @@ echo_string_list_list(EvaluationContext& context,
 
 struct EchoInstructions : RuleInstructions {
   public:
-	StringList Evaluate(EvaluationContext& context,
-						const StringListList& parameters) override
+	StringList Evaluate(
+		EvaluationContext& context,
+		const StringListList& parameters
+	) override
 	{
 		echo_string_list_list(context, parameters);
 		return StringList::False();
@@ -53,8 +57,10 @@ struct EchoInstructions : RuleInstructions {
 
 struct ExitInstructions : RuleInstructions {
   public:
-	StringList Evaluate(EvaluationContext& context,
-						const StringListList& parameters) override
+	StringList Evaluate(
+		EvaluationContext& context,
+		const StringListList& parameters
+	) override
 	{
 		echo_string_list_list(context, parameters);
 		context.SetJumpCondition(JUMP_CONDITION_EXIT);
@@ -64,8 +70,8 @@ struct ExitInstructions : RuleInstructions {
 
 struct MatchInstructions : RuleInstructions {
   public:
-	StringList Evaluate(EvaluationContext&,
-						const StringListList& parameters) override
+	StringList Evaluate(EvaluationContext&, const StringListList& parameters)
+		override
 	{
 		using data::RegExp;
 
@@ -93,8 +99,10 @@ struct MatchInstructions : RuleInstructions {
 
 				size_t matchCount = match.GroupCount();
 				for (size_t l = 0; l < matchCount; l++) {
-					result.Append(string.SubString(match.GroupStartOffsetAt(l),
-												   match.GroupEndOffsetAt(l)));
+					result.Append(string.SubString(
+						match.GroupStartOffsetAt(l),
+						match.GroupEndOffsetAt(l)
+					));
 				}
 			}
 		}
@@ -105,8 +113,8 @@ struct MatchInstructions : RuleInstructions {
 
 struct GlobInstructions : RuleInstructions {
   public:
-	StringList Evaluate(EvaluationContext&,
-						const StringListList& parameters) override
+	StringList Evaluate(EvaluationContext&, const StringListList& parameters)
+		override
 	{
 		using data::RegExp;
 
@@ -122,8 +130,10 @@ struct GlobInstructions : RuleInstructions {
 		std::vector<RegExp> regExps;
 
 		for (size_t k = 0; k < patternCount; k++) {
-			RegExp regExp(patterns.ElementAt(k).ToCString(),
-						  RegExp::PATTERN_TYPE_WILDCARD);
+			RegExp regExp(
+				patterns.ElementAt(k).ToCString(),
+				RegExp::PATTERN_TYPE_WILDCARD
+			);
 			if (regExp.IsValid())
 				regExps.push_back(regExp);
 		}
@@ -185,8 +195,10 @@ struct GlobInstructions : RuleInstructions {
 template<bool kIncludes>
 struct DependsInstructions : RuleInstructions {
   public:
-	StringList Evaluate(EvaluationContext& context,
-						const StringListList& parameters) override
+	StringList Evaluate(
+		EvaluationContext& context,
+		const StringListList& parameters
+	) override
 	{
 		if (parameters.size() < 2)
 			return StringList::False();
@@ -219,8 +231,10 @@ struct DependsInstructions : RuleInstructions {
 
 template<uint32_t kFlags>
 struct AddTargetFlagsRule : public RuleInstructions {
-	StringList Evaluate(EvaluationContext& context,
-						const StringListList& parameters) override
+	StringList Evaluate(
+		EvaluationContext& context,
+		const StringListList& parameters
+	) override
 	{
 		if (!parameters.empty()) {
 			const StringList& targetNames = parameters[0];
@@ -238,43 +252,57 @@ struct AddTargetFlagsRule : public RuleInstructions {
 /*static*/ void
 BuiltInRules::RegisterRules(RulePool& rulePool)
 {
-	_AddRuleConsumeReference(rulePool,
-							 "echo",
-							 new EchoInstructions,
-							 "Echo",
-							 "ECHO");
-	_AddRuleConsumeReference(rulePool,
-							 "exit",
-							 new ExitInstructions,
-							 "Exit",
-							 "EXIT");
-	_AddRuleConsumeReference(rulePool,
-							 "glob",
-							 new GlobInstructions,
-							 "Glob",
-							 "GLOB");
-	_AddRuleConsumeReference(rulePool,
-							 "match",
-							 new MatchInstructions,
-							 "Match",
-							 "MATCH");
-	_AddRuleConsumeReference(rulePool,
-							 "depends",
-							 new DependsInstructions<false>,
-							 "Depends",
-							 "DEPENDS");
-	_AddRuleConsumeReference(rulePool,
-							 "includes",
-							 new DependsInstructions<true>,
-							 "Includes",
-							 "INCLUDES");
+	_AddRuleConsumeReference(
+		rulePool,
+		"echo",
+		new EchoInstructions,
+		"Echo",
+		"ECHO"
+	);
+	_AddRuleConsumeReference(
+		rulePool,
+		"exit",
+		new ExitInstructions,
+		"Exit",
+		"EXIT"
+	);
+	_AddRuleConsumeReference(
+		rulePool,
+		"glob",
+		new GlobInstructions,
+		"Glob",
+		"GLOB"
+	);
+	_AddRuleConsumeReference(
+		rulePool,
+		"match",
+		new MatchInstructions,
+		"Match",
+		"MATCH"
+	);
+	_AddRuleConsumeReference(
+		rulePool,
+		"depends",
+		new DependsInstructions<false>,
+		"Depends",
+		"DEPENDS"
+	);
+	_AddRuleConsumeReference(
+		rulePool,
+		"includes",
+		new DependsInstructions<true>,
+		"Includes",
+		"INCLUDES"
+	);
 
-#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag)             \
-	_AddRuleConsumeReference(rulePool,                                   \
-							 name,                                       \
-							 new AddTargetFlagsRule<data::Target::flag>, \
-							 alias1,                                     \
-							 alias2)
+#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag) \
+	_AddRuleConsumeReference(                                \
+		rulePool,                                            \
+		name,                                                \
+		new AddTargetFlagsRule<data::Target::flag>,          \
+		alias1,                                              \
+		alias2                                               \
+	)
 
 	HAM_ADD_TARGET_FLAG_RULE("always", "Always", "ALWAYS", BUILD_ALWAYS);
 	HAM_ADD_TARGET_FLAG_RULE("leaves", "Leaves", "LEAVES", DEPENDS_ON_LEAVES);
@@ -287,11 +315,13 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 }
 
 /*static*/ void
-BuiltInRules::_AddRuleConsumeReference(RulePool& rulePool,
-									   const char* name,
-									   RuleInstructions* instructions,
-									   const char* alias1,
-									   const char* alias2)
+BuiltInRules::_AddRuleConsumeReference(
+	RulePool& rulePool,
+	const char* name,
+	RuleInstructions* instructions,
+	const char* alias1,
+	const char* alias2
+)
 {
 	util::Reference<RuleInstructions> instructionsReference(instructions, true);
 	_AddRule(rulePool, name, instructions);
@@ -304,9 +334,11 @@ BuiltInRules::_AddRuleConsumeReference(RulePool& rulePool,
 }
 
 /*static*/ void
-BuiltInRules::_AddRule(RulePool& rulePool,
-					   const char* name,
-					   RuleInstructions* instructions)
+BuiltInRules::_AddRule(
+	RulePool& rulePool,
+	const char* name,
+	RuleInstructions* instructions
+)
 {
 	Rule& rule = rulePool.LookupOrCreate(name);
 	rule.SetInstructions(instructions);

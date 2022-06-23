@@ -16,9 +16,11 @@ Process::Process()
 }
 
 bool
-Process::Launch(const char* command,
-				const char* const* arguments,
-				size_t argumentCount)
+Process::Launch(
+	const char* command,
+	const char* const* arguments,
+	size_t argumentCount
+)
 {
 	return fPlatformDelegate.Launch(command, arguments, argumentCount);
 }

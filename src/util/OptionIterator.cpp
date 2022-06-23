@@ -11,9 +11,11 @@ namespace ham::util
 // #pragma mark - OptionSpecification
 
 OptionSpecification&
-OptionSpecification::Add(int shortOption,
-						 const char* longOption,
-						 bool hasArgument)
+OptionSpecification::Add(
+	int shortOption,
+	const char* longOption,
+	bool hasArgument
+)
 {
 	Option option = {shortOption, longOption, hasArgument};
 	fShortOptions[shortOption] = option;
@@ -39,9 +41,11 @@ OptionSpecification::LongOption(const std::string option) const
 
 // #pragma mark - OptionIterator
 
-OptionIterator::OptionIterator(int argumentCount,
-							   const char* const* arguments,
-							   const OptionSpecification& options)
+OptionIterator::OptionIterator(
+	int argumentCount,
+	const char* const* arguments,
+	const OptionSpecification& options
+)
 	: fOptions(options),
 	  fArguments(arguments),
 	  fArgumentCount(argumentCount),

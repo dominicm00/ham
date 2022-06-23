@@ -32,8 +32,10 @@ class EvaluationContext
 	// XXX: Giving compatibility and behavior default values makes it easy to
 	// end up with inconsistent compatibility behavior. This constructor should
 	// probably require a compatibility value.
-	EvaluationContext(data::VariableDomain& globalVariables,
-					  data::TargetPool& targets);
+	EvaluationContext(
+		data::VariableDomain& globalVariables,
+		data::TargetPool& targets
+	);
 
 	behavior::Compatibility GetCompatibility() const { return fCompatibility; }
 	void SetCompatibility(behavior::Compatibility compatibility);

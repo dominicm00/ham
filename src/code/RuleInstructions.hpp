@@ -18,8 +18,8 @@ class RuleInstructions : public util::Referenceable
   public:
 	virtual ~RuleInstructions();
 
-	virtual StringList Evaluate(EvaluationContext& context,
-								const StringListList& parameters) = 0;
+	virtual StringList
+	Evaluate(EvaluationContext& context, const StringListList& parameters) = 0;
 };
 
 } // namespace ham::code

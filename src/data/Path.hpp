@@ -51,8 +51,8 @@ struct Path::Parts {
 	Parts(const StringPart& path) { SetTo(path); }
 
 	void SetTo(const StringPart& path);
-	void GetPath(StringBuffer& buffer,
-				 const behavior::Behavior& behavior) const;
+	void GetPath(StringBuffer& buffer, const behavior::Behavior& behavior)
+		const;
 	inline String ToPath(const behavior::Behavior& behavior) const;
 
 	bool IsAbsolute() const;

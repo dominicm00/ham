@@ -29,22 +29,24 @@ class StringListTest : public test::TestFixture
 	void Iteration();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringListTest,
-					   14,
-					   Constructor,
-					   ElementAccess,
-					   IsTrue,
-					   SubList,
-					   Contains,
-					   Constants,
-					   Comparison,
-					   Assignment,
-					   Concatenation,
-					   Clear,
-					   Join,
-					   JoinWithSeparator,
-					   Multiply,
-					   Iteration)
+	HAM_ADD_TEST_CASES(
+		StringListTest,
+		14,
+		Constructor,
+		ElementAccess,
+		IsTrue,
+		SubList,
+		Contains,
+		Constants,
+		Comparison,
+		Assignment,
+		Concatenation,
+		Clear,
+		Join,
+		JoinWithSeparator,
+		Multiply,
+		Iteration
+	)
 };
 
 } // namespace ham::tests

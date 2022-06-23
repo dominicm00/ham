@@ -38,8 +38,8 @@ class Parser
 
 	code::Block* Parse(const std::string& input);
 	code::Block* Parse(std::istream& input);
-	code::Block* Parse(const InputIteratorType& start,
-					   const InputIteratorType& end);
+	code::Block*
+	Parse(const InputIteratorType& start, const InputIteratorType& end);
 	code::Block* ParseFile(const char* fileName);
 
 	void Test(int argc, const char* const* argv);

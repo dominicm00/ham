@@ -33,19 +33,22 @@ MultipleFilesDataBasedTest::AddDataSet(
 	bool supportedByHam,
 	uint32_t skipMask,
 	size_t startLineIndex,
-	size_t endLineIndex)
+	size_t endLineIndex
+)
 {
-	DataBasedTest::AddDataSet(new DataSet(inputFiles,
-										  inputFileAges,
-										  outputFiles,
-										  missingOutputFiles,
-										  outputIsException,
-										  exitState,
-										  compatibilityMask,
-										  supportedByHam,
-										  skipMask,
-										  startLineIndex,
-										  endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(
+		inputFiles,
+		inputFileAges,
+		outputFiles,
+		missingOutputFiles,
+		outputIsException,
+		exitState,
+		compatibilityMask,
+		supportedByHam,
+		skipMask,
+		startLineIndex,
+		endLineIndex
+	));
 }
 
 void
@@ -54,7 +57,8 @@ MultipleFilesDataBasedTest::PrepareCode(
 	const std::string& outputPrefix,
 	const std::string& outputSuffix,
 	std::map<std::string, std::string>& _code,
-	std::map<std::string, int>& _codeAge) const
+	std::map<std::string, int>& _codeAge
+) const
 {
 	const DataSet& dataSet = *dynamic_cast<const DataSet*>(dataSetBase);
 
@@ -64,10 +68,12 @@ MultipleFilesDataBasedTest::PrepareCode(
 	std::map<std::string, std::string>::iterator it =
 		_code.find(util::kJamfileName);
 	if (it == _code.end()) {
-		HAM_TEST_THROW("No %s among test files\ntest case lines: %zu-%zu",
-					   util::kJamfileName,
-					   dataSet.fStartLineIndex + 1,
-					   dataSet.fEndLineIndex)
+		HAM_TEST_THROW(
+			"No %s among test files\ntest case lines: %zu-%zu",
+			util::kJamfileName,
+			dataSet.fStartLineIndex + 1,
+			dataSet.fEndLineIndex
+		)
 	}
 
 	it->second = outputPrefix + it->second + outputSuffix;

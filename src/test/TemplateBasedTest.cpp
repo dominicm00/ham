@@ -16,8 +16,10 @@
 namespace ham::test
 {
 
-TemplateBasedTest::TemplateBasedTest(const std::string& name,
-									 const std::string& code)
+TemplateBasedTest::TemplateBasedTest(
+	const std::string& name,
+	const std::string& code
+)
 	: DataBasedTest(name),
 	  fCode(code)
 {
@@ -34,26 +36,31 @@ TemplateBasedTest::AddDataSet(
 	bool supportedByHam,
 	uint32_t skipMask,
 	size_t startLineIndex,
-	size_t endLineIndex)
+	size_t endLineIndex
+)
 {
-	DataBasedTest::AddDataSet(new DataSet(input,
-										  outputFiles,
-										  missingOutputFiles,
-										  outputIsException,
-										  exitState,
-										  compatibilityMask,
-										  supportedByHam,
-										  skipMask,
-										  startLineIndex,
-										  endLineIndex));
+	DataBasedTest::AddDataSet(new DataSet(
+		input,
+		outputFiles,
+		missingOutputFiles,
+		outputIsException,
+		exitState,
+		compatibilityMask,
+		supportedByHam,
+		skipMask,
+		startLineIndex,
+		endLineIndex
+	));
 }
 
 void
-TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
-							   const std::string& outputPrefix,
-							   const std::string& outputSuffix,
-							   std::map<std::string, std::string>& _code,
-							   std::map<std::string, int>& _codeAge) const
+TemplateBasedTest::PrepareCode(
+	const DataSetBase* dataSetBase,
+	const std::string& outputPrefix,
+	const std::string& outputSuffix,
+	std::map<std::string, std::string>& _code,
+	std::map<std::string, int>& _codeAge
+) const
 {
 	const DataSet& dataSet = *dynamic_cast<const DataSet*>(dataSetBase);
 
@@ -86,10 +93,12 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 		char* indexEnd;
 		long index = strtol(percent, &indexEnd, 10);
 		if (indexEnd == percent) {
-			throw TestException(__FILE__,
-								__LINE__,
-								"Stray '%%' in code template:\n%s",
-								fCode.c_str());
+			throw TestException(
+				__FILE__,
+				__LINE__,
+				"Stray '%%' in code template:\n%s",
+				fCode.c_str()
+			);
 		}
 
 		if (index < 1 || (size_t)index > dataSet.fInput.size()) {
@@ -101,7 +110,8 @@ TemplateBasedTest::PrepareCode(const DataSetBase* dataSetBase,
 				index,
 				dataSet.fInput.size(),
 				dataSet.fStartLineIndex + 1,
-				dataSet.fEndLineIndex);
+				dataSet.fEndLineIndex
+			);
 		}
 
 		code += dataSet.fInput[index - 1];

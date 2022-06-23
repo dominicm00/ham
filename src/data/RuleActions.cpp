@@ -8,10 +8,12 @@
 namespace ham::data
 {
 
-RuleActions::RuleActions(const String& ruleName,
-						 const StringList& variables,
-						 const String& actions,
-						 uint32_t flags)
+RuleActions::RuleActions(
+	const String& ruleName,
+	const StringList& variables,
+	const String& actions,
+	uint32_t flags
+)
 	: util::Referenceable(),
 	  fRuleName(ruleName),
 	  fVariables(variables),

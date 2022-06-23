@@ -19,12 +19,14 @@ class StringPartTest : public test::TestFixture
 	void Assignment();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringPartTest,
-					   4,
-					   Constructor,
-					   SetTo,
-					   Comparison,
-					   Assignment)
+	HAM_ADD_TEST_CASES(
+		StringPartTest,
+		4,
+		Constructor,
+		SetTo,
+		Comparison,
+		Assignment
+	)
 };
 
 } // namespace ham::tests

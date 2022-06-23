@@ -52,7 +52,8 @@ String::SubString(size_t startOffset, size_t endOffset) const
 		return String();
 
 	return String(
-		_CreateBuffer(ToCString() + startOffset, endOffset - startOffset));
+		_CreateBuffer(ToCString() + startOffset, endOffset - startOffset)
+	);
 }
 
 String&
@@ -113,10 +114,12 @@ String::String(String::Buffer* buffer)
 }
 
 /*static*/ String
-String::_Concatenate(const char* string1,
-					 size_t length1,
-					 const char* string2,
-					 size_t length2)
+String::_Concatenate(
+	const char* string1,
+	size_t length1,
+	const char* string2,
+	size_t length2
+)
 {
 	if (length1 == 0 && length2 == 0)
 		return String();

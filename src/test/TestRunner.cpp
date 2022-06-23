@@ -55,10 +55,12 @@ TestRunner::AddTest(Test* test, const std::string& testCasePath)
 	if (subTest == nullptr)
 		return false;
 
-	return AddTest(subTest,
-				   separatorIndex != std::string::npos
-					   ? std::string(testCasePath, separatorIndex + 2)
-					   : std::string());
+	return AddTest(
+		subTest,
+		separatorIndex != std::string::npos
+			? std::string(testCasePath, separatorIndex + 2)
+			: std::string()
+	);
 }
 
 void
@@ -87,10 +89,12 @@ TestRunner::Run(TestEnvironment* environment)
 	printf("Summary: %zu tests run, %zu passed", totalTests, fPassedTests);
 	if (fUnexpectedlyPassedTests.size() > 0)
 		printf(" (%zu unexpectedly)", fUnexpectedlyPassedTests.size());
-	printf(", %zu failed, %zu failed expectedly, %zu skipped\n",
-		   fFailedTests.size(),
-		   fExpectedlyFailedTests,
-		   fSkippedTests);
+	printf(
+		", %zu failed, %zu failed expectedly, %zu skipped\n",
+		fFailedTests.size(),
+		fExpectedlyFailedTests,
+		fSkippedTests
+	);
 
 	if (!fFailedTests.empty()) {
 		printf("Failed tests:\n");
@@ -98,8 +102,10 @@ TestRunner::Run(TestEnvironment* environment)
 			 it != fFailedTests.end();
 			 ++it) {
 			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
-			printf("  %s\n",
-				   test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+			printf(
+				"  %s\n",
+				test->TestCaseAt(it->TestCaseIndex(), true).c_str()
+			);
 		}
 	}
 
@@ -109,8 +115,10 @@ TestRunner::Run(TestEnvironment* environment)
 			 it != fUnexpectedlyPassedTests.end();
 			 ++it) {
 			RunnableTest* test = dynamic_cast<RunnableTest*>(it->GetTest());
-			printf("  %s\n",
-				   test->TestCaseAt(it->TestCaseIndex(), true).c_str());
+			printf(
+				"  %s\n",
+				test->TestCaseAt(it->TestCaseIndex(), true).c_str()
+			);
 		}
 	}
 }
@@ -164,7 +172,8 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 				printf("PASSED\n");
 			} else {
 				fUnexpectedlyPassedTests.push_back(
-					TestIdentifier(test, testCase));
+					TestIdentifier(test, testCase)
+				);
 				printf("PASSED (unexpected)\n");
 			}
 		} else {
@@ -175,10 +184,12 @@ TestRunner::_RunTestCase(RunnableTest* test, int testCase)
 		if (compatible) {
 			fFailedTests.push_back(TestIdentifier(test, testCase));
 			printf("FAILED\n");
-			printf("%s:%d:\n  %s\n",
-				   exception.File(),
-				   exception.Line(),
-				   exception.Message().c_str());
+			printf(
+				"%s:%d:\n  %s\n",
+				exception.File(),
+				exception.Line(),
+				exception.Message().c_str()
+			);
 		} else {
 			fExpectedlyFailedTests++;
 			printf("FAILED (expected)\n");

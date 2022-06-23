@@ -28,10 +28,12 @@ class Leaf : public Node
 	virtual Node* Visit(NodeVisitor& visitor);
 	virtual void Dump(DumpContext& context) const;
 
-	static StringList EvaluateString(EvaluationContext& context,
-									 const char* stringStart,
-									 const char* stringEnd,
-									 const String* originalString);
+	static StringList EvaluateString(
+		EvaluationContext& context,
+		const char* stringStart,
+		const char* stringEnd,
+		const String* originalString
+	);
 
   private:
 	static StringList _EvaluateVariableExpression(
@@ -41,17 +43,21 @@ class Leaf : public Node
 		const std::vector<const char*>& colon,
 		const char* openingBracket,
 		const char* closingBracket,
-		bool recursive);
-	static bool _ParseSubscripts(const char* start,
-								 const char* end,
-								 size_t& _firstIndex,
-								 size_t& _endIndex);
+		bool recursive
+	);
+	static bool _ParseSubscripts(
+		const char* start,
+		const char* end,
+		size_t& _firstIndex,
+		size_t& _endIndex
+	);
 	static bool _ParseStringListOperationsRecursive(
 		EvaluationContext& context,
 		const std::vector<StringList>& operationsStringsList,
 		size_t operationsStringsListIndex,
 		data::StringListOperations operations,
-		std::vector<data::StringListOperations>& _operationsList);
+		std::vector<data::StringListOperations>& _operationsList
+	);
 
   private:
 	String fString;

@@ -29,9 +29,11 @@ PlatformProcessDelegate::Unset()
 }
 
 bool
-PlatformProcessDelegate::Launch(const char* command,
-								const char* const* arguments,
-								size_t /*argumentCount*/)
+PlatformProcessDelegate::Launch(
+	const char* command,
+	const char* const* arguments,
+	size_t /*argumentCount*/
+)
 {
 	Unset();
 

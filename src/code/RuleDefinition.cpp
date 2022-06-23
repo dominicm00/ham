@@ -14,9 +14,11 @@
 namespace ham::code
 {
 
-RuleDefinition::RuleDefinition(const String& ruleName,
-							   const StringList& parameterNames,
-							   Block* block)
+RuleDefinition::RuleDefinition(
+	const String& ruleName,
+	const StringList& parameterNames,
+	Block* block
+)
 	: fRuleName(ruleName),
 	  fParameterNames(parameterNames),
 	  fBlock(block),

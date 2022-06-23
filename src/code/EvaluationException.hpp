@@ -15,7 +15,8 @@ class EvaluationException : public util::TextFileException
   public:
 	EvaluationException(
 		const std::string& message = std::string(),
-		const util::TextFilePosition& position = util::TextFilePosition())
+		const util::TextFilePosition& position = util::TextFilePosition()
+	)
 		: util::TextFileException(message, position)
 	{
 	}

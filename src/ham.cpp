@@ -22,16 +22,22 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "Usage: %s [ <options> ] [ <target> ... ]\n", programName);
 	fprintf(out, "Options:\n");
 	fprintf(out, "  -a, --all\n");
-	fprintf(out,
-			"      Build all targets, even the ones that are "
-			"up-to-date.\n");
+	fprintf(
+		out,
+		"      Build all targets, even the ones that are "
+		"up-to-date.\n"
+	);
 	fprintf(out, "  -c <version>, --compatibility <version>\n");
-	fprintf(out,
-			"      Behave compatible to <version>, which is either of "
-			"\"jam\" (plain Jam\n");
-	fprintf(out,
-			"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
-			"default).\n");
+	fprintf(
+		out,
+		"      Behave compatible to <version>, which is either of "
+		"\"jam\" (plain Jam\n"
+	);
+	fprintf(
+		out,
+		"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
+		"default).\n"
+	);
 	fprintf(out, "  -d <option>, --debug <option>\n");
 	fprintf(out, "      Enable/set a debug option. Options are:\n");
 	fprintf(out, "      a     -  Print the actions\n");
@@ -47,9 +53,11 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "  -h, --help\n");
 	fprintf(out, "      Print this usage message.\n");
 	fprintf(out, "  -j <jobs>, --jobs <jobs>\n");
-	fprintf(out,
-			"      Use up to <jobs> number of concurrent shell "
-			"processes.\n");
+	fprintf(
+		out,
+		"      Use up to <jobs> number of concurrent shell "
+		"processes.\n"
+	);
 	fprintf(out, "  -n, --dry-run\n");
 	fprintf(out, "      Print actions and commands, but don't run them.\n");
 	fprintf(out, "  -o <file>, --actions <file>\n");
@@ -57,9 +65,11 @@ print_usage(const char* programName, bool error)
 	fprintf(out, "  -q, --quit-on-error\n");
 	fprintf(out, "      Quit as soon as making a target fails.\n");
 	fprintf(out, "  -s <variable>=<value>, --set <variable>=<value>\n");
-	fprintf(out,
-			"      Set variable <variable> to <value>, overriding the "
-			"environmental variable.\n");
+	fprintf(
+		out,
+		"      Set variable <variable> to <value>, overriding the "
+		"environmental variable.\n"
+	);
 	fprintf(out, "  -t <target>, --target <target>\n");
 	fprintf(out, "      Rebuild target <target>, even if it is up-to-date.\n");
 	fprintf(out, "  -v, --version\n");
@@ -74,8 +84,10 @@ print_usage_end_exit(const char* programName, bool error)
 }
 
 static bool
-set_variable(std::map<data::String, data::String>& variables,
-			 const char* variable)
+set_variable(
+	std::map<data::String, data::String>& variables,
+	const char* variable
+)
 {
 	const char* equalSign = strchr(variable, '=');
 	if (equalSign == nullptr)
@@ -120,22 +132,24 @@ main(int argc, const char* const* argv)
 	bool debugSpecified = false;
 	data::StringList forceUpdateTargets;
 
-	util::OptionIterator optionIterator(argc,
-										argv,
-										util::OptionSpecification()
-											.Add('a', "--all")
-											.Add('c', "--compatibility", true)
-											.Add('d', "--debug", true)
-											.Add('f', "--ruleset", true)
-											.Add('g', "--from-newest")
-											.Add('h', "--help")
-											.Add('j', "--jobs", true)
-											.Add('n', "--dry-run")
-											.Add('o', "--actions", true)
-											.Add('q', "--quit-on-error")
-											.Add('s', "--set", true)
-											.Add('t', "--target", true)
-											.Add('v', "--version"));
+	util::OptionIterator optionIterator(
+		argc,
+		argv,
+		util::OptionSpecification()
+			.Add('a', "--all")
+			.Add('c', "--compatibility", true)
+			.Add('d', "--debug", true)
+			.Add('f', "--ruleset", true)
+			.Add('g', "--from-newest")
+			.Add('h', "--help")
+			.Add('j', "--jobs", true)
+			.Add('n', "--dry-run")
+			.Add('o', "--actions", true)
+			.Add('q', "--quit-on-error")
+			.Add('s', "--set", true)
+			.Add('t', "--target", true)
+			.Add('v', "--version")
+	);
 
 	while (optionIterator.HasNext()) {
 		// short ("-") option(s)
@@ -149,10 +163,12 @@ main(int argc, const char* const* argv)
 				} else if (argument == "ham") {
 					compatibility = behavior::COMPATIBILITY_HAM;
 				} else {
-					fprintf(stderr,
-							"Error: Invalid argument for "
-							"compatibility option: \"%s\"\n",
-							argument.c_str());
+					fprintf(
+						stderr,
+						"Error: Invalid argument for "
+						"compatibility option: \"%s\"\n",
+						argument.c_str()
+					);
 					exit(1);
 				}
 				compatibilitySpecified = true;
@@ -176,12 +192,12 @@ main(int argc, const char* const* argv)
 							printActions = true;
 							break;
 							// TODO:...
-							//						case 'c':
-							//							printCauses = true;
-							//							break;
-							//						case 'd':
-							//							printDependencies =
-							// true; 							break;
+							//  case 'c':
+							//	    printCauses = true;
+							//	    break;
+							//  case 'd':
+							//	    printDependencies = true;
+							//		break;
 						case 'm':
 							printMakeTree = true;
 							break;
@@ -342,12 +358,14 @@ main(int argc, const char* const* argv)
 		fprintf(stderr, "%s.\n", exception.Message());
 	} catch (util::TextFileException& exception) {
 		const util::TextFilePosition& position = exception.Position();
-		fprintf(stderr,
-				"%s:%zu:%zu: %s.\n",
-				position.FileName(),
-				position.Line() + 1,
-				position.Column() + 1,
-				exception.Message());
+		fprintf(
+			stderr,
+			"%s:%zu:%zu: %s.\n",
+			position.FileName(),
+			position.Line() + 1,
+			position.Column() + 1,
+			exception.Message()
+		);
 	}
 
 	// TODO: Catch exceptions...

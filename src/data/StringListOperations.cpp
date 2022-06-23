@@ -113,9 +113,11 @@ StringListOperations::Parse(const char* start, const char* end)
 }
 
 StringList
-StringListOperations::Apply(const StringList& inputList,
-							size_t maxSize,
-							const behavior::Behavior& behavior) const
+StringListOperations::Apply(
+	const StringList& inputList,
+	size_t maxSize,
+	const behavior::Behavior& behavior
+) const
 {
 	if (!HasOperations())
 		return inputList.SubList(0, maxSize);

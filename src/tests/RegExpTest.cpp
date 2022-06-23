@@ -26,8 +26,10 @@ match_result_to_vector(const RegExp::MatchResult& result)
 
 	size_t groupCount = result.GroupCount();
 	for (size_t i = 0; i < groupCount; i++) {
-		vector.push_back(std::make_pair(result.GroupStartOffsetAt(i),
-										result.GroupEndOffsetAt(i)));
+		vector.push_back(std::make_pair(
+			result.GroupStartOffsetAt(i),
+			result.GroupEndOffsetAt(i)
+		));
 	}
 	return vector;
 }
@@ -137,68 +139,98 @@ RegExpTest::MatchRegularExpression()
 		// constructor
 		{
 			RegExp regExp(pattern, RegExp::PATTERN_TYPE_REGULAR_EXPRESSION);
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		// copy constructor
 		{
 			RegExp regExp0(pattern, RegExp::PATTERN_TYPE_REGULAR_EXPRESSION);
 			RegExp regExp(regExp0);
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		// SetPattern()
 		{
 			RegExp regExp;
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.SetPattern(
-								  pattern,
-								  RegExp::PATTERN_TYPE_REGULAR_EXPRESSION)),
-							  "pattern: \"%s\"",
-							  pattern)
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.SetPattern(
+					pattern,
+					RegExp::PATTERN_TYPE_REGULAR_EXPRESSION
+				)),
+				"pattern: \"%s\"",
+				pattern
+			)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		{
 			RegExp regExp("some pattern");
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.SetPattern(
-								  pattern,
-								  RegExp::PATTERN_TYPE_REGULAR_EXPRESSION)),
-							  "pattern: \"%s\"",
-							  pattern)
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.SetPattern(
+					pattern,
+					RegExp::PATTERN_TYPE_REGULAR_EXPRESSION
+				)),
+				"pattern: \"%s\"",
+				pattern
+			)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 	}
 }
@@ -246,31 +278,43 @@ RegExpTest::MatchWildcard()
 		// constructor
 		{
 			RegExp regExp(pattern, RegExp::PATTERN_TYPE_WILDCARD);
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		// copy constructor
 		{
 			RegExp regExp0(pattern, RegExp::PATTERN_TYPE_WILDCARD);
 			RegExp regExp(regExp0);
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		// SetPattern()
@@ -278,36 +322,52 @@ RegExpTest::MatchWildcard()
 			RegExp regExp;
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_VERIFY(
-					regExp.SetPattern(pattern, RegExp::PATTERN_TYPE_WILDCARD)),
+					regExp.SetPattern(pattern, RegExp::PATTERN_TYPE_WILDCARD)
+				),
 				"pattern: \"%s\"",
-				pattern)
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+				pattern
+			)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 
 		{
 			RegExp regExp("some pattern");
 			HAM_TEST_ADD_INFO(
 				HAM_TEST_VERIFY(
-					regExp.SetPattern(pattern, RegExp::PATTERN_TYPE_WILDCARD)),
+					regExp.SetPattern(pattern, RegExp::PATTERN_TYPE_WILDCARD)
+				),
 				"pattern: \"%s\"",
-				pattern)
-			HAM_TEST_ADD_INFO(HAM_TEST_VERIFY(regExp.IsValid()),
-							  "pattern: \"%s\"",
-							  pattern)
+				pattern
+			)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_VERIFY(regExp.IsValid()),
+				"pattern: \"%s\"",
+				pattern
+			)
 			RegExp::MatchResult result = regExp.Match(string);
-			HAM_TEST_ADD_INFO(HAM_TEST_EQUAL(match_result_to_vector(result),
-											 matches.ToVector()),
-							  "pattern: \"%s\", string: \"%s\"",
-							  pattern,
-							  string)
+			HAM_TEST_ADD_INFO(
+				HAM_TEST_EQUAL(
+					match_result_to_vector(result),
+					matches.ToVector()
+				),
+				"pattern: \"%s\", string: \"%s\"",
+				pattern,
+				string
+			)
 		}
 	}
 }

@@ -59,9 +59,11 @@ StringList::StringList(const StringList* other)
 	fData->Acquire();
 }
 
-StringList::StringList(const StringList& other,
-					   size_t startIndex,
-					   size_t endIndex)
+StringList::StringList(
+	const StringList& other,
+	size_t startIndex,
+	size_t endIndex
+)
 {
 	if (startIndex < other.fSize && startIndex < endIndex) {
 		fData = other.fData;
@@ -110,8 +112,10 @@ StringList::Contains(const String& string) const
 }
 
 int
-StringList::CompareWith(const StringList& other,
-						bool ignoreTrailingEmptyStrings) const
+StringList::CompareWith(
+	const StringList& other,
+	bool ignoreTrailingEmptyStrings
+) const
 {
 	size_t commonSize = ignoreTrailingEmptyStrings
 		? std::max(fSize, other.fSize)
@@ -271,7 +275,8 @@ StringList::Multiply(const StringListList& listList)
 
 		factorList.SetElementAt(
 			listIndex,
-			lists[listIndex]->ElementAt(indexes[listIndex]));
+			lists[listIndex]->ElementAt(indexes[listIndex])
+		);
 
 		// descend
 		if (listIndex < listCount - 1) {

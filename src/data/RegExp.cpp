@@ -251,8 +251,8 @@ RegExp::Match(const char* string) const
 	if (!IsValid())
 		return MatchResult();
 
-	return MatchResult(
-		new MatchResultData(fData->CompiledExpression(), string));
+	return MatchResult(new MatchResultData(fData->CompiledExpression(), string)
+	);
 }
 
 RegExp&

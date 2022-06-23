@@ -46,8 +46,10 @@ VariableExpansionTest::None()
 	HAM_TEST_EQUAL(_Evaluate(""), MakeStringList(""))
 	HAM_TEST_EQUAL(_Evaluate("foo"), MakeStringList("foo"))
 	HAM_TEST_EQUAL(_Evaluate("foo$tring"), MakeStringList("foo$tring"))
-	HAM_TEST_EQUAL(_Evaluate("foo(bar)$tring"),
-				   MakeStringList("foo(bar)$tring"))
+	HAM_TEST_EQUAL(
+		_Evaluate("foo(bar)$tring"),
+		MakeStringList("foo(bar)$tring")
+	)
 }
 
 void
@@ -129,7 +131,8 @@ VariableExpansionTest::PathSelectorsEmpty()
 		HAM_TEST_ADD_INFO(
 			HAM_TEST_EQUAL(_Evaluate(testData[i].string), testData[i].result),
 			"string: %s",
-			testData[i].string)
+			testData[i].string
+		)
 	}
 }
 

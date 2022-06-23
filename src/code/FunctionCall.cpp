@@ -101,7 +101,8 @@ FunctionCall::Evaluate(EvaluationContext& context)
 
 			util::Reference<data::RuleActionsCall> actionsCall(
 				new data::RuleActionsCall(actions, targets, sourceTargets),
-				true);
+				true
+			);
 			for (data::TargetList::iterator it = targets.begin();
 				 it != targets.end();
 				 ++it) {

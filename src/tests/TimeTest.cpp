@@ -131,10 +131,12 @@ TimeTest::Comparison()
 	for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); i++) {
 		Time time1(testData[i].time1);
 		Time time2(testData[i].time2);
-		HAM_TEST_ADD_INFO(TIME_COMPARE(time1, time2, testData[i].compare),
-						  "time1: %lld, time2: %lld",
-						  (long long)testData[i].time1,
-						  (long long)testData[i].time2)
+		HAM_TEST_ADD_INFO(
+			TIME_COMPARE(time1, time2, testData[i].compare),
+			"time1: %lld, time2: %lld",
+			(long long)testData[i].time1,
+			(long long)testData[i].time2
+		)
 	}
 }
 

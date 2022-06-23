@@ -30,9 +30,11 @@ struct Command : util::Referenceable {
 	};
 
   public:
-	Command(data::RuleActionsCall* actions,
-			const String& commandLine,
-			const StringList& boundTargetPaths);
+	Command(
+		data::RuleActionsCall* actions,
+		const String& commandLine,
+		const StringList& boundTargetPaths
+	);
 	~Command();
 
 	data::RuleActionsCall* Actions() const { return fActions; }

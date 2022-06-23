@@ -22,15 +22,17 @@ class StringTest : public test::TestFixture
 	void SubString();
 
 	// declare tests
-	HAM_ADD_TEST_CASES(StringTest,
-					   7,
-					   Constructor,
-					   CastOperator,
-					   Comparison,
-					   Assignment,
-					   Concatenation,
-					   ToLowerUpper,
-					   SubString)
+	HAM_ADD_TEST_CASES(
+		StringTest,
+		7,
+		Constructor,
+		CastOperator,
+		Comparison,
+		Assignment,
+		Concatenation,
+		ToLowerUpper,
+		SubString
+	)
 };
 
 } // namespace ham::tests

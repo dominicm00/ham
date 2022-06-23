@@ -10,8 +10,10 @@
 namespace ham::code
 {
 
-EvaluationContext::EvaluationContext(data::VariableDomain& globalVariables,
-									 data::TargetPool& targets)
+EvaluationContext::EvaluationContext(
+	data::VariableDomain& globalVariables,
+	data::TargetPool& targets
+)
 	: fCompatibility(behavior::COMPATIBILITY_HAM),
 	  fBehavior(fCompatibility),
 	  fGlobalVariables(globalVariables),
