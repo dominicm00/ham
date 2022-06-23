@@ -37,10 +37,7 @@ String::String(const String& other)
 	fBuffer->Acquire();
 }
 
-String::~String()
-{
-	fBuffer->Release();
-}
+String::~String() { fBuffer->Release(); }
 
 String
 String::SubString(size_t startOffset, size_t endOffset) const

@@ -5,9 +5,8 @@
 #ifndef HAM_DATA_STRING_PART_HPP
 #define HAM_DATA_STRING_PART_HPP
 
-#include <string.h>
-
 #include <algorithm>
+#include <string.h>
 #include <string>
 
 namespace ham

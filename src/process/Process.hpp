@@ -36,6 +36,6 @@ class Process
 	PlatformProcessDelegate fPlatformDelegate;
 };
 
-} // namespace ham:process
+} // namespace ham::process
 
 #endif // HAM_PROCESS_PROCESS_HPP

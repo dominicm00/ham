@@ -5,10 +5,10 @@
 #ifndef HAM_UTIL_SEQUENTIAL_SET_HPP
 #define HAM_UTIL_SEQUENTIAL_SET_HPP
 
+#include "util/Exception.hpp"
+
 #include <set>
 #include <vector>
-
-#include "util/Exception.hpp"
 
 namespace ham::util
 {
@@ -86,7 +86,10 @@ class SequentialSet<Element>::Iterator
 	{
 	}
 
-	bool HasNext() const { return fSet != nullptr && fNextIndex < fSet->Size(); }
+	bool HasNext() const
+	{
+		return fSet != nullptr && fNextIndex < fSet->Size();
+	}
 
 	const Element& Next() { return fSet->ElementAt(fNextIndex++); }
 

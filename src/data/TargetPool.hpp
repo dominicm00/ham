@@ -5,9 +5,9 @@
 #ifndef HAM_DATA_TARGET_POOL_HPP
 #define HAM_DATA_TARGET_POOL_HPP
 
-#include <map>
-
 #include "data/Target.hpp"
+
+#include <map>
 
 namespace ham::data
 {

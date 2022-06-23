@@ -5,14 +5,14 @@
 
 #include "code/BuiltInRules.hpp"
 
-#include <dirent.h>
-
 #include "code/EvaluationContext.hpp"
 #include "code/Rule.hpp"
 #include "code/RuleInstructions.hpp"
 #include "data/RegExp.hpp"
 #include "data/StringBuffer.hpp"
 #include "data/TargetPool.hpp"
+
+#include <dirent.h>
 
 namespace ham::code
 {
@@ -105,7 +105,7 @@ struct MatchInstructions : RuleInstructions {
 
 struct GlobInstructions : RuleInstructions {
   public:
-    StringList Evaluate(EvaluationContext&,
+	StringList Evaluate(EvaluationContext&,
 						const StringListList& parameters) override
 	{
 		using data::RegExp;
@@ -219,7 +219,7 @@ struct DependsInstructions : RuleInstructions {
 
 template<uint32_t kFlags>
 struct AddTargetFlagsRule : public RuleInstructions {
-    StringList Evaluate(EvaluationContext& context,
+	StringList Evaluate(EvaluationContext& context,
 						const StringListList& parameters) override
 	{
 		if (!parameters.empty()) {
@@ -269,11 +269,11 @@ BuiltInRules::RegisterRules(RulePool& rulePool)
 							 "Includes",
 							 "INCLUDES");
 
-#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag)                   \
-	_AddRuleConsumeReference(rulePool,                                         \
-							 name,                                             \
-							 new AddTargetFlagsRule<data::Target::flag>,       \
-							 alias1,                                           \
+#define HAM_ADD_TARGET_FLAG_RULE(name, alias1, alias2, flag)             \
+	_AddRuleConsumeReference(rulePool,                                   \
+							 name,                                       \
+							 new AddTargetFlagsRule<data::Target::flag>, \
+							 alias1,                                     \
 							 alias2)
 
 	HAM_ADD_TARGET_FLAG_RULE("always", "Always", "ALWAYS", BUILD_ALWAYS);

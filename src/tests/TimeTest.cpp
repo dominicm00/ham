@@ -5,25 +5,25 @@
 
 #include "tests/TimeTest.hpp"
 
-#include <sys/time.h>
-
 #include "data/Time.hpp"
+
+#include <sys/time.h>
 
 namespace ham::tests
 {
 
 using data::Time;
 
-#define TIME_COMPARE_WORK(time1, time2, expected)                              \
-	HAM_TEST_EQUAL(time1 == time2, expected == 0)                              \
-	HAM_TEST_EQUAL(time1 != time2, expected != 0)                              \
-	HAM_TEST_EQUAL(time1 < time2, expected < 0)                                \
-	HAM_TEST_EQUAL(time1 > time2, expected > 0)                                \
-	HAM_TEST_EQUAL(time1 <= time2, expected <= 0)                              \
+#define TIME_COMPARE_WORK(time1, time2, expected) \
+	HAM_TEST_EQUAL(time1 == time2, expected == 0) \
+	HAM_TEST_EQUAL(time1 != time2, expected != 0) \
+	HAM_TEST_EQUAL(time1 < time2, expected < 0)   \
+	HAM_TEST_EQUAL(time1 > time2, expected > 0)   \
+	HAM_TEST_EQUAL(time1 <= time2, expected <= 0) \
 	HAM_TEST_EQUAL(time1 >= time2, expected >= 0)
 
-#define TIME_COMPARE(time1, time2, expected)                                   \
-	TIME_COMPARE_WORK(time1, time2, expected)                                  \
+#define TIME_COMPARE(time1, time2, expected)  \
+	TIME_COMPARE_WORK(time1, time2, expected) \
 	TIME_COMPARE_WORK(time2, time1, -expected)
 
 void

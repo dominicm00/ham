@@ -37,10 +37,7 @@ TargetBuilder::TargetBuilder(const Options& options, const StringList& jamShell)
 {
 }
 
-TargetBuilder::~TargetBuilder()
-{
-	delete[] fJobSlots;
-}
+TargetBuilder::~TargetBuilder() { delete[] fJobSlots; }
 
 bool
 TargetBuilder::HasSpareJobSlots() const

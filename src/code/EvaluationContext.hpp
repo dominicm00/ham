@@ -5,12 +5,12 @@
 #ifndef HAM_CODE_EVALUATION_CONTEXT_HPP
 #define HAM_CODE_EVALUATION_CONTEXT_HPP
 
-#include <ostream>
-
 #include "behavior/Behavior.hpp"
 #include "code/Defs.hpp"
 #include "code/RulePool.hpp"
 #include "data/VariableScope.hpp"
+
+#include <ostream>
 
 namespace ham
 {

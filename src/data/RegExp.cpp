@@ -9,7 +9,6 @@
 #include "util/Referenceable.hpp"
 
 #include <regex.h>
-
 #include <vector>
 
 namespace ham::data
@@ -304,15 +303,17 @@ RegExp::MatchResult::HasMatched() const
 size_t
 RegExp::MatchResult::StartOffset() const
 {
-	return fData != nullptr && fData->MatchCount() > 0 ? fData->Matches()[0].rm_so
-													: 0;
+	return fData != nullptr && fData->MatchCount() > 0
+		? fData->Matches()[0].rm_so
+		: 0;
 }
 
 size_t
 RegExp::MatchResult::EndOffset() const
 {
-	return fData != nullptr && fData->MatchCount() > 0 ? fData->Matches()[0].rm_eo
-													: 0;
+	return fData != nullptr && fData->MatchCount() > 0
+		? fData->Matches()[0].rm_eo
+		: 0;
 }
 
 size_t

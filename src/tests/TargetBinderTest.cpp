@@ -260,8 +260,9 @@ TargetBinderTest::Bind()
 				HAM_TEST_ADD_INFO(
 					// The FS might not store the nanoseconds, so we only
 					// compare the seconds.
-					//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >=
-					//startTime) 				HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
+					//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
+					//>= startTime)
+					// HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
 					//<= endTime),
 					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
 									>= startTime.Seconds())

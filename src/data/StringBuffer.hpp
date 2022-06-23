@@ -5,9 +5,9 @@
 #ifndef HAM_DATA_STRING_BUFFER_HPP
 #define HAM_DATA_STRING_BUFFER_HPP
 
-#include <string>
-
 #include "data/String.hpp"
+
+#include <string>
 
 namespace ham
 {
@@ -50,7 +50,9 @@ class StringBuffer
 	friend inline Output& operator<<(Output& out, const StringBuffer& buffer);
 
   private:
-	enum { MIN_BUFFER_SIZE = 256 };
+	enum {
+		MIN_BUFFER_SIZE = 256
+	};
 
   private:
 	std::string fData;
@@ -170,15 +172,9 @@ StringBuffer::operator[](int index) const
 //	return std::string(Data());
 // }
 
-StringBuffer::operator String() const
-{
-	return String(Data());
-}
+StringBuffer::operator String() const { return String(Data()); }
 
-StringBuffer::operator const char*() const
-{
-	return Data();
-}
+StringBuffer::operator const char*() const { return Data(); }
 
 template<typename Output>
 inline Output&

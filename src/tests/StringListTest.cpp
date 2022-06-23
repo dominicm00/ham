@@ -5,11 +5,11 @@
 
 #include "tests/StringListTest.hpp"
 
+#include "data/StringList.hpp"
+
 #include <numeric>
 #include <string>
 #include <vector>
-
-#include "data/StringList.hpp"
 
 namespace ham::tests
 {
@@ -65,9 +65,9 @@ operator+(const TestListList& testListList, const TestList& testList)
 	return result;
 }
 
-#define LIST_EQUAL(actual, expected)                                           \
-	HAM_TEST_EQUAL(actual.Size(), (expected).size())                           \
-	HAM_TEST_EQUAL(actual, (expected))                                         \
+#define LIST_EQUAL(actual, expected)                 \
+	HAM_TEST_EQUAL(actual.Size(), (expected).size()) \
+	HAM_TEST_EQUAL(actual, (expected))               \
 	HAM_TEST_EQUAL(actual.IsEmpty(), (expected).empty())
 
 #define LIST_COMPARE_WORK(list1, list2, expected, expectedIgnoreTrailingEmpty) \
@@ -81,8 +81,8 @@ operator+(const TestListList& testListList, const TestList& testList)
 	HAM_TEST_EQUAL(list1 <= list2, expected <= 0)                              \
 	HAM_TEST_EQUAL(list1 >= list2, expected >= 0)
 
-#define LIST_COMPARE(list1, list2, expected, expectedIgnoreTrailingEmpty)      \
-	LIST_COMPARE_WORK(list1, list2, expected, expectedIgnoreTrailingEmpty)     \
+#define LIST_COMPARE(list1, list2, expected, expectedIgnoreTrailingEmpty)  \
+	LIST_COMPARE_WORK(list1, list2, expected, expectedIgnoreTrailingEmpty) \
 	LIST_COMPARE_WORK(list2, list1, -expected, -expectedIgnoreTrailingEmpty)
 
 void

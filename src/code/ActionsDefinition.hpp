@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_ACTIONS_DEFINITION_HPP
 #define HAM_CODE_ACTIONS_DEFINITION_HPP
 
-#include <stdint.h>
-
 #include "code/Node.hpp"
+
+#include <stdint.h>
 
 namespace ham::code
 {

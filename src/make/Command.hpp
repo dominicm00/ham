@@ -22,7 +22,12 @@ namespace make
 class TargetBuildInfo;
 
 struct Command : util::Referenceable {
-	enum State { NOT_EXECUTED, IN_PROGRESS, SUCCEEDED, FAILED };
+	enum State {
+		NOT_EXECUTED,
+		IN_PROGRESS,
+		SUCCEEDED,
+		FAILED
+	};
 
   public:
 	Command(data::RuleActionsCall* actions,

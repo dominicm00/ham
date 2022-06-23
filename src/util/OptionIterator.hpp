@@ -54,7 +54,11 @@ class OptionIterator
   private:
 	typedef OptionSpecification::Option Option;
 
-	enum Status { MORE_OPTIONS, NO_MORE_OPTIONS, ERROR };
+	enum Status {
+		MORE_OPTIONS,
+		NO_MORE_OPTIONS,
+		ERROR
+	};
 
   private:
 	void _FindNext() { fStatus = _FindNextInternal(); }

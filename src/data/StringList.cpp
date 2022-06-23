@@ -84,10 +84,7 @@ StringList::StringList(const StringList& other)
 	fData->Acquire();
 }
 
-StringList::~StringList()
-{
-	fData->Release();
-}
+StringList::~StringList() { fData->Release(); }
 
 bool
 StringList::IsTrue() const

@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_DUMP_CONTEXT_HPP
 #define HAM_CODE_DUMP_CONTEXT_HPP
 
-#include <sstream>
-
 #include "data/String.hpp"
+
+#include <sstream>
 
 namespace ham::code
 {

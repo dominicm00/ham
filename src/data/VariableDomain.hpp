@@ -5,9 +5,9 @@
 #ifndef HAM_DATA_VARIABLE_DOMAIN_HPP
 #define HAM_DATA_VARIABLE_DOMAIN_HPP
 
-#include <map>
-
 #include "StringList.hpp"
+
+#include <map>
 
 namespace ham::data
 {

@@ -5,13 +5,13 @@
 
 #include "test/TemplateBasedTest.hpp"
 
-#include <sstream>
-
 #include "behavior/Behavior.hpp"
 #include "parser/ParseException.hpp"
 #include "test/TestException.hpp"
 #include "test/TestFixture.hpp"
 #include "util/Constants.hpp"
+
+#include <sstream>
 
 namespace ham::test
 {

@@ -13,7 +13,13 @@ namespace ham::data
 class FileStatus
 {
   public:
-	enum Type { NONE, FILE, DIRECTORY, SYMLINK, OTHER };
+	enum Type {
+		NONE,
+		FILE,
+		DIRECTORY,
+		SYMLINK,
+		OTHER
+	};
 
   public:
 	FileStatus();

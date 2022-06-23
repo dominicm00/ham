@@ -57,18 +57,18 @@ Jump<JumpType>::Dump(DumpContext& context) const
 
 // define and instantiate the specializations
 
-#define HAM_DEFINE_JUMP_STATEMENT(name, condition)                             \
-	struct JumpType##name {                                                    \
-		static const char* const kName;                                        \
-                                                                               \
-		static inline void Setup(EvaluationContext& context)                   \
-		{                                                                      \
-			context.SetJumpCondition(condition);                               \
-		}                                                                      \
-	};                                                                         \
-                                                                               \
-	const char* const JumpType##name::kName = #name;                           \
-                                                                               \
+#define HAM_DEFINE_JUMP_STATEMENT(name, condition)           \
+	struct JumpType##name {                                  \
+		static const char* const kName;                      \
+                                                             \
+		static inline void Setup(EvaluationContext& context) \
+		{                                                    \
+			context.SetJumpCondition(condition);             \
+		}                                                    \
+	};                                                       \
+                                                             \
+	const char* const JumpType##name::kName = #name;         \
+                                                             \
 	template class Jump<JumpType##name>;
 
 // TODO: Set correct jump statements!

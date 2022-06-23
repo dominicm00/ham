@@ -18,13 +18,31 @@ typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 class MakeTarget
 {
   public:
-	enum ProcessingState { UNPROCESSED, PROCESSING, PROCESSED };
+	enum ProcessingState {
+		UNPROCESSED,
+		PROCESSING,
+		PROCESSED
+	};
 
-	enum State { UP_TO_DATE, OUT_OF_DATE, MISSING };
+	enum State {
+		UP_TO_DATE,
+		OUT_OF_DATE,
+		MISSING
+	};
 
-	enum Fate { MAKE, MAKE_IF_NEEDED, KEEP, CANT_MAKE };
+	enum Fate {
+		MAKE,
+		MAKE_IF_NEEDED,
+		KEEP,
+		CANT_MAKE
+	};
 
-	enum MakeState { DONE, PENDING, FAILED, SKIPPED };
+	enum MakeState {
+		DONE,
+		PENDING,
+		FAILED,
+		SKIPPED
+	};
 
   public:
 	MakeTarget(const data::Target* target);

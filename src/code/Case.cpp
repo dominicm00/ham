@@ -19,10 +19,7 @@ Case::Case(const String& pattern, Node* block)
 	fBlock->AcquireReference();
 }
 
-Case::~Case()
-{
-	fBlock->ReleaseReference();
-}
+Case::~Case() { fBlock->ReleaseReference(); }
 
 bool
 Case::Matches(EvaluationContext&, const StringList& value) const

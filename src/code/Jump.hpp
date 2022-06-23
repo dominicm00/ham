@@ -27,8 +27,8 @@ class Jump : public Node
 
 // declare the specializations
 
-#define HAM_DECLARE_JUMP_STATEMENT(name)                                       \
-	struct JumpType##name;                                                     \
+#define HAM_DECLARE_JUMP_STATEMENT(name) \
+	struct JumpType##name;               \
 	typedef Jump<JumpType##name> name;
 
 HAM_DECLARE_JUMP_STATEMENT(Break)

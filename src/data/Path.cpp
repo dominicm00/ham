@@ -5,9 +5,9 @@
 
 #include "data/Path.hpp"
 
-#include <sys/stat.h>
-
 #include "data/FileStatus.hpp"
+
+#include <sys/stat.h>
 
 namespace ham::data
 {

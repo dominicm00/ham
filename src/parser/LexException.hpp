@@ -5,9 +5,9 @@
 #ifndef HAM_PARSER_LEX_EXCEPTION_HPP
 #define HAM_PARSER_LEX_EXCEPTION_HPP
 
-#include <string>
-
 #include "parser/ParsePosition.hpp"
+
+#include <string>
 
 namespace ham::parser
 {

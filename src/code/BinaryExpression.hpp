@@ -28,8 +28,8 @@ class BinaryExpression : public Node
 
 // declare the specializations
 
-#define HAM_DECLARE_OPERATOR_EXPRESSION(name)                                  \
-	struct name##Operator;                                                     \
+#define HAM_DECLARE_OPERATOR_EXPRESSION(name) \
+	struct name##Operator;                    \
 	typedef BinaryExpression<name##Operator> name##Expression;
 
 HAM_DECLARE_OPERATOR_EXPRESSION(Equal)

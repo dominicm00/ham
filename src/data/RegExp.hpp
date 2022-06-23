@@ -13,7 +13,10 @@ namespace ham::data
 class RegExp
 {
   public:
-	enum PatternType { PATTERN_TYPE_REGULAR_EXPRESSION, PATTERN_TYPE_WILDCARD };
+	enum PatternType {
+		PATTERN_TYPE_REGULAR_EXPRESSION,
+		PATTERN_TYPE_WILDCARD
+	};
 
 	class MatchResult;
 

@@ -4,6 +4,7 @@
  */
 
 #include "make/TargetBuildInfo.hpp"
+
 #include "make/Command.hpp"
 
 namespace ham::make

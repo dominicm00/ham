@@ -5,10 +5,10 @@
 #ifndef HAM_DATA_TIME_HPP
 #define HAM_DATA_TIME_HPP
 
+#include "String.hpp"
+
 #include <stddef.h>
 #include <stdint.h>
-
-#include "String.hpp"
 
 namespace ham::data
 {

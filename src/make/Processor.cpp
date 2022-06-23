@@ -5,10 +5,6 @@
 
 #include "make/Processor.hpp"
 
-#include <fstream>
-#include <memory>
-#include <stdarg.h>
-
 #include "behavior/Compatibility.hpp"
 #include "code/Block.hpp"
 #include "code/BuiltInRules.hpp"
@@ -25,6 +21,10 @@
 #include "parser/Parser.hpp"
 #include "ruleset/HamRuleset.hpp"
 #include "ruleset/JamRuleset.hpp"
+
+#include <fstream>
+#include <memory>
+#include <stdarg.h>
 
 namespace ham::make
 {

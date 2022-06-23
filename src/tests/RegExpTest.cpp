@@ -5,10 +5,10 @@
 
 #include "tests/RegExpTest.hpp"
 
+#include "data/RegExp.hpp"
+
 #include <utility>
 #include <vector>
-
-#include "data/RegExp.hpp"
 
 namespace ham::tests
 {

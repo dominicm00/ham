@@ -5,13 +5,13 @@
 #ifndef HAM_DATA_STRING_LIST_OPERATIONS_HPP
 #define HAM_DATA_STRING_LIST_OPERATIONS_HPP
 
-#include <stdint.h>
-
 #include "behavior/Behavior.hpp"
 #include "data/Path.hpp"
 #include "data/StringBuffer.hpp"
 #include "data/StringList.hpp"
 #include "data/StringPart.hpp"
+
+#include <stdint.h>
 
 namespace ham::data
 {

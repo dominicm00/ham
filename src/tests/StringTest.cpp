@@ -5,9 +5,9 @@
 
 #include "tests/StringTest.hpp"
 
-#include <string>
-
 #include "data/String.hpp"
+
+#include <string>
 
 namespace ham::tests
 {
@@ -20,23 +20,23 @@ sign(int number)
 	return number == 0 ? 0 : (number < 0 ? -1 : 1);
 }
 
-#define STRING_EQUAL(actual, expected)                                         \
-	HAM_TEST_EQUAL(actual.ToCString(), std::string(expected))                  \
-	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected))                \
-	HAM_TEST_EQUAL(actual.Length(), strlen(expected))                          \
+#define STRING_EQUAL(actual, expected)                          \
+	HAM_TEST_EQUAL(actual.ToCString(), std::string(expected))   \
+	HAM_TEST_EQUAL(actual.ToStlString(), std::string(expected)) \
+	HAM_TEST_EQUAL(actual.Length(), strlen(expected))           \
 	HAM_TEST_EQUAL(actual.IsEmpty(), strlen(expected) == 0)
 
-#define STRING_COMPARE_WORK(string1, string2, expected)                        \
-	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected)               \
-	HAM_TEST_EQUAL(string1 == string2, expected == 0)                          \
-	HAM_TEST_EQUAL(string1 != string2, expected != 0)                          \
-	HAM_TEST_EQUAL(string1 < string2, expected < 0)                            \
-	HAM_TEST_EQUAL(string1 > string2, expected > 0)                            \
-	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)                          \
+#define STRING_COMPARE_WORK(string1, string2, expected)          \
+	HAM_TEST_EQUAL(sign(string1.CompareWith(string2)), expected) \
+	HAM_TEST_EQUAL(string1 == string2, expected == 0)            \
+	HAM_TEST_EQUAL(string1 != string2, expected != 0)            \
+	HAM_TEST_EQUAL(string1 < string2, expected < 0)              \
+	HAM_TEST_EQUAL(string1 > string2, expected > 0)              \
+	HAM_TEST_EQUAL(string1 <= string2, expected <= 0)            \
 	HAM_TEST_EQUAL(string1 >= string2, expected >= 0)
 
-#define STRING_COMPARE(string1, string2, expected)                             \
-	STRING_COMPARE_WORK(string1, string2, expected)                            \
+#define STRING_COMPARE(string1, string2, expected)  \
+	STRING_COMPARE_WORK(string1, string2, expected) \
 	STRING_COMPARE_WORK(string2, string1, -expected)
 
 void

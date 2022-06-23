@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_BLOCK_HPP
 #define HAM_CODE_BLOCK_HPP
 
-#include <list>
-
 #include "code/Node.hpp"
+
+#include <list>
 
 namespace ham::code
 {

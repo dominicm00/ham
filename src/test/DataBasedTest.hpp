@@ -5,11 +5,11 @@
 #ifndef HAM_TEST_DATA_BASED_TEST_HPP
 #define HAM_TEST_DATA_BASED_TEST_HPP
 
+#include "test/RunnableTest.hpp"
+
 #include <map>
 #include <set>
 #include <vector>
-
-#include "test/RunnableTest.hpp"
 
 namespace ham::test
 {

@@ -5,10 +5,10 @@
 #ifndef HAM_CODE_CODE_HPP
 #define HAM_CODE_CODE_HPP
 
-#include <list>
-
 #include "data/StringList.hpp"
 #include "util/Referenceable.hpp"
+
+#include <list>
 
 namespace ham::code
 {
@@ -28,7 +28,7 @@ class NodeVisitor
   public:
 	virtual ~NodeVisitor();
 
-    /**
+	/**
 	 * Called on all Node objects in a subtree.
 	 *
 	 * \param[in] node Node to visit.
@@ -67,7 +67,7 @@ class Node : public Referenceable
 	 * match. A simple example is provided below:
 
 	 \code
-     if (visitor.VisitNode(this))
+	 if (visitor.VisitNode(this))
 	   return this;
 
 	 if (Node* result = fLeft->Visit(visitor))

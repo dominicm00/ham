@@ -5,13 +5,13 @@
 
 #include "test/DataBasedTest.hpp"
 
-#include <fstream>
-#include <sstream>
-
 #include "behavior/Behavior.hpp"
 #include "test/TestException.hpp"
 #include "test/TestFixture.hpp"
 #include "util/TextFileException.hpp"
+
+#include <fstream>
+#include <sstream>
 
 namespace ham::test
 {
@@ -57,7 +57,8 @@ DataBasedTest::CreateFixture(TestEnvironment* /* environment */)
 }
 
 void
-DataBasedTest::DeleteFixture(TestEnvironment* /* environment */, void* /* fixture */)
+DataBasedTest::DeleteFixture(TestEnvironment* /* environment */,
+							 void* /* fixture */)
 {
 }
 

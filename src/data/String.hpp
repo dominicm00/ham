@@ -5,14 +5,13 @@
 #ifndef HAM_DATA_STRING_HPP
 #define HAM_DATA_STRING_HPP
 
-#include <string.h>
+#include "data/StringPart.hpp"
+#include "util/Referenceable.hpp"
 
 #include <list>
 #include <ostream>
+#include <string.h>
 #include <string>
-
-#include "data/StringPart.hpp"
-#include "util/Referenceable.hpp"
 
 namespace ham
 {

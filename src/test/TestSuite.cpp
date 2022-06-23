@@ -22,7 +22,8 @@ TestSuite::~TestSuite()
 test::Test*
 TestSuite::TestAt(int index) const
 {
-	return index >= 0 && (size_t)index < fTests.size() ? fTests[index] : nullptr;
+	return index >= 0 && (size_t)index < fTests.size() ? fTests[index]
+													   : nullptr;
 }
 
 test::Test*

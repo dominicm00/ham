@@ -4,22 +4,22 @@
  */
 
 #include "test/TestFixture.hpp"
-#include <dirent.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <utime.h>
-
-#include <fstream>
-#include <iterator>
-#include <sstream>
 
 #include "data/FileStatus.hpp"
 #include "make/Processor.hpp"
 #include "test/TestEnvironment.hpp"
 #include "util/Constants.hpp"
+
+#include <dirent.h>
+#include <errno.h>
+#include <fstream>
+#include <iterator>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <utime.h>
 
 namespace ham::test
 {
@@ -99,10 +99,7 @@ TestFixture::TemporaryDirectoryCreator::Delete()
 
 TestFixture::CodeExecuter::CodeExecuter() {}
 
-TestFixture::CodeExecuter::~CodeExecuter()
-{
-	Cleanup();
-}
+TestFixture::CodeExecuter::~CodeExecuter() { Cleanup(); }
 
 void
 TestFixture::CodeExecuter::Execute(
@@ -469,13 +466,13 @@ TestFixture::MakePath(const char* head, const char* tail)
 	// TODO: Path delimiter!
 }
 
-#define DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(type)                     \
-	template<>                                                                 \
-	std::string TestFixture::ValueToString<type>(const type& value)            \
-	{                                                                          \
-		std::ostringstream stream;                                             \
-		stream << value;                                                       \
-		return stream.str();                                                   \
+#define DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(type)          \
+	template<>                                                      \
+	std::string TestFixture::ValueToString<type>(const type& value) \
+	{                                                               \
+		std::ostringstream stream;                                  \
+		stream << value;                                            \
+		return stream.str();                                        \
 	}
 
 DEFINE_SSTEAM_VALUE_TO_STRING_SPECIALIZATION(char)

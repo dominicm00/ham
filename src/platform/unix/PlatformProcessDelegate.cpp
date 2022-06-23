@@ -5,14 +5,14 @@
 
 #include "platform/unix/PlatformProcessDelegate.hpp"
 
+#include "process/ChildInfo.hpp"
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-#include "process/ChildInfo.hpp"
 
 namespace ham::process
 {

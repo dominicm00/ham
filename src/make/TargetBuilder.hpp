@@ -5,12 +5,11 @@
 #ifndef HAM_MAKE_TARGET_BUILDER_HPP
 #define HAM_MAKE_TARGET_BUILDER_HPP
 
-#include <stddef.h>
-
-#include <vector>
-
 #include "data/StringList.hpp"
 #include "process/Process.hpp"
+
+#include <stddef.h>
+#include <vector>
 
 namespace ham::make
 {

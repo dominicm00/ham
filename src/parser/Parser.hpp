@@ -5,10 +5,10 @@
 #ifndef HAM_PARSER_PARSER_HPP
 #define HAM_PARSER_PARSER_HPP
 
-#include <iterator>
-
 #include "code/Defs.hpp"
 #include "parser/Lexer.hpp"
+
+#include <iterator>
 
 namespace ham
 {
@@ -18,7 +18,7 @@ namespace code
 class Block;
 class List;
 class Node;
-}
+} // namespace code
 
 namespace parser
 {

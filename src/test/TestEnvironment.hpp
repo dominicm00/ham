@@ -5,9 +5,9 @@
 #ifndef HAM_TEST_TEST_ENVIRONMENT_HPP
 #define HAM_TEST_TEST_ENVIRONMENT_HPP
 
-#include <string>
-
 #include "behavior/Compatibility.hpp"
+
+#include <string>
 
 namespace ham::test
 {

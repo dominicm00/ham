@@ -6,13 +6,11 @@
 #define HAM_DATA_STRING_LIST_HPP
 
 #include "data/String.hpp"
-
-#include <stdlib.h>
+#include "util/Referenceable.hpp"
 
 #include <new>
+#include <stdlib.h>
 #include <vector>
-
-#include "util/Referenceable.hpp"
 
 namespace ham
 {
@@ -156,7 +154,10 @@ class StringList::Iterator
 	{
 	}
 
-	bool HasNext() const { return fList != nullptr && fNextIndex < fList->fSize; }
+	bool HasNext() const
+	{
+		return fList != nullptr && fNextIndex < fList->fSize;
+	}
 
 	String Next()
 	{

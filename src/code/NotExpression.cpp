@@ -17,10 +17,7 @@ NotExpression::NotExpression(Node* child)
 	fChild->AcquireReference();
 }
 
-NotExpression::~NotExpression()
-{
-	fChild->ReleaseReference();
-}
+NotExpression::~NotExpression() { fChild->ReleaseReference(); }
 
 code::Node*
 NotExpression::Visit(NodeVisitor& visitor)

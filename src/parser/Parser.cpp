@@ -5,14 +5,6 @@
 
 #include "parser/Parser.hpp"
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <fstream>
-#include <iostream>
-#include <memory>
-#include <sstream>
-
 #include "code/ActionsDefinition.hpp"
 #include "code/Assignment.hpp"
 #include "code/BinaryExpression.hpp"
@@ -36,6 +28,13 @@
 #include "data/RuleActions.hpp"
 #include "parser/ParseException.hpp"
 
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <stdlib.h>
+#include <string.h>
+
 namespace ham::parser
 {
 
@@ -55,7 +54,7 @@ struct ActionsFlagMap : std::map<data::String, uint32_t> {
 };
 
 static ActionsFlagMap sActionsFlags;
-}
+} // namespace
 
 // #pragma mark - Listener
 

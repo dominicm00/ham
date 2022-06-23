@@ -5,11 +5,11 @@
 #ifndef HAM_TEST_RUNNABLE_TEST_HPP
 #define HAM_TEST_RUNNABLE_TEST_HPP
 
-#include <memory>
-#include <vector>
-
 #include "test/Test.hpp"
 #include "test/TestEnvironment.hpp"
+
+#include <memory>
+#include <vector>
 
 namespace ham::test
 {
@@ -109,7 +109,7 @@ class GenericRunnableTest : public RunnableTest
 
 	template<typename Type>
 	//	static void InitTestCase(Type* fixture, char[sizeof(&
-	//Type::InitTestCase)])
+	// Type::InitTestCase)])
 	static void InitTestCase(Type* fixture, decltype(&Type::InitTestCase))
 	{
 		fixture->InitTestCase();

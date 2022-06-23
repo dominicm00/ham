@@ -3,14 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <dirent.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <memory>
-
 #include "parser/ParseException.hpp"
 #include "test/DataBasedTestParser.hpp"
 #include "test/RunnableTest.hpp"
@@ -25,6 +17,13 @@
 #include "tests/TargetBinderTest.hpp"
 #include "tests/TimeTest.hpp"
 #include "tests/VariableExpansionTest.hpp"
+
+#include <dirent.h>
+#include <memory>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 using namespace ham;
 
@@ -266,8 +265,9 @@ main(int argc, const char* const* argv)
 					// If not explicitly given, guess the jam version.
 					if (!explicitCompatibility) {
 						const char* slash = strrchr(jamExecutable.c_str(), '/');
-						const char* baseName =
-							slash != nullptr ? slash + 1 : jamExecutable.c_str();
+						const char* baseName = slash != nullptr
+							? slash + 1
+							: jamExecutable.c_str();
 						if (strcmp(baseName, "jam") == 0)
 							compatibility = behavior::COMPATIBILITY_JAM;
 						else if (strcmp(baseName, "bjam") == 0)

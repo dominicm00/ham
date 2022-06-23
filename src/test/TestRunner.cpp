@@ -5,11 +5,11 @@
 
 #include "test/TestRunner.hpp"
 
-#include <stdio.h>
-
 #include "test/RunnableTest.hpp"
 #include "test/TestException.hpp"
 #include "test/TestSuite.hpp"
+
+#include <stdio.h>
 
 namespace ham::test
 {

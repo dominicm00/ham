@@ -5,10 +5,10 @@
 #ifndef HAM_UTIL_TEXT_FILE_EXCEPTION_HPP
 #define HAM_UTIL_TEXT_FILE_EXCEPTION_HPP
 
-#include <string>
-
 #include "util/Exception.hpp"
 #include "util/TextFilePosition.hpp"
+
+#include <string>
 
 namespace ham::util
 {

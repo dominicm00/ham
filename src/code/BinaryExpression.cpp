@@ -63,24 +63,22 @@ BinaryExpression<Operator>::Dump(DumpContext& context) const
 
 // define and instantiate the specializations
 
-#define HAM_DEFINE_OPERATOR_EXPRESSION(name, symbol, expression)               \
-	struct name##Operator {                                                    \
-		static const char* const kSymbol;                                      \
-                                                                               \
-		static StringList Do(const StringList& a, const StringList& b)         \
-		{                                                                      \
-			return expression ? StringList::True() : StringList::False();      \
-		}                                                                      \
-	};                                                                         \
-                                                                               \
-	const char* const name##Operator::kSymbol = #symbol;                       \
-                                                                               \
+#define HAM_DEFINE_OPERATOR_EXPRESSION(name, symbol, expression)          \
+	struct name##Operator {                                               \
+		static const char* const kSymbol;                                 \
+                                                                          \
+		static StringList Do(const StringList& a, const StringList& b)    \
+		{                                                                 \
+			return expression ? StringList::True() : StringList::False(); \
+		}                                                                 \
+	};                                                                    \
+                                                                          \
+	const char* const name##Operator::kSymbol = #symbol;                  \
+                                                                          \
 	template class BinaryExpression<name##Operator>;
 
-#define HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(name, symbol, oper)	\
-	HAM_DEFINE_OPERATOR_EXPRESSION(name,								\
-								   symbol,								\
-								   a.CompareWith(b, true) oper 0)
+#define HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(name, symbol, oper) \
+	HAM_DEFINE_OPERATOR_EXPRESSION(name, symbol, a.CompareWith(b, true) oper 0)
 
 HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(Equal, =, ==)
 HAM_DEFINE_COMPARISON_OPERATOR_EXPRESSION(NotEqual, !=, !=)

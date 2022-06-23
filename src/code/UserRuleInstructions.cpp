@@ -5,11 +5,11 @@
 
 #include "code/UserRuleInstructions.hpp"
 
-#include <stdio.h>
-
 #include "code/EvaluationContext.hpp"
 #include "code/Node.hpp"
 #include "data/VariableScope.hpp"
+
+#include <stdio.h>
 
 namespace ham::code
 {
@@ -24,10 +24,7 @@ UserRuleInstructions::UserRuleInstructions(const StringList& parameterNames,
 	fBlock->AcquireReference();
 }
 
-UserRuleInstructions::~UserRuleInstructions()
-{
-	fBlock->ReleaseReference();
-}
+UserRuleInstructions::~UserRuleInstructions() { fBlock->ReleaseReference(); }
 
 StringList
 UserRuleInstructions::Evaluate(EvaluationContext& context,

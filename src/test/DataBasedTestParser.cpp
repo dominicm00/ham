@@ -5,12 +5,12 @@
 
 #include "test/DataBasedTestParser.hpp"
 
-#include <memory>
-#include <vector>
-
 #include "parser/ParseException.hpp"
 #include "test/MultipleFilesDataBasedTest.hpp"
 #include "test/TemplateBasedTest.hpp"
+
+#include <memory>
+#include <vector>
 
 namespace ham::test
 {

@@ -3,16 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <string.h>
-#include <unistd.h>
-
-#include <map>
-
 #include "make/MakeException.hpp"
 #include "make/Options.hpp"
 #include "make/Processor.hpp"
 #include "util/OptionIterator.hpp"
 #include "util/TextFileException.hpp"
+
+#include <map>
+#include <string.h>
+#include <unistd.h>
 
 using namespace ham;
 

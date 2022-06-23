@@ -5,10 +5,6 @@
 
 #include "code/Include.hpp"
 
-#include <fstream>
-#include <memory>
-#include <sstream>
-
 #include "code/Block.hpp"
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
@@ -19,6 +15,10 @@
 #include "parser/Parser.hpp"
 #include "util/Constants.hpp"
 
+#include <fstream>
+#include <memory>
+#include <sstream>
+
 namespace ham::code
 {
 
@@ -28,10 +28,7 @@ Include::Include(Node* fileNames)
 	fFileNames->AcquireReference();
 }
 
-Include::~Include()
-{
-	fFileNames->ReleaseReference();
-}
+Include::~Include() { fFileNames->ReleaseReference(); }
 
 StringList
 Include::Evaluate(EvaluationContext& context)

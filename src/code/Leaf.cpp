@@ -5,13 +5,13 @@
 
 #include "code/Leaf.hpp"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
 #include "data/StringListOperations.hpp"
+
+#include <algorithm>
+#include <limits>
+#include <utility>
 
 namespace ham::code
 {
@@ -290,8 +290,10 @@ Leaf::_EvaluateVariableExpression(EvaluationContext& context,
 	// Expand and parse the subscripts.
 	std::vector<std::pair<size_t, size_t>> subscripts;
 	if (openingBracket != nullptr) {
-		StringList subscriptStrings =
-			EvaluateString(context, openingBracket + 1, closingBracket, nullptr);
+		StringList subscriptStrings = EvaluateString(context,
+													 openingBracket + 1,
+													 closingBracket,
+													 nullptr);
 		if (subscriptStrings.IsEmpty())
 			return StringList();
 

@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_RULE_POOL_HPP
 #define HAM_CODE_RULE_POOL_HPP
 
-#include <map>
-
 #include "code/Rule.hpp"
+
+#include <map>
 
 namespace ham::code
 {

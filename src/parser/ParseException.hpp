@@ -5,10 +5,10 @@
 #ifndef HAM_PARSER_PARSE_EXCEPTION_HPP
 #define HAM_PARSER_PARSE_EXCEPTION_HPP
 
-#include <string>
-
 #include "parser/ParsePosition.hpp"
 #include "util/TextFileException.hpp"
+
+#include <string>
 
 namespace ham::parser
 {

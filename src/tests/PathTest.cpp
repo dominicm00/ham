@@ -130,6 +130,7 @@ PathTest::Make()
 
 	const char* const testDataContext[] =
 		{"", "xyz", "xyz/", "xyz/abc", "/xyz", "/xyz/abc", "/xyz/abc/"};
+
 	const size_t testDataContextCount =
 		sizeof(testDataContext) / sizeof(testDataContext[0]);
 
@@ -241,8 +242,9 @@ PathTest::GetFileStatus()
 				// The FS might not store the nanoseconds, so we only compare
 				// the seconds.
 				//				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() >=
-				//startTime) 				HAM_TEST_VERIFY(fileStatus.LastModifiedTime() <=
-				//endTime),
+				// startTime)
+				// HAM_TEST_VERIFY(fileStatus.LastModifiedTime()
+				// <= endTime),
 				HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()
 								>= startTime.Seconds())
 					HAM_TEST_VERIFY(fileStatus.LastModifiedTime().Seconds()

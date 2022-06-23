@@ -5,19 +5,19 @@
 #ifndef HAM_PARSER_LEXER_HPP
 #define HAM_PARSER_LEXER_HPP
 
-#include <map>
-#include <stdexcept>
-
 #include "data/StringBuffer.hpp"
 #include "parser/LexException.hpp"
 #include "parser/Token.hpp"
+
+#include <map>
+#include <stdexcept>
 
 //#define TRACE_PARSER_LEXER
 #ifdef TRACE_PARSER_LEXER
 #define TRACE(...) printf(__VA_ARGS__)
 #else
-#define TRACE(...)                                                             \
-	do {                                                                       \
+#define TRACE(...) \
+	do {           \
 	} while (false)
 #endif
 

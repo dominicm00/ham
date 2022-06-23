@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_SWITCH_HPP
 #define HAM_CODE_SWITCH_HPP
 
-#include <list>
-
 #include "code/Case.hpp"
+
+#include <list>
 
 namespace ham::code
 {

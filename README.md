@@ -89,6 +89,12 @@ make
 
 You can then run `make install` to install Ham on your system.
 
+## Contributing
+To contribute to Ham, you'll need:
+- `clang-format` v14 or above
+
+Before submitting a pull request, make sure to run the `format.sh` script.
+
 [^1]: Debug information/levels differ between `ham`, `jam`, and `b2`.
 [^2]: `jam` has several bugs with their implementation of concurrent actions.
 [^3]: In `-cham` mode, `-q` is enabled by default, but the flag is accepted for

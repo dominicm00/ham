@@ -5,10 +5,10 @@
 #ifndef HAM_TEST_TEST_SUITE_HPP
 #define HAM_TEST_TEST_SUITE_HPP
 
-#include <vector>
-
 #include "test/RunnableTest.hpp"
 #include "test/Test.hpp"
+
+#include <vector>
 
 namespace ham::test
 {

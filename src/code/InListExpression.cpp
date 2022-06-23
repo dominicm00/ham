@@ -5,10 +5,10 @@
 
 #include "code/InListExpression.hpp"
 
-#include <algorithm>
-
 #include "code/DumpContext.hpp"
 #include "code/EvaluationContext.hpp"
+
+#include <algorithm>
 
 namespace ham::code
 {

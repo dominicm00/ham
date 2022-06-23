@@ -5,9 +5,9 @@
 #ifndef HAM_CODE_LIST_HPP
 #define HAM_CODE_LIST_HPP
 
-#include <vector>
-
 #include "code/Node.hpp"
+
+#include <vector>
 
 namespace ham::code
 {

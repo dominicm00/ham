@@ -22,9 +22,6 @@ Command::Command(data::RuleActionsCall* actions,
 	fActions->AcquireReference();
 }
 
-Command::~Command()
-{
-	fActions->ReleaseReference();
-}
+Command::~Command() { fActions->ReleaseReference(); }
 
 } // namespace ham::make
