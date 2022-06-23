@@ -27,7 +27,7 @@ class RegExpTest : public test::TestFixture
 	)
 
   private:
-	struct Matches;
+	class Matches;
 };
 
 } // namespace ham::tests

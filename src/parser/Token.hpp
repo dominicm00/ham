@@ -65,10 +65,11 @@ enum TokenID {
 	TOKEN_EOF
 };
 
-struct Token : data::String {
+class Token : public data::String
+{
+  public:
 	typedef TokenID id_type;
 
-  public:
 	Token()
 		: fID(TOKEN_STRING)
 	{

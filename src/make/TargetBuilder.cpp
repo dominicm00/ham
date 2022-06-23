@@ -14,11 +14,12 @@
 namespace ham::make
 {
 
-struct TargetBuilder::JobSlot {
+class TargetBuilder::JobSlot
+{
+  public:
 	process::Process fProcess;
 	Command* fCommand;
 
-  public:
 	JobSlot()
 		: fProcess(),
 		  fCommand(nullptr)

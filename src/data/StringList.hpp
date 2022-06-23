@@ -81,7 +81,9 @@ class StringList
 	StringList& operator=(const StringList& other);
 
   private:
-	struct Data {
+	class Data
+	{
+	  public:
 		static Data* Create(size_t capacity)
 		{
 			void* memory = malloc(sizeof(Data) + sizeof(String) * capacity);

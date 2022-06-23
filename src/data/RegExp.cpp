@@ -16,7 +16,9 @@ namespace ham::data
 
 // #pragma mark - RegExp::Data
 
-struct RegExp::Data {
+class RegExp::Data
+{
+  public:
 	Data(const char* pattern, PatternType patternType)
 		: fReferenceCount(1)
 	{
@@ -138,7 +140,9 @@ struct RegExp::Data {
 
 // #pragma mark - RegExp::MatchResultData
 
-struct RegExp::MatchResultData {
+class RegExp::MatchResultData
+{
+  public:
 	MatchResultData(const regex_t* compiledExpression, const char* string)
 		: fReferenceCount(1),
 		  fMatchCount(0),

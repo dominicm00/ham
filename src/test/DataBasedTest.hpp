@@ -39,7 +39,9 @@ class DataBasedTest : public RunnableTest
 	RunTestCase(TestEnvironment* environment, void* fixture, int index);
 
   protected:
-	struct DataSetBase {
+	class DataSetBase
+	{
+	  public:
 		DataSetBase(
 			const std::map<std::string, std::string>& outputFiles,
 			const std::set<std::string>& missingOutputFiles,

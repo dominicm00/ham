@@ -38,7 +38,9 @@ class TemplateBasedTest : public DataBasedTest
 	) const;
 
   private:
-	struct DataSet : public DataSetBase {
+	class DataSet : public DataSetBase
+	{
+	  public:
 		DataSet(
 			const std::vector<std::string>& input,
 			const std::map<std::string, std::string>& outputFiles,

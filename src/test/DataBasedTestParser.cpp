@@ -59,7 +59,8 @@ join_file_content(const std::vector<std::string>& input)
 	return inputCode;
 }
 
-struct DataBasedTestParser::TestFile {
+class DataBasedTestParser::TestFile
+{
   public:
 	TestFile(
 		const std::vector<std::string>& content,
@@ -81,7 +82,9 @@ struct DataBasedTestParser::TestFile {
 	bool fJoinContent;
 };
 
-struct DataBasedTestParser::TestCase {
+class DataBasedTestParser::TestCase
+{
+  public:
 	TestCase(
 		const std::vector<TestFile>& inputFiles,
 		const std::vector<TestFile>& outputFiles,

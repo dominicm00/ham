@@ -31,7 +31,9 @@ template<typename BaseIterator>
 class Lexer
 {
   private:
-	struct Iterator {
+	class Iterator
+	{
+	  public:
 		Iterator()
 			: fLine(0),
 			  fColumn(0)

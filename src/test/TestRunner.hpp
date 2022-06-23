@@ -26,7 +26,9 @@ class TestRunner
 	void Run(TestEnvironment* environment);
 
   private:
-	struct TestIdentifier {
+	class TestIdentifier
+	{
+	  public:
 		TestIdentifier(Test* test = nullptr, int testCaseIndex = -1)
 			: fTest(test),
 			  fTestCaseIndex(testCaseIndex)

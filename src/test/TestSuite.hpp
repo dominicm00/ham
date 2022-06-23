@@ -31,7 +31,9 @@ class TestSuite : public Test
 	TestList fTests;
 };
 
-struct TestSuiteBuilder {
+class TestSuiteBuilder
+{
+  public:
 	TestSuiteBuilder(
 		TestSuite& testSuite,
 		TestSuiteBuilder* parentBuilder = nullptr

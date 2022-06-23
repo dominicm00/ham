@@ -85,7 +85,9 @@ class GenericRunnableTest : public RunnableTest
 	typedef void (TestFixture::*TestCaseMethod)();
 	typedef std::vector<TestCaseMethod> TestCaseMethodList;
 
-	struct AddTestCaseVisitor {
+	class AddTestCaseVisitor
+	{
+	  public:
 		AddTestCaseVisitor(GenericRunnableTest<TestFixture>* test)
 			: fTest(test)
 		{

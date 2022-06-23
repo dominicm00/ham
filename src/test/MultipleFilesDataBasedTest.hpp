@@ -41,7 +41,9 @@ class MultipleFilesDataBasedTest : public DataBasedTest
 	) const;
 
   private:
-	struct DataSet : public DataSetBase {
+	class DataSet : public DataSetBase
+	{
+	  public:
 		DataSet(
 			const std::map<std::string, std::string>& inputFiles,
 			const std::map<std::string, int>& inputFileAges,

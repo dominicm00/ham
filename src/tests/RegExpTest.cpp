@@ -34,7 +34,9 @@ match_result_to_vector(const RegExp::MatchResult& result)
 	return vector;
 }
 
-struct RegExpTest::Matches : public std::vector<std::pair<size_t, size_t>> {
+class RegExpTest::Matches : public std::vector<std::pair<size_t, size_t>>
+{
+  public:
 	Matches& Add(size_t offset, size_t length)
 	{
 		push_back(std::make_pair(offset, length));

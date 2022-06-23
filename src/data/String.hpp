@@ -69,7 +69,9 @@ class String
   private:
 	friend class StringList;
 
-	struct Buffer {
+	class Buffer
+	{
+	  public:
 		static Buffer* Create(size_t length)
 		{
 			void* memory = malloc(sizeof(Buffer) + length);
@@ -86,6 +88,12 @@ class String
 				free(this);
 		}
 
+		int32_t fReferenceCount;
+		size_t fLength;
+		char fString[1];
+
+		static Buffer sEmptyBuffer;
+
 	  private:
 		Buffer(size_t length)
 			: fReferenceCount(1),
@@ -95,13 +103,6 @@ class String
 		}
 
 		~Buffer() {}
-
-	  public:
-		int32_t fReferenceCount;
-		size_t fLength;
-		char fString[1];
-
-		static Buffer sEmptyBuffer;
 	};
 
   private:

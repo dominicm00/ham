@@ -10,7 +10,9 @@
 namespace ham::parser
 {
 
-struct ParsePosition {
+class ParsePosition
+{
+  public:
 	ParsePosition()
 		: fLine(0),
 		  fColumn(0)

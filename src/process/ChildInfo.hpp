@@ -10,7 +10,9 @@
 namespace ham::process
 {
 
-struct ChildInfo {
+class ChildInfo
+{
+  public:
 	Process::Id fId;
 	bool fExited;
 	int fExitCode;

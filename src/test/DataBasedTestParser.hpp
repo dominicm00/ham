@@ -24,8 +24,8 @@ class DataBasedTestParser
 	void _Throw(const std::string& message, size_t column = 0);
 
   private:
-	struct TestFile;
-	struct TestCase;
+	class TestFile;
+	class TestCase;
 
   private:
 	const char* fFileName;

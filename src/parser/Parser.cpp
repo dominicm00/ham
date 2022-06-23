@@ -40,7 +40,9 @@ namespace ham::parser
 
 namespace
 {
-struct ActionsFlagMap : std::map<data::String, uint32_t> {
+class ActionsFlagMap : public std::map<data::String, uint32_t>
+{
+  public:
 	ActionsFlagMap()
 	{
 		(*this)["updated"] = data::RuleActions::UPDATED;
@@ -77,7 +79,9 @@ Parser::Listener::NextToken(const Token& /* token */)
 
 // #pragma mark - NodeListContainer
 
-struct Parser::NodeListContainer {
+class Parser::NodeListContainer
+{
+  public:
 	code::NodeList fNodes;
 
 	~NodeListContainer()
@@ -99,7 +103,9 @@ struct Parser::NodeListContainer {
 
 // #pragma mark - ListenerNotifier
 
-struct Parser::ListenerNotifier {
+class Parser::ListenerNotifier
+{
+  public:
 	ListenerNotifier(Parser::Listener* listener, const char* name)
 		: fListener(listener)
 	{
@@ -124,7 +130,9 @@ struct Parser::ListenerNotifier {
 
 // #pragma mark - DumpListener
 
-struct Parser::DumpListener : Parser::Listener {
+class Parser::DumpListener : public Parser::Listener
+{
+  public:
 	DumpListener()
 		: fLevel(0)
 	{

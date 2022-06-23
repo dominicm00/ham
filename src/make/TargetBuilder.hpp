@@ -32,7 +32,7 @@ class TargetBuilder
 	bool HasPendingBuildInfos() const;
 
   private:
-	struct JobSlot;
+	class JobSlot;
 
   private:
 	void _ExecuteNextCommand(TargetBuildInfo* buildInfo);

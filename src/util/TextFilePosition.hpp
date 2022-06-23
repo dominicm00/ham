@@ -10,7 +10,9 @@
 namespace ham::util
 {
 
-struct TextFilePosition {
+class TextFilePosition
+{
+  public:
 	TextFilePosition()
 		: fLine(0),
 		  fColumn(0)

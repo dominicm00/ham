@@ -21,7 +21,9 @@ namespace make
 
 class TargetBuildInfo;
 
-struct Command : util::Referenceable {
+class Command : public util::Referenceable
+{
+  public:
 	enum State {
 		NOT_EXECUTED,
 		IN_PROGRESS,
@@ -29,7 +31,6 @@ struct Command : util::Referenceable {
 		FAILED
 	};
 
-  public:
 	Command(
 		data::RuleActionsCall* actions,
 		const String& commandLine,

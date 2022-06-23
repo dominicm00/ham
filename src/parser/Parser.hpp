@@ -47,9 +47,9 @@ class Parser
   private:
 	typedef parser::Lexer<InputIteratorType> LexerType;
 
-	struct NodeListContainer;
-	struct ListenerNotifier;
-	struct DumpListener;
+	class NodeListContainer;
+	class ListenerNotifier;
+	class DumpListener;
 
   private:
 	code::Block* _ParseFile();

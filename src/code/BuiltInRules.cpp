@@ -43,7 +43,8 @@ echo_string_list_list(
 	output << std::endl;
 }
 
-struct EchoInstructions : RuleInstructions {
+class EchoInstructions : public RuleInstructions
+{
   public:
 	StringList Evaluate(
 		EvaluationContext& context,
@@ -55,7 +56,8 @@ struct EchoInstructions : RuleInstructions {
 	}
 };
 
-struct ExitInstructions : RuleInstructions {
+class ExitInstructions : public RuleInstructions
+{
   public:
 	StringList Evaluate(
 		EvaluationContext& context,
@@ -68,7 +70,8 @@ struct ExitInstructions : RuleInstructions {
 	}
 };
 
-struct MatchInstructions : RuleInstructions {
+class MatchInstructions : public RuleInstructions
+{
   public:
 	StringList Evaluate(EvaluationContext&, const StringListList& parameters)
 		override
@@ -111,7 +114,8 @@ struct MatchInstructions : RuleInstructions {
 	}
 };
 
-struct GlobInstructions : RuleInstructions {
+class GlobInstructions : public RuleInstructions
+{
   public:
 	StringList Evaluate(EvaluationContext&, const StringListList& parameters)
 		override
@@ -193,7 +197,8 @@ struct GlobInstructions : RuleInstructions {
 };
 
 template<bool kIncludes>
-struct DependsInstructions : RuleInstructions {
+class DependsInstructions : public RuleInstructions
+{
   public:
 	StringList Evaluate(
 		EvaluationContext& context,
@@ -230,7 +235,9 @@ struct DependsInstructions : RuleInstructions {
 };
 
 template<uint32_t kFlags>
-struct AddTargetFlagsRule : public RuleInstructions {
+class AddTargetFlagsRule : public RuleInstructions
+{
+  public:
 	StringList Evaluate(
 		EvaluationContext& context,
 		const StringListList& parameters

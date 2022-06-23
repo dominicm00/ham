@@ -41,8 +41,8 @@ class RegExp
 	RegExp& operator=(const RegExp& other);
 
   private:
-	struct Data;
-	struct MatchResultData;
+	class Data;
+	class MatchResultData;
 
   private:
 	Data* fData;

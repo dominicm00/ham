@@ -45,7 +45,8 @@ class Path
  <grist>/some/root/path/to/basename.suffix(member)
  \endverbatim
  */
-struct Path::Parts {
+class Path::Parts
+{
   public:
 	Parts() {}
 	Parts(const StringPart& path) { SetTo(path); }
