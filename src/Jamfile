@@ -17,36 +17,35 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
 RULESET_DIR = [ FDirName $(SUBDIR) ruleset ] ;
 
-rule Ruleset
+rule RulesetObjects
 {
-	# Ruleset <ruleset> ;
-	# Builds ruleset files so they can be included into C++ code.
+	# RulesetObjects <objects> : <ruleset> ;
+	# Builds ruleset objects from a ruleset.
 
-	local ruleset = [ FGristFiles $(1) ] ;
-	local header = [ FGristFiles $(ruleset:S=.h) ] ;
-	local source = [ FGristFiles $(ruleset:S=.cpp) ] ;
+	local targets = [ FGristFiles $(1) ] ;
+	local ruleset = [ FGristFiles $(2) ] ;
 
 	SEARCH on $(ruleset) = $(RULESET_DIR) ;
 
-	DEPENDS $(source) : $(header) ;
-	BuildRulesetObject $(header) : $(1) ;
-	BuildRulesetObject $(source) : $(1) ;
+	for target in $(targets) {
+		DEPENDS $(target) : $(ruleset) ;
+		if $(target:S) = .cpp {
+		   DEPENDS $(target) : $(target:S=.hpp) ;
+		}
+
+		MakeLocate $(target) : $(RULESET_DIR) ;
+		LocalClean clean : $(target) ;
+		BuildRulesetObject $(target) : $(ruleset) ;
+	}
 }
 
-rule BuildRulesetObject
-{
-	MakeLocate $(1) : $(RULESET_DIR) ;
-	LocalClean clean : $(1) ;
-	BuildRulesetObject1 $(1) : $(2) ;
-}
-
-actions BuildRulesetObject1
+actions BuildRulesetObject
 {
 	$(RULESET_DIR)/build-ruleset.sh "$(1)" "$(2)"
 }
 
-Ruleset HamRuleset.ham ;
-Ruleset JamRuleset.ham ;
+RulesetObjects HamRuleset.cpp HamRuleset.hpp : HamRuleset.ham ;
+RulesetObjects JamRuleset.cpp JamRuleset.hpp : JamRuleset.ham ;
 
 SharedLibrary libham.so
 	:
