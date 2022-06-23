@@ -112,6 +112,7 @@ main(int argc, const char* const* argv)
 
 	// import environment
 	// TODO: Platform specific!
+	// TODO: Split up PATH-type variables
 	for (size_t i = 0; environ[i] != nullptr; i++)
 		set_variable(variables, environ[i]);
 
