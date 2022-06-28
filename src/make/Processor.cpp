@@ -16,6 +16,7 @@
 #include "data/TargetBinder.hpp"
 #include "make/Command.hpp"
 #include "make/MakeException.hpp"
+#include "make/MakeTarget.hpp"
 #include "make/TargetBuildInfo.hpp"
 #include "make/TargetBuilder.hpp"
 #include "parser/Parser.hpp"
@@ -405,21 +406,19 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	MakeTarget::Fate fate = MakeTarget::KEEP;
 	if (isPseudoTarget || !makeTarget->FileExists()) {
 		state = MakeTarget::MISSING;
-		if (cantMake)
-			fate = MakeTarget::CANT_MAKE;
-		else
-			fate = MakeTarget::MAKE;
+		fate = MakeTarget::MAKE;
 	} else if (newestDependencyTime > time) {
 		state = MakeTarget::OUT_OF_DATE;
-		if (cantMake)
-			fate = MakeTarget::CANT_MAKE;
-		else if (!target->IsDontUpdate())
+		if (!target->IsDontUpdate())
 			fate = MakeTarget::MAKE;
 	} else {
 		state = MakeTarget::UP_TO_DATE;
 		if (dependencyUpdated)
 			fate = MakeTarget::MAKE;
 	}
+
+	if (fate == MakeTarget::MAKE && cantMake)
+		fate = MakeTarget::CANT_MAKE;
 
 	if (fate == MakeTarget::MAKE) {
 		// If target is temporary, downgrade to MAKE_IF_NEEDED.
