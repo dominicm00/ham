@@ -642,6 +642,8 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 
 	std::unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
 
+	// TODO: Support RuleActions::TOGETHER
+	// TODO: Support RuleActions::PIECEMEAL
 	for (std::vector<data::RuleActionsCall*>::const_iterator it =
 			 target->ActionsCalls().begin();
 		 it != target->ActionsCalls().end();
@@ -747,6 +749,8 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 
+	// TODO: Support RuleActions::UPDATED
+	// TODO: Support RuleActions::EXISTING
 	StringList boundSourceTargets;
 	for (data::TargetList::const_iterator it =
 			 actionsCall->SourceTargets().begin();
@@ -795,14 +799,6 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
-	// TODO: Support:
-	// - UPDATED
-	// - TOGETHER
-	// - IGNORE
-	// - QUIETLY
-	// - PIECEMEAL
-	// - EXISTING
-	// - MAX_LINE_FACTOR
 
 	while (remainder < end) {
 		// transfer whitespace unchanged

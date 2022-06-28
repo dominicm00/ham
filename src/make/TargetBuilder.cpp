@@ -139,6 +139,7 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 
 		fFinishedCommands.push_back(command);
 		command->SetState(
+			// TODO: Support RuleActions::IGNORE
 			processInfo.fExitCode == 0 ? Command::SUCCEEDED : Command::FAILED
 		);
 	}
@@ -192,6 +193,7 @@ void
 TargetBuilder::_ExecuteCommand(Command* command)
 {
 	if (fOptions.IsPrintActions()) {
+		// TODO: Support RuleActions::QUIETLY
 		data::RuleActionsCall* actions = command->Actions();
 		printf(
 			"%s %s\n",
