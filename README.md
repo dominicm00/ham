@@ -29,14 +29,14 @@ While in compatibility mode, Ham will attempt to respect the command line parame
 | Flags                | Description                    | `ham` | `jam`     | `ham -cjam` | `b2`  | `ham -cboost` |
 |:---------------------|:-------------------------------|:-----:|:---------:|:-----------:|:-----:|:-------------:|
 | `-a`                 | build all                      | P     | **X**     | P           | **X** | P             |
-| `-dX`                | debug info                     | P[^1] | **X**     | P[^1]       | **X** | P[^1]         |
+| `-dX`                | debug info                     | P[^1] | **X**     | P           | **X** | P             |
 | `-fX`                | select ruleset                 | P     | **X**     | P           | **X** | P             |
 | `-g`                 | new sources first              | P     | **X**     | P           | **X** | P             |
 | `-jX`                | run actions concurrently       | P     | **X[^2]** | P           | **X** | P             |
 | `-n`                 | dry run                        | P     | **X**     | P           | **X** | P             |
 | `-oX`                | output commands to file        | P     | **X**     | P           | **X** | P             |
 | `-q`                 | quit on build failure          | P[^3] | **X**     | P           | **X** | P             |
-| `-c`                 | continue on build failure      | P     | *N/A*     | *N/A*       | *N/A* | *N/A*         |
+| `-k`                 | keep going on build failure    | P     | *N/A*     | P[^4]       | *N/A* | P             |
 | `-sX=Y`              | set variable                   | P     | **X**     | P           | **X** | P             |
 | `-tX`                | rebuild target                 | P     | **X**     | P           | **X** | P             |
 | `--x`                | forward args to scripts        | P     |           |             | **X** | P             |
@@ -77,7 +77,7 @@ To contribute to Ham, you'll need:
 
 Before submitting a pull request, make sure to run the `format.sh` script.
 
-[^1]: Debug information/levels differ between `ham`, `jam`, and `b2`.
-[^2]: `jam` has several bugs with their implementation of concurrent actions.
-[^3]: In `-cham` mode, `-q` is enabled by default, but the flag is accepted for
-    convenience.
+[^1]: Debug information/levels may differ between `ham`, `jam`, and `b2`.
+[^2]: `jam`'s implementation of concurrent actions has known bugs.
+[^3]: In `-cham` mode `-q` is enabled by default, but for convenience the flag is still accepted.
+[^4]: In `-cjam` and `-cboost` mode `-k` is enabled by default, but for convenience the flag is still accepted.
