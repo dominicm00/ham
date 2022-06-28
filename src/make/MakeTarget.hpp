@@ -18,18 +18,28 @@ typedef util::SequentialSet<MakeTarget*> MakeTargetSet;
 class MakeTarget
 {
   public:
+	/**
+	 * State during recursive processing. Used while processing the make tree to
+	 * detect cycles.
+	 */
 	enum ProcessingState {
 		UNPROCESSED,
 		PROCESSING,
 		PROCESSED
 	};
 
+	/**
+	 * File status of the target.
+	 */
 	enum State {
 		UP_TO_DATE,
 		OUT_OF_DATE,
 		MISSING
 	};
 
+	/**
+	 * Whether or not to make a target.
+	 */
 	enum Fate {
 		MAKE,
 		MAKE_IF_NEEDED,
@@ -37,6 +47,9 @@ class MakeTarget
 		CANT_MAKE
 	};
 
+	/**
+	 * Status of make execution.
+	 */
 	enum MakeState {
 		DONE,
 		PENDING,
