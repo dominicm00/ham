@@ -9,7 +9,9 @@
 #include "util/OptionIterator.hpp"
 #include "util/TextFileException.hpp"
 
+#include <iostream>
 #include <map>
+#include <ostream>
 #include <string.h>
 #include <unistd.h>
 
@@ -18,62 +20,51 @@ using namespace ham;
 static void
 print_usage(const char* programName, bool error)
 {
-	FILE* out = error ? stderr : stdout;
-	fprintf(out, "Usage: %s [ <options> ] [ <target> ... ]\n", programName);
-	fprintf(out, "Options:\n");
-	fprintf(out, "  -a, --all\n");
-	fprintf(
-		out,
-		"      Build all targets, even the ones that are "
-		"up-to-date.\n"
-	);
-	fprintf(out, "  -c <version>, --compatibility <version>\n");
-	fprintf(
-		out,
-		"      Behave compatible to <version>, which is either of "
-		"\"jam\" (plain Jam\n"
-	);
-	fprintf(
-		out,
-		"      2.5), \"boost\" (Boost.Jam), or \"ham\" (Ham, the "
-		"default).\n"
-	);
-	fprintf(out, "  -d <option>, --debug <option>\n");
-	fprintf(out, "      Enable/set a debug option. Options are:\n");
-	fprintf(out, "      a     -  Print the actions\n");
-	fprintf(out, "      c     -  Print the causes\n");
-	fprintf(out, "      d     -  Print the dependencies\n");
-	fprintf(out, "      m     -  Print the make tree\n");
-	fprintf(out, "      x     -  Print the make commands\n");
-	fprintf(out, "      0..9  -  Set debug level.\n");
-	fprintf(out, "  -f <file>, --ruleset <file>\n");
-	fprintf(out, "      Execute <file> instead of the built-in ruleset.\n");
-	fprintf(out, "  -g, --from-newest\n");
-	fprintf(out, "      Build from the newest sources first.\n");
-	fprintf(out, "  -h, --help\n");
-	fprintf(out, "      Print this usage message.\n");
-	fprintf(out, "  -j <jobs>, --jobs <jobs>\n");
-	fprintf(
-		out,
-		"      Use up to <jobs> number of concurrent shell "
-		"processes.\n"
-	);
-	fprintf(out, "  -n, --dry-run\n");
-	fprintf(out, "      Print actions and commands, but don't run them.\n");
-	fprintf(out, "  -o <file>, --actions <file>\n");
-	fprintf(out, "      Write the actions to file <file>.\n");
-	fprintf(out, "  -q, --quit-on-error\n");
-	fprintf(out, "      Quit as soon as making a target fails.\n");
-	fprintf(out, "  -s <variable>=<value>, --set <variable>=<value>\n");
-	fprintf(
-		out,
-		"      Set variable <variable> to <value>, overriding the "
-		"environmental variable.\n"
-	);
-	fprintf(out, "  -t <target>, --target <target>\n");
-	fprintf(out, "      Rebuild target <target>, even if it is up-to-date.\n");
-	fprintf(out, "  -v, --version\n");
-	fprintf(out, "      Print the Ham version and exit.\n");
+	std::ostream out(error ? std::cerr.rdbuf() : std::cout.rdbuf());
+	out << "Usage: " << programName
+		<< " [ <options> ] [ <target> ... ]\n"
+		   "Options:\n"
+		   "  -a, --all\n"
+		   "      Build all targets, even the ones that are up-to-date.\n"
+		   "  -c <version>, --compatibility <version>\n"
+		   "      Behave compatible to <version>, which is one of:\n"
+		   "      - \"ham\" (Ham, the default)\n"
+		   "      - \"jam\" (Perforce Jam 2.5)\n"
+		   "      - \"boost\" (Boost.Build)\n"
+		   "  -d <option>, --debug <option>\n"
+		   "      Enable/set a debug option. Options are:\n"
+		   "      a     -  Print the actions\n"
+		   "      c     -  Print the causes\n"
+		   "      d     -  Print the dependencies\n"
+		   "      m     -  Print the make tree\n"
+		   "      x     -  Print the make commands\n"
+		   "      0..9  -  Set debug level.\n"
+		   "  -f <file>, --ruleset <file>\n"
+		   "      Execute <file> instead of the built-in ruleset.\n"
+		   "  -g, --from-newest\n"
+		   "      Build from the newest sources first.\n"
+		   "  -h, --help\n"
+		   "      Print this usage message.\n"
+		   "  -j <jobs>, --jobs <jobs>\n"
+		   "      Use up to <jobs> number of concurrent shell processes.\n"
+		   "  -k, --keep-going\n"
+		   "      Keep going when target fails. "
+		   "Default in -cjam and -cboost mode.\n"
+		   "  -n, --dry-run\n"
+		   "      Print actions and commands, but don't run them.\n"
+		   "  -o <file>, --output-actions <file>\n"
+		   "      Write the actions to <file>.\n"
+		   "  -q, --quit-on-error\n"
+		   "      Quit immediately when a target fails. Default in -cham "
+		   "mode.\n"
+		   "  -s <variable>=<value>, --set <variable>=<value>\n"
+		   "      Set variable <variable> to <value>, overriding the "
+		   "environmental variable.\n"
+		   "  -t <target>, --target <target>\n"
+		   "      Rebuild target <target>, even if it is up-to-date.\n"
+		   "  -v, --version\n"
+		   "      Print the Ham version and exit.\n"
+		<< std::endl;
 }
 
 [[noreturn]] static void
@@ -81,6 +72,16 @@ print_usage_end_exit(const char* programName, bool error)
 {
 	print_usage(programName, error);
 	exit(error ? 1 : 0);
+}
+
+[[noreturn]] static void
+unimplemented_cli(const char* unimplementedOption, const char* issueLink)
+{
+	std::cerr << "Error: " << unimplementedOption
+			  << " is not implemented in this version of Ham.\n"
+				 "Check the implementation status at:\n"
+			  << issueLink << std::endl;
+	exit(1);
 }
 
 static bool
@@ -145,8 +146,9 @@ main(int argc, const char* const* argv)
 			.Add('g', "--from-newest")
 			.Add('h', "--help")
 			.Add('j', "--jobs", true)
+			.Add('k', "--keep-going")
 			.Add('n', "--dry-run")
-			.Add('o', "--actions", true)
+			.Add('o', "--output-actions", true)
 			.Add('q', "--quit-on-error")
 			.Add('s', "--set", true)
 			.Add('t', "--target", true)
@@ -157,20 +159,30 @@ main(int argc, const char* const* argv)
 		// short ("-") option(s)
 		std::string argument;
 		switch (optionIterator.Next(argument)) {
+			case 'a':
+				unimplemented_cli(
+					"Building all targets",
+					"https://github.com/dominicm00/ham/issues/35"
+				);
 			case 'c': {
 				if (argument == "jam") {
 					compatibility = behavior::COMPATIBILITY_JAM;
 				} else if (argument == "boost") {
-					compatibility = behavior::COMPATIBILITY_BOOST_JAM;
+					// TODO: This is disabled because Boost.Build was
+					// revamped since this compatibility was written, and
+					// current compatibility status is unknown.
+					//
+					// compatibility = behavior::COMPATIBILITY_BOOST_JAM;
+					unimplemented_cli(
+						"Boost.Build compatibility",
+						"https://github.com/dominicm00/ham/issues/32"
+					);
 				} else if (argument == "ham") {
 					compatibility = behavior::COMPATIBILITY_HAM;
 				} else {
-					fprintf(
-						stderr,
-						"Error: Invalid argument for "
-						"compatibility option: \"%s\"\n",
-						argument.c_str()
-					);
+					std::cerr << "Error: Invalid argument for "
+								 "compatibility option: "
+							  << argument << std::endl;
 					exit(1);
 				}
 				compatibilitySpecified = true;
@@ -193,13 +205,16 @@ main(int argc, const char* const* argv)
 						case 'a':
 							printActions = true;
 							break;
-							// TODO:...
-							//  case 'c':
-							//	    printCauses = true;
-							//	    break;
-							//  case 'd':
-							//	    printDependencies = true;
-							//		break;
+						case 'c':
+							unimplemented_cli(
+								"Displaying causes",
+								"https://github.com/dominicm00/ham/issues/33"
+							);
+						case 'd':
+							unimplemented_cli(
+								"Displaying dependency tree",
+								"https://github.com/dominicm00/ham/issues/34"
+							);
 						case 'm':
 							printMakeTree = true;
 							break;
@@ -209,13 +224,25 @@ main(int argc, const char* const* argv)
 						default:
 							if (!isdigit(debugOption))
 								print_usage_end_exit(programName, true);
+
+							bool allOptionsSupported = true;
 							switch (debugOption - '0') {
 									// TODO: Support all debug levels correctly!
 								case 9:
+									allOptionsSupported = false;
+									[[fallthrough]];
 								case 8:
+									allOptionsSupported = false;
+									[[fallthrough]];
 								case 7:
+									allOptionsSupported = false;
+									[[fallthrough]];
 								case 6:
+									allOptionsSupported = false;
+									[[fallthrough]];
 								case 5:
+									allOptionsSupported = false;
+									[[fallthrough]];
 								case 4:
 									printCommands = true;
 									[[fallthrough]];
@@ -228,6 +255,15 @@ main(int argc, const char* const* argv)
 									[[fallthrough]];
 								case 0:
 									break;
+							}
+
+							if (!allOptionsSupported) {
+								std::cerr << "Warning: not all selected debug "
+											 "options are implemented in this "
+											 "version of Ham. See "
+											 "https://github.com/dominicm00/"
+											 "ham/issues/31 for more details."
+										  << std::endl;
 							}
 					}
 				}
@@ -254,6 +290,10 @@ main(int argc, const char* const* argv)
 				break;
 			}
 
+			case 'k':
+				quitOnError = false;
+				break;
+
 			case 'n':
 				dryRun = true;
 				break;
@@ -278,7 +318,10 @@ main(int argc, const char* const* argv)
 				break;
 
 			case 'v':
-				printf("Ham 0.1, Copyright 2010-2013 Ingo Weinhold.");
+				std::cout << "Ham 0.1\n"
+							 "Copyright 2010-2013 Ingo Weinhold.\n"
+							 "Copyright 2022      Dominic Martinez."
+						  << std::endl;
 				exit(0);
 
 			default:
@@ -358,17 +401,12 @@ main(int argc, const char* const* argv)
 		// build the targets
 		processor.BuildTargets();
 	} catch (make::MakeException& exception) {
-		fprintf(stderr, "%s.\n", exception.Message());
+		std::cerr << exception.Message() << std::endl;
 	} catch (util::TextFileException& exception) {
 		const util::TextFilePosition& position = exception.Position();
-		fprintf(
-			stderr,
-			"%s:%zu:%zu: %s.\n",
-			position.FileName(),
-			position.Line() + 1,
-			position.Column() + 1,
-			exception.Message()
-		);
+		std::cerr << position.FileName() << ":" << position.Line() + 1 << ":"
+				  << position.Column() + 1 << ":" << exception.Message() << "."
+				  << std::endl;
 	}
 
 	// TODO: Catch exceptions...
