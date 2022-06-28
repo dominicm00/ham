@@ -533,6 +533,7 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 	const StringList* scanRule = variables->Lookup(kHeaderRuleVariableName);
 	if (scanPattern == nullptr || scanRule == nullptr || scanPattern->IsEmpty()
 		|| scanRule->IsEmpty()) {
+		// TODO: Warn if only one variable is set as it's probably a mistake!
 		return;
 	}
 
@@ -680,6 +681,7 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 			break;
 		case MakeTarget::PENDING:
 			// cannot happen
+			// TODO: Have an internal error here?
 			break;
 		case MakeTarget::FAILED:
 			break;

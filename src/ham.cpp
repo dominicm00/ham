@@ -105,6 +105,7 @@ main(int argc, const char* const* argv)
 
 	// get standard variables
 	std::map<data::String, data::String> variables;
+	// TODO: Properly detect platform!
 	set_variable(variables, "UNIX=true");
 	set_variable(variables, "OS=LINUX");
 	set_variable(variables, "OSPLAT=X86");
@@ -321,6 +322,7 @@ main(int argc, const char* const* argv)
 		if (strcmp(baseName, "jam") == 0)
 			compatibility = behavior::COMPATIBILITY_JAM;
 		else if (strcmp(baseName, "bjam") == 0)
+			// TODO: Boost jam is no longer called bjam.
 			compatibility = behavior::COMPATIBILITY_BOOST_JAM;
 	}
 
