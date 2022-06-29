@@ -14,6 +14,7 @@ Options::Options()
 	  fDryRun(false),
 	  fPrintMakeTree(false),
 	  fPrintActions(false),
+	  fPrintQuietActions(false),
 	  fPrintCommands(false),
 	  fJobCount(1),
 	  fBuildFromNewest(false),
