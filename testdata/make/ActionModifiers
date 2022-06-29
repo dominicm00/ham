@@ -356,3 +356,93 @@ Source
 #!exception
 Error: Action JoinFiles has 'updated' modifier and must be passed exactly 1 target, but was passed 2
 ---
+# Combine 'actions together' on the same target.
+# target	- target (missing)
+#
+#!file Jamfile
+rule EchoOnce
+{
+	Depends $(1) : $(2) ;
+}
+
+actions together EchoOnce
+{
+	if [ " $(2) " = " source1 source2 " ] \
+	|| [ " $(2) " = " source2 source1 " ]; then
+		echo "Pass" >> $(1)
+	else
+		echo "Fail" >> $(1)
+	fi
+}
+
+NOTFILE source1 source2 ;
+
+LOCATE on target = . ;
+EchoOnce target : source1 ;
+EchoOnce target : source2 ;
+
+Depends all : target ;
+
+-
+#!file target
+Pass
+---
+# Don't combine 'actions together' on different targets.
+# target1	- target (missing)
+# target2	- target (missing)
+#
+#!file Jamfile
+rule EchoOnce
+{
+	Depends $(1) : $(2) ;
+}
+
+actions together EchoOnce
+{
+	echo "Action called by $(2)" >> "$(1)"
+}
+
+NOTFILE source1 source2 ;
+
+LOCATE on target1 = . ;
+LOCATE on target2 = . ;
+EchoOnce target1 : source1 ;
+EchoOnce target2 : source2 ;
+
+Depends all : target1 target2 ;
+
+-
+#!file target1
+Action called by source1
+#!file target2
+Action called by source2
+---
+# Don't combine 'actions together' on different rules.
+# target	- target (missing)
+#
+#!file Jamfile
+actions together EchoOnce1
+{
+	echo "Action called by $(2)" >> "$(1)"
+}
+
+actions together EchoOnce2
+{
+	echo "Action called by $(2)" >> "$(1)"
+}
+
+NOTFILE source1 source2 ;
+
+LOCATE on target = . ;
+EchoOnce1 target : source1 ;
+EchoOnce2 target : source2 ;
+
+Depends target : source1 source2 ;
+
+Depends all : target ;
+
+-
+#!file target
+Action called by source1
+Action called by source2
+---
