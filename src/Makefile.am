@@ -15,8 +15,8 @@ ruleset/JamRuleset.cpp ruleset/JamRuleset.hpp: ruleset/JamRuleset.ham
 	./ruleset/build-ruleset.sh $@ ruleset/JamRuleset.ham
 
 
-lib_LTLIBRARIES = libham.la
-libham_la_SOURCES =								\
+noinst_LIBRARIES = libham.a
+libham_a_SOURCES =								\
 	behavior/Behavior.cpp						\
 	code/ActionsDefinition.cpp					\
 	code/Assignment.cpp							\
@@ -73,7 +73,7 @@ libham_la_SOURCES =								\
 
 check_PROGRAMS = hamtest
 TESTS = hamtest
-hamtest_LDADD = libham.la
+hamtest_LDADD = libham.a
 hamtest_SOURCES = 						\
 	tests/ham-tests.cpp					\
 	tests/PathTest.cpp					\

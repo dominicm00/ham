@@ -7,6 +7,6 @@ SUBDIRS = src
 
 bin_PROGRAMS = ham
 ham_SOURCES = src/ham.cpp
-ham_LDADD = src/libham.la
+ham_LDADD = src/libham.a
 
 dist_doc_DATA = README.md

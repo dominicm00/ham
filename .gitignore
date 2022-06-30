@@ -4,6 +4,8 @@ generated
 **/*.lo
 **/*.o
 **/*.la
+**/*.a
+**/*.so
 **/.libs
 ham
 libtool
