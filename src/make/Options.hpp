@@ -33,6 +33,9 @@ class Options
 	bool IsPrintActions() const { return fPrintActions; }
 	void SetPrintActions(bool print) { fPrintActions = print; }
 
+	bool IsPrintQuietActions() const { return fPrintQuietActions; }
+	void SetPrintQuietActions(bool print) { fPrintQuietActions = print; }
+
 	bool IsPrintCommands() const { return fPrintCommands; }
 	void SetPrintCommands(bool print) { fPrintCommands = print; }
 
@@ -54,6 +57,7 @@ class Options
 	bool fDryRun;
 	bool fPrintMakeTree;
 	bool fPrintActions;
+	bool fPrintQuietActions;
 	bool fPrintCommands;
 	int fJobCount;
 	bool fBuildFromNewest;

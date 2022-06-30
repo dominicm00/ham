@@ -131,6 +131,7 @@ main(int argc, const char* const* argv)
 	bool quitOnError = false;
 	bool printMakeTree = false;
 	bool printActions = true;
+	bool printQuietActions = false;
 	bool printCommands = false;
 	bool debugSpecified = false;
 	data::StringList forceUpdateTargets;
@@ -204,6 +205,7 @@ main(int argc, const char* const* argv)
 					switch (debugOption) {
 						case 'a':
 							printActions = true;
+							printQuietActions = true;
 							break;
 						case 'c':
 							unimplemented_cli(
@@ -380,6 +382,7 @@ main(int argc, const char* const* argv)
 	options.SetDryRun(dryRun);
 	options.SetPrintMakeTree(printMakeTree);
 	options.SetPrintActions(printActions);
+	options.SetPrintQuietActions(printQuietActions);
 	options.SetPrintCommands(printCommands);
 	if (actionsOutputFileSpecified)
 		options.SetActionsOutputFile(actionsOutputFile.c_str());
