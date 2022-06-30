@@ -131,7 +131,7 @@ main(int argc, const char* const* argv)
 	bool quitOnError = false;
 	bool printMakeTree = false;
 	bool printActions = true;
-	bool printQuietActions = true;
+	bool printQuietActions = false;
 	bool printCommands = false;
 	bool debugSpecified = false;
 	data::StringList forceUpdateTargets;
