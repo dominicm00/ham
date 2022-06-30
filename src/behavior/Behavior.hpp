@@ -41,7 +41,7 @@ class Behavior
 		 \verbatim
 		 my_program = bash ;
 		 Echo $(my_program:R=/bin/) ;
-
+		 -
 		 > /bin//bash
 		 \endverbatim
 		 */
@@ -54,7 +54,7 @@ class Behavior
 		 \verbatim
 		 my_program = bash ;
 		 Echo $(my_program:R=/bin/) ;
-
+		 -
 		 > /bin/bash
 		 \endverbatim
 		 */
@@ -70,7 +70,7 @@ class Behavior
 		 my_list = Ham is super fun ;
 		 Echo $(my_list[1-3]:J=-) ;
 		 Echo $(my_list[1-4]:J=-) ;
-
+		 -
 		 >
 		 > Ham-is-super-fun
 		 \endverbatim
@@ -84,7 +84,7 @@ class Behavior
 		 my_list = Ham is super fun ;
 		 Echo $(my_list[1-3]:J=-) ;
 		 Echo $(my_list[1-4]:J=-) ;
-
+		 -
 		 > Ham-is-super
 		 > Ham-is-super-fun
 		 \endverbatim
@@ -100,7 +100,7 @@ class Behavior
 		 \verbatim
 		 my_list = Ham is super fun ;
 		 Echo $(my_list:LJ=X) ;
-
+		 -
 		 > hamxisxsuperxfun
 		 \endverbatim
 		 */
@@ -113,7 +113,7 @@ class Behavior
 		 \verbatim
 		 my_list = Ham is super fun ;
 		 Echo $(my_list:LJ=X) ;
-
+		 -
 		 > hamXisXsuperXfun
 		 \endverbatim
 		 */
