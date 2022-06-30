@@ -13,6 +13,7 @@
 #include "code/Leaf.hpp"
 #include "code/OnExpression.hpp"
 #include "data/RegExp.hpp"
+#include "data/RuleActions.hpp"
 #include "data/TargetBinder.hpp"
 #include "make/Command.hpp"
 #include "make/MakeException.hpp"
@@ -742,37 +743,56 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
-	// TODO: Support RuleActions::UPDATED
-	// TODO: Support RuleActions::EXISTING
-	auto setBoundTargets =
-		[this](StringList& boundTargets, const data::TargetList& targets) {
-			for (const auto target : targets) {
-				MakeTarget* makeTarget = _GetMakeTarget(target, true);
-				if (!makeTarget->IsBound()) {
-					// Bind independent targets, but don't make them.
-					_BindTarget(makeTarget);
+	std::uint32_t flags =
+		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+	auto setBoundTargets = [this, flags](
+							   StringList& boundTargets,
+							   const data::TargetList& targets,
+							   const bool isSources
+						   ) {
+		for (const auto target : targets) {
+			MakeTarget* makeTarget = _GetMakeTarget(target, true);
+			if (!makeTarget->IsBound()) {
+				// Bind independent targets, but don't make them.
+				_BindTarget(makeTarget);
 
-					std::stringstream warning{};
-					auto warningString{
-						_IsPseudoTarget(makeTarget)
-							? "using independent pseudotarget "
-							: "using independent target "};
-					warning << warningString << makeTarget->GetTarget()->Name();
+				// Unprocessed targets neither exist or are marked for
+				// updating; if EXISTING or UPDATED modifiers are present,
+				// we can safely skip any sources without warning.
+				if (isSources
+					&& ((flags & data::RuleActions::EXISTING)
+						|| (flags & data::RuleActions::UPDATED)))
+					continue;
 
-					_PrintWarning(warning.str());
-				}
+				std::stringstream warning{};
+				auto warningString{
+					_IsPseudoTarget(makeTarget)
+						? "using independent pseudotarget "
+						: "using independent target "};
+				warning << warningString << makeTarget->GetTarget()->Name();
 
-				boundTargets.Append(makeTarget->BoundPath());
+				_PrintWarning(warning.str());
 			}
-		};
+
+			if ((flags & data::RuleActions::EXISTING)
+				&& !makeTarget->FileExists())
+				continue;
+
+			if ((flags & data::RuleActions::UPDATED)
+				&& makeTarget->GetFate() != MakeTarget::MAKE)
+				continue;
+
+			boundTargets.Append(makeTarget->BoundPath());
+		}
+	};
 
 	StringList boundTargets;
-	setBoundTargets(boundTargets, actionsCall->Targets());
+	setBoundTargets(boundTargets, actionsCall->Targets(), false);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 
 	StringList boundSourceTargets;
-	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets());
+	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets(), true);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 
