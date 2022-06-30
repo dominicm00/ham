@@ -728,6 +728,7 @@ Parser::_ParseList()
 {
 	PARSER_NONTERMINAL("list");
 
+	// BUG: This object is leaking.
 	util::Reference<code::List> list(new code::List, true);
 
 	// zero or more arguments
