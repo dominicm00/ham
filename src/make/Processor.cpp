@@ -24,7 +24,10 @@
 #include "ruleset/JamRuleset.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <memory>
+#include <ostream>
+#include <sstream>
 #include <stdarg.h>
 
 namespace ham::make
@@ -739,26 +742,37 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
+	// TODO: Support RuleActions::UPDATED
+	// TODO: Support RuleActions::EXISTING
+	auto setBoundTargets =
+		[this](StringList& boundTargets, const data::TargetList& targets) {
+			for (const auto target : targets) {
+				MakeTarget* makeTarget = _GetMakeTarget(target, true);
+				if (!makeTarget->IsBound()) {
+					// Bind independent targets, but don't make them.
+					_BindTarget(makeTarget);
+
+					std::stringstream warning{};
+					auto warningString{
+						_IsPseudoTarget(makeTarget)
+							? "using independent pseudotarget "
+							: "using independent target "};
+					warning << warningString << makeTarget->GetTarget()->Name();
+
+					_PrintWarning(warning.str());
+				}
+
+				boundTargets.Append(makeTarget->BoundPath());
+			}
+		};
+
 	StringList boundTargets;
-	for (data::TargetList::const_iterator it = actionsCall->Targets().begin();
-		 it != actionsCall->Targets().end();
-		 ++it) {
-		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
-		boundTargets.Append(makeTarget->BoundPath());
-	}
+	setBoundTargets(boundTargets, actionsCall->Targets());
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 
-	// TODO: Support RuleActions::UPDATED
-	// TODO: Support RuleActions::EXISTING
 	StringList boundSourceTargets;
-	for (data::TargetList::const_iterator it =
-			 actionsCall->SourceTargets().begin();
-		 it != actionsCall->SourceTargets().end();
-		 ++it) {
-		MakeTarget* makeTarget = _GetMakeTarget(*it, true);
-		boundSourceTargets.Append(makeTarget->BoundPath());
-	}
+	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets());
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 
@@ -940,6 +954,12 @@ Processor::_PrintMakeTreeStep(
 	}
 
 	printf("\n");
+}
+
+void
+Processor::_PrintWarning(std::string warning)
+{
+	std::cerr << "...warning: " << warning << "..." << std::endl;
 }
 
 } // namespace ham::make
