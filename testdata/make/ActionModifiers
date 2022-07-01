@@ -1,0 +1,83 @@
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# Don't include missing sources in 'existing' actions
+# target	- target (missing)
+# source1	- source
+# source2	- source (missing)
+# source3	- source
+#
+#!file Jamfile
+actions existing EchoExisting
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoExisting target : source1 source2 source3 ;
+Depends all : target ;
+#!file source1
+Already exists
+#!file source3
+Already exists
+-
+#!file target
+./source1 ./source3
+---
+# Include all existing sources in 'existing' actions
+# target	- target (missing)
+# source1	- source
+# source2	- source
+# source3	- source
+#
+#!file Jamfile
+actions existing EchoExisting
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoExisting target : source1 source2 source3 ;
+Depends all : target ;
+#!file source1
+Already exists
+#!file source2
+Already exists
+#!file source3
+Already exists
+-
+#!file target
+./source1 ./source2 ./source3
+---
+# Don't run 'existing' actions without any existing sources
+# target	- target (missing)
+# source1	- source (missing)
+# source2	- source (missing)
+# source3	- source (missing)
+#
+#!file Jamfile
+actions existing EchoAction
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoAction target : source1 source2 source3 ;
+Depends all : target ;
+-
+#!file target missing
+---
