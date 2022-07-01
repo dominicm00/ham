@@ -136,22 +136,12 @@ class Behavior
 		return fBrokenSubscriptJoin;
 	}
 	JoinCaseOperator GetJoinCaseOperator() const { return fJoinCaseOperator; }
-	IndependentTarget GetIndependentTarget() const
-	{
-		return fIndependentTarget;
-	}
-	IndependentTargetStrictness GetIndependentTargetStrictness() const
-	{
-		return fIndependentTargetStrictness;
-	}
 
   private:
 	EchoTrailingSpace fEchoTrailingSpace;
 	PathRootReplacerSlash fPathRootReplacerSlash;
 	BrokenSubscriptJoin fBrokenSubscriptJoin;
 	JoinCaseOperator fJoinCaseOperator;
-	IndependentTarget fIndependentTarget;
-	IndependentTargetStrictness fIndependentTargetStrictness;
 };
 
 } // namespace ham::behavior
