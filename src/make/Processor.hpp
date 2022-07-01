@@ -173,6 +173,7 @@ class Processor
 		const char* pattern,
 		...
 	);
+	void _PrintWarning(std::string warning);
 
   private:
 	data::VariableDomain fGlobalVariables;
