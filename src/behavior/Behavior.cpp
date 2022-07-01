@@ -17,16 +17,13 @@ Behavior::Behavior(Compatibility compatibility)
 	: fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
 	  fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE),
 	  fBrokenSubscriptJoin(NO_BROKEN_SUBSCRIPT_JOIN),
-	  fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR),
-	  fIndependentTarget(NO_CREATE_IMPLICIT_DEPENDENCY),
-	  fIndependentTargetStrictness(ERROR_INDEPENDENT_TARGET)
+	  fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR)
 {
 	switch (compatibility) {
 		case COMPATIBILITY_JAM:
 			fEchoTrailingSpace = ECHO_TRAILING_SPACE;
 			fPathRootReplacerSlash = PATH_ROOT_REPLACER_SLASH_ALWAYS;
 			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
-			fIndependentTargetStrictness = WARN_INDEPENDENT_TARGET;
 			break;
 		case COMPATIBILITY_BOOST_JAM:
 			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
