@@ -660,7 +660,11 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 			command.SetTo(commandIt->second);
 		} else {
 			// prepare the actions command line
-			command.SetTo(_BuildCommand(actionsCall), true);
+			Command* builtCommand = _BuildCommand(actionsCall);
+			if (builtCommand == nullptr)
+				continue;
+
+			command.SetTo(builtCommand, true);
 			if (actionsCall->Targets().size() > 1) {
 				fCommands[actionsCall] = command.Get();
 				command.Get()->AcquireReference();
@@ -743,61 +747,63 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
-	std::uint32_t flags =
+	const std::uint32_t flags =
 		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	auto setBoundTargets = [this, flags](
-							   StringList& boundTargets,
-							   const data::TargetList& targets,
-							   const bool isSources
-						   ) {
-		for (const auto target : targets) {
-			MakeTarget* makeTarget = _GetMakeTarget(target, true);
-			if (!makeTarget->IsBound()) {
-				// Bind independent targets, but don't make them.
-				_BindTarget(makeTarget);
+	const bool isExistingAction = flags & data::RuleActions::EXISTING;
+	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+	const bool isTrimmedSources = isExistingAction || isUpdatedAction;
+	const auto setBoundTargets =
+		[this, isExistingAction, isUpdatedAction, isTrimmedSources](
+			StringList& boundTargets,
+			const data::TargetList& targets,
+			const bool isSources
+		) {
+			for (const auto target : targets) {
+				MakeTarget* makeTarget = _GetMakeTarget(target, true);
+				if (!makeTarget->IsBound()) {
+					// Bind independent targets, but don't make them.
+					_BindTarget(makeTarget);
 
-				// Unprocessed targets neither exist or are marked for
-				// updating; if EXISTING or UPDATED modifiers are present,
-				// we can safely skip any sources without warning.
-				if (isSources
-					&& ((flags & data::RuleActions::EXISTING)
-						|| (flags & data::RuleActions::UPDATED)))
+					// Don't warn about standalone targets if the source list is
+					// "trimmed" via EXISTING or UPDATED.
+					if (!(isSources && isTrimmedSources)) {
+						std::stringstream warning{};
+						auto warningString{
+							_IsPseudoTarget(makeTarget)
+								? "using independent pseudotarget "
+								: "using independent target "};
+						warning << warningString
+								<< makeTarget->GetTarget()->Name();
+
+						_PrintWarning(warning.str());
+					}
+				}
+
+				if (isSources && isExistingAction && !makeTarget->FileExists())
 					continue;
 
-				std::stringstream warning{};
-				auto warningString{
-					_IsPseudoTarget(makeTarget)
-						? "using independent pseudotarget "
-						: "using independent target "};
-				warning << warningString << makeTarget->GetTarget()->Name();
+				if (isSources && isUpdatedAction
+					&& makeTarget->GetFate() != MakeTarget::MAKE)
+					continue;
 
-				_PrintWarning(warning.str());
+				boundTargets.Append(makeTarget->BoundPath());
 			}
-
-			if ((flags & data::RuleActions::EXISTING)
-				&& !makeTarget->FileExists())
-				continue;
-
-			if ((flags & data::RuleActions::UPDATED)
-				&& makeTarget->GetFate() != MakeTarget::MAKE)
-				continue;
-
-			boundTargets.Append(makeTarget->BoundPath());
-		}
-	};
+		};
 
 	StringList boundTargets;
 	setBoundTargets(boundTargets, actionsCall->Targets(), false);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
+	const bool targetsEmpty = boundTargets.IsEmpty();
 
 	StringList boundSourceTargets;
 	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets(), true);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
+	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
 
-	// get the first of the targets and push a copy of its variable domain as a
-	// new local scope
+	// get the first of the targets and push a copy of its variable domain
+	// as a new local scope
 	const Target* target = *actionsCall->Targets().begin();
 	data::VariableDomain localVariables;
 	if (target->Variables() != nullptr)
@@ -852,12 +858,35 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
+			// Check for empty expansions
+			const auto isVar = [wordStart](char varName) {
+				return wordStart[2] == varName;
+			};
+			const bool varIsTarget = isVar('1') || isVar('<');
+			const bool varIsSource = isVar('2') || isVar('>');
+
+			// If sources are being expanded and have been trimmed to empty by
+			// EXISTING or UPDATED, cancel this action.
+			if (varIsSource && sourcesEmpty && isTrimmedSources)
+				return nullptr;
+
+			// If a target list is otherwise empty and used, print a warning.
+			if ((sourcesEmpty && varIsSource)
+				|| (targetsEmpty && varIsTarget)) {
+				std::stringstream warning{};
+				warning << "action " << actionsCall->Actions()->RuleName()
+						<< " called with no ";
+				warning << (varIsSource ? "sources" : "targets");
+				_PrintWarning(warning.str());
+			}
+
 			StringList result = code::Leaf::EvaluateString(
 				fEvaluationContext,
 				wordStart,
 				remainder,
 				nullptr
 			);
+
 			bool isFirst = true;
 			for (StringList::Iterator it = result.GetIterator();
 				 it.HasNext();) {
