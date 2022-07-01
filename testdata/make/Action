@@ -37,3 +37,23 @@ Depends all : target ;
 #!file target
 source1 source2
 ---
+# Standalone targets are bound.
+# target	- target (missing)
+# source	- source
+#
+#!file Jamfile
+actions CopyFile
+{
+    cp $(2) $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source = src ;
+CopyFile target : source ;
+Depends all : target ;
+#!file src/source
+Source contents
+-
+#!file target
+Source contents
+---

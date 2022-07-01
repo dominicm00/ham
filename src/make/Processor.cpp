@@ -749,20 +749,20 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			for (const auto target : targets) {
 				MakeTarget* makeTarget = _GetMakeTarget(target, true);
 				if (!makeTarget->IsBound()) {
-					String targetName{makeTarget->GetTarget()->Name()};
+					// Bind independent targets, but don't make them.
+					_BindTarget(makeTarget);
 
 					std::stringstream warning{};
 					auto warningString{
 						_IsPseudoTarget(makeTarget)
 							? "using independent pseudotarget "
 							: "using independent target "};
-					warning << warningString << targetName;
+					warning << warningString << makeTarget->GetTarget()->Name();
 
 					_PrintWarning(warning.str());
-					boundTargets.Append(targetName);
-				} else {
-					boundTargets.Append(makeTarget->BoundPath());
 				}
+
+				boundTargets.Append(makeTarget->BoundPath());
 			}
 		};
 
