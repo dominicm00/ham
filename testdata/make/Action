@@ -1,0 +1,39 @@
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# Unbound pseudotargets default to target name.
+# target	- target (missing)
+#
+#!file Jamfile
+actions EchoSources
+{
+    echo $(2) >> $(1)
+}
+
+NOTFILE source1 source2 ;
+
+LOCATE on target = . ;
+EchoSources target : source1 source2 ;
+Depends all : target ;
+-
+#!file target
+source1 source2
+---
+# Unbound targets default to target name.
+# target	- target (missing)
+#
+#!file Jamfile
+actions EchoSources
+{
+    echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+EchoSources target : source1 source2 ;
+Depends all : target ;
+-
+#!file target
+source1 source2
+---
