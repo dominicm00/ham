@@ -751,13 +751,14 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 				if (!makeTarget->IsBound()) {
 					String targetName{makeTarget->GetTarget()->Name()};
 
-					// Output a warning only if target is not a pseudotarget
-					if (!_IsPseudoTarget(makeTarget)) {
-						std::stringstream warning{};
-						warning << "using independent target " << targetName;
-						_PrintWarning(warning.str());
-					}
+					std::stringstream warning{};
+					auto warningString{
+						_IsPseudoTarget(makeTarget)
+							? "using independent pseudotarget "
+							: "using independent target "};
+					warning << warningString << targetName;
 
+					_PrintWarning(warning.str());
 					boundPaths.Append(targetName);
 				} else {
 					boundPaths.Append(makeTarget->BoundPath());
