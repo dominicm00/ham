@@ -744,8 +744,8 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 	// TODO: Support RuleActions::UPDATED
 	// TODO: Support RuleActions::EXISTING
-	auto setBoundPaths =
-		[this](StringList& boundPaths, const data::TargetList& targets) {
+	auto setBoundTargets =
+		[this](StringList& boundTargets, const data::TargetList& targets) {
 			for (const auto target : targets) {
 				MakeTarget* makeTarget = _GetMakeTarget(target, true);
 				if (!makeTarget->IsBound()) {
@@ -759,20 +759,20 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 					warning << warningString << targetName;
 
 					_PrintWarning(warning.str());
-					boundPaths.Append(targetName);
+					boundTargets.Append(targetName);
 				} else {
-					boundPaths.Append(makeTarget->BoundPath());
+					boundTargets.Append(makeTarget->BoundPath());
 				}
 			}
 		};
 
 	StringList boundTargets;
-	setBoundPaths(boundTargets, actionsCall->Targets());
+	setBoundTargets(boundTargets, actionsCall->Targets());
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 
 	StringList boundSourceTargets;
-	setBoundPaths(boundSourceTargets, actionsCall->SourceTargets());
+	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets());
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 
