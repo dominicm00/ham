@@ -102,7 +102,33 @@ EchoAction target : source1 source2 source3 ;
 Depends all : target ;
 Depends target : source2 ;
 -
+#!error make
 #!file target missing
+---
+# Updated modifier, independent targets, compatibility
+# target	- target
+# source1	- source (missing)
+# source2	- source (missing)
+# source3	- source (missing)
+#!file Jamfile
+#!compat jam boost !ham
+actions updated EchoAction
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+NOTFILE source2 ;
+EchoAction target : source1 source2 source3 ;
+Depends all : target ;
+Depends target : source2 ;
+-
+#!file target
+./source1 ./source2 ./source3
 ---
 # Updated modifier, some targets updated
 # target	- target
