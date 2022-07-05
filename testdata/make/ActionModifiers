@@ -102,7 +102,8 @@ EchoAction target : source1 source2 source3 ;
 Depends all : target ;
 Depends target : source2 ;
 -
-#!error make
+#!exception
+using independent target source1 in an 'updated' action
 #!file target missing
 ---
 # Updated modifier, independent targets, compatibility
