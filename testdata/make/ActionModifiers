@@ -81,7 +81,7 @@ Depends all : target ;
 -
 #!file target missing
 ---
-# Updated modifier, all targets missing
+# Updated modifier, independent targets
 # target	- target
 # source1	- source (missing)
 # source2	- source (missing)
@@ -97,11 +97,12 @@ LOCATE on source1 = . ;
 LOCATE on source2 = . ;
 LOCATE on source3 = . ;
 
+NOTFILE source2 ;
 EchoAction target : source1 source2 source3 ;
 Depends all : target ;
+Depends target : source2 ;
 -
-#!file target
-./source1 ./source2 ./source3
+#!file target missing
 ---
 # Updated modifier, some targets updated
 # target	- target
@@ -128,7 +129,7 @@ Depends all : target ;
 Old
 #!file source1 2
 Source1
-#!file source2
+#!file source2 0
 Source2
 #!file source3 2
 Source3
