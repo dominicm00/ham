@@ -35,7 +35,8 @@ split_string(const std::string& string)
 		std::string substring(
 			remainder,
 			index,
-			end != std::string::npos ? end : remainder.length() - index
+			end != std::string::npos ? end - index : std::string::npos
+
 		);
 		result.push_back(substring);
 		index += substring.length();
