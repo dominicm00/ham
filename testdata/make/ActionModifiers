@@ -239,3 +239,48 @@ Updated
 Source3
 Updated
 ---
+# Updated modifier, targets updated indirectly
+# oldTarget	- target (old)
+# newTarget - target (new)
+# source1	- source (directly updated)
+# source2	- source (directly not updated)
+# source3	- source (indirectly updated)
+# source4	- source (indirectly not updated)
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on newTarget = . ;
+LOCATE on oldTarget = . ;
+JoinFiles newTarget : source1 source2 source3 source4 ;
+
+Depends newTarget : source1 source2 ;
+Depends oldTarget : source3 source4 newTarget ;
+Depends all : oldTarget ;
+
+#!file oldTarget 3
+Old
+#!file newTarget 1
+New
+#!file source1
+Source1
+#!file source2 1
+Source2
+#!file source3 2
+Source3
+#!file source4 3
+Source4
+-
+#!file newTarget
+Source1
+Source3
+Updated
+---
