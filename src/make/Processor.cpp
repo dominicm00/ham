@@ -15,6 +15,7 @@
 #include "data/RegExp.hpp"
 #include "data/RuleActions.hpp"
 #include "data/TargetBinder.hpp"
+#include "data/TargetContainers.hpp"
 #include "make/Command.hpp"
 #include "make/MakeException.hpp"
 #include "make/MakeTarget.hpp"
@@ -740,91 +741,98 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 	return skippedCount;
 }
 
-Command*
-Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
+void
+Processor::_BindActionTargets(
+	const data::RuleActionsCall* actionCall,
+	const bool isSources,
+	StringList& boundTargets
+)
 {
+	const std::uint32_t flags =
+		actionCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+	const bool isExistingAction = flags & data::RuleActions::EXISTING;
+	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+
+	const data::TargetList& targets = actionCall->Targets();
+
+	const Target* primaryTarget = *targets.begin();
+	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
+
+	for (const auto target : targets) {
+		MakeTarget* makeTarget = _GetMakeTarget(target, true);
+
+		if (!makeTarget->IsBound()) {
+			// Bind independent targets, but don't make them.
+			_BindTarget(makeTarget);
+
+			// Sources to EXISTING actions are always independent, so
+			// don't warn about them.
+			if (!(isSources && isExistingAction)) {
+				std::stringstream warning{};
+				auto warningString{
+					_IsPseudoTarget(makeTarget)
+						? "using independent pseudotarget "
+						: "using independent target "};
+				warning << warningString << makeTarget->GetTarget()->Name();
+
+				// Sources to UPDATED actions must be in the dependency
+				// tree
+				//
+				// TODO: Jam includes independent targets in UPDATED
+				// actions, so this should be made compatibility
+				// behavior.
+				if (isSources && isUpdatedAction) {
+					warning << " in an 'updated' action";
+					throw MakeException(warning.str());
+				} else {
+					_PrintWarning(warning.str());
+				}
+			}
+		}
+
+		if (isSources) {
+			if (isExistingAction && !makeTarget->FileExists())
+				continue;
+
+			// A source is updated if:
+			// - It is being made, or
+			// - It is newer than the target
+			bool updated = makeTarget->GetFate() == MakeTarget::MAKE
+				|| primaryMakeTarget->GetOriginalTime() < makeTarget->GetTime();
+			if (isUpdatedAction && !updated)
+				continue;
+		}
+
+		boundTargets.Append(makeTarget->BoundPath());
+	}
+}
+
+Command*
+Processor::_BuildCommand(data::RuleActionsCall* actionCall)
+{
+	const std::uint32_t flags =
+		actionCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+	const bool isExistingAction = flags & data::RuleActions::EXISTING;
+	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+
 	// create a variable domain for the built-in variables (the numbered ones
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
-	const std::uint32_t flags =
-		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	const bool isExistingAction = flags & data::RuleActions::EXISTING;
-	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
-	const bool isTrimmedSources = isExistingAction || isUpdatedAction;
-	const Target* primaryTarget = *actionsCall->Targets().begin();
-	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
-
-	const auto setBoundTargets =
-		[this, isExistingAction, isUpdatedAction, primaryMakeTarget](
-			StringList& boundTargets,
-			const data::TargetList& targets,
-			const bool isSources
-		) {
-			for (const auto target : targets) {
-				MakeTarget* makeTarget = _GetMakeTarget(target, true);
-
-				if (!makeTarget->IsBound()) {
-					// Bind independent targets, but don't make them.
-					_BindTarget(makeTarget);
-
-					// Sources to EXISTING actions are always independent, so
-					// don't warn about them.
-					if (!(isSources && isExistingAction)) {
-						std::stringstream warning{};
-						auto warningString{
-							_IsPseudoTarget(makeTarget)
-								? "using independent pseudotarget "
-								: "using independent target "};
-						warning << warningString
-								<< makeTarget->GetTarget()->Name();
-
-						// Sources to UPDATED actions must be in the dependency
-						// tree
-						//
-						// TODO: Jam includes independent targets in UPDATED
-						// actions, so this should be made compatibility
-						// behavior.
-						if (isSources && isUpdatedAction) {
-							warning << " in an 'updated' action";
-							throw MakeException(warning.str());
-						} else {
-							_PrintWarning(warning.str());
-						}
-					}
-				}
-
-				if (isSources) {
-					if (isExistingAction && !makeTarget->FileExists())
-						continue;
-
-					// A source is updated if:
-					// - It is being made, or
-					// - It is newer than the target
-					bool updated = makeTarget->GetFate() == MakeTarget::MAKE
-						|| primaryMakeTarget->GetOriginalTime()
-							< makeTarget->GetTime();
-					if (isUpdatedAction && !updated)
-						continue;
-				}
-
-				boundTargets.Append(makeTarget->BoundPath());
-			}
-		};
-
 	StringList boundTargets;
-	setBoundTargets(boundTargets, actionsCall->Targets(), false);
+	_BindActionTargets(actionCall, false, boundTargets);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 	const bool targetsEmpty = boundTargets.IsEmpty();
 
 	StringList boundSourceTargets;
-	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets(), true);
+	_BindActionTargets(actionCall, true, boundSourceTargets);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
 
 	// Push a copy of the primary target's variable domain as a new local scope
+	const Target* primaryTarget = *actionCall->Targets().begin();
 	data::VariableDomain localVariables;
 	if (primaryTarget->Variables() != nullptr)
 		localVariables = *primaryTarget->Variables();
@@ -839,7 +847,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	fEvaluationContext.SetBuiltInVariables(&builtInVariables);
 
 	// bind the variables specified by the actions
-	for (StringList::Iterator it = actionsCall->Actions()->Variables();
+	for (StringList::Iterator it = actionCall->Actions()->Variables();
 		 it.HasNext();) {
 		String variable = it.Next();
 		if (const StringList* values =
@@ -855,7 +863,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		}
 	}
 
-	String rawCommandLine = actionsCall->Actions()->Actions();
+	String rawCommandLine = actionCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
@@ -887,14 +895,15 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 			// If sources are being expanded and have been trimmed to empty by
 			// EXISTING or UPDATED, cancel this action.
-			if (varIsSource && sourcesEmpty && isTrimmedSources)
+			if (varIsSource && sourcesEmpty
+				&& (isExistingAction || isUpdatedAction))
 				return nullptr;
 
 			// If a target list is otherwise empty and used, print a warning.
 			if ((sourcesEmpty && varIsSource)
 				|| (targetsEmpty && varIsTarget)) {
 				std::stringstream warning{};
-				warning << "action " << actionsCall->Actions()->RuleName()
+				warning << "action " << actionCall->Actions()->RuleName()
 						<< " called with no ";
 				warning << (varIsSource ? "sources" : "targets");
 				_PrintWarning(warning.str());
@@ -924,7 +933,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	fEvaluationContext.SetLocalScope(oldLocalScope);
 	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
 
-	return new Command(actionsCall, commandLine, boundTargets);
+	return new Command(actionCall, commandLine, boundTargets);
 }
 
 void

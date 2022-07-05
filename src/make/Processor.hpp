@@ -6,6 +6,7 @@
 #define HAM_CODE_PROCESSOR_HPP
 
 #include "code/EvaluationContext.hpp"
+#include "data/RuleActions.hpp"
 #include "data/StringList.hpp"
 #include "data/TargetPool.hpp"
 #include "data/VariableDomain.hpp"
@@ -116,6 +117,20 @@ class Processor
 	 * \param[in] makeTarget
 	 */
 	void _BindTarget(MakeTarget* makeTarget);
+
+	/**
+	 * Create a list of bound paths from an actions targets. Depending on action
+	 * modifiers, may exclude certain targets.
+	 *
+	 * \param[in] actionCall action call to bind
+	 * \param[in] isSources whether or not to bind the sources of the action
+	 * call \param[out] boundTargets list to append bound targets to
+	 */
+	void _BindActionTargets(
+		const data::RuleActionsCall* actionCall,
+		const bool isSources,
+		StringList& boundTargets
+	);
 
 	/**
 	 * Scans target with the kHeaderScanVariableName egrep pattern. If matches
