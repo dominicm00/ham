@@ -753,9 +753,10 @@ Processor::_BindActionTargets(
 	const bool isExistingAction = flags & data::RuleActions::EXISTING;
 	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
 
-	const data::TargetList& targets = actionCall->Targets();
+	const data::TargetList& targets =
+		isSources ? actionCall->SourceTargets() : actionCall->Targets();
 
-	const Target* primaryTarget = *targets.begin();
+	const Target* primaryTarget = *actionCall->Targets().begin();
 	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
 	for (const auto target : targets) {
