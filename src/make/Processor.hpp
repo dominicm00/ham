@@ -122,12 +122,12 @@ class Processor
 	 * Create a list of bound paths from an actions targets. Depending on action
 	 * modifiers, may exclude certain targets.
 	 *
-	 * \param[in] actionCall action call to bind
+	 * \param[in] actionsCall actions call to bind
 	 * \param[in] isSources whether or not to bind the sources of the action
 	 * call \param[out] boundTargets list to append bound targets to
 	 */
-	void _BindActionTargets(
-		const data::RuleActionsCall* actionCall,
+	void _BindActionsTargets(
+		const data::RuleActionsCall* actionsCall,
 		const bool isSources,
 		StringList& boundTargets
 	);

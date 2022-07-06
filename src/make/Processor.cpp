@@ -742,21 +742,21 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 }
 
 void
-Processor::_BindActionTargets(
-	const data::RuleActionsCall* actionCall,
+Processor::_BindActionsTargets(
+	const data::RuleActionsCall* actionsCall,
 	const bool isSources,
 	StringList& boundTargets
 )
 {
 	const std::uint32_t flags =
-		actionCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
 	const bool isExistingAction = flags & data::RuleActions::EXISTING;
 	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
 
 	const data::TargetList& targetList =
-		isSources ? actionCall->SourceTargets() : actionCall->Targets();
+		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
 
-	const Target* primaryTarget = *actionCall->Targets().begin();
+	const Target* primaryTarget = *actionsCall->Targets().begin();
 	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
 	for (const auto target : targetList) {
@@ -816,14 +816,14 @@ Processor::_BindActionTargets(
 }
 
 Command*
-Processor::_BuildCommand(data::RuleActionsCall* actionCall)
+Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
 	const std::uint32_t flags =
-		actionCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
 	const bool isExistingAction = flags & data::RuleActions::EXISTING;
 	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
 
-	auto numTargets = actionCall->Targets().size();
+	auto numTargets = actionsCall->Targets().size();
 
 	// Actions must have at least one target (ADR 5)
 	//
@@ -832,7 +832,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	// somewhere in parsing.
 	if (numTargets == 0) {
 		std::stringstream error{};
-		error << "Error: Action " << actionCall->Actions()->RuleName()
+		error << "Error: Action " << actionsCall->Actions()->RuleName()
 			  << " was called with no targets";
 		throw MakeException(error.str());
 	}
@@ -840,7 +840,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	// Updated actions cannot have multiple targets (ADR 4)
 	if (isUpdatedAction && numTargets > 1) {
 		std::stringstream error{};
-		error << "Error: Action " << actionCall->Actions()->RuleName()
+		error << "Error: Action " << actionsCall->Actions()->RuleName()
 			  << " has 'updated' modifier and must be passed exactly 1 target, "
 				 "but was passed "
 			  << numTargets;
@@ -852,19 +852,19 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	data::VariableDomain builtInVariables;
 
 	StringList boundTargets;
-	_BindActionTargets(actionCall, false, boundTargets);
+	_BindActionTargets(actionsCall, false, boundTargets);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 	const bool targetsEmpty = boundTargets.IsEmpty();
 
 	StringList boundSourceTargets;
-	_BindActionTargets(actionCall, true, boundSourceTargets);
+	_BindActionTargets(actionsCall, true, boundSourceTargets);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
 
 	// Push a copy of the primary target's variable domain as a new local scope
-	const Target* primaryTarget = *actionCall->Targets().begin();
+	const Target* primaryTarget = *actionsCall->Targets().begin();
 	data::VariableDomain localVariables;
 	if (primaryTarget->Variables() != nullptr)
 		localVariables = *primaryTarget->Variables();
@@ -879,7 +879,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	fEvaluationContext.SetBuiltInVariables(&builtInVariables);
 
 	// bind the variables specified by the actions
-	for (StringList::Iterator it = actionCall->Actions()->Variables();
+	for (StringList::Iterator it = actionsCall->Actions()->Variables();
 		 it.HasNext();) {
 		String variable = it.Next();
 		if (const StringList* values =
@@ -902,7 +902,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 		fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
 	};
 
-	String rawCommandLine = actionCall->Actions()->Actions();
+	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
@@ -944,7 +944,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 			if ((sourcesEmpty && varIsSource)
 				|| (targetsEmpty && varIsTarget)) {
 				std::stringstream warning{};
-				warning << "action " << actionCall->Actions()->RuleName()
+				warning << "action " << actionsCall->Actions()->RuleName()
 						<< " called with no ";
 				warning << (varIsSource ? "sources" : "targets");
 				_PrintWarning(warning.str());
@@ -971,7 +971,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	}
 
 	cleanup();
-	return new Command(actionCall, commandLine, boundTargets);
+	return new Command(actionsCall, commandLine, boundTargets);
 }
 
 void
