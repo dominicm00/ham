@@ -823,6 +823,18 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 	const bool isExistingAction = flags & data::RuleActions::EXISTING;
 	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
 
+	auto numTargets = actionCall->Targets().size();
+
+	// Updated actions cannot have multiple targets (ADR 4)
+	if (isUpdatedAction && numTargets > 1) {
+		std::stringstream error{};
+		error << "Error: Action " << actionCall->Actions()->RuleName()
+			  << " has 'updated' modifier and must be passed exactly 1 target, "
+				 "but was passed "
+			  << numTargets;
+		throw MakeException(error.str());
+	}
+
 	// create a variable domain for the built-in variables (the numbered ones
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
