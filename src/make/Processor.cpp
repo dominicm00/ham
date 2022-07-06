@@ -753,13 +753,13 @@ Processor::_BindActionTargets(
 	const bool isExistingAction = flags & data::RuleActions::EXISTING;
 	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
 
-	const data::TargetList& targets =
+	const data::TargetList& targetList =
 		isSources ? actionCall->SourceTargets() : actionCall->Targets();
 
 	const Target* primaryTarget = *actionCall->Targets().begin();
 	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
-	for (const auto target : targets) {
+	for (const auto target : targetList) {
 		MakeTarget* makeTarget = _GetMakeTarget(target, true);
 
 		if (!makeTarget->IsBound()) {
@@ -799,11 +799,13 @@ Processor::_BindActionTargets(
 			// - It is being made, or
 			// - It is newer than the primary target, and
 			// - It is not a pseudotarget
-			bool updated = !_IsPseudoTarget(makeTarget)
-				&& (makeTarget->GetFate() == MakeTarget::MAKE
-					|| primaryMakeTarget->GetOriginalTime()
-						< makeTarget->GetTime());
-			if (isUpdatedAction && !updated)
+			bool isMake = makeTarget->GetFate() == MakeTarget::MAKE;
+			bool isNewer =
+				primaryMakeTarget->GetOriginalTime() < makeTarget->GetTime();
+			bool isUpdatedTarget =
+				!_IsPseudoTarget(makeTarget) && (isMake || isNewer);
+
+			if (isUpdatedAction && !isUpdatedTarget)
 				continue;
 		}
 
