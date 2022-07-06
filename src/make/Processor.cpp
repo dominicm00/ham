@@ -825,6 +825,18 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 
 	auto numTargets = actionCall->Targets().size();
 
+	// Actions must have at least one target (ADR 5)
+	//
+	// TODO: This is a redundant check because there shouldn't be a way to
+	// actually call an action without a target. This needs to be implemented
+	// somewhere in parsing.
+	if (numTargets == 0) {
+		std::stringstream error{};
+		error << "Error: Action " << actionCall->Actions()->RuleName()
+			  << " was called with no targets";
+		throw MakeException(error.str());
+	}
+
 	// Updated actions cannot have multiple targets (ADR 4)
 	if (isUpdatedAction && numTargets > 1) {
 		std::stringstream error{};
