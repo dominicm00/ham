@@ -17,17 +17,20 @@ Behavior::Behavior(Compatibility compatibility)
 	: fEchoTrailingSpace(ECHO_NO_TRAILING_SPACE),
 	  fPathRootReplacerSlash(PATH_ROOT_REPLACER_SLASH_AVOID_DUPLICATE),
 	  fBrokenSubscriptJoin(NO_BROKEN_SUBSCRIPT_JOIN),
-	  fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR)
+	  fJoinCaseOperator(JOIN_AFTER_CASE_OPERATOR),
+	  fErrorUpdatedSource(ERROR_INDEPENDENT_UPDATED)
 {
 	switch (compatibility) {
 		case COMPATIBILITY_JAM:
 			fEchoTrailingSpace = ECHO_TRAILING_SPACE;
 			fPathRootReplacerSlash = PATH_ROOT_REPLACER_SLASH_ALWAYS;
 			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
+			fErrorUpdatedSource = WARN_INDEPENDENT_UPDATED;
 			break;
 		case COMPATIBILITY_BOOST_JAM:
 			fBrokenSubscriptJoin = BROKEN_SUBSCRIPT_JOIN;
 			fJoinCaseOperator = JOIN_BEFORE_CASE_OPERATOR;
+			fErrorUpdatedSource = WARN_INDEPENDENT_UPDATED;
 			break;
 		case COMPATIBILITY_HAM_1:
 			break;

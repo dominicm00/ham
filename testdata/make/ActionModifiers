@@ -1,0 +1,358 @@
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# Don't include missing sources in 'existing' actions
+# target	- target
+# source1	- source
+# source2	- source (missing)
+# source3	- source
+#
+#!file Jamfile
+actions existing EchoExisting
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoExisting target : source1 source2 source3 ;
+Depends all : target ;
+#!file source1
+Already exists
+#!file source3
+Already exists
+-
+#!file target
+./source1 ./source3
+---
+# Include all existing sources in 'existing' actions
+# target	- target
+# source1	- source
+# source2	- source
+# source3	- source
+#
+#!file Jamfile
+actions existing EchoExisting
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoExisting target : source1 source2 source3 ;
+Depends all : target ;
+#!file source1
+Already exists
+#!file source2
+Already exists
+#!file source3
+Already exists
+-
+#!file target
+./source1 ./source2 ./source3
+---
+# Don't run 'existing' actions without any existing sources
+# target	- target
+# source1	- source (missing)
+# source2	- source (missing)
+# source3	- source (missing)
+#
+#!file Jamfile
+actions existing EchoAction
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+EchoAction target : source1 source2 source3 ;
+Depends all : target ;
+-
+#!file target missing
+---
+# Updated modifier, independent targets
+# target	- target
+# source1	- source (missing)
+# source2	- source (missing)
+# source3	- source (missing)
+#!file Jamfile
+actions updated EchoAction
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+NOTFILE source2 ;
+EchoAction target : source1 source2 source3 ;
+Depends all : target ;
+Depends target : source2 ;
+-
+#!exception
+using independent target source1 in an 'updated' action
+#!file target missing
+---
+# Updated modifier, independent targets, compatibility
+# target	- target
+# source1	- source (missing)
+# source2	- source (missing)
+# source3	- source (missing)
+#!file Jamfile
+#!compat jam boost !ham
+actions updated EchoAction
+{
+	echo $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on source3 = . ;
+
+NOTFILE source2 ;
+EchoAction target : source1 source2 source3 ;
+Depends all : target ;
+Depends target : source2 ;
+-
+#!file target
+./source1 ./source2 ./source3
+---
+# Updated modifier, some targets updated
+# target	- target
+# source1	- source (older)
+# source2	- source (newer)
+# source3	- source (older)
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1 2
+Source1
+#!file source2 0
+Source2
+#!file source3 2
+Source3
+-
+#!file target
+Source2
+Updated
+---
+# Updated modifier, all targets updated
+# target	- target
+# source1	- source (newer)
+# source2	- source (newer)
+# source3	- source (newer)
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 source2 source3 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1
+Source1
+#!file source2
+Source2
+#!file source3
+Source3
+-
+#!file target
+Source1
+Source2
+Source3
+Updated
+---
+# Updated modifier, no targets updated in an invocation
+# target	- target
+# source1	- source (older)
+# source2	- source (newer)
+# source3	- source (newer)
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) >> $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target = . ;
+JoinFiles target : source1 ;
+JoinFiles target : source2 ;
+JoinFiles target : source3 ;
+Depends all : target ;
+
+#!file target 1
+Old
+#!file source1 2
+Source1
+#!file source2
+Source2
+#!file source3
+Source3
+-
+#!file target
+Old
+Source2
+Updated
+Source3
+Updated
+---
+# Updated modifier, targets updated indirectly
+# oldTarget		- target (old)
+#  source1		- source (directly updated)
+#  source2		- source (directly not updated)
+#  gen			- source (missing, being made)
+#  newTarget	- target (new)
+#   source3		- source (indirectly updated, newer than both)
+#   source4		- source (indirectly updated, newer than target)
+#   source5		- source (indirectly not updated, older than target)
+# siblingTarget	- target (old)
+#  source6		- source (updated for sibling)
+# emptyTarget	- target
+#  pseudo		- source (pseudotarget)
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) > $(1)
+	echo "Updated" >> $(1)
+}
+
+actions GenSource
+{
+	echo Created $(1) > $(1)
+}
+
+NOTFILE pseudo ;
+LOCATE on newTarget = . ;
+LOCATE on oldTarget = . ;
+LOCATE on siblingTarget = . ;
+LOCATE on emptyTarget = . ;
+LOCATE on gen = . ;
+
+GenSource gen ;
+
+JoinFiles oldTarget
+		  : source1
+		   	source2
+		  	source3
+		  	source4
+		  	source5
+		  	source6
+		  	gen ;
+JoinFiles siblingTarget : source6 ;
+JoinFiles newTarget : source3 source4 source5 ;
+JoinFiles emptyTarget : pseudo ;
+
+Depends oldTarget : newTarget ;
+Depends all : oldTarget siblingTarget emptyTarget ;
+
+#!file siblingTarget 4
+Sibling
+#!file oldTarget 3
+Old
+#!file newTarget 1
+New
+#!file source1
+Source1
+#!file source2 3
+Source2
+#!file source3
+Source3
+#!file source4 2
+Source4
+#!file source5 3
+Source5
+#!file source6 3
+Source6
+-
+#!file oldTarget
+Source1
+Source3
+Source4
+Created ./gen
+Updated
+#!file siblingTarget
+Source6
+Updated
+#!file newTarget
+Source3
+Updated
+#!file emptyTarget missing
+#!file gen
+Created ./gen
+---
+# Updated modifier, multiple targets
+# target1	- target
+# target2	- target
+# source	- source
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) >> $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target1 = . ;
+LOCATE on target2 = . ;
+JoinFiles target1 target2 : source ;
+Depends all : target1 target2 ;
+
+#!file source
+Source
+-
+#!exception
+Error: Action JoinFiles has 'updated' modifier and must be passed exactly 1 target, but was passed 2
+---

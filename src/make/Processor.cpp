@@ -13,7 +13,9 @@
 #include "code/Leaf.hpp"
 #include "code/OnExpression.hpp"
 #include "data/RegExp.hpp"
+#include "data/RuleActions.hpp"
 #include "data/TargetBinder.hpp"
+#include "data/TargetContainers.hpp"
 #include "make/Command.hpp"
 #include "make/MakeException.hpp"
 #include "make/MakeTarget.hpp"
@@ -659,7 +661,11 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 			command.SetTo(commandIt->second);
 		} else {
 			// prepare the actions command line
-			command.SetTo(_BuildCommand(actionsCall), true);
+			Command* builtCommand = _BuildCommand(actionsCall);
+			if (builtCommand == nullptr)
+				continue;
+
+			command.SetTo(builtCommand, true);
 			if (actionsCall->Targets().size() > 1) {
 				fCommands[actionsCall] = command.Get();
 				command.Get()->AcquireReference();
@@ -735,53 +741,133 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 	return skippedCount;
 }
 
+void
+Processor::_BindActionsTargets(
+	const data::RuleActionsCall* actionsCall,
+	const bool isSources,
+	StringList& boundTargets
+)
+{
+	const std::uint32_t flags =
+		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+	const bool isExistingAction = flags & data::RuleActions::EXISTING;
+	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+
+	const data::TargetList& targetList =
+		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
+
+	const Target* primaryTarget = *actionsCall->Targets().begin();
+	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
+
+	for (const auto target : targetList) {
+		MakeTarget* makeTarget = _GetMakeTarget(target, true);
+
+		if (!makeTarget->IsBound()) {
+			// Bind independent targets, but don't make them.
+			_BindTarget(makeTarget);
+
+			// Sources to EXISTING actions are always independent, so
+			// don't warn about them.
+			if (!(isSources && isExistingAction)) {
+				std::stringstream warning{};
+				auto warningString{
+					_IsPseudoTarget(makeTarget)
+						? "using independent pseudotarget "
+						: "using independent target "};
+				warning << warningString << makeTarget->GetTarget()->Name();
+
+				// Sources to UPDATED actions must be in the dependency
+				// tree
+				if (isSources && isUpdatedAction)
+					warning << " in an 'updated' action";
+
+				bool errorOnIndependentUpdated =
+					fEvaluationContext.GetBehavior().GetErrorUpdatedSource()
+					== behavior::Behavior::ERROR_INDEPENDENT_UPDATED;
+
+				if (isSources && isUpdatedAction && errorOnIndependentUpdated) {
+					throw MakeException(warning.str());
+				} else {
+					_PrintWarning(warning.str());
+				}
+			}
+		}
+
+		if (isSources) {
+			if (isExistingAction && !makeTarget->FileExists())
+				continue;
+
+			// A source is updated if:
+			// - It is being made, or
+			// - It is newer than the primary target, and
+			// - It is not a pseudotarget
+			bool isMake = makeTarget->GetFate() == MakeTarget::MAKE;
+			bool isNewer =
+				primaryMakeTarget->GetOriginalTime() < makeTarget->GetTime();
+			bool isUpdatedTarget =
+				!_IsPseudoTarget(makeTarget) && (isMake || isNewer);
+
+			if (isUpdatedAction && !isUpdatedTarget)
+				continue;
+		}
+
+		boundTargets.Append(makeTarget->BoundPath());
+	}
+}
+
 Command*
 Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
+	const std::uint32_t flags =
+		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
+	const bool isExistingAction = flags & data::RuleActions::EXISTING;
+	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+
+	auto numTargets = actionsCall->Targets().size();
+
+	// Actions must have at least one target (ADR 5)
+	//
+	// TODO: This is a redundant check because there shouldn't be a way to
+	// actually call an action without a target. This needs to be implemented
+	// somewhere in parsing.
+	if (numTargets == 0) {
+		std::stringstream error{};
+		error << "Error: Action " << actionsCall->Actions()->RuleName()
+			  << " was called with no targets";
+		throw MakeException(error.str());
+	}
+
+	// Updated actions cannot have multiple targets (ADR 4)
+	if (isUpdatedAction && numTargets > 1) {
+		std::stringstream error{};
+		error << "Error: Action " << actionsCall->Actions()->RuleName()
+			  << " has 'updated' modifier and must be passed exactly 1 target, "
+				 "but was passed "
+			  << numTargets;
+		throw MakeException(error.str());
+	}
+
 	// create a variable domain for the built-in variables (the numbered ones
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
-	// TODO: Support RuleActions::UPDATED
-	// TODO: Support RuleActions::EXISTING
-	auto setBoundTargets =
-		[this](StringList& boundTargets, const data::TargetList& targets) {
-			for (const auto target : targets) {
-				MakeTarget* makeTarget = _GetMakeTarget(target, true);
-				if (!makeTarget->IsBound()) {
-					// Bind independent targets, but don't make them.
-					_BindTarget(makeTarget);
-
-					std::stringstream warning{};
-					auto warningString{
-						_IsPseudoTarget(makeTarget)
-							? "using independent pseudotarget "
-							: "using independent target "};
-					warning << warningString << makeTarget->GetTarget()->Name();
-
-					_PrintWarning(warning.str());
-				}
-
-				boundTargets.Append(makeTarget->BoundPath());
-			}
-		};
-
 	StringList boundTargets;
-	setBoundTargets(boundTargets, actionsCall->Targets());
+	_BindActionsTargets(actionsCall, false, boundTargets);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
+	const bool targetsEmpty = boundTargets.IsEmpty();
 
 	StringList boundSourceTargets;
-	setBoundTargets(boundSourceTargets, actionsCall->SourceTargets());
+	_BindActionsTargets(actionsCall, true, boundSourceTargets);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
+	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
 
-	// get the first of the targets and push a copy of its variable domain as a
-	// new local scope
-	const Target* target = *actionsCall->Targets().begin();
+	// Push a copy of the primary target's variable domain as a new local scope
+	const Target* primaryTarget = *actionsCall->Targets().begin();
 	data::VariableDomain localVariables;
-	if (target->Variables() != nullptr)
-		localVariables = *target->Variables();
+	if (primaryTarget->Variables() != nullptr)
+		localVariables = *primaryTarget->Variables();
 	data::VariableScope* oldLocalScope = fEvaluationContext.LocalScope();
 	data::VariableScope localScope(localVariables, oldLocalScope);
 
@@ -809,6 +895,13 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		}
 	}
 
+	// Cleanup function; must always be called before returning
+	const auto cleanup = [this, oldLocalScope, oldBuiltInVariables]() {
+		// reinstate the old local variable scope and the built-in variables
+		fEvaluationContext.SetLocalScope(oldLocalScope);
+		fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
+	};
+
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
@@ -832,12 +925,38 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
+			// Check for empty expansions
+			const auto isVar = [wordStart](char varName) {
+				return wordStart[2] == varName;
+			};
+			const bool varIsTarget = isVar('1') || isVar('<');
+			const bool varIsSource = isVar('2') || isVar('>');
+
+			// If sources are being expanded and have been trimmed to empty by
+			// EXISTING or UPDATED, cancel this action.
+			if (varIsSource && sourcesEmpty
+				&& (isExistingAction || isUpdatedAction)) {
+				cleanup();
+				return nullptr;
+			}
+
+			// If a target list is otherwise empty and used, print a warning.
+			if ((sourcesEmpty && varIsSource)
+				|| (targetsEmpty && varIsTarget)) {
+				std::stringstream warning{};
+				warning << "action " << actionsCall->Actions()->RuleName()
+						<< " called with no ";
+				warning << (varIsSource ? "sources" : "targets");
+				_PrintWarning(warning.str());
+			}
+
 			StringList result = code::Leaf::EvaluateString(
 				fEvaluationContext,
 				wordStart,
 				remainder,
 				nullptr
 			);
+
 			bool isFirst = true;
 			for (StringList::Iterator it = result.GetIterator();
 				 it.HasNext();) {
@@ -851,10 +970,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			commandLine.Append(wordStart, remainder - wordStart);
 	}
 
-	// reinstate the old local variable scope and the built-in variables
-	fEvaluationContext.SetLocalScope(oldLocalScope);
-	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
-
+	cleanup();
 	return new Command(actionsCall, commandLine, boundTargets);
 }
 
