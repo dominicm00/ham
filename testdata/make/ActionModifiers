@@ -241,12 +241,18 @@ Source3
 Updated
 ---
 # Updated modifier, targets updated indirectly
-# oldTarget	- target (old)
-# newTarget - target (new)
-# source1	- source (directly updated)
-# source2	- source (directly not updated)
-# source3	- source (indirectly updated)
-# source4	- source (indirectly not updated)
+# oldTarget		- target (old)
+#  source1		- source (directly updated)
+#  source2		- source (directly not updated)
+#  gen			- source (missing, being made)
+#  newTarget	- target (new)
+#   source3		- source (indirectly updated, newer than both)
+#   source4		- source (indirectly updated, newer than target)
+#   source5		- source (indirectly not updated, older than target)
+# siblingTarget	- target (old)
+#  source6		- source (updated for sibling)
+# emptyTarget	- target
+#  pseudo		- source (pseudotarget)
 #!file Jamfile
 rule JoinFiles
 {
@@ -259,29 +265,67 @@ actions updated JoinFiles
 	echo "Updated" >> $(1)
 }
 
+actions GenSource
+{
+	echo Created $(1) > $(1)
+}
+
+NOTFILE pseudo ;
 LOCATE on newTarget = . ;
 LOCATE on oldTarget = . ;
-JoinFiles newTarget : source1 source2 source3 source4 ;
+LOCATE on siblingTarget = . ;
+LOCATE on emptyTarget = . ;
+LOCATE on gen = . ;
 
-Depends newTarget : source1 source2 ;
-Depends oldTarget : source3 source4 newTarget ;
-Depends all : oldTarget ;
+GenSource gen ;
 
+JoinFiles oldTarget
+		  : source1
+		   	source2
+		  	source3
+		  	source4
+		  	source5
+		  	source6
+		  	gen ;
+JoinFiles siblingTarget : source6 ;
+JoinFiles newTarget : source3 source4 source5 ;
+JoinFiles emptyTarget : pseudo ;
+
+Depends oldTarget : newTarget ;
+Depends all : oldTarget siblingTarget emptyTarget ;
+
+#!file siblingTarget 4
+Sibling
 #!file oldTarget 3
 Old
 #!file newTarget 1
 New
 #!file source1
 Source1
-#!file source2 1
+#!file source2 3
 Source2
-#!file source3 2
+#!file source3
 Source3
-#!file source4 3
+#!file source4 2
 Source4
+#!file source5 3
+Source5
+#!file source6 3
+Source6
 -
-#!file newTarget
+#!file oldTarget
 Source1
 Source3
+Source4
+Created gen
 Updated
+#!file siblingTarget
+Source6
+Updated
+#!file newTarget
+Source3
+Updated
+#!file emptyTarget missing
+#!file gen
+Created gen
 ---
