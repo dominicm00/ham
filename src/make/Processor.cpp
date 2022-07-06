@@ -852,13 +852,13 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	data::VariableDomain builtInVariables;
 
 	StringList boundTargets;
-	_BindActionTargets(actionsCall, false, boundTargets);
+	_BindActionsTargets(actionsCall, false, boundTargets);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
 	const bool targetsEmpty = boundTargets.IsEmpty();
 
 	StringList boundSourceTargets;
-	_BindActionTargets(actionsCall, true, boundSourceTargets);
+	_BindActionsTargets(actionsCall, true, boundSourceTargets);
 	builtInVariables.Set("2", boundSourceTargets);
 	builtInVariables.Set(">", boundSourceTargets);
 	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
