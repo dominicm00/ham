@@ -869,6 +869,13 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 		}
 	}
 
+	// Cleanup function; must always be called before returning
+	const auto cleanup = [this, oldLocalScope, oldBuiltInVariables]() {
+		// reinstate the old local variable scope and the built-in variables
+		fEvaluationContext.SetLocalScope(oldLocalScope);
+		fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
+	};
+
 	String rawCommandLine = actionCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
@@ -902,8 +909,10 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 			// If sources are being expanded and have been trimmed to empty by
 			// EXISTING or UPDATED, cancel this action.
 			if (varIsSource && sourcesEmpty
-				&& (isExistingAction || isUpdatedAction))
+				&& (isExistingAction || isUpdatedAction)) {
+				cleanup();
 				return nullptr;
+			}
 
 			// If a target list is otherwise empty and used, print a warning.
 			if ((sourcesEmpty && varIsSource)
@@ -935,10 +944,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionCall)
 			commandLine.Append(wordStart, remainder - wordStart);
 	}
 
-	// reinstate the old local variable scope and the built-in variables
-	fEvaluationContext.SetLocalScope(oldLocalScope);
-	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
-
+	cleanup();
 	return new Command(actionCall, commandLine, boundTargets);
 }
 
