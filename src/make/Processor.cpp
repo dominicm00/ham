@@ -778,12 +778,14 @@ Processor::_BindActionTargets(
 
 				// Sources to UPDATED actions must be in the dependency
 				// tree
-				//
-				// TODO: Jam includes independent targets in UPDATED
-				// actions, so this should be made compatibility
-				// behavior.
-				if (isSources && isUpdatedAction) {
+				if (isSources && isUpdatedAction)
 					warning << " in an 'updated' action";
+
+				bool errorOnIndependentUpdated =
+					fEvaluationContext.GetBehavior().GetErrorUpdatedSource()
+					== behavior::Behavior::ERROR_INDEPENDENT_UPDATED;
+
+				if (isSources && isUpdatedAction && errorOnIndependentUpdated) {
 					throw MakeException(warning.str());
 				} else {
 					_PrintWarning(warning.str());

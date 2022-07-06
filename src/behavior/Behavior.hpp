@@ -120,6 +120,20 @@ class Behavior
 		JOIN_AFTER_CASE_OPERATOR
 	};
 
+	enum ErrorUpdatedSource {
+		/**
+		 * Error when an independent source is passed to a RuleActions::UPDATED
+		 * action
+		 */
+		ERROR_INDEPENDENT_UPDATED,
+
+		/**
+		 * Warning when an independent source is passed to a
+		 * RuleActions::UPDATED action
+		 */
+		WARN_INDEPENDENT_UPDATED
+	};
+
   public:
 	Behavior(Compatibility compatibility);
 
@@ -136,12 +150,17 @@ class Behavior
 		return fBrokenSubscriptJoin;
 	}
 	JoinCaseOperator GetJoinCaseOperator() const { return fJoinCaseOperator; }
+	ErrorUpdatedSource GetErrorUpdatedSource() const
+	{
+		return fErrorUpdatedSource;
+	}
 
   private:
 	EchoTrailingSpace fEchoTrailingSpace;
 	PathRootReplacerSlash fPathRootReplacerSlash;
 	BrokenSubscriptJoin fBrokenSubscriptJoin;
 	JoinCaseOperator fJoinCaseOperator;
+	ErrorUpdatedSource fErrorUpdatedSource;
 };
 
 } // namespace ham::behavior
