@@ -329,3 +329,30 @@ Updated
 #!file gen
 Created ./gen
 ---
+# Updated modifier, multiple targets
+# target1	- target
+# target2	- target
+# source	- source
+#!file Jamfile
+rule JoinFiles
+{
+	Depends $(1) : $(2) ;
+}
+
+actions updated JoinFiles
+{
+	cat $(2) >> $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on target1 = . ;
+LOCATE on target2 = . ;
+JoinFiles target1 target2 : source ;
+Depends all : target1 target2 ;
+
+#!file source
+Source
+-
+#!exception
+Error: Action JoinFiles has 'updated' modifier and must be passed exactly 1 target, but was passed 2
+---
