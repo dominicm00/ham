@@ -797,9 +797,12 @@ Processor::_BindActionTargets(
 
 			// A source is updated if:
 			// - It is being made, or
-			// - It is newer than the target
-			bool updated = makeTarget->GetFate() == MakeTarget::MAKE
-				|| primaryMakeTarget->GetOriginalTime() < makeTarget->GetTime();
+			// - It is newer than the primary target, and
+			// - It is not a pseudotarget
+			bool updated = !_IsPseudoTarget(makeTarget)
+				&& (makeTarget->GetFate() == MakeTarget::MAKE
+					|| primaryMakeTarget->GetOriginalTime()
+						< makeTarget->GetTime());
 			if (isUpdatedAction && !updated)
 				continue;
 		}
