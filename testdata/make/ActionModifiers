@@ -317,7 +317,7 @@ Source6
 Source1
 Source3
 Source4
-Created gen
+Created ./gen
 Updated
 #!file siblingTarget
 Source6
@@ -327,5 +327,5 @@ Source3
 Updated
 #!file emptyTarget missing
 #!file gen
-Created gen
+Created ./gen
 ---
