@@ -51,6 +51,7 @@ LOCATE on target = . ;
 LOCATE on source = src ;
 CopyFile target : source ;
 Depends all : target ;
+
 #!file src/source
 Source contents
 -
