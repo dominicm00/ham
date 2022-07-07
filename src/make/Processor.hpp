@@ -13,6 +13,10 @@
 #include "make/MakeTarget.hpp"
 #include "make/Options.hpp"
 
+#include <map>
+#include <memory>
+#include <vector>
+
 namespace ham::make
 {
 
@@ -22,6 +26,11 @@ using data::TargetSet;
 
 class Command;
 class TargetBuildInfo;
+
+using MakeTargetMap = std::map<const Target*, MakeTarget*>;
+using CommandList = std::vector<const Command*>;
+using CommandMap = std::map<const Target*, CommandList>;
+using TargetBuildInfoSet = std::set<TargetBuildInfo*>;
 
 class Processor
 {
@@ -83,11 +92,6 @@ class Processor
 	void BuildTargets();
 
   private:
-	typedef std::map<const Target*, MakeTarget*> MakeTargetMap;
-	typedef std::map<data::RuleActionsCall*, Command*> CommandMap;
-	typedef std::set<TargetBuildInfo*> TargetBuildInfoSet;
-
-  private:
 	MakeTarget* _GetMakeTarget(const Target* target, bool create);
 	MakeTarget* _GetMakeTarget(const String& targetName, bool create);
 	bool _IsPseudoTarget(const MakeTarget* makeTarget) const;
@@ -119,20 +123,6 @@ class Processor
 	void _BindTarget(MakeTarget* makeTarget);
 
 	/**
-	 * Create a list of bound paths from an actions targets. Depending on action
-	 * modifiers, may exclude certain targets.
-	 *
-	 * \param[in] actionsCall actions call to bind
-	 * \param[in] isSources whether or not to bind the sources of the action
-	 * call \param[out] boundTargets list to append bound targets to
-	 */
-	void _BindActionsTargets(
-		const data::RuleActionsCall* actionsCall,
-		const bool isSources,
-		StringList& boundTargets
-	);
-
-	/**
 	 * Scans target with the kHeaderScanVariableName egrep pattern. If matches
 	 * are found, apply the rule kHeaderRuleVariableName to the target with the
 	 * matches of the egrep pattern as sources. This is generally used to add
@@ -153,6 +143,13 @@ class Processor
 	bool _CollectMakableTargets(MakeTarget* makeTarget);
 
 	/**
+	 * Make commands for a certain target.
+	 *
+	 * \param[in] target
+	 */
+	CommandList _MakeCommands(const Target* target);
+
+	/**
 	 * Returns the build info for a target, or nullptr if there are no pending
 	 * actions.
 	 *
@@ -170,6 +167,22 @@ class Processor
 	 * \return the number of targets skipped as a result of the completion.
 	 */
 	size_t _TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state);
+
+	/**
+	 * Create a list of bound paths from an actions targets. Depending on action
+	 * modifiers, may exclude certain targets.
+	 *
+	 * \param[in] actionsCall actions call to bind
+	 * \param[in] isSources whether or not to bind the sources of the action
+	 * call \param[out] boundTargets list to append bound targets to
+	 */
+	void _BindActionsTargets(
+		const data::RuleActions* actions,
+		const std::vector<const Target*> targets,
+		const std::vector<const Target*> sources,
+		const bool isSources,
+		StringList& boundTargets
+	);
 
 	/**
 	 * Create a runnable Command from an actions call.

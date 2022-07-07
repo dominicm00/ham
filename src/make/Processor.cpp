@@ -25,17 +25,24 @@
 #include "ruleset/HamRuleset.hpp"
 #include "ruleset/JamRuleset.hpp"
 
+#include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <ostream>
+#include <set>
 #include <sstream>
 #include <stdarg.h>
+#include <utility>
+#include <vector>
 
 namespace ham::make
 {
 
 using data::Time;
+using std::unique_ptr;
 
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
@@ -64,11 +71,6 @@ Processor::~Processor()
 		 it != fTargetBuildInfos.end();
 		 ++it) {
 		delete *it;
-	}
-
-	for (CommandMap::iterator it = fCommands.begin(); it != fCommands.end();
-		 ++it) {
-		delete it->second;
 	}
 
 	for (MakeTargetMap::iterator it = fMakeTargets.begin();
@@ -283,7 +285,7 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 	if (!create)
 		return nullptr;
 
-	std::unique_ptr<MakeTarget> makeTarget(new MakeTarget(target));
+	unique_ptr<MakeTarget> makeTarget(new MakeTarget(target));
 	fMakeTargets[target] = makeTarget.get();
 	return makeTarget.release();
 }
@@ -646,6 +648,50 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	return needToMake;
 }
 
+CommandList
+Processor::_MakeCommands(const Target* target)
+{
+	// Check command cache
+	if (auto it = fCommands.find(target); it != fCommands.end())
+		return it->second;
+
+	// TODO: Support RuleActions::PIECEMEAL
+	//
+	// Each TOGETHER action can be associated to a set of sources (the targets
+	// are implied since TOGETHER actions can only have one target). Ham does
+	// not guarantee that TOGETHER actions have sources in any order, so we
+	// don't need to use a SequentialSet.
+	using TogetherCallMap = std::map<data::RuleActions*, std::set<Target*>>;
+	TogetherCallMap togetherMap{};
+	CommandList& commandList = fCommands[target];
+
+	for (std::vector<data::RuleActionsCall*>::const_iterator it =
+			 target->ActionsCalls().begin();
+		 it != target->ActionsCalls().end();
+		 ++it) {
+		data::RuleActionsCall* actionsCall = *it;
+		data::RuleActions* actions = actionsCall->Actions();
+
+		if (actions->IsTogether()) {
+			for (auto source : actionsCall->SourceTargets())
+				togetherMap[actions].insert(source);
+		} else {
+			commandList.emplace_back(_BuildCommand(actionsCall));
+		}
+	}
+
+	// Add TOGETHER actions
+	for (auto& [action, sourceSet] : togetherMap) {
+		using ConstTargetList = const std::vector<const Target*>;
+		ConstTargetList targets{target};
+		ConstTargetList sources(sourceSet.begin(), sourceSet.end());
+		data::RuleActionsCall call{action, targets, targets};
+		commandList.emplace_back(_BuildCommand(&call));
+	}
+
+	return commandList;
+}
+
 TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
@@ -655,35 +701,11 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 		return nullptr;
 	}
 
-	std::unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
+	unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
 
-	// TODO: Support RuleActions::TOGETHER
-	// TODO: Support RuleActions::PIECEMEAL
-	for (std::vector<data::RuleActionsCall*>::const_iterator it =
-			 target->ActionsCalls().begin();
-		 it != target->ActionsCalls().end();
-		 ++it) {
-		data::RuleActionsCall* actionsCall = *it;
-
-		util::Reference<Command> command;
-		CommandMap::iterator commandIt = fCommands.find(actionsCall);
-		if (commandIt != fCommands.end()) {
-			command.SetTo(commandIt->second);
-		} else {
-			// prepare the actions command line
-			Command* builtCommand = _BuildCommand(actionsCall);
-			if (builtCommand == nullptr)
-				continue;
-
-			command.SetTo(builtCommand, true);
-			if (actionsCall->Targets().size() > 1) {
-				fCommands[actionsCall] = command.Get();
-				command.Get()->AcquireReference();
-			}
-		}
-
-		buildInfo->AddCommand(command.Get());
-	}
+	auto commands = _MakeCommands(target);
+	for (auto command : commands)
+		buildInfo->AddCommand(command);
 
 	return buildInfo.release();
 }
@@ -753,18 +775,19 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 
 void
 Processor::_BindActionsTargets(
-	const data::RuleActionsCall* actionsCall,
+	const data::RuleActions* actions,
+	const std::vector<const Target*> targets,
+	const std::vector<const Target*> sources,
 	const bool isSources,
 	StringList& boundTargets
 )
 {
-	const bool isExistingAction = actionsCall->Actions()->IsExisting();
-	const bool isUpdatedAction = actionsCall->Actions()->IsUpdated();
+	const bool isExistingAction = actions->IsExisting();
+	const bool isUpdatedAction = actions->IsUpdated();
 
-	const data::TargetList& targetList =
-		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
+	const std::vector<const Target*> targetList = isSources ? sources : targets;
 
-	const Target* primaryTarget = *actionsCall->Targets().begin();
+	const Target* primaryTarget = *targets.begin();
 	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
 	for (const auto target : targetList) {
@@ -824,12 +847,16 @@ Processor::_BindActionsTargets(
 }
 
 Command*
-Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
+Processor::_BuildCommand(
+	const data::RuleActions* actions,
+	const std::vector<const Target*> targets,
+	const std::vector<const Target*> sources
+)
 {
-	const bool isExistingAction = actionsCall->Actions()->IsExisting();
-	const bool isUpdatedAction = actionsCall->Actions()->IsUpdated();
+	const bool isExistingAction = actions->IsExisting();
+	const bool isUpdatedAction = actions->IsUpdated();
 
-	auto numTargets = actionsCall->Targets().size();
+	auto numTargets = targets.size();
 
 	// Actions must have at least one target (ADR 5)
 	//
@@ -838,7 +865,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// somewhere in parsing.
 	if (numTargets == 0) {
 		std::stringstream error{};
-		error << "Error: Action " << actionsCall->Actions()->RuleName()
+		error << "Error: Action " << actions->RuleName()
 			  << " was called with no targets";
 		throw MakeException(error.str());
 	}
@@ -846,7 +873,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// Updated actions cannot have multiple targets (ADR 4)
 	if (isUpdatedAction && numTargets > 1) {
 		std::stringstream error{};
-		error << "Error: Action " << actionsCall->Actions()->RuleName()
+		error << "Error: Action " << actions->RuleName()
 			  << " has 'updated' modifier and must be passed exactly 1 target, "
 				 "but was passed "
 			  << numTargets;
