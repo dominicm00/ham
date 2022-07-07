@@ -225,6 +225,8 @@ Processor::BuildTargets()
 		printf("...updating %zu target(s)...\n", fTargetsToUpdateCount);
 
 	// get the JAMSHELL variable
+	//
+	// TODO: This should be target-local!
 	StringList jamShell(fEvaluationContext.LookupVariable(kJamShellVariableName)
 	);
 	if (!jamShell.IsTrue()) {
