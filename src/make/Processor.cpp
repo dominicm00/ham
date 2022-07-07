@@ -758,10 +758,8 @@ Processor::_BindActionsTargets(
 	StringList& boundTargets
 )
 {
-	const std::uint32_t flags =
-		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	const bool isExistingAction = flags & data::RuleActions::EXISTING;
-	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+	const bool isExistingAction = actionsCall->Actions()->IsExisting();
+	const bool isUpdatedAction = actionsCall->Actions()->IsUpdated();
 
 	const data::TargetList& targetList =
 		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
@@ -828,10 +826,8 @@ Processor::_BindActionsTargets(
 Command*
 Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
-	const std::uint32_t flags =
-		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	const bool isExistingAction = flags & data::RuleActions::EXISTING;
-	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+	const bool isExistingAction = actionsCall->Actions()->IsExisting();
+	const bool isUpdatedAction = actionsCall->Actions()->IsUpdated();
 
 	auto numTargets = actionsCall->Targets().size();
 

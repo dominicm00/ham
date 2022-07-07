@@ -33,20 +33,29 @@ class RuleActions : public util::Referenceable
 		const String& ruleName,
 		const StringList& variables,
 		const String& actions,
-		uint32_t flags
+		std::uint32_t flags
 	);
 	~RuleActions();
 
 	const String& RuleName() const { return fRuleName; }
 	const StringList& Variables() const { return fVariables; }
 	const String& Actions() const { return fActions; }
-	uint32_t Flags() const { return fFlags; }
+	std::uint32_t Flags() const { return fFlags; }
+
+	bool IsUpdated() const { return fFlags & UPDATED; }
+	bool IsTogether() const { return fFlags & TOGETHER; }
+	bool IsIgnore() const { return fFlags & IGNORE; }
+	bool IsQuietly() const { return fFlags & QUIETLY; }
+	bool IsPiecemeal() const { return fFlags & PIECEMEAL; }
+	bool IsExisting() const { return fFlags & EXISTING; }
+
+	std::uint32_t MaxLine() const { return fFlags / MAX_LINE_FACTOR; }
 
   private:
 	String fRuleName;
 	StringList fVariables;
 	String fActions;
-	uint32_t fFlags;
+	std::uint32_t fFlags;
 };
 
 class RuleActionsCall : public util::Referenceable
