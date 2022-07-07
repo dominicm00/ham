@@ -204,7 +204,7 @@ Processor::PrepareTargets()
 	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
 		 it.HasNext();) {
 		MakeTarget* makeTarget = it.Next();
-		_SealTargetFateRecursively(makeTarget, Time(0), true);
+		_SealTargetFateRecursively(makeTarget, Time::MIN, true);
 	}
 }
 
@@ -333,11 +333,11 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	// Determine whether it is a pseudo target.
 	bool isPseudoTarget = _IsPseudoTarget(makeTarget);
 	if (isPseudoTarget || !makeTarget->FileExists())
-		makeTarget->SetOriginalTime(Time(0));
+		makeTarget->SetOriginalTime(Time::MIN);
 
 	Time time = makeTarget->GetOriginalTime();
 	if (!time.IsValid())
-		time = Time(0);
+		time = Time::MIN;
 
 	// add make targets for dependencies
 	const Target* target = makeTarget->GetTarget();
@@ -346,8 +346,8 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		makeTarget->AddDependency(_GetMakeTarget(it.Next(), true));
 
 	// recursively process the target's dependencies
-	Time newestDependencyTime(0);
-	Time newestLeafTime(0);
+	Time newestDependencyTime = Time::MIN;
+	Time newestLeafTime = Time::MIN;
 	bool dependencyUpdated = false;
 	bool cantMake = false;
 	for (size_t i = 0; i < makeTarget->Dependencies().Size(); i++) {
@@ -402,7 +402,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 	// Consider a "don't update" target very old, so targets depending on it
 	// won't be remade unnecessarily.
 	if (target->IsDontUpdate()) {
-		time = newestDependencyTime = Time(0);
+		time = newestDependencyTime = Time::MIN;
 		makeTarget->SetOriginalTime(time);
 	}
 

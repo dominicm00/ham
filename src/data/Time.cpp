@@ -5,11 +5,15 @@
 
 #include "data/Time.hpp"
 
+#include <cstdint>
 #include <sys/time.h>
 #include <time.h>
 
 namespace ham::data
 {
+
+const Time Time::MIN = Time(0);
+const Time Time::MAX = Time(INT64_MAX);
 
 /*static*/ Time
 Time::Now()

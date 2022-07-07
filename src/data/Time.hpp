@@ -17,6 +17,8 @@ class Time
 {
   public:
 	static const uint32_t kNanoFactor = 1000000000;
+	static const Time MIN;
+	static const Time MAX;
 
   public:
 	inline Time();
