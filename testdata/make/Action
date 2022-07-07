@@ -3,7 +3,7 @@
 
 #!multipleFiles
 ---
-# Unbound pseudotargets default to target name.
+# Independent pseudotargets default to target name.
 # target	- target (missing)
 #
 #!file Jamfile
@@ -21,7 +21,7 @@ Depends all : target ;
 #!file target
 source1 source2
 ---
-# Unbound targets default to target name.
+# Independent targets default to target name.
 # target	- target (missing)
 #
 #!file Jamfile
@@ -37,7 +37,7 @@ Depends all : target ;
 #!file target
 source1 source2
 ---
-# Standalone targets are bound.
+# Independent targets are bound.
 # target	- target (missing)
 # source	- source
 #
