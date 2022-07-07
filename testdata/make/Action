@@ -58,3 +58,28 @@ Source contents
 #!file target
 Source contents
 ---
+# Skip targets that can't be created
+# parent		- target
+#  child		- target
+#   grandchild	- target (no action, missing)
+#
+#!file Jamfile
+rule EchoSources
+{
+	Depends $(1) : $(2) ;
+}
+actions EchoSources
+{
+    echo $(2) >> $(1)
+	echo "Updated" >> $(1)
+}
+
+LOCATE on parent = . ;
+LOCATE on child = . ;
+LOCATE on grandchild = . ;
+EchoSources parent : child ;
+EchoSources child : grandchild ;
+Depends all : parent ;
+-
+#!file parent missing
+---
