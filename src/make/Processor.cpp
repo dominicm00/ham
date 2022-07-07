@@ -433,10 +433,14 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			fate = MakeTarget::MAKE_IF_NEEDED;
 
 		if (!target->HasActionsCalls() && !isPseudoTarget) {
-			if (target->IsIgnoreIfMissing())
+			if (target->IsIgnoreIfMissing()) {
 				fate = MakeTarget::KEEP;
-			else
+			} else {
+				std::stringstream warning{};
+				warning << "don't know how to make " << target->Name();
+				_PrintWarning(warning.str());
 				fate = MakeTarget::CANT_MAKE;
+			}
 		}
 	}
 
@@ -619,6 +623,10 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 			makeTarget->SetMakeState(MakeTarget::DONE);
 			break;
 		case MakeTarget::CANT_MAKE:
+			std::stringstream warning{};
+			warning << "can't make " << makeTarget->GetTarget()->Name()
+					<< ", skipping";
+			_PrintWarning(warning.str());
 			makeTarget->SetMakeState(MakeTarget::SKIPPED);
 			break;
 	}
