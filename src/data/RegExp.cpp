@@ -8,19 +8,66 @@
 #include "data/StringBuffer.hpp"
 #include "util/Referenceable.hpp"
 
+#include <exception>
+#include <memory>
 #include <regex.h>
+#include <stdexcept>
 #include <vector>
 
 namespace ham::data
 {
 
-// #pragma mark - RegExp::Data
+RegExp::Exception::Exception(Type type) noexcept
+	: std::runtime_error(""),
+	  fType(type),
+	  fRegError(0),
+	  fCompiledExpression(nullptr),
+	  fErrorMessage(nullptr)
+{
+}
+
+RegExp::Exception::Exception(int error, const regex_t* expression)
+	: std::runtime_error(""),
+	  fType(REGEX_ERROR),
+	  fRegError(error),
+	  fCompiledExpression(expression),
+	  fErrorMessage(nullptr)
+{
+	auto bufSize = regerror(fRegError, fCompiledExpression, nullptr, 0);
+	fErrorMessage = new char[bufSize];
+	regerror(fRegError, fCompiledExpression, fErrorMessage, bufSize);
+	fCompiledExpression = nullptr;
+}
+
+RegExp::Exception::~Exception() noexcept
+{
+	if (fErrorMessage != nullptr)
+		delete[] fErrorMessage;
+}
+
+const char*
+RegExp::Exception::what() const noexcept
+{
+	switch (fType) {
+		case EMPTY_BRACK:
+			return "Empty bracket expression encountered.";
+		case MISSING_BRACK:
+			return "Missing end bracket.";
+		case BAD_ESCAPE:
+			return "Escape character occured at end of regex.";
+		case UNKNOWN:
+			return "Unknown regex exception occured";
+		case REGEX_ERROR:
+			return fErrorMessage;
+		default:
+			return nullptr;
+	}
+}
 
 class RegExp::Data
 {
   public:
 	Data(const char* pattern, PatternType patternType)
-		: fReferenceCount(1)
 	{
 		// convert the shell pattern to a regular expression
 		StringBuffer patternString;
@@ -39,26 +86,25 @@ class RegExp::Data
 						const char* end = pattern;
 						while (*end != ']') {
 							if (*end++ == '\0') {
-								fError = REG_EBRACK;
-								return;
+								throw Exception(Exception::MISSING_BRACK);
 							}
 						}
 
 						if (pattern == end) {
 							// Empty bracket expression. It will never match
 							// anything. Strictly speaking this is not
-							// considered an error, but we handle it like one.
-							fError = REG_EBRACK;
-							return;
+							// considered an error, but we handle it like
+							// one.
+							throw Exception(Exception::EMPTY_BRACK);
 						}
 
 						patternString += '[';
 
 						// We need to avoid "[." ... ".]", "[=" ... "=]", and
 						// "[:" ... ":]" sequences, since those have special
-						// meaning in regular expressions. If we encounter
-						// a '[' followed by either of '.', '=', or ':', we
-						// replace the '[' by "[.[.]".
+						// meaning in regular expressions. If we encounter a '['
+						// followed by either of '.', '=', or ':', we replace
+						// the '[' by "[.[.]".
 						while (pattern < end) {
 							c = *pattern++;
 							if (c == '[' && pattern < end) {
@@ -82,8 +128,7 @@ class RegExp::Data
 						// Quotes the next character. Works the same way for
 						// regular expressions.
 						if (*pattern == '\0') {
-							fError = REG_EESCAPE;
-							return;
+							throw Exception(Exception::BAD_ESCAPE);
 						}
 
 						patternString += '\\';
@@ -111,251 +156,144 @@ class RegExp::Data
 			pattern = patternString.Data();
 		}
 
-		fError = regcomp(&fCompiledExpression, pattern, REG_EXTENDED);
+		if (int errorCode =
+				regcomp(&fCompiledExpression, pattern, REG_EXTENDED))
+			throw Exception(errorCode, &fCompiledExpression);
 	}
 
-	~Data()
-	{
-		if (fError == 0)
-			regfree(&fCompiledExpression);
-	}
-
-	void Acquire() { util::increment_reference_count(fReferenceCount); }
-
-	void Release()
-	{
-		if (util::decrement_reference_count(fReferenceCount) == 1)
-			delete this;
-	}
-
-	bool IsValid() const { return fError == 0; }
+	~Data() { regfree(&fCompiledExpression); }
 
 	const regex_t* CompiledExpression() const { return &fCompiledExpression; }
 
   private:
-	int32_t fReferenceCount;
-	int fError;
 	regex_t fCompiledExpression;
 };
 
-// #pragma mark - RegExp::MatchResultData
-
-class RegExp::MatchResultData
-{
-  public:
-	MatchResultData(const regex_t* compiledExpression, const char* string)
-		: fReferenceCount(1),
-		  fMatchCount(0),
-		  fMatches(nullptr)
-	{
-		// Do the matching: Since we need to provide a buffer for the matches
-		// for regexec() to fill in, but don't know the number of matches
-		// beforehand, we need to guess and retry with a larger buffer, if it
-		// wasn't large enough.
-		size_t maxMatchCount = 32;
-		for (;;) {
-			fMatches = new regmatch_t[maxMatchCount];
-			if (regexec(compiledExpression, string, maxMatchCount, fMatches, 0)
-				!= 0) {
-				delete[] fMatches;
-				fMatches = nullptr;
-				fMatchCount = 0;
-				break;
-			}
-
-			if (fMatches[maxMatchCount - 1].rm_so == -1) {
-				// determine the match count
-				size_t lower = 0;
-				size_t upper = maxMatchCount;
-				while (lower < upper) {
-					size_t mid = (lower + upper) / 2;
-					if (fMatches[mid].rm_so == -1)
-						upper = mid;
-					else
-						lower = mid + 1;
-				}
-				fMatchCount = lower;
-				break;
-			}
-
-			// buffer too small -- try again with larger buffer
-			delete[] fMatches;
-			fMatches = nullptr;
-			maxMatchCount *= 2;
-		}
-	}
-
-	~MatchResultData() { delete[] fMatches; }
-
-	void Acquire() { util::increment_reference_count(fReferenceCount); }
-
-	void Release()
-	{
-		if (util::decrement_reference_count(fReferenceCount) == 1)
-			delete this;
-	}
-
-	size_t MatchCount() const { return fMatchCount; }
-
-	const regmatch_t* Matches() const { return fMatches; }
-
-  private:
-	int32_t fReferenceCount;
-	size_t fMatchCount;
-	regmatch_t* fMatches;
-};
-
-// #pragma mark - RegExp
-
-RegExp::RegExp()
-	: fData(nullptr)
-{
-}
-
 RegExp::RegExp(const char* pattern, PatternType patternType)
-	: fData(nullptr)
+	: fData(std::shared_ptr<Data>{new Data(pattern, patternType)})
 {
-	SetPattern(pattern, patternType);
 }
 
 RegExp::RegExp(const RegExp& other)
 	: fData(other.fData)
 {
-	if (fData != nullptr)
-		fData->Acquire();
 }
 
-RegExp::~RegExp()
-{
-	if (fData != nullptr)
-		fData->Release();
-}
-
-bool
-RegExp::SetPattern(const char* pattern, PatternType patternType)
-{
-	if (fData != nullptr) {
-		fData->Release();
-		fData = nullptr;
-	}
-
-	fData = new Data(pattern, patternType);
-	if (!fData->IsValid()) {
-		delete fData;
-		fData = nullptr;
-		return false;
-	}
-
-	return true;
-}
+RegExp::~RegExp() = default;
 
 RegExp::MatchResult
 RegExp::Match(const char* string) const
 {
-	if (!IsValid())
-		return MatchResult();
-
-	return MatchResult(new MatchResultData(fData->CompiledExpression(), string)
-	);
+	return MatchResult(fData->CompiledExpression(), string);
 }
 
 RegExp&
 RegExp::operator=(const RegExp& other)
 {
-	if (fData != nullptr)
-		fData->Release();
-
 	fData = other.fData;
-
-	if (fData != nullptr)
-		fData->Acquire();
-
 	return *this;
 }
 
-// #pragma mark - RegExp::MatchResult
-
-RegExp::MatchResult::MatchResult()
-	: fData(nullptr)
+RegExp::MatchResult::MatchResult(
+	const regex_t* compiledExpression,
+	const char* string
+)
+	: fMatchCount(0),
+	  fMatches(nullptr)
 {
-}
+	// Do the matching: Since we need to provide a buffer for the matches
+	// for regexec() to fill in, but don't know the number of matches
+	// beforehand, we need to guess and retry with a larger buffer, if it
+	// wasn't large enough.
+	size_t maxMatchCount = 32;
+	for (;;) {
+		fMatches = std::shared_ptr<regmatch_t[]>{new regmatch_t[maxMatchCount]};
+		if (regexec(
+				compiledExpression,
+				string,
+				maxMatchCount,
+				fMatches.get(),
+				0
+			)
+			!= 0) {
+			// no matches were found
+			fMatchCount = 0;
+			fMatches.reset();
+			break;
+		}
 
-RegExp::MatchResult::MatchResult(MatchResultData* data)
-	: fData(data)
-{
+		if (fMatches[maxMatchCount - 1].rm_so == -1) {
+			// determine the match count
+			size_t lower = 0;
+			size_t upper = maxMatchCount;
+			while (lower < upper) {
+				size_t mid = (lower + upper) / 2;
+				if (fMatches[mid].rm_so == -1)
+					upper = mid;
+				else
+					lower = mid + 1;
+			}
+			fMatchCount = lower;
+			break;
+		}
+
+		// buffer too small -- try again with larger buffer
+		maxMatchCount *= 2;
+	}
+
+	if (fMatchCount > 0 && fMatches.get() == nullptr)
+		throw Exception(Exception::UNKNOWN);
 }
 
 RegExp::MatchResult::MatchResult(const MatchResult& other)
-	: fData(other.fData)
+	: fMatchCount(other.fMatchCount),
+	  fMatches(other.fMatches)
 {
-	if (fData != nullptr)
-		fData->Acquire();
 }
 
-RegExp::MatchResult::~MatchResult()
-{
-	if (fData != nullptr)
-		fData->Release();
-}
+RegExp::MatchResult::~MatchResult() noexcept = default;
 
 bool
 RegExp::MatchResult::HasMatched() const
 {
-	return fData != nullptr && fData->MatchCount() > 0;
+	return fMatchCount > 0;
 }
 
 size_t
 RegExp::MatchResult::StartOffset() const
 {
-	return fData != nullptr && fData->MatchCount() > 0
-		? fData->Matches()[0].rm_so
-		: 0;
+	return fMatchCount > 0 ? fMatches[0].rm_so : 0;
 }
 
 size_t
 RegExp::MatchResult::EndOffset() const
 {
-	return fData != nullptr && fData->MatchCount() > 0
-		? fData->Matches()[0].rm_eo
-		: 0;
+	return fMatchCount > 0 ? fMatches[0].rm_eo : 0;
 }
 
 size_t
 RegExp::MatchResult::GroupCount() const
 {
-	if (fData == nullptr)
-		return 0;
-
-	size_t matchCount = fData->MatchCount();
-	return matchCount > 0 ? matchCount - 1 : 0;
+	return fMatchCount > 0 ? fMatchCount - 1 : 0;
 }
 
 size_t
 RegExp::MatchResult::GroupStartOffsetAt(size_t index) const
 {
-	return fData != nullptr && fData->MatchCount() > index + 1
-		? fData->Matches()[index + 1].rm_so
-		: 0;
+	return fMatchCount > index + 1 ? fMatches[index + 1].rm_so : 0;
 }
 
 size_t
 RegExp::MatchResult::GroupEndOffsetAt(size_t index) const
 {
-	return fData != nullptr && fData->MatchCount() > index + 1
-		? fData->Matches()[index + 1].rm_eo
-		: 0;
+	return fMatchCount > index + 1 ? fMatches[index + 1].rm_eo : 0;
 }
 
 RegExp::MatchResult&
 RegExp::MatchResult::operator=(const MatchResult& other)
 {
-	if (fData != nullptr)
-		fData->Release();
-
-	fData = other.fData;
-
-	if (fData != nullptr)
-		fData->Acquire();
+	fMatchCount = other.fMatchCount;
+	fMatches = other.fMatches;
 
 	return *this;
 }

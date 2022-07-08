@@ -549,8 +549,6 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 
 	// prepare the grep regular expression
 	data::RegExp regExp(scanPattern->ElementAt(0).ToCString());
-	if (!regExp.IsValid())
-		return;
 
 	// open the file
 	std::ifstream file(makeTarget->BoundPath().ToCString());
