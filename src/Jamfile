@@ -83,6 +83,8 @@ SharedLibrary libham.so
 	Path.cpp
 	RegExp.cpp
 	RuleActions.cpp
+	String.cpp
+	StringList.cpp
 	StringListOperations.cpp
 	Target.cpp
 	TargetBinder.cpp

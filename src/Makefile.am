@@ -48,6 +48,8 @@ libham_a_SOURCES =								\
 	data/Path.cpp								\
 	data/RegExp.cpp								\
 	data/RuleActions.cpp						\
+	data/String.cpp								\
+	data/StringList.cpp							\
 	data/StringListOperations.cpp				\
 	data/Target.cpp								\
 	data/TargetBinder.cpp						\
@@ -129,7 +131,11 @@ nobase_dist_include_HEADERS =					\
 	data/Path.hpp								\
 	data/RegExp.hpp								\
 	data/RuleActions.hpp						\
+	data/String.hpp								\
+	data/StringBuffer.hpp						\
+	data/StringList.hpp							\
 	data/StringListOperations.hpp				\
+	data/StringPart.hpp							\
 	data/Target.hpp								\
 	data/TargetBinder.hpp						\
 	data/TargetContainers.hpp					\
