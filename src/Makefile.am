@@ -48,8 +48,6 @@ libham_a_SOURCES =								\
 	data/Path.cpp								\
 	data/RegExp.cpp								\
 	data/RuleActions.cpp						\
-	data/String.cpp								\
-	data/StringList.cpp							\
 	data/StringListOperations.cpp				\
 	data/Target.cpp								\
 	data/TargetBinder.cpp						\
@@ -79,9 +77,6 @@ hamtest_SOURCES = 						\
 	tests/PathTest.cpp					\
 	tests/RegExpTest.cpp				\
 	tests/RulesetTest.cpp				\
-	tests/StringListTest.cpp			\
-	tests/StringPartTest.cpp			\
-	tests/StringTest.cpp				\
 	tests/TargetBinderTest.cpp			\
 	tests/TimeTest.cpp					\
 	tests/VariableExpansionTest.cpp		\
@@ -134,11 +129,7 @@ nobase_dist_include_HEADERS =					\
 	data/Path.hpp								\
 	data/RegExp.hpp								\
 	data/RuleActions.hpp						\
-	data/String.hpp								\
-	data/StringBuffer.hpp						\
-	data/StringList.hpp							\
 	data/StringListOperations.hpp				\
-	data/StringPart.hpp							\
 	data/Target.hpp								\
 	data/TargetBinder.hpp						\
 	data/TargetContainers.hpp					\

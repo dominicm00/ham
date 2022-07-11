@@ -83,8 +83,6 @@ SharedLibrary libham.so
 	Path.cpp
 	RegExp.cpp
 	RuleActions.cpp
-	String.cpp
-	StringList.cpp
 	StringListOperations.cpp
 	Target.cpp
 	TargetBinder.cpp
@@ -145,9 +143,6 @@ BinCommand ham-tests
 	PathTest.cpp
 	RegExpTest.cpp
 	RulesetTest.cpp
-	StringListTest.cpp
-	StringPartTest.cpp
-	StringTest.cpp
 	TargetBinderTest.cpp
 	TimeTest.cpp
 	VariableExpansionTest.cpp
