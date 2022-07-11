@@ -6,8 +6,8 @@
 #define HAM_DATA_PATH_HPP
 
 #include "behavior/Behavior.hpp"
-#include "data/StringBuffer.hpp"
-#include "data/StringPart.hpp"
+
+#include <string_view>
 
 namespace ham::data
 {
@@ -20,11 +20,11 @@ class Path
 	class Parts;
 
   public:
-	static bool IsAbsolute(const StringPart& path);
-	static StringPart RemoveGrist(const StringPart& path);
-	static String Make(const StringPart& head, const StringPart& tail);
-	static bool Exists(const char* path);
-	static bool GetFileStatus(const char* path, FileStatus& _status);
+	static bool IsAbsolute(std::string_view path);
+	static std::string_view RemoveGrist(std::string_view path);
+	static std::string Make(std::string_view head, std::string_view tail);
+	static bool Exists(std::string_view path);
+	static bool GetFileStatus(std::string_view path, FileStatus& _status);
 };
 
 /**
@@ -49,64 +49,54 @@ class Path::Parts
 {
   public:
 	Parts() {}
-	Parts(const StringPart& path) { SetTo(path); }
+	Parts(std::string_view path) { SetTo(path); }
 
-	void SetTo(const StringPart& path);
-	void GetPath(StringBuffer& buffer, const behavior::Behavior& behavior)
-		const;
-	inline String ToPath(const behavior::Behavior& behavior) const;
+	void SetTo(std::string_view path);
+	std::string ToPath(const behavior::Behavior& behavior) const;
 
 	bool IsAbsolute() const;
 
-	const StringPart& Grist() const { return fGrist; }
-	void SetGrist(const StringPart& grist) { fGrist = grist; }
-	void UnsetGrist() { fGrist.Unset(); }
+	std::string_view Grist() const { return fGrist; }
+	void SetGrist(std::string_view grist) { fGrist = grist; }
+	void UnsetGrist() { fGrist = {}; }
 
-	const StringPart& Root() const { return fRoot; }
-	void SetRoot(const StringPart& root) { fRoot = root; }
-	void UnsetRoot() { fRoot.Unset(); }
+	std::string_view Root() const { return fRoot; }
+	void SetRoot(std::string_view root) { fRoot = root; }
+	void UnsetRoot() { fRoot = {}; }
 
-	const StringPart& Directory() const { return fDirectory; }
-	void SetDirectory(const StringPart& directory) { fDirectory = directory; }
-	void UnsetDirectory() { fDirectory.Unset(); }
+	std::string_view Directory() const { return fDirectory; }
+	void SetDirectory(std::string_view directory) { fDirectory = directory; }
+	void UnsetDirectory() { fDirectory = {}; }
 
-	const StringPart& BaseName() const { return fBaseName; }
-	void SetBaseName(const StringPart& baseName) { fBaseName = baseName; }
-	void UnsetBaseName() { fBaseName.Unset(); }
+	std::string_view BaseName() const { return fBaseName; }
+	void SetBaseName(std::string_view baseName) { fBaseName = baseName; }
+	void UnsetBaseName() { fBaseName = {}; }
 
-	const StringPart& Suffix() const { return fSuffix; }
-	void SetSuffix(const StringPart& suffix) { fSuffix = suffix; }
-	void UnsetSuffix() { fSuffix.Unset(); }
+	std::string_view Suffix() const { return fSuffix; }
+	void SetSuffix(std::string_view suffix) { fSuffix = suffix; }
+	void UnsetSuffix() { fSuffix = {}; }
 
-	const StringPart& ArchiveMember() const { return fArchiveMember; }
-	void SetArchiveMember(const StringPart& archiveMember)
+	std::string_view ArchiveMember() const { return fArchiveMember; }
+	void SetArchiveMember(std::string_view archiveMember)
 	{
 		fArchiveMember = archiveMember;
 	}
-	void UnsetArchiveMember() { fArchiveMember.Unset(); }
+	void UnsetArchiveMember() { fArchiveMember = {}; }
 
   private:
-	StringPart fGrist;
-	StringPart fRoot;
-	StringPart fDirectory;
-	StringPart fBaseName;
-	StringPart fSuffix;
-	StringPart fArchiveMember;
+	std::string_view fGrist;
+	std::string_view fRoot;
+	std::string_view fDirectory;
+	std::string_view fBaseName;
+	std::string_view fSuffix;
+	std::string_view fArchiveMember;
 };
 
 /*static*/ inline bool
-Path::IsAbsolute(const StringPart& path)
+Path::IsAbsolute(std::string_view path)
 {
 	// TODO: Platform dependent!
 	return !path.IsEmpty() && path.Start()[0] == '/';
-}
-
-String
-Path::Parts::ToPath(const behavior::Behavior& behavior) const
-{
-	StringBuffer buffer;
-	GetPath(buffer, behavior);
-	return buffer;
 }
 
 } // namespace ham::data

@@ -108,7 +108,7 @@ Path::Parts::IsAbsolute() const
  * \param[in] path String representation of a Path.
  */
 void
-Path::Parts::SetTo(const StringPart& path)
+Path::Parts::Parts(path)
 {
 	// TODO: This is platform dependent!
 
@@ -175,36 +175,36 @@ Path::Parts::SetTo(const StringPart& path)
  * \param[out] buffer   Buffer where path will be inserted.
  * \param[in]  behavior Compatibility behavior to emulate.
  */
-void
-Path::Parts::GetPath(StringBuffer& buffer, const behavior::Behavior& behavior)
-	const
+std::string
+Path::Parts::ToPath(const behavior::Behavior& behavior) const
 {
+	std::string buffer;
 	// TODO: This is platform dependent!
 
-	if (!fGrist.IsEmpty()) {
-		if (fGrist.Start()[0] != '<')
+	if (!fGrist.empty()) {
+		if (fGrist.front() != '<')
 			buffer += '<';
 		buffer += fGrist;
-		if (fGrist.End()[-1] != '>')
+		if (fGrist.back() != '>')
 			buffer += '>';
 	}
 
 	// Use root only, if the directory part isn't absolute and if the root isn't
 	// ".".
-	if (!fRoot.IsEmpty() && (fRoot.Length() > 1 || fRoot.Start()[0] != '.')
+	if (!fRoot.empty() && (fRoot.length() > 1 || fRoot.front() != '.')
 		&& !Path::IsAbsolute(fDirectory)) {
 		buffer += fRoot;
 		if (behavior.GetPathRootReplacerSlash()
 				== behavior::Behavior::PATH_ROOT_REPLACER_SLASH_ALWAYS
-			|| fRoot.End()[-1] != '/') {
+			|| fRoot.back() != '/') {
 			buffer += '/';
 		}
 	}
 
-	if (!fDirectory.IsEmpty()) {
+	if (!fDirectory.empty()) {
 		buffer += fDirectory;
-		if (fDirectory != StringPart("/", 1)
-			&& (!fBaseName.IsEmpty() || !fSuffix.IsEmpty())) {
+		if (fDirectory.back() != "/"
+			&& (!fBaseName.empty() || !fSuffix.empty())) {
 			buffer += '/';
 		}
 	}
@@ -212,11 +212,13 @@ Path::Parts::GetPath(StringBuffer& buffer, const behavior::Behavior& behavior)
 	buffer += fBaseName;
 	buffer += fSuffix;
 
-	if (!fArchiveMember.IsEmpty()) {
+	if (!fArchiveMember.empty()) {
 		buffer += '(';
 		buffer += fArchiveMember;
 		buffer += ')';
 	}
+
+	return buffer;
 }
 
 } // namespace ham::data

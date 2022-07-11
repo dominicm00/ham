@@ -7,14 +7,22 @@
 
 #include "behavior/Behavior.hpp"
 #include "data/Path.hpp"
-#include "data/StringBuffer.hpp"
-#include "data/StringList.hpp"
-#include "data/StringPart.hpp"
 
+#include <concepts>
+#include <iterator>
+#include <ranges>
 #include <stdint.h>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 namespace ham::data
 {
+
+template<typename List>
+concept StringRange = std::ranges::forward_range<
+	List> && std::same_as<std::ranges::range_value_t<List>, std::string_view>;
 
 class StringListOperations
 {
@@ -56,7 +64,7 @@ class StringListOperations
   public:
 	StringListOperations();
 
-	void Parse(const char* start, const char* end);
+	void Parse(std::string_view);
 
 	inline uint32_t Operations() const { return fOperations; }
 	inline bool HasOperations() const { return fOperations != 0; }
@@ -66,22 +74,22 @@ class StringListOperations
 		fOperations |= operations;
 	}
 
-	StringList Apply(
-		const StringList& list,
+	std::vector<std::string> Apply(
+		StringRange auto inputList,
 		size_t maxSize,
 		const behavior::Behavior& behavior
 	) const;
 
   private:
 	uint32_t fOperations;
-	StringPart fGristParameter;
-	StringPart fDirectoryParameter;
-	StringPart fBaseNameParameter;
-	StringPart fSuffixParameter;
-	StringPart fArchiveMemberParameter;
-	StringPart fRootParameter;
-	StringPart fEmptyParameter;
-	StringPart fJoinParameter;
+	std::string_view fGristParameter;
+	std::string_view fDirectoryParameter;
+	std::string_view fBaseNameParameter;
+	std::string_view fSuffixParameter;
+	std::string_view fArchiveMemberParameter;
+	std::string_view fRootParameter;
+	std::string_view fEmptyParameter;
+	std::string_view fJoinParameter;
 };
 
 } // namespace ham::data

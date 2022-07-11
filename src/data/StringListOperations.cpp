@@ -7,6 +7,12 @@
 
 #include "data/Path.hpp"
 
+#include <chrono>
+#include <cstddef>
+#include <string>
+#include <string_view>
+#include <vector>
+
 namespace ham::data
 {
 
@@ -26,15 +32,15 @@ StringListOperations::StringListOperations()
 }
 
 void
-StringListOperations::Parse(const char* start, const char* end)
+StringListOperations::Parse(std::string_view str)
 {
 	uint32_t pendingOperation = 0;
-	StringPart* pendingParameter = nullptr;
+	std::string_view* pendingParameter;
 
-	for (; start < end; start++) {
-		if (*start == '=') {
+	for (size_t i = 0; i < str.length(); i++) {
+		if (str[i] == '=') {
 			if (pendingParameter != nullptr) {
-				pendingParameter->SetTo(start + 1, end);
+				*pendingParameter = str.substr(i + 1);
 				AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 			}
 			return;
@@ -44,7 +50,7 @@ StringListOperations::Parse(const char* start, const char* end)
 		pendingOperation = 0;
 		pendingParameter = nullptr;
 
-		switch (*start) {
+		switch (str[i]) {
 			case 'G':
 				pendingOperation = SELECT_GRIST | REPLACE_GRIST;
 				pendingParameter = &fGristParameter;
@@ -93,34 +99,35 @@ StringListOperations::Parse(const char* start, const char* end)
 	if ((pendingOperation & NO_PARAMETER_OPERATION_MASK) != 0) {
 		// Emulate Jam behavior: On the first encounter of a path part selector
 		// we forget all path part replacer operations.
+		// TODO: Make this compatibility?
 		if ((pendingOperation & PATH_PART_SELECTOR_MASK) != 0
 			&& (fOperations & PATH_PART_SELECTOR_MASK) == 0
 			&& (fOperations & PATH_PART_REPLACER_MASK) != 0) {
-			fGristParameter.Unset();
-			fDirectoryParameter.Unset();
-			fBaseNameParameter.Unset();
-			fSuffixParameter.Unset();
-			fArchiveMemberParameter.Unset();
-			fRootParameter.Unset();
+			fGristParameter = {};
+			fDirectoryParameter = {};
+			fBaseNameParameter = {};
+			fSuffixParameter = {};
+			fArchiveMemberParameter = {};
+			fRootParameter = {};
 			fOperations &= ~(uint32_t)PATH_PART_REPLACER_MASK;
 		}
 
 		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 	} else if (pendingParameter != nullptr) {
-		pendingParameter->SetTo(end, end);
+		pendingParameter = {};
 		AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 	}
 }
 
-StringList
+std::vector<std::string>
 StringListOperations::Apply(
-	const StringList& inputList,
+	StringRange auto inputList,
 	size_t maxSize,
 	const behavior::Behavior& behavior
 ) const
 {
 	if (!HasOperations())
-		return inputList.SubList(0, maxSize);
+		return inputList | std::ranges::views::take(maxSize);
 
 	uint32_t operations = fOperations;
 	bool hasSelectorOperation = (operations & PATH_PART_SELECTOR_MASK) != 0;
@@ -133,28 +140,25 @@ StringListOperations::Apply(
 
 	// If a join shall be performed before to-upper/to-lower, we simply convert
 	// the join parameter first and join as usual afterwards.
-	String joinParameterBuffer;
-	StringPart joinParameter = fJoinParameter;
-	if (!joinParameter.IsEmpty() && (operations & (TO_UPPER | TO_LOWER)) != 0
+	std::string joinParameter = fJoinParameter;
+	if (!joinParameter.empty() && (operations & (TO_UPPER | TO_LOWER)) != 0
 		&& behavior.GetJoinCaseOperator()
 			== behavior::Behavior::JOIN_BEFORE_CASE_OPERATOR) {
-		joinParameterBuffer = joinParameter;
 		if ((operations & TO_UPPER) != 0)
-			joinParameterBuffer.ToUpper();
+			joinParameter = util::String::ToUpper(fJoinParameter);
 		else
-			joinParameterBuffer.ToLower();
-		joinParameter = joinParameterBuffer;
+			joinParameter = util::String::ToLower(fJoinParameter);
 	}
 
-	StringList resultList;
-	StringBuffer buffer;
+	std::vector<std::string> resultList;
+	std::string buffer;
 
-	const StringList& list =
-		inputList.IsEmpty() && (operations & REPLACE_EMPTY) != 0
-		? StringList(String(fEmptyParameter))
+	const std::vector<std::string> list =
+		inputList.empty() && (operations & REPLACE_EMPTY) != 0
+		? {std::string{fEmptyParameter}}
 		: inputList;
 
-	size_t count = std::min(list.Size(), maxSize);
+	size_t count = std::min(list.size(), maxSize);
 	for (size_t i = 0; i < count; i++) {
 		String string = list.ElementAt(i);
 
