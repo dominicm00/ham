@@ -9,6 +9,8 @@
 #include "code/EvaluationContext.hpp"
 #include "data/RegExp.hpp"
 
+#include <iostream>
+
 namespace ham::code
 {
 
@@ -26,16 +28,16 @@ Case::Matches(EvaluationContext&, const StringList& value) const
 {
 	using data::RegExp;
 
-	RegExp regExp(fPattern.ToCString(), RegExp::PATTERN_TYPE_WILDCARD);
-	if (!regExp.IsValid()) {
-		// TODO: Throw exception!
+	try {
+		RegExp regExp(fPattern.ToCString(), RegExp::PATTERN_TYPE_WILDCARD);
+		String string = value.ElementAt(0);
+		RegExp::MatchResult match = regExp.Match(string.ToCString());
+		return match.HasMatched() && match.StartOffset() == 0
+			&& match.EndOffset() == string.Length();
+	} catch (const RegExp::Exception& e) {
+		std::cerr << e.what();
 		return false;
 	}
-
-	String string = value.ElementAt(0);
-	RegExp::MatchResult match = regExp.Match(string.ToCString());
-	return match.HasMatched() && match.StartOffset() == 0
-		&& match.EndOffset() == string.Length();
 }
 
 StringList

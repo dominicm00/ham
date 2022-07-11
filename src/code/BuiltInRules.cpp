@@ -89,10 +89,6 @@ class MatchInstructions : public RuleInstructions
 		StringList result;
 		for (size_t i = 0; i < expressionCount; i++) {
 			RegExp regExp(expressions.ElementAt(i).ToCString());
-			if (!regExp.IsValid()) {
-				// TODO: Throw exception!
-				continue;
-			}
 
 			for (size_t k = 0; k < stringCount; k++) {
 				String string = strings.ElementAt(k);
@@ -138,8 +134,7 @@ class GlobInstructions : public RuleInstructions
 				patterns.ElementAt(k).ToCString(),
 				RegExp::PATTERN_TYPE_WILDCARD
 			);
-			if (regExp.IsValid())
-				regExps.push_back(regExp);
+			regExps.push_back(regExp);
 		}
 		size_t regExpCount = regExps.size();
 

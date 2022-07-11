@@ -5,7 +5,10 @@
 #ifndef HAM_DATA_REG_EXP_HPP
 #define HAM_DATA_REG_EXP_HPP
 
+#include <memory>
+#include <regex.h>
 #include <stddef.h>
+#include <stdexcept>
 
 namespace ham::data
 {
@@ -19,9 +22,9 @@ class RegExp
 	};
 
 	class MatchResult;
+	class Exception;
 
   public:
-	RegExp();
 	RegExp(
 		const char* pattern,
 		PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION
@@ -29,31 +32,46 @@ class RegExp
 	RegExp(const RegExp& other);
 	~RegExp();
 
-	bool IsValid() const { return fData != nullptr; }
-
-	bool SetPattern(
-		const char* pattern,
-		PatternType patternType = PATTERN_TYPE_REGULAR_EXPRESSION
-	);
-
 	MatchResult Match(const char* string) const;
 
 	RegExp& operator=(const RegExp& other);
 
   private:
 	class Data;
-	class MatchResultData;
 
   private:
-	Data* fData;
+	std::shared_ptr<Data> fData;
+};
+
+class RegExp::Exception : public std::runtime_error
+{
+  public:
+	enum Type {
+		EMPTY_BRACK,   ///< empty bracket expression
+		MISSING_BRACK, ///< missing end bracket
+		BAD_ESCAPE,	   ///< escape character "\" occurred at end of regex
+		REGEX_ERROR,   ///< error in regex method, error code in fRegError
+		UNKNOWN		   ///< unknown exception occured
+	};
+
+	Exception(Type type) noexcept;
+	Exception(int error, const regex_t* expression);
+	~Exception() noexcept;
+
+	const char* what() const noexcept override;
+
+  private:
+	const Type fType;
+	const int fRegError;
+	const regex_t* fCompiledExpression;
+	char* fErrorMessage;
 };
 
 class RegExp::MatchResult
 {
   public:
-	MatchResult();
 	MatchResult(const MatchResult& other);
-	~MatchResult();
+	~MatchResult() noexcept;
 
 	bool HasMatched() const;
 
@@ -70,11 +88,11 @@ class RegExp::MatchResult
 	friend class RegExp;
 
   private:
-	MatchResult(MatchResultData* data);
-	// takes over the data reference
+	MatchResult(const regex_t* compiledExpression, const char* string);
 
   private:
-	MatchResultData* fData;
+	size_t fMatchCount;
+	std::shared_ptr<regmatch_t[]> fMatches;
 };
 
 } // namespace ham::data
