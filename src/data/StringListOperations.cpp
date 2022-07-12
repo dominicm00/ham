@@ -6,8 +6,8 @@
 #include "data/StringListOperations.hpp"
 
 #include "data/Path.hpp"
+#include "util/StringUtil.hpp"
 
-#include <chrono>
 #include <cstddef>
 #include <string>
 #include <string_view>
@@ -140,7 +140,7 @@ StringListOperations::Apply(
 
 	// If a join shall be performed before to-upper/to-lower, we simply convert
 	// the join parameter first and join as usual afterwards.
-	std::string joinParameter = fJoinParameter;
+	std::string joinParameter{fJoinParameter};
 	if (!joinParameter.empty() && (operations & (TO_UPPER | TO_LOWER)) != 0
 		&& behavior.GetJoinCaseOperator()
 			== behavior::Behavior::JOIN_BEFORE_CASE_OPERATOR) {
@@ -155,20 +155,20 @@ StringListOperations::Apply(
 
 	const std::vector<std::string> list =
 		inputList.empty() && (operations & REPLACE_EMPTY) != 0
-		? {std::string{fEmptyParameter}}
+		? std::vector<std::string>{std::string{fEmptyParameter}}
 		: inputList;
 
 	size_t count = std::min(list.size(), maxSize);
 	for (size_t i = 0; i < count; i++) {
-		String string = list.ElementAt(i);
+		std::string str = list[i];
 
-		size_t bufferSizeBeforeElement = buffer.Length();
+		size_t bufferSizeBeforeElement = buffer.length();
 
 		// If any of the file name/path part selectors/replacers need to be
 		// applied, we disassemble the string, make the modifications, and
 		// reassemble it.
 		if (hasPathPartOperation) {
-			Path::Parts parts(string);
+			Path::Parts parts{str};
 
 			if ((operations & REPLACE_GRIST) != 0)
 				parts.SetGrist(fGristParameter);
@@ -206,26 +206,33 @@ StringListOperations::Apply(
 				parts.UnsetArchiveMember();
 			}
 
-			parts.GetPath(buffer, behavior);
-		} else
-			buffer += string;
+			buffer = parts.ToPath(behavior);
+		} else {
+			buffer += str;
+		}
 
 		if ((operations & TO_UPPER) != 0) {
-			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
-			char* end = buffer.Data() + buffer.Length();
-			std::transform(toConvert, end, toConvert, ::toupper);
+			std::transform(
+				buffer.cbegin() + bufferSizeBeforeElement,
+				buffer.cend(),
+				buffer.begin() + bufferSizeBeforeElement,
+				[](unsigned char c) { return std::toupper(c); }
+			);
 		} else if ((operations & TO_LOWER) != 0) {
-			char* toConvert = buffer.Data() + bufferSizeBeforeElement;
-			char* end = buffer.Data() + buffer.Length();
-			std::transform(toConvert, end, toConvert, ::tolower);
+			std::transform(
+				buffer.cbegin() + bufferSizeBeforeElement,
+				buffer.cend(),
+				buffer.begin() + bufferSizeBeforeElement,
+				[](unsigned char c) { return std::tolower(c); }
+			);
 		}
 
 		if ((operations & JOIN) != 0) {
 			if (i + 1 < count)
 				buffer += joinParameter;
 		} else {
-			resultList.Append(buffer);
-			buffer = StringPart();
+			resultList.push_back(buffer);
+			buffer = std::string{};
 		}
 	}
 
@@ -234,8 +241,8 @@ StringListOperations::Apply(
 		// of jam.
 		if (behavior.GetBrokenSubscriptJoin()
 				== behavior::Behavior::NO_BROKEN_SUBSCRIPT_JOIN
-			|| count == list.Size()) {
-			resultList.Append(buffer);
+			|| count == list.size()) {
+			resultList.push_back(buffer);
 		}
 	}
 

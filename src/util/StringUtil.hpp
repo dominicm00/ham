@@ -13,14 +13,28 @@ namespace ham::util
 class String
 {
   public:
-	std::string ToUpper(std::string_view str)
+	static std::string ToUpper(std::string_view str)
 	{
-		return std::ranges::transform(str, std::toupper);
+		std::string ret{str};
+		std::transform(
+			ret.cbegin(),
+			ret.cend(),
+			ret.begin(), // write to the same location
+			[](unsigned char c) { return std::toupper(c); }
+		);
+		return ret;
 	}
 
-	std::string ToLower(std::string_view str)
+	static std::string ToLower(std::string_view str)
 	{
-		return std::ranges::transform(str, std::tolower);
+		std::string ret{str};
+		std::transform(
+			ret.cbegin(),
+			ret.cend(),
+			ret.begin(), // write to the same location
+			[](unsigned char c) { return std::tolower(c); }
+		);
+		return ret;
 	}
 };
 
