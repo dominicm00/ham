@@ -7,35 +7,25 @@
 
 #include "data/FileStatus.hpp"
 
+#include <string>
+#include <string_view>
 #include <sys/stat.h>
 
 namespace ham::data
 {
 
-static const char*
-find_grist_end(const StringPart& path)
+/*static*/ std::string_view
+Path::RemoveGrist(std::string_view path)
 {
-	const char* remainder = path.Start();
-	const char* pathEnd = path.End();
+	if (path.front() != '<')
+		return path;
 
-	if (*remainder != '<')
-		return nullptr;
+	auto end = path.find('>');
 
-	remainder = std::find(remainder + 1, pathEnd, '>');
-	if (remainder == pathEnd)
-		return nullptr;
+	if (end == std::string::npos)
+		return path;
 
-	return remainder + 1;
-}
-
-// #pragma mark - Path
-
-/*static*/ StringPart
-Path::RemoveGrist(const StringPart& path)
-{
-	if (const char* gristEnd = find_grist_end(path))
-		return StringPart(gristEnd, path.End());
-	return path;
+	return path.substr(end + 1);
 }
 
 /**
@@ -44,20 +34,20 @@ Path::RemoveGrist(const StringPart& path)
  * \param[in] head The string to use as the prefix.
  * \param[in] tail The string to use as the suffix.
  */
-String
-Path::Make(const StringPart& head, const StringPart& tail)
+std::string
+Path::Make(std::string_view head, std::string_view tail)
 {
-	if (head.IsEmpty())
-		return String(tail);
-	if (tail.IsEmpty())
-		return String(head);
+	if (head.empty())
+		return std::string{tail};
+	if (tail.empty())
+		return std::string{head};
 	if (IsAbsolute(tail))
-		return String(tail);
+		return std::string{tail};
 
 	// TODO: Path separator!
-	StringBuffer buffer;
+	std::string buffer;
 	buffer += head;
-	if (head.End()[-1] != '/')
+	if (head.back() != '/')
 		buffer += '/';
 	buffer += tail;
 	return buffer;
@@ -107,62 +97,49 @@ Path::Parts::IsAbsolute() const
  *
  * \param[in] path String representation of a Path.
  */
-void
-Path::Parts::Parts(path)
+Path::Parts::Parts(std::string_view path)
 {
 	// TODO: This is platform dependent!
+	std::string_view remainder{path};
 
-	const char* remainder = path.Start();
-	const char* pathEnd = path.End();
+	if (remainder.empty())
+		return;
 
 	// grist
-	if (const char* gristEnd = find_grist_end(path)) {
-		fGrist.SetTo(remainder, gristEnd);
-		remainder = gristEnd;
-	} else
-		fGrist.Unset();
-
-	// root
-	fRoot.Unset();
+	if (remainder.front() == '<') {
+		const auto gristEnd = remainder.find('>');
+		if (gristEnd != std::string::npos) {
+			fGrist = remainder.substr(0, gristEnd + 1);
+			remainder = remainder.substr(gristEnd + 1);
+		}
+	}
 
 	// directory path
-	if (const char* lastSlash = strrchr(remainder, '/')) {
-		fDirectory.SetTo(
-			remainder,
-			lastSlash == remainder ? remainder + 1 : lastSlash
-		);
-		remainder = lastSlash + 1;
-	} else
-		fDirectory.Unset();
+	const auto lastSlash = remainder.rfind('/');
+	if (lastSlash != std::string::npos) {
+		fDirectory = remainder.substr(0, lastSlash + 1);
+		remainder = remainder.substr(lastSlash + 1);
+	}
 
 	// archive member
-	const char* archiveMemberStart = nullptr;
-	if (remainder != pathEnd && pathEnd[-1] == ')')
-		archiveMemberStart = strchr(remainder, '(');
-	if (archiveMemberStart != nullptr)
-		fArchiveMember.SetTo(archiveMemberStart + 1, pathEnd - 1);
-	else
-		fArchiveMember.Unset();
+	auto archiveMemberStart = std::string::npos;
+	if (!remainder.empty() && remainder.back() == ')')
+		archiveMemberStart = remainder.find('(');
+	if (archiveMemberStart != std::string::npos) {
+		fArchiveMember = remainder.substr(archiveMemberStart);
+		remainder = remainder.substr(0, archiveMemberStart);
+	}
 
 	// suffix
-	const char* fileNameEnd =
-		archiveMemberStart != nullptr ? archiveMemberStart : pathEnd;
-	typedef std::reverse_iterator<const char*> ReverseStringIterator;
-	const char* lastDot = std::find(
-							  ReverseStringIterator(fileNameEnd),
-							  ReverseStringIterator(remainder),
-							  '.'
-						  )
-							  .base()
-		- 1;
-	if (lastDot != remainder - 1) {
-		fSuffix.SetTo(lastDot, fileNameEnd);
-		fileNameEnd = lastDot;
-	} else
-		fSuffix.Unset();
+
+	// TODO: Like Jam, we count hidden files like .hidden as having a suffix.
+	// This should be compatilbility behavior.
+	const auto lastDot = remainder.rfind('.');
+	if (lastDot != std::string::npos)
+		fSuffix = remainder.substr('.');
 
 	// base name
-	fBaseName.SetTo(remainder, fileNameEnd);
+	fBaseName = remainder.substr(0, lastDot);
 }
 
 /**
@@ -203,7 +180,7 @@ Path::Parts::ToPath(const behavior::Behavior& behavior) const
 
 	if (!fDirectory.empty()) {
 		buffer += fDirectory;
-		if (fDirectory.back() != "/"
+		if (fDirectory.back() != '/'
 			&& (!fBaseName.empty() || !fSuffix.empty())) {
 			buffer += '/';
 		}

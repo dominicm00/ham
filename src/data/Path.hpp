@@ -7,6 +7,7 @@
 
 #include "behavior/Behavior.hpp"
 
+#include <string>
 #include <string_view>
 
 namespace ham::data
@@ -23,8 +24,8 @@ class Path
 	static bool IsAbsolute(std::string_view path);
 	static std::string_view RemoveGrist(std::string_view path);
 	static std::string Make(std::string_view head, std::string_view tail);
-	static bool Exists(std::string_view path);
-	static bool GetFileStatus(std::string_view path, FileStatus& _status);
+	static bool Exists(const char* path);
+	static bool GetFileStatus(const char* path, FileStatus& _status);
 };
 
 /**
@@ -44,39 +45,42 @@ class Path
  # If root was set to /some/root, then the final path would be:
  <grist>/some/root/path/to/basename.suffix(member)
  \endverbatim
+ *
+ * For performance, this class uses string views to decompose and manipulate an
+ * existing string. Path::Parts must not outlive the scope of any strings it is
+ * passed.
  */
 class Path::Parts
 {
   public:
 	Parts() {}
-	Parts(std::string_view path) { SetTo(path); }
+	Parts(std::string_view path);
 
-	void SetTo(std::string_view path);
 	std::string ToPath(const behavior::Behavior& behavior) const;
 
 	bool IsAbsolute() const;
 
-	std::string_view Grist() const { return fGrist; }
+	std::string Grist() const { return std::string{fGrist}; }
 	void SetGrist(std::string_view grist) { fGrist = grist; }
 	void UnsetGrist() { fGrist = {}; }
 
-	std::string_view Root() const { return fRoot; }
+	std::string Root() const { return std::string{fRoot}; }
 	void SetRoot(std::string_view root) { fRoot = root; }
 	void UnsetRoot() { fRoot = {}; }
 
-	std::string_view Directory() const { return fDirectory; }
+	std::string Directory() const { return std::string{fDirectory}; }
 	void SetDirectory(std::string_view directory) { fDirectory = directory; }
 	void UnsetDirectory() { fDirectory = {}; }
 
-	std::string_view BaseName() const { return fBaseName; }
+	std::string BaseName() const { return std::string{fBaseName}; }
 	void SetBaseName(std::string_view baseName) { fBaseName = baseName; }
 	void UnsetBaseName() { fBaseName = {}; }
 
-	std::string_view Suffix() const { return fSuffix; }
+	std::string Suffix() const { return std::string{fSuffix}; }
 	void SetSuffix(std::string_view suffix) { fSuffix = suffix; }
 	void UnsetSuffix() { fSuffix = {}; }
 
-	std::string_view ArchiveMember() const { return fArchiveMember; }
+	std::string ArchiveMember() const { return std::string{fArchiveMember}; }
 	void SetArchiveMember(std::string_view archiveMember)
 	{
 		fArchiveMember = archiveMember;
@@ -96,7 +100,7 @@ class Path::Parts
 Path::IsAbsolute(std::string_view path)
 {
 	// TODO: Platform dependent!
-	return !path.IsEmpty() && path.Start()[0] == '/';
+	return !path.empty() && path.front() == '/';
 }
 
 } // namespace ham::data
