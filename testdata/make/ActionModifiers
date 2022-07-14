@@ -446,3 +446,28 @@ Depends all : target ;
 Action called by source1
 Action called by source2
 ---
+# Error when together action is passed multiple targets
+#
+#!file Jamfile
+rule EchoOnce
+{
+	Depends $(1) : $(2) ;
+}
+
+actions together EchoOnce
+{
+	echo "Action called by $(2)" >> "$(1)"
+}
+
+NOTFILE source1 source2 ;
+
+LOCATE on target1 = . ;
+LOCATE on target2 = . ;
+EchoOnce target1 target2 : source1 ;
+EchoOnce target1 target2 : source2 ;
+
+Depends all : target1 target2 ;
+-
+#!exception
+Error: Action EchoOnce has 'together' modifier and must be passed exactly 1 target, but was passed 2
+---
