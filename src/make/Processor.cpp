@@ -679,6 +679,18 @@ Processor::_MakeCommands(Target* target)
 		data::RuleActions* actions = actionsCall->Actions();
 
 		if (actions->IsTogether()) {
+			// Together actions cannot have multiple targets (ADR 6)
+			if (auto numTargets = actionsCall->Targets().size();
+				numTargets > 1) {
+				std::stringstream error{};
+				error << "Error: Action " << actions->RuleName()
+					  << " has 'together' modifier and must be passed exactly "
+						 "1 target, "
+						 "but was passed "
+					  << numTargets;
+				throw MakeException(error.str());
+			}
+
 			for (auto source : actionsCall->SourceTargets())
 				togetherMap[actions].insert(source);
 		} else {
