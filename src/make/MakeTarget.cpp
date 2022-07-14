@@ -8,7 +8,7 @@
 namespace ham::make
 {
 
-MakeTarget::MakeTarget(const data::Target* target)
+MakeTarget::MakeTarget(data::Target* target)
 	: fTarget(target),
 	  fBoundPath(),
 	  fOriginalTime(),

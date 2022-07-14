@@ -194,11 +194,9 @@ TargetBuilder::_ExecuteCommand(Command* command)
 {
 	if (fOptions.IsPrintActions()) {
 		data::RuleActionsCall* actions = command->Actions();
-		std::uint32_t flags =
-			actions->Actions()->Flags() & data::RuleActions::FLAG_MASK;
 
 		if (fOptions.IsPrintQuietActions()
-			|| !(flags & data::RuleActions::QUIETLY)) {
+			|| !(actions->Actions()->IsQuietly())) {
 			printf(
 				"%s %s\n",
 				actions->Actions()->RuleName().ToCString(),

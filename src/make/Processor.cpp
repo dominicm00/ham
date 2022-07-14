@@ -25,17 +25,24 @@
 #include "ruleset/HamRuleset.hpp"
 #include "ruleset/JamRuleset.hpp"
 
+#include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <ostream>
+#include <set>
 #include <sstream>
 #include <stdarg.h>
+#include <utility>
+#include <vector>
 
 namespace ham::make
 {
 
 using data::Time;
+using std::unique_ptr;
 
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
@@ -66,15 +73,16 @@ Processor::~Processor()
 		delete *it;
 	}
 
-	for (CommandMap::iterator it = fCommands.begin(); it != fCommands.end();
-		 ++it) {
-		delete it->second;
-	}
-
 	for (MakeTargetMap::iterator it = fMakeTargets.begin();
 		 it != fMakeTargets.end();
 		 ++it) {
 		delete it->second;
+	}
+
+	for (auto& targetCommands : fCommands) {
+		for (auto command : targetCommands.second) {
+			delete command;
+		}
 	}
 }
 
@@ -169,7 +177,7 @@ Processor::PrepareTargets()
 	size_t primaryTargetCount = fPrimaryTargetNames.Size();
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		const Target* target = fTargets.Lookup(targetName);
+		Target* target = fTargets.Lookup(targetName);
 		if (target == nullptr) {
 			throw MakeException(
 				std::string("Unknown target \"") + targetName.ToCString() + "\""
@@ -185,7 +193,7 @@ Processor::PrepareTargets()
 
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		const Target* target = fTargets.Lookup(targetName);
+		Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
 		fPrimaryTargets.Append(makeTarget);
 		_PrepareTargetRecursively(makeTarget);
@@ -274,7 +282,7 @@ Processor::BuildTargets()
 }
 
 MakeTarget*
-Processor::_GetMakeTarget(const Target* target, bool create)
+Processor::_GetMakeTarget(Target* target, bool create)
 {
 	MakeTargetMap::iterator it = fMakeTargets.find(target);
 	if (it != fMakeTargets.end())
@@ -283,7 +291,7 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 	if (!create)
 		return nullptr;
 
-	std::unique_ptr<MakeTarget> makeTarget(new MakeTarget(target));
+	unique_ptr<MakeTarget> makeTarget(new MakeTarget(target));
 	fMakeTargets[target] = makeTarget.get();
 	return makeTarget.release();
 }
@@ -291,8 +299,8 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 MakeTarget*
 Processor::_GetMakeTarget(const String& targetName, bool create)
 {
-	const Target* target = create ? fTargets.LookupOrCreate(targetName)
-								  : fTargets.Lookup(targetName);
+	Target* target = create ? fTargets.LookupOrCreate(targetName)
+							: fTargets.Lookup(targetName);
 	return target != nullptr ? _GetMakeTarget(target, create) : nullptr;
 }
 
@@ -644,43 +652,78 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	return needToMake;
 }
 
-TargetBuildInfo*
-Processor::_MakeTarget(MakeTarget* makeTarget)
+CommandList
+Processor::_MakeCommands(Target* target)
 {
-	const Target* target = makeTarget->GetTarget();
-	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
-		_TargetMade(makeTarget, MakeTarget::DONE);
-		return nullptr;
-	}
+	// Check command cache
+	if (auto it = fCommands.find(target); it != fCommands.end())
+		return it->second;
 
-	std::unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
-
-	// TODO: Support RuleActions::TOGETHER
 	// TODO: Support RuleActions::PIECEMEAL
+	//
+	// Each TOGETHER action can be associated to a set of sources (the targets
+	// are implied since TOGETHER actions can only have one target). Ham does
+	// not guarantee that TOGETHER actions have sources in any order, so we
+	// don't need to use a SequentialSet.
+	using TogetherCallMap = std::map<data::RuleActions*, std::set<Target*>>;
+	TogetherCallMap togetherMap{};
+	CommandList& commandList = fCommands[target];
+
 	for (std::vector<data::RuleActionsCall*>::const_iterator it =
 			 target->ActionsCalls().begin();
 		 it != target->ActionsCalls().end();
 		 ++it) {
 		data::RuleActionsCall* actionsCall = *it;
+		data::RuleActions* actions = actionsCall->Actions();
 
-		util::Reference<Command> command;
-		CommandMap::iterator commandIt = fCommands.find(actionsCall);
-		if (commandIt != fCommands.end()) {
-			command.SetTo(commandIt->second);
-		} else {
-			// prepare the actions command line
-			Command* builtCommand = _BuildCommand(actionsCall);
-			if (builtCommand == nullptr)
-				continue;
-
-			command.SetTo(builtCommand, true);
-			if (actionsCall->Targets().size() > 1) {
-				fCommands[actionsCall] = command.Get();
-				command.Get()->AcquireReference();
+		if (actions->IsTogether()) {
+			// Together actions cannot have multiple targets (ADR 6)
+			if (auto numTargets = actionsCall->Targets().size();
+				numTargets > 1) {
+				std::stringstream error{};
+				error << "Error: Action " << actions->RuleName()
+					  << " has 'together' modifier and must be passed exactly "
+						 "1 target, "
+						 "but was passed "
+					  << numTargets;
+				throw MakeException(error.str());
 			}
-		}
 
-		buildInfo->AddCommand(command.Get());
+			for (auto source : actionsCall->SourceTargets())
+				togetherMap[actions].insert(source);
+		} else {
+			commandList.emplace_back(_BuildCommand(actionsCall));
+		}
+	}
+
+	// Add TOGETHER actions
+	for (auto [action, sourceSet] : togetherMap) {
+		data::TargetList targets{target};
+		data::TargetList sources(sourceSet.begin(), sourceSet.end());
+		auto actionsCall = new data::RuleActionsCall{action, targets, sources};
+		commandList.emplace_back(_BuildCommand(actionsCall));
+		// Target takes ownership of actions call
+		target->AddActionsCall(actionsCall);
+	}
+
+	return commandList;
+}
+
+TargetBuildInfo*
+Processor::_MakeTarget(MakeTarget* makeTarget)
+{
+	Target* target = makeTarget->GetTarget();
+	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
+		_TargetMade(makeTarget, MakeTarget::DONE);
+		return nullptr;
+	}
+
+	unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
+
+	auto commands = _MakeCommands(target);
+	for (auto command : commands) {
+		if (command != nullptr)
+			buildInfo->AddCommand(command);
 	}
 
 	return buildInfo.release();
@@ -751,21 +794,20 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 
 void
 Processor::_BindActionsTargets(
-	const data::RuleActionsCall* actionsCall,
-	const bool isSources,
+	data::RuleActionsCall* actionsCall,
+	bool isSources,
 	StringList& boundTargets
 )
 {
-	const std::uint32_t flags =
-		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	const bool isExistingAction = flags & data::RuleActions::EXISTING;
-	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+	const data::RuleActions* actions = actionsCall->Actions();
+	const bool isExistingAction = actions->IsExisting();
+	const bool isUpdatedAction = actions->IsUpdated();
 
-	const data::TargetList& targetList =
+	data::TargetList targetList =
 		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
 
-	const Target* primaryTarget = *actionsCall->Targets().begin();
-	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
+	Target* primaryTarget = *actionsCall->Targets().begin();
+	MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
 	for (const auto target : targetList) {
 		MakeTarget* makeTarget = _GetMakeTarget(target, true);
@@ -826,10 +868,9 @@ Processor::_BindActionsTargets(
 Command*
 Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
-	const std::uint32_t flags =
-		actionsCall->Actions()->Flags() & data::RuleActions::FLAG_MASK;
-	const bool isExistingAction = flags & data::RuleActions::EXISTING;
-	const bool isUpdatedAction = flags & data::RuleActions::UPDATED;
+	const data::RuleActions* actions = actionsCall->Actions();
+	const bool isExistingAction = actions->IsExisting();
+	const bool isUpdatedAction = actions->IsUpdated();
 
 	auto numTargets = actionsCall->Targets().size();
 
@@ -840,7 +881,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// somewhere in parsing.
 	if (numTargets == 0) {
 		std::stringstream error{};
-		error << "Error: Action " << actionsCall->Actions()->RuleName()
+		error << "Error: Action " << actions->RuleName()
 			  << " was called with no targets";
 		throw MakeException(error.str());
 	}
@@ -848,7 +889,7 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// Updated actions cannot have multiple targets (ADR 4)
 	if (isUpdatedAction && numTargets > 1) {
 		std::stringstream error{};
-		error << "Error: Action " << actionsCall->Actions()->RuleName()
+		error << "Error: Action " << actions->RuleName()
 			  << " has 'updated' modifier and must be passed exactly 1 target, "
 				 "but was passed "
 			  << numTargets;
@@ -903,17 +944,11 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		}
 	}
 
-	// Cleanup function; must always be called before returning
-	const auto cleanup = [this, oldLocalScope, oldBuiltInVariables]() {
-		// reinstate the old local variable scope and the built-in variables
-		fEvaluationContext.SetLocalScope(oldLocalScope);
-		fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
-	};
-
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
+	bool canceled = false;
 
 	while (remainder < end) {
 		// transfer whitespace unchanged
@@ -944,8 +979,8 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			// EXISTING or UPDATED, cancel this action.
 			if (varIsSource && sourcesEmpty
 				&& (isExistingAction || isUpdatedAction)) {
-				cleanup();
-				return nullptr;
+				canceled = true;
+				break;
 			}
 
 			// If a target list is otherwise empty and used, print a warning.
@@ -978,8 +1013,11 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			commandLine.Append(wordStart, remainder - wordStart);
 	}
 
-	cleanup();
-	return new Command(actionsCall, commandLine, boundTargets);
+	// reinstate the old local variable scope and the built-in variables
+	fEvaluationContext.SetLocalScope(oldLocalScope);
+	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
+	return canceled ? nullptr
+					: new Command(actionsCall, commandLine, boundTargets);
 }
 
 void
