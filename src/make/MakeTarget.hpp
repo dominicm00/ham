@@ -58,12 +58,12 @@ class MakeTarget
 	};
 
   public:
-	MakeTarget(const data::Target* target);
+	MakeTarget(data::Target* target);
 	~MakeTarget();
 
 	String Name() const { return fTarget->Name(); }
 
-	const data::Target* GetTarget() const { return fTarget; }
+	data::Target* GetTarget() const { return fTarget; }
 
 	bool IsBound() const { return !fBoundPath.IsEmpty(); }
 	String BoundPath() const { return fBoundPath; }
@@ -115,7 +115,7 @@ class MakeTarget
 	}
 
   private:
-	const data::Target* fTarget;
+	data::Target* fTarget;
 	String fBoundPath;
 	data::Time fOriginalTime;
 	// file time, or, if missing, least possible

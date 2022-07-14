@@ -171,7 +171,7 @@ Processor::PrepareTargets()
 	size_t primaryTargetCount = fPrimaryTargetNames.Size();
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		const Target* target = fTargets.Lookup(targetName);
+		Target* target = fTargets.Lookup(targetName);
 		if (target == nullptr) {
 			throw MakeException(
 				std::string("Unknown target \"") + targetName.ToCString() + "\""
@@ -187,7 +187,7 @@ Processor::PrepareTargets()
 
 	for (size_t i = 0; i < primaryTargetCount; i++) {
 		String targetName = fPrimaryTargetNames.ElementAt(i);
-		const Target* target = fTargets.Lookup(targetName);
+		Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
 		fPrimaryTargets.Append(makeTarget);
 		_PrepareTargetRecursively(makeTarget);
@@ -276,7 +276,7 @@ Processor::BuildTargets()
 }
 
 MakeTarget*
-Processor::_GetMakeTarget(const Target* target, bool create)
+Processor::_GetMakeTarget(Target* target, bool create)
 {
 	MakeTargetMap::iterator it = fMakeTargets.find(target);
 	if (it != fMakeTargets.end())
@@ -293,8 +293,8 @@ Processor::_GetMakeTarget(const Target* target, bool create)
 MakeTarget*
 Processor::_GetMakeTarget(const String& targetName, bool create)
 {
-	const Target* target = create ? fTargets.LookupOrCreate(targetName)
-								  : fTargets.Lookup(targetName);
+	Target* target = create ? fTargets.LookupOrCreate(targetName)
+							: fTargets.Lookup(targetName);
 	return target != nullptr ? _GetMakeTarget(target, create) : nullptr;
 }
 
@@ -649,7 +649,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 }
 
 CommandList
-Processor::_MakeCommands(const Target* target)
+Processor::_MakeCommands(Target* target)
 {
 	// Check command cache
 	if (auto it = fCommands.find(target); it != fCommands.end())
@@ -681,10 +681,9 @@ Processor::_MakeCommands(const Target* target)
 	}
 
 	// Add TOGETHER actions
-	for (auto& [action, sourceSet] : togetherMap) {
-		using ConstTargetList = const std::vector<const Target*>;
-		ConstTargetList targets{target};
-		ConstTargetList sources(sourceSet.begin(), sourceSet.end());
+	for (auto [action, sourceSet] : togetherMap) {
+		data::TargetList targets{target};
+		data::TargetList sources(sourceSet.begin(), sourceSet.end());
 		data::RuleActionsCall call{action, targets, targets};
 		commandList.emplace_back(_BuildCommand(&call));
 	}
@@ -695,7 +694,7 @@ Processor::_MakeCommands(const Target* target)
 TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
-	const Target* target = makeTarget->GetTarget();
+	Target* target = makeTarget->GetTarget();
 	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
 		return nullptr;
@@ -775,20 +774,20 @@ Processor::_TargetMade(MakeTarget* makeTarget, MakeTarget::MakeState state)
 
 void
 Processor::_BindActionsTargets(
-	const data::RuleActions* actions,
-	const std::vector<const Target*> targets,
-	const std::vector<const Target*> sources,
-	const bool isSources,
+	data::RuleActionsCall* actionsCall,
+	bool isSources,
 	StringList& boundTargets
 )
 {
+	const data::RuleActions* actions = actionsCall->Actions();
 	const bool isExistingAction = actions->IsExisting();
 	const bool isUpdatedAction = actions->IsUpdated();
 
-	const std::vector<const Target*> targetList = isSources ? sources : targets;
+	data::TargetList targetList =
+		isSources ? actionsCall->SourceTargets() : actionsCall->Targets();
 
-	const Target* primaryTarget = *targets.begin();
-	const MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
+	Target* primaryTarget = *actionsCall->Targets().begin();
+	MakeTarget* primaryMakeTarget = _GetMakeTarget(primaryTarget, true);
 
 	for (const auto target : targetList) {
 		MakeTarget* makeTarget = _GetMakeTarget(target, true);
@@ -847,16 +846,13 @@ Processor::_BindActionsTargets(
 }
 
 Command*
-Processor::_BuildCommand(
-	const data::RuleActions* actions,
-	const std::vector<const Target*> targets,
-	const std::vector<const Target*> sources
-)
+Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 {
+	const data::RuleActions* actions = actionsCall->Actions();
 	const bool isExistingAction = actions->IsExisting();
 	const bool isUpdatedAction = actions->IsUpdated();
 
-	auto numTargets = targets.size();
+	auto numTargets = actionsCall->Targets().size();
 
 	// Actions must have at least one target (ADR 5)
 	//

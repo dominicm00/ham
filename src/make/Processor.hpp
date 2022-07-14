@@ -8,6 +8,7 @@
 #include "code/EvaluationContext.hpp"
 #include "data/RuleActions.hpp"
 #include "data/StringList.hpp"
+#include "data/TargetContainers.hpp"
 #include "data/TargetPool.hpp"
 #include "data/VariableDomain.hpp"
 #include "make/MakeTarget.hpp"
@@ -27,9 +28,9 @@ using data::TargetSet;
 class Command;
 class TargetBuildInfo;
 
-using MakeTargetMap = std::map<const Target*, MakeTarget*>;
-using CommandList = std::vector<const Command*>;
-using CommandMap = std::map<const Target*, CommandList>;
+using MakeTargetMap = std::map<Target*, MakeTarget*>;
+using CommandList = std::vector<Command*>;
+using CommandMap = std::map<Target*, CommandList>;
 using TargetBuildInfoSet = std::set<TargetBuildInfo*>;
 
 class Processor
@@ -92,7 +93,7 @@ class Processor
 	void BuildTargets();
 
   private:
-	MakeTarget* _GetMakeTarget(const Target* target, bool create);
+	MakeTarget* _GetMakeTarget(Target* target, bool create);
 	MakeTarget* _GetMakeTarget(const String& targetName, bool create);
 	bool _IsPseudoTarget(const MakeTarget* makeTarget) const;
 
@@ -147,7 +148,7 @@ class Processor
 	 *
 	 * \param[in] target
 	 */
-	CommandList _MakeCommands(const Target* target);
+	CommandList _MakeCommands(Target* target);
 
 	/**
 	 * Returns the build info for a target, or nullptr if there are no pending
@@ -177,10 +178,8 @@ class Processor
 	 * call \param[out] boundTargets list to append bound targets to
 	 */
 	void _BindActionsTargets(
-		const data::RuleActions* actions,
-		const std::vector<const Target*> targets,
-		const std::vector<const Target*> sources,
-		const bool isSources,
+		data::RuleActionsCall* actionsCall,
+		bool isSources,
 		StringList& boundTargets
 	);
 
