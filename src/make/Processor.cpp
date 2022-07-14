@@ -78,6 +78,12 @@ Processor::~Processor()
 		 ++it) {
 		delete it->second;
 	}
+
+	for (auto& targetCommands : fCommands) {
+		for (auto command : targetCommands.second) {
+			delete command;
+		}
+	}
 }
 
 void
@@ -684,8 +690,10 @@ Processor::_MakeCommands(Target* target)
 	for (auto [action, sourceSet] : togetherMap) {
 		data::TargetList targets{target};
 		data::TargetList sources(sourceSet.begin(), sourceSet.end());
-		data::RuleActionsCall call{action, targets, targets};
-		commandList.emplace_back(_BuildCommand(&call));
+		auto actionsCall = new data::RuleActionsCall{action, targets, sources};
+		commandList.emplace_back(_BuildCommand(actionsCall));
+		// Target takes ownership of actions call
+		target->AddActionsCall(actionsCall);
 	}
 
 	return commandList;
@@ -703,8 +711,10 @@ Processor::_MakeTarget(MakeTarget* makeTarget)
 	unique_ptr<TargetBuildInfo> buildInfo(new TargetBuildInfo(makeTarget));
 
 	auto commands = _MakeCommands(target);
-	for (auto command : commands)
-		buildInfo->AddCommand(command);
+	for (auto command : commands) {
+		if (command != nullptr)
+			buildInfo->AddCommand(command);
+	}
 
 	return buildInfo.release();
 }
