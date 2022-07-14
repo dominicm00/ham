@@ -934,17 +934,11 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		}
 	}
 
-	// Cleanup function; must always be called before returning
-	const auto cleanup = [this, oldLocalScope, oldBuiltInVariables]() {
-		// reinstate the old local variable scope and the built-in variables
-		fEvaluationContext.SetLocalScope(oldLocalScope);
-		fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
-	};
-
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	data::StringBuffer commandLine;
+	bool canceled = false;
 
 	while (remainder < end) {
 		// transfer whitespace unchanged
@@ -975,8 +969,8 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			// EXISTING or UPDATED, cancel this action.
 			if (varIsSource && sourcesEmpty
 				&& (isExistingAction || isUpdatedAction)) {
-				cleanup();
-				return nullptr;
+				canceled = true;
+				break;
 			}
 
 			// If a target list is otherwise empty and used, print a warning.
@@ -1009,8 +1003,11 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 			commandLine.Append(wordStart, remainder - wordStart);
 	}
 
-	cleanup();
-	return new Command(actionsCall, commandLine, boundTargets);
+	// reinstate the old local variable scope and the built-in variables
+	fEvaluationContext.SetLocalScope(oldLocalScope);
+	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
+	return canceled ? nullptr
+					: new Command(actionsCall, commandLine, boundTargets);
 }
 
 void
