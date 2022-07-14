@@ -960,21 +960,21 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		// get the next contiguous non-whitespace sequence
 		const char* wordStart = remainder;
 		bool needsExpansion = false;
+		bool varIsTarget = false;
+		bool varIsSource = false;
 		while (remainder < end && !isspace(*remainder)) {
-			if (*remainder == '$')
+			if (*remainder == '$') {
 				needsExpansion |= remainder + 1 < end && remainder[1] == '(';
+				varIsTarget |= remainder + 2 < end
+					&& (remainder[2] == '1' || remainder[2] == '<');
+				varIsSource |= remainder + 2 < end
+					&& (remainder[2] == '2' || remainder[2] == '>');
+			}
 			remainder++;
 		}
 
 		// append the sequence, expanding variables, if necessary
 		if (needsExpansion) {
-			// Check for empty expansions
-			const auto isVar = [wordStart](char varName) {
-				return wordStart[2] == varName;
-			};
-			const bool varIsTarget = isVar('1') || isVar('<');
-			const bool varIsSource = isVar('2') || isVar('>');
-
 			// If sources are being expanded and have been trimmed to empty by
 			// EXISTING or UPDATED, cancel this action.
 			if (varIsSource && sourcesEmpty
