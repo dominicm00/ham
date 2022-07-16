@@ -187,8 +187,10 @@ class Processor
 	 * Create a runnable Command from an actions call.
 	 *
 	 * \param[in] actionsCall
+	 * \param[out] commands CommandList to add actions to
 	 */
-	Command* _BuildCommand(data::RuleActionsCall* actionsCall);
+	void
+	_BuildCommands(data::RuleActionsCall* actionsCall, CommandList& commands);
 
 	void _PrintMakeTreeBinding(const MakeTarget* makeTarget);
 	void

@@ -48,6 +48,9 @@ static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
 static const String kJamShellVariableName("JAMSHELL");
 
+// TODO: This should be determined dynamically
+static const size_t kMaxCommandLength = 8'000;
+
 Processor::Processor()
 	: fGlobalVariables(),
 	  fTargets(),
@@ -692,7 +695,7 @@ Processor::_MakeCommands(Target* target)
 			for (auto source : actionsCall->SourceTargets())
 				togetherMap[actions].insert(source);
 		} else {
-			commandList.emplace_back(_BuildCommand(actionsCall));
+			_BuildCommands(actionsCall, commandList);
 		}
 	}
 
@@ -701,9 +704,9 @@ Processor::_MakeCommands(Target* target)
 		data::TargetList targets{target};
 		data::TargetList sources(sourceSet.begin(), sourceSet.end());
 		auto actionsCall = new data::RuleActionsCall{action, targets, sources};
-		commandList.emplace_back(_BuildCommand(actionsCall));
 		// Target takes ownership of actions call
 		target->AddActionsCall(actionsCall);
+		_BuildCommands(actionsCall, commandList);
 	}
 
 	return commandList;
@@ -865,8 +868,11 @@ Processor::_BindActionsTargets(
 	}
 }
 
-Command*
-Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
+void
+Processor::_BuildCommands(
+	data::RuleActionsCall* actionsCall,
+	CommandList& commands
+)
 {
 	const data::RuleActions* actions = actionsCall->Actions();
 	const bool isExistingAction = actions->IsExisting();
