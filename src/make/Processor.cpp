@@ -938,11 +938,11 @@ Processor::_BuildCommands(
 	 * To add a source, consider the newly generated word groups where there are
 	 * n <= p occurences of the new source. The number of such cases is
 	 * C(n,p)*(l-n)^p. The length of a case is `baseLength + multiplicity*n*s +
-	 * otherSources`. When summing all the cases, each source appears in the sum
-	 * the same number of times, so we can substitute the average for each
-	 * occurence of an unknown source:
+	 * multiplicity*(p-n)*otherSources`. When summing all the cases, each source
+	 * appears in the sum the same number of times, so we can substitute the
+	 * average for each occurence of an unknown source:
 	 *
-	 * Length = C(n,p)*(l-n)^p*(b + m*n*s + (p-n)A)
+	 * Length = C(n,p)*(l-n)^p*(b + m*n*s + m*(p-n)^2*A)
 	 *
 	 * Then, sum n from 1 to p to obtain the length of all word groups added by
 	 * the new source.
