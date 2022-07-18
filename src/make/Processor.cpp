@@ -1031,7 +1031,8 @@ Processor::_PiecemealWords(
 	 * Let `length1 := eval{"a"}` and `length2 := eval{"ab"}`. `length2 -
 	 * length1 - power + 1` is the source _multiplicity_, or how many times each
 	 * source is included in the word because of external variable products.
-	 * `length1` is also the base length of the word group.
+	 * `length1 - (length2 - length1) = 2*length1 - length2` is also the base
+	 * length of the word group.
 	 *
 	 * Say we are given the length of a word with a source set of length `l`.
 	 * Let `A` be the average length of the sources in the set. We add a new
@@ -1060,7 +1061,7 @@ Processor::_PiecemealWords(
 	 * The empty set has length 0, so via induction we can build up to any
 	 * source set.
 	 */
-	data::StringListList sources{};
+	data::StringListList piecemealSources{};
 
 	// Helpers
 	const auto genDomain = [context](std::vector<const char*> vars) {
@@ -1099,6 +1100,17 @@ Processor::_PiecemealWords(
 		return length;
 	};
 
+	const auto fact = [](std::size_t num) {
+		for (std::size_t i = num - 1; num > 1; num--) {
+			num *= i;
+		}
+		return num;
+	};
+
+	const auto comb = [fact](std::size_t r, std::size_t n) {
+		return fact(n) / (fact(r) * fact(n - r));
+	};
+
 	// Test variable domains
 	auto singleDomain = genDomain({"a"});
 	auto longDomain = genDomain({"ab"});
@@ -1112,6 +1124,7 @@ Processor::_PiecemealWords(
 			getLength(&longDomain, wordStart, wordEnd);
 		const std::size_t dualLength =
 			getLength(&dualDomain, wordStart, wordEnd);
+		const std::size_t baseLength = 2 * singleLength - longLength;
 
 		if (dualLength % singleLength != 0)
 			throw MakeException("Impossible variable expansion length");
@@ -1121,9 +1134,44 @@ Processor::_PiecemealWords(
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
 		// TODO: Calculate and split sources
+		StringList sources{};
+		double average = 0;
+		std::size_t size = 0;
+		for (std::size_t i = 0; i < boundSources.Size(); i++) {
+			auto source = boundSources.ElementAt(i);
+
+			// Calculate size of added source
+			std::size_t newSize = 0;
+			for (std::size_t n = 1; n <= power; n++) {
+				const std::size_t numGroups =
+					comb(n, power) * std::pow(sources.Size() - n, power);
+				const std::size_t newSourceLength =
+					multiplicity * n * source.Length();
+				const std::size_t otherSourceLength =
+					multiplicity * std::pow(power - n, 2) * average;
+
+				newSize += numGroups
+					* (baseLength + newSourceLength + otherSourceLength);
+			}
+			size += newSize;
+
+			if (size > maxLine) {
+				if (sources.IsEmpty()) {
+					std::stringstream error;
+					error << "maxline of " << maxLine
+						  << " is too small; unable to add source "
+						  << source.ToStlString();
+					throw MakeException(error.str());
+				}
+				piecemealSources.push_back(sources);
+				sources = {};
+				average = 0;
+				size = 0;
+			}
+		}
 	}
 
-	return sources;
+	return piecemealSources;
 }
 
 void
