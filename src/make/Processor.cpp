@@ -1163,10 +1163,19 @@ Processor::_PiecemealWords(
 						  << source.ToStlString();
 					throw MakeException(error.str());
 				}
+
 				piecemealSources.push_back(sources);
 				sources = {};
 				average = 0;
 				size = 0;
+
+				// Redo calculation with current source
+				i--;
+			} else {
+				size += source.Length();
+				average = (sources.Size() * average + source.Length())
+					/ (sources.Size() - 1);
+				sources.Append(source);
 			}
 		}
 	}
