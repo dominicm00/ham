@@ -15,6 +15,7 @@
 #include "code/OnExpression.hpp"
 #include "data/RegExp.hpp"
 #include "data/RuleActions.hpp"
+#include "data/StringBuffer.hpp"
 #include "data/StringList.hpp"
 #include "data/TargetBinder.hpp"
 #include "data/TargetContainers.hpp"
@@ -993,7 +994,26 @@ Processor::_BuildCommands(
 		sources.push_back(boundSourceTargets);
 	}
 
-	// TODO: create command for each source list
+	for (StringList commandSources : sources) {
+		data::VariableDomain builtInWithSources{builtInVariables};
+		builtInWithSources.Set("2", commandSources);
+		builtInWithSources.Set(">", commandSources);
+		fEvaluationContext.SetBuiltInVariables(&builtInWithSources);
+
+		// Build command
+		data::String commandLine{};
+		for (auto& [wordStart, wordEnd] : words) {
+			auto evaluatedWord = code::Leaf::EvaluateString(
+				fEvaluationContext,
+				wordStart,
+				wordEnd,
+				nullptr
+			);
+			const StringPart separator{" "};
+			commandLine = commandLine + evaluatedWord.Join(separator);
+		}
+		commands.push_back(new Command(actionsCall, commandLine, boundTargets));
+	}
 
 	// reinstate the old local variable scope and the built-in variables
 	fEvaluationContext.SetLocalScope(oldLocalScope);
