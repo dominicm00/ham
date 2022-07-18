@@ -12,8 +12,8 @@ namespace ham::make
 
 Command::Command(
 	data::RuleActionsCall* actions,
-	const String& commandLine,
-	const StringList& boundTargetPaths
+	const String commandLine,
+	const StringList boundTargetPaths
 )
 	: fActions(actions),
 	  fCommandLine(commandLine),
