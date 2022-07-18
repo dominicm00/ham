@@ -39,6 +39,7 @@
 #include <set>
 #include <sstream>
 #include <stdarg.h>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -1116,32 +1117,38 @@ Processor::_PiecemealWords(
 	auto longDomain = genDomain({"ab"});
 	auto dualDomain = genDomain({"a", "b"});
 
+	// Calculate basic word info
+	std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> wordInfo{};
 	for (const auto& [wordStart, wordEnd] : words) {
-		// Get basic word lengths
 		const std::size_t singleLength =
 			getLength(&singleDomain, wordStart, wordEnd);
 		const std::size_t longLength =
 			getLength(&longDomain, wordStart, wordEnd);
 		const std::size_t dualLength =
 			getLength(&dualDomain, wordStart, wordEnd);
-		const std::size_t baseLength = 2 * singleLength - longLength;
 
 		if (dualLength % singleLength != 0)
 			throw MakeException("Impossible variable expansion length");
 
+		const std::size_t baseLength = 2 * singleLength - longLength;
 		const std::size_t power =
 			std::round(std::sqrt((double)dualLength / singleLength));
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
-		// TODO: Calculate and split sources
-		StringList sources{};
-		double average = 0;
-		std::size_t size = 0;
-		for (std::size_t i = 0; i < boundSources.Size(); i++) {
-			auto source = boundSources.ElementAt(i);
+		wordInfo.push_back({baseLength, power, multiplicity});
+	}
 
-			// Calculate size of added source
-			std::size_t newSize = 0;
+	// Piecemeal sources
+	StringList sources{};
+	double average = 0;
+	std::size_t commandSize = 0;
+	for (std::size_t i = 0; i < boundSources.Size(); i++) {
+		auto source = boundSources.ElementAt(i);
+
+		// Calculate size of added source
+		for (const auto& [baseLength, power, multiplicity] : wordInfo) {
+			// Calculate word size
+			std::size_t wordSize = 0;
 			for (std::size_t n = 1; n <= power; n++) {
 				const std::size_t numGroups =
 					comb(n, power) * std::pow(sources.Size() - n, power);
@@ -1150,35 +1157,38 @@ Processor::_PiecemealWords(
 				const std::size_t otherSourceLength =
 					multiplicity * std::pow(power - n, 2) * average;
 
-				newSize += numGroups
+				wordSize += numGroups
 					* (baseLength + newSourceLength + otherSourceLength);
 			}
-			size += newSize;
+			// Add spaces
+			commandSize += wordSize + 1;
+		}
+		// Remove trailing space
+		commandSize--;
 
-			if (size > maxLine) {
-				if (sources.IsEmpty()) {
-					std::stringstream error;
-					error << "maxline of " << maxLine
-						  << " is too small; unable to add source "
-						  << source.ToStlString();
-					throw MakeException(error.str());
-				}
-
-				piecemealSources.push_back(sources);
-				sources = {};
-				average = 0;
-				size = 0;
-
-				// Redo calculation with current source
-				i--;
-			} else {
-				size += source.Length();
-				average = (sources.Size() * average + source.Length())
-					/ (sources.Size() - 1);
-				sources.Append(source);
+		if (commandSize > maxLine) {
+			if (sources.IsEmpty()) {
+				std::stringstream error;
+				error << "maxline of " << maxLine
+					  << " is too small; unable to add source "
+					  << source.ToStlString();
+				throw MakeException(error.str());
 			}
+
+			piecemealSources.push_back(sources);
+			sources = {};
+			average = 0;
+			commandSize = 0;
+			i--; // redo calculation with current source
+		} else {
+			average = (sources.Size() * average + source.Length())
+				/ (sources.Size() - 1);
+			sources.Append(source);
 		}
 	}
+
+	if (!sources.IsEmpty())
+		piecemealSources.push_back(sources);
 
 	return piecemealSources;
 }
