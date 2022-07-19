@@ -1046,7 +1046,7 @@ Processor::_PiecemealWords(
 	 *
 	 * Let `length1 := eval{"a"}` and `length2 := eval{"a", "b"}`. The source
 	 * _power_, or how many times the source variable is included in the word,
-	 * is `sqrt(length2/length1)`. Because other variables are constant, this
+	 * is `log2(length2/length1)`. Because other variables are constant, this
 	 * accounts for nested variables holding the source variable.
 	 *
 	 * Let `length1 := eval{"a"}` and `length2 := eval{"ab"}`. `length2 -
@@ -1152,7 +1152,7 @@ Processor::_PiecemealWords(
 
 		const std::size_t baseLength = 2 * singleLength - longLength;
 		const std::size_t power =
-			std::round(std::sqrt((double)dualLength / singleLength));
+			std::round(std::log2((double)dualLength / singleLength));
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
 		wordInfo.push_back({baseLength, power, multiplicity});
