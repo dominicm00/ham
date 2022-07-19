@@ -1055,9 +1055,9 @@ Processor::_PiecemealWords(
 	 * `length1 - (length2 - length1) = 2*length1 - length2` is also the base
 	 * length of the word group.
 	 *
-	 * Say we are given the length of a word with a source set of length `l`.
+	 * Say we are given the length of a word with a source set of length `L`.
 	 * Let `A` be the average length of the sources in the set. We add a new
-	 * source of length `s`
+	 * source of length `S`
 	 *
 	 * Note: the below computation is mathematically correct when A is a
 	 * rational number. For computational purposes, we store A as a float, and
@@ -1065,19 +1065,19 @@ Processor::_PiecemealWords(
 	 *
 	 * To add a source, consider the newly generated word groups where there are
 	 * n <= p occurences of the new source. The number of such cases is
-	 * C(n,p)*(l-n)^p. The length of a case is `baseLength + multiplicity*n*s +
-	 * multiplicity*(p-n)*otherSources`. When summing all the cases, each source
-	 * appears in the sum the same number of times, so we can substitute the
-	 * average for each occurence of an unknown source:
+	 * C(n,p)*L^(p-n). The length of a case is `baseLength + multiplicity*n*S +
+	 * otherSources`. When summing all the cases, each source appears in the sum
+	 * the same number of times, so we can substitute the average for each
+	 * occurence of an unknown source:
 	 *
-	 * Length = C(n,p)*(l-n)^p*(b + m*n*s + m*(p-n)^2*A)
+	 * Length = C(n,p)*L^(p-n)*(b + m*n*S + m*(p-n)*A)
 	 *
 	 * Then, sum n from 1 to p to obtain the length of all word groups added by
 	 * the new source.
 	 *
 	 * Finally, to iterate, update the total length and average:
 	 *
-	 * newA = (oldA*l + newL)/(l + 1)
+	 * newA = (oldA*L + newL)/(L + 1)
 	 *
 	 * The empty set has length 0, so via induction we can build up to any
 	 * source set.
@@ -1160,7 +1160,7 @@ Processor::_PiecemealWords(
 
 	// Piecemeal sources
 	StringList sources{};
-	double average = 0;
+	double averageLength = 0;
 	std::size_t commandSize = 0;
 	for (std::size_t i = 0; i < boundSources.Size(); i++) {
 		auto source = boundSources.ElementAt(i);
@@ -1171,11 +1171,11 @@ Processor::_PiecemealWords(
 			std::size_t wordSize = 0;
 			for (std::size_t n = 1; n <= power; n++) {
 				const std::size_t numGroups =
-					comb(n, power) * std::pow(sources.Size() - n, power);
+					comb(n, power) * std::pow(sources.Size(), power - n);
 				const std::size_t newSourceLength =
 					multiplicity * n * source.Length();
 				const std::size_t otherSourceLength =
-					multiplicity * std::pow(power - n, 2) * average;
+					multiplicity * (power - n) * averageLength;
 
 				wordSize += numGroups
 					* (baseLength + newSourceLength + otherSourceLength);
@@ -1197,11 +1197,11 @@ Processor::_PiecemealWords(
 
 			piecemealSources.push_back(sources);
 			sources = {};
-			average = 0;
+			averageLength = 0;
 			commandSize = 0;
 			i--; // redo calculation with current source
 		} else {
-			average = (sources.Size() * average + source.Length())
+			averageLength = (sources.Size() * averageLength + source.Length())
 				/ (sources.Size() - 1);
 			sources.Append(source);
 		}
