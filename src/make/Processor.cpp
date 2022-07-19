@@ -1002,6 +1002,7 @@ Processor::_BuildCommands(
 
 		// Build command
 		data::String commandLine{};
+		bool first = true;
 		for (auto& [wordStart, wordEnd] : words) {
 			auto evaluatedWord = code::Leaf::EvaluateString(
 				fEvaluationContext,
@@ -1010,6 +1011,13 @@ Processor::_BuildCommands(
 				nullptr
 			);
 			const StringPart separator{" "};
+
+			if (!first) {
+				commandLine = commandLine + " ";
+			} else {
+				first = false;
+			}
+
 			commandLine = commandLine + evaluatedWord.Join(separator);
 		}
 		commands.push_back(new Command(actionsCall, commandLine, boundTargets));
