@@ -1114,11 +1114,8 @@ Processor::_PiecemealWords(
 
 	auto oldDomain = fEvaluationContext.BuiltInVariables();
 
-	const auto getLength = [this, oldDomain](
-							   data::VariableDomain* domain,
-							   std::string_view word,
-							   std::string_view space
-						   ) {
+	const auto getLength =
+		[this, oldDomain](data::VariableDomain* domain, std::string_view word) {
 		fEvaluationContext.SetBuiltInVariables(domain);
 		const StringList list = code::Leaf::EvaluateString(
 			fEvaluationContext,
@@ -1132,7 +1129,7 @@ Processor::_PiecemealWords(
 		for (std::size_t i = 0; i < list.Size(); i++) {
 			length += list.ElementAt(i).Length() + 1;
 		}
-		return length + space.length();
+		return length;
 	};
 
 	const auto fact = [](std::size_t num) {
@@ -1156,11 +1153,12 @@ Processor::_PiecemealWords(
 	auto dualDomain = genDomain({"a", "b"});
 
 	// Calculate basic word info
-	std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> wordInfo{};
+	std::vector<std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>>
+		wordInfo{};
 	for (const auto& [word, space] : words) {
-		const std::size_t singleLength = getLength(&singleDomain, word, space);
-		const std::size_t longLength = getLength(&longDomain, word, space);
-		const std::size_t dualLength = getLength(&dualDomain, word, space);
+		const std::size_t singleLength = getLength(&singleDomain, word);
+		const std::size_t longLength = getLength(&longDomain, word);
+		const std::size_t dualLength = getLength(&dualDomain, word);
 
 		if (singleLength == 0 || longLength == 0 || dualLength == 0) {
 			throw MakeException("Failed to calculate word length");
@@ -1174,7 +1172,7 @@ Processor::_PiecemealWords(
 			std::round(std::log2((double)dualLength / singleLength));
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
-		wordInfo.push_back({baseLength, power, multiplicity});
+		wordInfo.push_back({baseLength, power, multiplicity, space.length()});
 	}
 
 	// Piecemeal sources
@@ -1185,7 +1183,7 @@ Processor::_PiecemealWords(
 		auto source = boundSources.ElementAt(i);
 
 		// Calculate size of added source
-		for (const auto& [baseLength, power, multiplicity] : wordInfo) {
+		for (const auto& [baseLength, power, multiplicity, spaces] : wordInfo) {
 			// Calculate word size
 			std::size_t wordSize = 0;
 			for (std::size_t n = 1; n <= power; n++) {
@@ -1199,11 +1197,9 @@ Processor::_PiecemealWords(
 				wordSize += numGroups
 					* (baseLength + newSourceLength + otherSourceLength);
 			}
-			// Add spaces
-			commandSize += wordSize + 1;
+			// Add trailing whitespace
+			commandSize += wordSize + spaces;
 		}
-		// Remove trailing space
-		commandSize--;
 
 		if (commandSize > maxLine) {
 			if (sources.IsEmpty()) {
