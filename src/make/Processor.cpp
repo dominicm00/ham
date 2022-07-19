@@ -1020,7 +1020,11 @@ Processor::_BuildCommands(
 
 			commandLine = commandLine + evaluatedWord.Join(separator);
 		}
-		commands.push_back(new Command(actionsCall, commandLine, boundTargets));
+		commands.push_back(new Command(
+			actionsCall,
+			std::move(commandLine),
+			std::move(boundTargets)
+		));
 	}
 
 	// reinstate the old local variable scope and the built-in variables
