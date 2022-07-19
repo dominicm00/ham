@@ -1122,9 +1122,13 @@ Processor::_PiecemealWords(
 	};
 
 	const auto fact = [](std::size_t num) {
+		if (num <= 1)
+			return std::size_t{1};
+
 		for (std::size_t i = num - 1; num > 1; num--) {
 			num *= i;
 		}
+
 		return num;
 	};
 
