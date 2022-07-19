@@ -16,6 +16,7 @@
 
 #include <map>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace ham::make
@@ -197,7 +198,7 @@ class Processor
 	 */
 	data::StringListList _PiecemealWords(
 		code::EvaluationContext* context,
-		std::vector<std::pair<const char*, const char*>> words,
+		std::vector<std::pair<std::string_view, std::string_view>> words,
 		StringList boundSources,
 		std::size_t maxLine
 	);

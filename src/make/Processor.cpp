@@ -30,6 +30,7 @@
 #include "ruleset/JamRuleset.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstddef>
 #include <fstream>
@@ -40,6 +41,7 @@
 #include <set>
 #include <sstream>
 #include <stdarg.h>
+#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -960,24 +962,30 @@ Processor::_BuildCommands(
 		}
 	}
 
-	// Split command into words
-	std::vector<std::pair<const char*, const char*>> words{};
+	// Split command into words. Each word is a pair consisting of the string
+	// and trailing whitespace.
+	std::vector<std::pair<std::string_view, std::string_view>> words{};
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
 	const char* wordStart = remainder;
+	const char* wordEnd = nullptr;
 	while (remainder < end) {
-		// skip whitespace
-		if (std::isspace(*remainder)) {
-			if (wordStart != remainder) {
-				words.push_back({wordStart, remainder});
-			}
-			remainder++;
+		const bool isSpace = std::isspace(*remainder);
+
+		if (!isSpace && wordEnd != nullptr) {
+			words.push_back({{wordStart, wordEnd}, {wordEnd, remainder}});
 			wordStart = remainder;
-		} else {
-			remainder++;
+			wordEnd = nullptr;
+		} else if (isSpace && wordEnd == nullptr) {
+			wordEnd = remainder;
 		}
+
+		remainder++;
 	}
+	if (wordEnd == nullptr)
+		wordEnd = remainder;
+	words.push_back({{wordStart, wordEnd}, {wordEnd, remainder}});
 
 	data::StringListList sources{};
 	if (actions->IsPiecemeal() && !boundSourceTargets.IsEmpty()) {
@@ -1002,23 +1010,17 @@ Processor::_BuildCommands(
 
 		// Build command
 		data::String commandLine{};
-		bool first = true;
-		for (auto& [wordStart, wordEnd] : words) {
+		for (auto& [word, space] : words) {
 			auto evaluatedWord = code::Leaf::EvaluateString(
 				fEvaluationContext,
-				wordStart,
-				wordEnd,
+				word.cbegin(),
+				word.cend(),
 				nullptr
 			);
 			const StringPart separator{" "};
 
-			if (!first) {
-				commandLine = commandLine + " ";
-			} else {
-				first = false;
-			}
-
-			commandLine = commandLine + evaluatedWord.Join(separator);
+			commandLine = commandLine + evaluatedWord.Join(separator)
+				+ std::string{space}.c_str();
 		}
 		commands.push_back(new Command(
 			actionsCall,
@@ -1036,7 +1038,7 @@ Processor::_BuildCommands(
 data::StringListList
 Processor::_PiecemealWords(
 	code::EvaluationContext* context,
-	std::vector<std::pair<const char*, const char*>> words,
+	std::vector<std::pair<std::string_view, std::string_view>> words,
 	StringList boundSources,
 	std::size_t maxLine
 )
@@ -1114,14 +1116,14 @@ Processor::_PiecemealWords(
 
 	const auto getLength = [this, oldDomain](
 							   data::VariableDomain* domain,
-							   const char* wordStart,
-							   const char* wordEnd
+							   std::string_view word,
+							   std::string_view space
 						   ) {
 		fEvaluationContext.SetBuiltInVariables(domain);
 		const StringList list = code::Leaf::EvaluateString(
 			fEvaluationContext,
-			wordStart,
-			wordEnd,
+			word.cbegin(),
+			word.cend(),
 			nullptr
 		);
 		fEvaluationContext.SetBuiltInVariables(oldDomain);
@@ -1130,7 +1132,7 @@ Processor::_PiecemealWords(
 		for (std::size_t i = 0; i < list.Size(); i++) {
 			length += list.ElementAt(i).Length() + 1;
 		}
-		return length;
+		return length + space.length();
 	};
 
 	const auto fact = [](std::size_t num) {
@@ -1155,13 +1157,10 @@ Processor::_PiecemealWords(
 
 	// Calculate basic word info
 	std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> wordInfo{};
-	for (const auto& [wordStart, wordEnd] : words) {
-		const std::size_t singleLength =
-			getLength(&singleDomain, wordStart, wordEnd);
-		const std::size_t longLength =
-			getLength(&longDomain, wordStart, wordEnd);
-		const std::size_t dualLength =
-			getLength(&dualDomain, wordStart, wordEnd);
+	for (const auto& [word, space] : words) {
+		const std::size_t singleLength = getLength(&singleDomain, word, space);
+		const std::size_t longLength = getLength(&longDomain, word, space);
+		const std::size_t dualLength = getLength(&dualDomain, word, space);
 
 		if (singleLength == 0 || longLength == 0 || dualLength == 0) {
 			throw MakeException("Failed to calculate word length");
