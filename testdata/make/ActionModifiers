@@ -471,3 +471,27 @@ Depends all : target1 target2 ;
 #!exception
 Error: Action EchoOnce has 'together' modifier and must be passed exactly 1 target, but was passed 2
 ---
+# Piecemeal, multiple lines
+#
+#!file Jamfile
+rule Echo
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 32 Echo
+{
+    echo $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+Echo target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+source11 source12
+source21 source22
+source31
+---
