@@ -1147,6 +1147,10 @@ Processor::_PiecemealWords(
 		const std::size_t dualLength =
 			getLength(&dualDomain, wordStart, wordEnd);
 
+		if (singleLength == 0 || longLength == 0 || dualLength == 0) {
+			throw MakeException("Failed to calculate word length");
+		}
+
 		if (dualLength % singleLength != 0)
 			throw MakeException("Impossible variable expansion length");
 
