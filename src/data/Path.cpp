@@ -180,8 +180,7 @@ Path::Parts::ToPath(const behavior::Behavior& behavior) const
 
 	if (!fDirectory.empty()) {
 		buffer += fDirectory;
-		if (fDirectory.back() != '/'
-			&& (!fBaseName.empty() || !fSuffix.empty())) {
+		if (fDirectory != "/" && (!fBaseName.empty() || !fSuffix.empty())) {
 			buffer += '/';
 		}
 	}
