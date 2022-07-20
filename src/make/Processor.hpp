@@ -2,8 +2,8 @@
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_CODE_PROCESSOR_HPP
-#define HAM_CODE_PROCESSOR_HPP
+#ifndef HAM_MAKE_PROCESSOR_HPP
+#define HAM_MAKE_PROCESSOR_HPP
 
 #include "code/EvaluationContext.hpp"
 #include "data/RuleActions.hpp"
@@ -223,4 +223,4 @@ class Processor
 
 } // namespace ham::make
 
-#endif // HAM_CODE_PROCESSOR_HPP
+#endif // HAM_MAKE_PROCESSOR_HPP
