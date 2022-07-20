@@ -1196,7 +1196,7 @@ Processor::_PiecemealWords(
 				const std::size_t newSourceLength =
 					multiplicity * n * source.Length();
 				const std::size_t otherSourceLength =
-					multiplicity * (power - n) * averageLength;
+					std::round(multiplicity * (power - n) * averageLength);
 
 				wordSize += numGroups
 					* (baseLength + newSourceLength + otherSourceLength);
@@ -1227,7 +1227,7 @@ Processor::_PiecemealWords(
 			i--; // redo calculation with current source
 		} else {
 			averageLength = (sources.Size() * averageLength + source.Length())
-				/ (sources.Size() - 1);
+				/ (sources.Size() + 1);
 			sources.Append(source);
 		}
 	}
