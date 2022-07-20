@@ -1199,6 +1199,12 @@ Processor::_PiecemealWords(
 				wordSize += numGroups
 					* (baseLength + newSourceLength + otherSourceLength);
 			}
+
+			// Use base length if sources are not included
+			if (power == 0) {
+				wordSize = baseLength;
+			}
+
 			// Add trailing whitespace
 			commandSize += wordSize + spaces;
 		}
