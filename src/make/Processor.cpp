@@ -1157,8 +1157,8 @@ Processor::_PiecemealWords(
 	auto dualDomain = genDomain({"a", "b"});
 
 	// Calculate basic word info
-	std::vector<std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>>
-		wordInfo{};
+	std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> wordInfo{};
+	std::size_t baseCommandSize = 0;
 	for (const auto& [word, space] : words) {
 		const std::size_t singleLength = getLength(&singleDomain, word);
 		const std::size_t longLength = getLength(&longDomain, word);
@@ -1176,18 +1176,26 @@ Processor::_PiecemealWords(
 			std::round(std::log2((double)dualLength / singleLength));
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
-		wordInfo.push_back({baseLength, power, multiplicity, space.length()});
+		// Count whitespace as constant
+		baseCommandSize += space.length();
+
+		// If word is a constant, add length directly to command
+		if (power == 0) {
+			baseCommandSize += baseLength - 1;
+		} else {
+			wordInfo.push_back({baseLength, power, multiplicity});
+		}
 	}
 
 	// Piecemeal sources
 	StringList sources{};
 	double averageLength = 0;
-	std::size_t commandSize = 0;
+	std::size_t commandSize = baseCommandSize;
 	for (std::size_t i = 0; i < boundSources.Size(); i++) {
 		auto source = boundSources.ElementAt(i);
 
 		// Calculate size of added source
-		for (const auto& [baseLength, power, multiplicity, spaces] : wordInfo) {
+		for (const auto& [baseLength, power, multiplicity] : wordInfo) {
 			// Calculate word size
 			std::size_t wordSize = 0;
 			for (std::size_t n = 1; n <= power; n++) {
@@ -1202,16 +1210,8 @@ Processor::_PiecemealWords(
 					* (baseLength + newSourceLength + otherSourceLength);
 			}
 
-			// Use base length if sources are not included
-			if (power == 0) {
-				wordSize = baseLength;
-			}
-
 			// Compensate for trailing space
-			wordSize--;
-
-			// Add trailing whitespace
-			commandSize += wordSize + spaces;
+			commandSize += wordSize - 1;
 		}
 
 		if (commandSize > maxLine) {
@@ -1226,7 +1226,7 @@ Processor::_PiecemealWords(
 			piecemealSources.push_back(sources);
 			sources = {};
 			averageLength = 0;
-			commandSize = 0;
+			commandSize = baseCommandSize;
 			i--; // redo calculation with current source
 		} else {
 			averageLength = (sources.Size() * averageLength + source.Length())
