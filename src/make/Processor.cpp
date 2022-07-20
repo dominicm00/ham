@@ -1210,11 +1210,13 @@ Processor::_PiecemealWords(
 					* (baseLength + newSourceLength + otherSourceLength);
 			}
 
-			// Compensate for trailing space
-			commandSize += wordSize - 1;
+			commandSize += wordSize;
 		}
 
-		if (commandSize > maxLine) {
+		// Each (non-constant) word has a trailing space that is included for
+		// the incremental length calculation, but is not included in the final
+		// command.
+		if (commandSize - wordInfo.size() > maxLine) {
 			if (sources.IsEmpty()) {
 				std::stringstream error;
 				error << "maxline of " << maxLine
