@@ -133,7 +133,7 @@ Path::Parts::Parts(std::string_view path)
 	// suffix
 
 	// TODO: Like Jam, we count hidden files like .hidden as having a suffix.
-	// This should be compatilbility behavior.
+	// This should be compatibility behavior.
 	const auto lastDot = remainder.rfind('.');
 	if (lastDot != std::string::npos)
 		fSuffix = remainder.substr('.');
