@@ -587,3 +587,25 @@ Depends all : target ;
 #!file target
 Ran with sources
 ---
+# Piecemeal, can't fit source
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 30 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE thissourceistoobig ;
+LOCATE on target = . ;
+EchoPiece target : thissourceistoobig ;
+Depends all : target ;
+-
+#!exception
+maxline of 30 is too small; unable to add source thissourceistoobig
+---
+# Piecemeal, power=2, m=1, sources same length
