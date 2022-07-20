@@ -567,3 +567,23 @@ Depends all : target ;
 #!file target
 Ran with sources source11 source12 source21 source22 source31
 ---
+# Piecemeal, no sources
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 78 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+EchoPiece target ;
+Depends all : target ;
+-
+#!file target
+Ran with sources
+---
