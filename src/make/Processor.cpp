@@ -1116,6 +1116,7 @@ Processor::_PiecemealWords(
 
 	auto oldDomain = fEvaluationContext.BuiltInVariables();
 
+	// Includes trailing space for length to be consistent
 	const auto getLength =
 		[this, oldDomain](data::VariableDomain* domain, std::string_view word) {
 		fEvaluationContext.SetBuiltInVariables(domain);
@@ -1132,8 +1133,7 @@ Processor::_PiecemealWords(
 			// Add joined spaces
 			length += list.ElementAt(i).Length() + 1;
 		}
-		// Remove trailing space
-		return --length;
+		return length;
 	};
 
 	const auto fact = [](std::size_t num) {
@@ -1206,6 +1206,9 @@ Processor::_PiecemealWords(
 			if (power == 0) {
 				wordSize = baseLength;
 			}
+
+			// Compensate for trailing space
+			wordSize--;
 
 			// Add trailing whitespace
 			commandSize += wordSize + spaces;
