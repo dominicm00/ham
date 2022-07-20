@@ -968,24 +968,26 @@ Processor::_BuildCommands(
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
-	const char* wordStart = remainder;
+	const char* wordStart = nullptr;
 	const char* wordEnd = nullptr;
 	while (remainder < end) {
 		const bool isSpace = std::isspace(*remainder);
 
+		if (!isSpace && wordStart == nullptr)
+			wordStart = remainder;
+		if (isSpace && wordEnd == nullptr && wordStart != nullptr)
+			wordEnd = remainder;
 		if (!isSpace && wordEnd != nullptr) {
 			words.push_back({{wordStart, wordEnd}, {wordEnd, remainder}});
 			wordStart = remainder;
 			wordEnd = nullptr;
-		} else if (isSpace && wordEnd == nullptr) {
-			wordEnd = remainder;
 		}
 
 		remainder++;
 	}
 	if (wordEnd == nullptr)
-		wordEnd = remainder;
-	words.push_back({{wordStart, wordEnd}, {wordEnd, remainder}});
+		wordEnd = remainder - 1;
+	words.push_back({{wordStart, wordEnd}, {wordEnd, remainder - 1}});
 
 	data::StringListList sources{};
 	if (actions->IsPiecemeal() && !boundSourceTargets.IsEmpty()) {
