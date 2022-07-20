@@ -35,7 +35,7 @@ void
 StringListOperations::Parse(std::string_view str)
 {
 	uint32_t pendingOperation = 0;
-	std::string_view* pendingParameter;
+	std::string_view* pendingParameter = nullptr;
 
 	for (size_t i = 0; i < str.length(); i++) {
 		if (str[i] == '=') {
