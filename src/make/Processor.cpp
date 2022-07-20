@@ -1066,10 +1066,10 @@ Processor::_PiecemealWords(
 	 * accounts for nested variables holding the source variable.
 	 *
 	 * Let `length1 := eval{"a"}` and `length2 := eval{"ab"}`. `length2 -
-	 * length1 - power + 1` is the source _multiplicity_, or how many times each
-	 * source is included in the word because of external variable products.
-	 * `length1 - (length2 - length1) = 2*length1 - length2` is also the base
-	 * length of the word group.
+	 * length1 - power + 1` is the source _multiplicity_ (m), or how many times
+	 * each source is included in the word because of external variable
+	 * products. `length1 - (length2 - length1) = 2*length1 - length2` is also
+	 * the base length of the word group.
 	 *
 	 * Say we are given the length of a word with a source set of length `L`.
 	 * Let `A` be the average length of the sources in the set. We add a new
@@ -1081,7 +1081,7 @@ Processor::_PiecemealWords(
 	 *
 	 * To add a source, consider the newly generated word groups where there are
 	 * n <= p occurences of the new source. The number of such cases is
-	 * C(n,p)*L^(p-n). The length of a case is `baseLength + multiplicity*n*S +
+	 * C(n,p)*L^(p-n). The length of a case is `baseLength + m*n*S +
 	 * otherSources`. When summing all the cases, each source appears in the sum
 	 * the same number of times, so we can substitute the average for each
 	 * occurence of an unknown source:
