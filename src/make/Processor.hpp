@@ -193,16 +193,6 @@ class Processor
 	void
 	_BuildCommands(data::RuleActionsCall* actionsCall, CommandList& commands);
 
-	/**
-	 * Piecemeal a list of words based on a source list and max line length.
-	 */
-	data::StringListList _PiecemealWords(
-		code::EvaluationContext* context,
-		std::vector<std::pair<std::string_view, std::string_view>> words,
-		StringList boundSources,
-		std::size_t maxLine
-	);
-
 	void _PrintMakeTreeBinding(const MakeTarget* makeTarget);
 	void
 	_PrintMakeTreeState(const MakeTarget* makeTarget, data::Time parentTime);

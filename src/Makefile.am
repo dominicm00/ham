@@ -59,6 +59,7 @@ libham_a_SOURCES =								\
 	make/Command.cpp							\
 	make/MakeTarget.cpp							\
 	make/Options.cpp							\
+	make/Piecemeal.cpp							\
 	make/Processor.cpp							\
 	make/TargetBuildInfo.cpp					\
 	make/TargetBuilder.cpp						\
@@ -150,6 +151,7 @@ nobase_dist_include_HEADERS =					\
 	make/MakeException.hpp						\
 	make/MakeTarget.hpp							\
 	make/Options.hpp							\
+	make/Piecemeal.hpp							\
 	make/Processor.hpp							\
 	make/TargetBuildInfo.hpp					\
 	make/TargetBuilder.hpp						\
