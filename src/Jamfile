@@ -96,6 +96,7 @@ SharedLibrary libham.so
 	Command.cpp
 	MakeTarget.cpp
 	Options.cpp
+    Piecemeal.cpp
 	Processor.cpp
 	TargetBuilder.cpp
 	TargetBuildInfo.cpp

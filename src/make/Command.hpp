@@ -33,8 +33,8 @@ class Command : public util::Referenceable
 
 	Command(
 		data::RuleActionsCall* actions,
-		const String& commandLine,
-		const StringList& boundTargetPaths
+		const String commandLine,
+		const StringList boundTargetPaths
 	);
 	~Command();
 

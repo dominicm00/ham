@@ -471,3 +471,161 @@ Depends all : target1 target2 ;
 #!exception
 Error: Action EchoOnce has 'together' modifier and must be passed exactly 1 target, but was passed 2
 ---
+# Piecemeal, multiple lines, exact
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 52 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11 source12
+Ran with sources source21 source22
+Ran with sources source31
+---
+# Piecemeal, multiple lines, 1 less
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 49 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11
+Ran with sources source12
+Ran with sources source21
+Ran with sources source22
+Ran with sources source31
+---
+# Piecemeal, multiple lines, 1 more
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 51 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11 source12
+Ran with sources source21 source22
+Ran with sources source31
+---
+# Piecemeal, single line
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 78 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11 source12 source21 source22 source31
+---
+# Piecemeal, no sources
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 78 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+LOCATE on target = . ;
+EchoPiece target ;
+Depends all : target ;
+-
+#!file target
+Ran with sources
+---
+# Piecemeal, can't fit source
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 30 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE thissourceistoobig ;
+LOCATE on target = . ;
+EchoPiece target : thissourceistoobig ;
+Depends all : target ;
+-
+#!exception
+maxline of 30 is too small; unable to add source thissourceistoobig
+---
+# Piecemeal fails on high power sources
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 80 EchoPiece
+{
+    echo $(2)-$(2) >> $(1)
+}
+
+NOTFILE source1 source2 source3 source4 ;
+LOCATE on target = . ;
+EchoPiece target : source1 source2 source3 source4 ;
+Depends all : target ;
+-
+#!exception
+Word $(2)-$(2) in piecemeal action EchoPiece contains the source variable ($(2)/$(>)) more than once
+---

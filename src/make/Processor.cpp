@@ -9,16 +9,21 @@
 #include "code/Block.hpp"
 #include "code/BuiltInRules.hpp"
 #include "code/Constant.hpp"
+#include "code/EvaluationContext.hpp"
 #include "code/FunctionCall.hpp"
 #include "code/Leaf.hpp"
 #include "code/OnExpression.hpp"
 #include "data/RegExp.hpp"
 #include "data/RuleActions.hpp"
+#include "data/StringBuffer.hpp"
+#include "data/StringList.hpp"
 #include "data/TargetBinder.hpp"
 #include "data/TargetContainers.hpp"
+#include "data/VariableDomain.hpp"
 #include "make/Command.hpp"
 #include "make/MakeException.hpp"
 #include "make/MakeTarget.hpp"
+#include "make/Piecemeal.hpp"
 #include "make/TargetBuildInfo.hpp"
 #include "make/TargetBuilder.hpp"
 #include "parser/Parser.hpp"
@@ -26,6 +31,8 @@
 #include "ruleset/JamRuleset.hpp"
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
@@ -35,6 +42,8 @@
 #include <set>
 #include <sstream>
 #include <stdarg.h>
+#include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -47,6 +56,9 @@ using std::unique_ptr;
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
 static const String kJamShellVariableName("JAMSHELL");
+
+// TODO: This should be determined dynamically
+static const size_t kMaxCommandLength = 8'000;
 
 Processor::Processor()
 	: fGlobalVariables(),
@@ -692,7 +704,7 @@ Processor::_MakeCommands(Target* target)
 			for (auto source : actionsCall->SourceTargets())
 				togetherMap[actions].insert(source);
 		} else {
-			commandList.emplace_back(_BuildCommand(actionsCall));
+			_BuildCommands(actionsCall, commandList);
 		}
 	}
 
@@ -701,9 +713,9 @@ Processor::_MakeCommands(Target* target)
 		data::TargetList targets{target};
 		data::TargetList sources(sourceSet.begin(), sourceSet.end());
 		auto actionsCall = new data::RuleActionsCall{action, targets, sources};
-		commandList.emplace_back(_BuildCommand(actionsCall));
 		// Target takes ownership of actions call
 		target->AddActionsCall(actionsCall);
+		_BuildCommands(actionsCall, commandList);
 	}
 
 	return commandList;
@@ -865,8 +877,11 @@ Processor::_BindActionsTargets(
 	}
 }
 
-Command*
-Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
+void
+Processor::_BuildCommands(
+	data::RuleActionsCall* actionsCall,
+	CommandList& commands
+)
 {
 	const data::RuleActions* actions = actionsCall->Actions();
 	const bool isExistingAction = actions->IsExisting();
@@ -900,17 +915,21 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 	// and "<" and ">")
 	data::VariableDomain builtInVariables;
 
+	StringList boundSourceTargets;
+	_BindActionsTargets(actionsCall, true, boundSourceTargets);
+	// If sources are being expanded and have been trimmed to empty by
+	// EXISTING or UPDATED, cancel this action.
+	if (boundSourceTargets.IsEmpty() && (isExistingAction || isUpdatedAction)) {
+		return;
+	}
+
+	/* Bind non-source variables */
+
+	// Bind targets
 	StringList boundTargets;
 	_BindActionsTargets(actionsCall, false, boundTargets);
 	builtInVariables.Set("1", boundTargets);
 	builtInVariables.Set("<", boundTargets);
-	const bool targetsEmpty = boundTargets.IsEmpty();
-
-	StringList boundSourceTargets;
-	_BindActionsTargets(actionsCall, true, boundSourceTargets);
-	builtInVariables.Set("2", boundSourceTargets);
-	builtInVariables.Set(">", boundSourceTargets);
-	const bool sourcesEmpty = boundSourceTargets.IsEmpty();
 
 	// Push a copy of the primary target's variable domain as a new local scope
 	const Target* primaryTarget = *actionsCall->Targets().begin();
@@ -944,80 +963,80 @@ Processor::_BuildCommand(data::RuleActionsCall* actionsCall)
 		}
 	}
 
+	// Split command into words. Each word is a pair consisting of the string
+	// and trailing whitespace.
+	std::vector<std::pair<std::string_view, std::string_view>> words{};
 	String rawCommandLine = actionsCall->Actions()->Actions();
 	const char* remainder = rawCommandLine.ToCString();
 	const char* end = remainder + rawCommandLine.Length();
-	data::StringBuffer commandLine;
-	bool canceled = false;
-
+	const char* wordStart = nullptr;
+	const char* wordEnd = nullptr;
 	while (remainder < end) {
-		// transfer whitespace unchanged
-		if (isspace(*remainder)) {
-			commandLine += *remainder++;
-			continue;
+		const bool isSpace = std::isspace(*remainder);
+
+		if (!isSpace && wordStart == nullptr)
+			wordStart = remainder;
+		if (isSpace && wordEnd == nullptr && wordStart != nullptr)
+			wordEnd = remainder;
+		if (!isSpace && wordEnd != nullptr) {
+			words.push_back({{wordStart, wordEnd}, {wordEnd, remainder}});
+			wordStart = remainder;
+			wordEnd = nullptr;
 		}
 
-		// get the next contiguous non-whitespace sequence
-		const char* wordStart = remainder;
-		bool needsExpansion = false;
-		while (remainder < end && !isspace(*remainder)) {
-			if (*remainder == '$')
-				needsExpansion |= remainder + 1 < end && remainder[1] == '(';
-			remainder++;
-		}
+		remainder++;
+	}
+	if (wordEnd == nullptr)
+		wordEnd = remainder - 1;
+	words.push_back({{wordStart, wordEnd}, {wordEnd, remainder - 1}});
 
-		// append the sequence, expanding variables, if necessary
-		if (needsExpansion) {
-			// Check for empty expansions
-			const auto isVar = [wordStart](char varName) {
-				return wordStart[2] == varName;
-			};
-			const bool varIsTarget = isVar('1') || isVar('<');
-			const bool varIsSource = isVar('2') || isVar('>');
+	data::StringListList sources{};
+	if (actions->IsPiecemeal() && !boundSourceTargets.IsEmpty()) {
+		std::uint32_t maxLine =
+			actions->MaxLine() > 0 ? actions->MaxLine() : kMaxCommandLength;
 
-			// If sources are being expanded and have been trimmed to empty by
-			// EXISTING or UPDATED, cancel this action.
-			if (varIsSource && sourcesEmpty
-				&& (isExistingAction || isUpdatedAction)) {
-				canceled = true;
-				break;
-			}
+		sources = Piecemeal::Words(
+			fEvaluationContext,
+			actions->RuleName().ToStlString(),
+			words,
+			boundSourceTargets,
+			maxLine
+		);
+	} else {
+		sources.push_back(boundSourceTargets);
+	}
 
-			// If a target list is otherwise empty and used, print a warning.
-			if ((sourcesEmpty && varIsSource)
-				|| (targetsEmpty && varIsTarget)) {
-				std::stringstream warning{};
-				warning << "action " << actionsCall->Actions()->RuleName()
-						<< " called with no ";
-				warning << (varIsSource ? "sources" : "targets");
-				_PrintWarning(warning.str());
-			}
+	for (StringList commandSources : sources) {
+		data::VariableDomain builtInWithSources{builtInVariables};
+		builtInWithSources.Set("2", commandSources);
+		builtInWithSources.Set(">", commandSources);
+		fEvaluationContext.SetBuiltInVariables(&builtInWithSources);
 
-			StringList result = code::Leaf::EvaluateString(
+		// Build command
+		data::String commandLine{};
+		for (auto& [word, space] : words) {
+			auto evaluatedWord = code::Leaf::EvaluateString(
 				fEvaluationContext,
-				wordStart,
-				remainder,
+				word.cbegin(),
+				word.cend(),
 				nullptr
 			);
+			const StringPart separator{" "};
 
-			bool isFirst = true;
-			for (StringList::Iterator it = result.GetIterator();
-				 it.HasNext();) {
-				if (isFirst)
-					isFirst = false;
-				else
-					commandLine += ' ';
-				commandLine += it.Next();
-			}
-		} else
-			commandLine.Append(wordStart, remainder - wordStart);
+			commandLine = commandLine + evaluatedWord.Join(separator)
+				+ std::string{space}.c_str();
+		}
+		commands.push_back(new Command(
+			actionsCall,
+			std::move(commandLine),
+			std::move(boundTargets)
+		));
 	}
 
 	// reinstate the old local variable scope and the built-in variables
 	fEvaluationContext.SetLocalScope(oldLocalScope);
 	fEvaluationContext.SetBuiltInVariables(oldBuiltInVariables);
-	return canceled ? nullptr
-					: new Command(actionsCall, commandLine, boundTargets);
+	return;
 }
 
 void
