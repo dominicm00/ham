@@ -1129,9 +1129,11 @@ Processor::_PiecemealWords(
 
 		std::size_t length = 0;
 		for (std::size_t i = 0; i < list.Size(); i++) {
+			// Add joined spaces
 			length += list.ElementAt(i).Length() + 1;
 		}
-		return length;
+		// Remove trailing space
+		return --length;
 	};
 
 	const auto fact = [](std::size_t num) {
