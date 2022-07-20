@@ -474,24 +474,24 @@ Error: Action EchoOnce has 'together' modifier and must be passed exactly 1 targ
 # Piecemeal, multiple lines
 #
 #!file Jamfile
-rule Echo
+rule EchoPiece
 {
     Depends $(1) : $(2) ;
 }
 
-actions piecemeal maxline 32 Echo
+actions piecemeal maxline 32 EchoPiece
 {
-    echo $(2) >> $(1)
+    echo Ran with $(2) >> $(1)
 }
 
 NOTFILE source11 source12 source21 source22 source31 ;
 
 LOCATE on target = . ;
-Echo target : source11 source12 source21 source22 source31 ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
 Depends all : target ;
 -
 #!file target
-source11 source12
-source21 source22
-source31
+Ran with source11 source12
+Ran with source21 source22
+Ran with source31
 ---
