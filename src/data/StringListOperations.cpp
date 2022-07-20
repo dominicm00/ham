@@ -114,7 +114,7 @@ StringListOperations::Parse(std::string_view str)
 
 		AddOperations(pendingOperation & NO_PARAMETER_OPERATION_MASK);
 	} else if (pendingParameter != nullptr) {
-		pendingParameter = {};
+		*pendingParameter = {};
 		AddOperations(pendingOperation & PARAMETER_OPERATION_MASK);
 	}
 }
