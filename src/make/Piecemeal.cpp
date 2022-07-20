@@ -20,6 +20,7 @@ namespace ham::make
 data::StringListList
 Piecemeal::Words(
 	code::EvaluationContext context,
+	std::string actionName,
 	std::vector<std::pair<std::string_view, std::string_view>> words,
 	StringList boundSources,
 	std::size_t maxLine
@@ -117,44 +118,36 @@ Piecemeal::Words(
 		return length;
 	};
 
-	const auto fact = [](std::size_t num) {
-		if (num <= 1)
-			return std::size_t{1};
-
-		for (std::size_t i = num - 1; num > 1; num--) {
-			num *= i;
-		}
-
-		return num;
-	};
-
-	const auto comb = [fact](std::size_t r, std::size_t n) {
-		return fact(n) / (fact(r) * fact(n - r));
-	};
-
 	// Test variable domains
 	auto singleDomain = genDomain({"a"});
 	auto longDomain = genDomain({"ab"});
 	auto dualDomain = genDomain({"a", "b"});
 
 	// Calculate basic word info
-	std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> wordInfo{};
+	std::vector<std::tuple<std::size_t, std::size_t>> wordInfo{};
 	std::size_t baseCommandSize = 0;
 	for (const auto& [word, space] : words) {
 		const std::size_t singleLength = getLength(&singleDomain, word);
 		const std::size_t longLength = getLength(&longDomain, word);
 		const std::size_t dualLength = getLength(&dualDomain, word);
 
-		if (singleLength == 0 || longLength == 0 || dualLength == 0) {
+		if (singleLength == 0 || longLength == 0 || dualLength == 0)
 			throw MakeException("Failed to calculate word length");
-		}
 
 		if (dualLength % singleLength != 0)
 			throw MakeException("Impossible variable expansion length");
 
-		const std::size_t baseLength = 2 * singleLength - longLength;
+		// (ADR 7) High power sources are forbidden
 		const std::size_t power =
 			std::round(std::log2((double)dualLength / singleLength));
+		if (power > 1) {
+			std::stringstream error{};
+			error << "Word " << word << " in piecemeal action " << actionName
+				  << " contains the source variable ($(2)/$(>)) more than once";
+			throw MakeException(error.str());
+		}
+
+		const std::size_t baseLength = 2 * singleLength - longLength;
 		const std::size_t multiplicity = longLength - singleLength - power + 1;
 
 		// Count whitespace as constant
@@ -164,7 +157,7 @@ Piecemeal::Words(
 		if (power == 0) {
 			baseCommandSize += baseLength - 1;
 		} else {
-			wordInfo.push_back({baseLength, power, multiplicity});
+			wordInfo.push_back({baseLength, multiplicity});
 		}
 	}
 
@@ -176,22 +169,8 @@ Piecemeal::Words(
 		auto source = boundSources.ElementAt(i);
 
 		// Calculate size of added source
-		for (const auto& [baseLength, power, multiplicity] : wordInfo) {
-			// Calculate word size
-			std::size_t wordSize = 0;
-			for (std::size_t n = 1; n <= power; n++) {
-				const std::size_t numGroups =
-					comb(n, power) * std::pow(sources.Size(), power - n);
-				const std::size_t newSourceLength =
-					multiplicity * n * source.Length();
-				const std::size_t otherSourceLength =
-					std::round(multiplicity * (power - n) * averageLength);
-
-				wordSize += numGroups
-					* (baseLength + newSourceLength + otherSourceLength);
-			}
-
-			commandSize += wordSize;
+		for (const auto& [baseLength, multiplicity] : wordInfo) {
+			commandSize += baseLength + multiplicity * source.Length();
 		}
 
 		// Each (non-constant) word has a trailing space that is included for

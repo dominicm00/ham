@@ -608,4 +608,24 @@ Depends all : target ;
 #!exception
 maxline of 30 is too small; unable to add source thissourceistoobig
 ---
-# Piecemeal, power=2, m=1, sources same length
+# Piecemeal fails on high power sources
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 80 EchoPiece
+{
+    echo $(2)-$(2) >> $(1)
+}
+
+NOTFILE source1 source2 source3 source4 ;
+LOCATE on target = . ;
+EchoPiece target : source1 source2 source3 source4 ;
+Depends all : target ;
+-
+#!exception
+Word $(2)-$(2) in piecemeal action EchoPiece contains the source variable ($(2)/$(>)) more than once
+---
