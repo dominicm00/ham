@@ -471,7 +471,7 @@ Depends all : target1 target2 ;
 #!exception
 Error: Action EchoOnce has 'together' modifier and must be passed exactly 1 target, but was passed 2
 ---
-# Piecemeal, multiple lines
+# Piecemeal, multiple lines, exact
 #
 #!file Jamfile
 rule EchoPiece
@@ -479,9 +479,9 @@ rule EchoPiece
     Depends $(1) : $(2) ;
 }
 
-actions piecemeal maxline 32 EchoPiece
+actions piecemeal maxline 52 EchoPiece
 {
-    echo Ran with $(2) >> $(1)
+    echo Ran with sources $(2) >> $(1)
 }
 
 NOTFILE source11 source12 source21 source22 source31 ;
@@ -491,7 +491,79 @@ EchoPiece target : source11 source12 source21 source22 source31 ;
 Depends all : target ;
 -
 #!file target
-Ran with source11 source12
-Ran with source21 source22
-Ran with source31
+Ran with sources source11 source12
+Ran with sources source21 source22
+Ran with sources source31
+---
+# Piecemeal, multiple lines, 1 less
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 49 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11
+Ran with sources source12
+Ran with sources source21
+Ran with sources source22
+Ran with sources source31
+---
+# Piecemeal, multiple lines, 1 more
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 51 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11 source12
+Ran with sources source21 source22
+Ran with sources source31
+---
+# Piecemeal, single line
+#
+#!file Jamfile
+rule EchoPiece
+{
+    Depends $(1) : $(2) ;
+}
+
+actions piecemeal maxline 78 EchoPiece
+{
+    echo Ran with sources $(2) >> $(1)
+}
+
+NOTFILE source11 source12 source21 source22 source31 ;
+
+LOCATE on target = . ;
+EchoPiece target : source11 source12 source21 source22 source31 ;
+Depends all : target ;
+-
+#!file target
+Ran with sources source11 source12 source21 source22 source31
 ---
