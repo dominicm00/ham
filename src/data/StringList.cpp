@@ -92,9 +92,6 @@ bool
 StringList::IsTrue() const
 {
 	size_t count = Size();
-	if (count == 0)
-		return true;
-
 	for (size_t i = 0; i < count; i++) {
 		if (!ElementAt(i).IsEmpty())
 			return true;
