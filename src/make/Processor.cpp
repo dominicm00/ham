@@ -331,6 +331,13 @@ Processor::_IsPseudoTarget(const MakeTarget* makeTarget) const
 			&& !target->Dependencies().IsEmpty());
 }
 
+bool
+Processor::_IsMakeableTarget(const MakeTarget* makeTarget) const
+{
+	return makeTarget->GetTarget()->IsBuildAlways()
+		|| !_IsPseudoTarget(makeTarget);
+}
+
 void
 Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 {
@@ -398,7 +405,7 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			case MakeTarget::MAKE_IF_NEEDED:
 				break;
 			case MakeTarget::MAKE:
-				if (!_IsPseudoTarget(dependency)
+				if (_IsMakeableTarget(dependency)
 					&& (!target->DependsOnLeaves() || dependency->IsLeaf())) {
 					dependencyUpdated = true;
 				}
@@ -423,8 +430,9 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		newestDependencyTime = newestLeafTime;
 
 	// Consider a "don't update" target very old, so targets depending on it
-	// won't be remade unnecessarily.
-	if (target->IsDontUpdate()) {
+	// won't be remade unnecessarily. Forced updates take precedence over "don't
+	// update"
+	if (target->IsDontUpdate() && !target->IsBuildAlways()) {
 		time = newestDependencyTime = Time::MIN;
 		makeTarget->SetOriginalTime(time);
 	}
@@ -445,12 +453,15 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			fate = MakeTarget::MAKE;
 	}
 
+	if (target->IsBuildAlways())
+		fate = MakeTarget::MAKE;
+
 	if (fate == MakeTarget::MAKE && cantMake)
 		fate = MakeTarget::CANT_MAKE;
 
 	if (fate == MakeTarget::MAKE) {
-		// If target is temporary, downgrade to MAKE_IF_NEEDED.
-		if (target->IsTemporary())
+		// If target is temporary and not forced, downgrade to MAKE_IF_NEEDED.
+		if (target->IsTemporary() && !target->IsBuildAlways())
 			fate = MakeTarget::MAKE_IF_NEEDED;
 
 		if (!target->HasActionsCalls() && !isPseudoTarget) {
@@ -517,7 +528,7 @@ Processor::_SealTargetFateRecursively(
 			dependency,
 			makeTarget->GetOriginalTime(),
 			makeTarget->GetFate() == MakeTarget::MAKE
-				&& !_IsPseudoTarget(makeTarget)
+				&& _IsMakeableTarget(makeTarget)
 		);
 		fMakeLevel--;
 	}
@@ -631,7 +642,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
 			makeTarget->SetMakeState(MakeTarget::PENDING);
-			if (!_IsPseudoTarget(makeTarget))
+			if (_IsMakeableTarget(makeTarget))
 				fTargetsToUpdateCount++;
 			needToMake = true;
 			break;
@@ -726,7 +737,7 @@ TargetBuildInfo*
 Processor::_MakeTarget(MakeTarget* makeTarget)
 {
 	Target* target = makeTarget->GetTarget();
-	if (_IsPseudoTarget(makeTarget) || target->ActionsCalls().empty()) {
+	if (!_IsMakeableTarget(makeTarget) || target->ActionsCalls().empty()) {
 		_TargetMade(makeTarget, MakeTarget::DONE);
 		return nullptr;
 	}
@@ -863,12 +874,12 @@ Processor::_BindActionsTargets(
 			// A source is updated if:
 			// - It is being made, or
 			// - It is newer than the primary target, and
-			// - It is not a pseudotarget
+			// - It is makeable
 			bool isMake = makeTarget->GetFate() == MakeTarget::MAKE;
 			bool isNewer =
 				primaryMakeTarget->GetOriginalTime() < makeTarget->GetTime();
 			bool isUpdatedTarget =
-				!_IsPseudoTarget(makeTarget) && (isMake || isNewer);
+				_IsMakeableTarget(makeTarget) && (isMake || isNewer);
 
 			if (isUpdatedAction && !isUpdatedTarget)
 				continue;
