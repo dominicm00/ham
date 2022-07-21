@@ -289,23 +289,15 @@ Processor::BuildTargets()
 	}
 
 	// Delete temporaries
+	std::uintmax_t filesRemoved = 0;
 	for (MakeTargetSet::Iterator it = fTemporaryTargets.GetIterator();
 		 it.HasNext();) {
 		MakeTarget* makeTarget = it.Next();
 		const std::filesystem::path path{makeTarget->BoundPath().ToStlString()};
-
-		const auto status = std::filesystem::status(path);
-		std::uintmax_t filesRemoved = std::filesystem::remove_all(path);
-		if (status.type() == std::filesystem::file_type::directory) {
-			std::cout << "...removed temporary directory "
-					  << makeTarget->GetTarget()->Name().ToStlString()
-					  << " with " << filesRemoved << " files..." << std::endl;
-		} else if (filesRemoved > 0) {
-			std::cout << "...removed temporary "
-					  << makeTarget->GetTarget()->Name().ToStlString() << "..."
-					  << std::endl;
-		}
+		filesRemoved += std::filesystem::remove_all(path);
 	}
+	std::cout << "...removed " << filesRemoved << " temporary files..."
+			  << std::endl;
 
 	if (targetsFailed > 0)
 		printf("...failed updating %zu target(s)...\n", targetsFailed);
