@@ -629,3 +629,35 @@ Depends all : target ;
 #!exception
 Word $(2)-$(2) in piecemeal action EchoPiece contains the source variable ($(2)/$(>)) more than once
 ---
+# Ignore modifier
+#
+#!file Jamfile
+actions ignore BuildFail
+{
+    echo "Built source" > $(1)
+    exit 1
+}
+
+rule CopyCat
+{
+    Depends $(1) : $(2) ;
+}
+
+actions CopyCat
+{
+    cat $(2) > $(1)
+}
+
+LOCATE on source = . ;
+BuildFail source ;
+
+LOCATE on target = . ;
+CopyCat target : source ;
+Depends all : target ;
+
+#!file target
+Old
+-
+#!file target
+Built source
+---
