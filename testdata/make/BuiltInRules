@@ -1,0 +1,53 @@
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev
+# Distributed under the terms of the MIT License.
+
+#!multipleFiles
+---
+# NOCARE rule
+#
+#!file Jamfile
+rule EchoSource
+{
+    Depends $(1) : $(2) ;
+}
+
+actions EchoSource
+{
+    echo $(2) > $(1)
+}
+
+NOCARE source ;
+LOCATE on source = . ;
+LOCATE on target = . ;
+
+EchoSource target : source ;
+Depends all : target ;
+
+-
+#!file target
+./source
+---
+# Only apply NOCARE to specific source
+#
+#!file Jamfile
+rule EchoSource
+{
+    Depends $(1) : $(2) ;
+}
+
+actions EchoSource
+{
+    echo $(2) > $(1)
+}
+
+NOCARE source1 ;
+LOCATE on source1 = . ;
+LOCATE on source2 = . ;
+LOCATE on target = . ;
+
+EchoSource target : source1 source2 ;
+Depends all : target ;
+
+-
+#!file target missing
+---
