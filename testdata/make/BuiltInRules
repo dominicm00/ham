@@ -17,7 +17,6 @@ actions EchoSource
 }
 
 NOCARE source ;
-LOCATE on source = . ;
 LOCATE on target = . ;
 
 EchoSource target : source ;
@@ -25,7 +24,7 @@ Depends all : target ;
 
 -
 #!file target
-./source
+source
 ---
 # Only apply NOCARE to specific source
 #
