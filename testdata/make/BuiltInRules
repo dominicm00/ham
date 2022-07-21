@@ -101,3 +101,40 @@ Source file
 #!file target
 Source file
 ---
+# ALWAYS rule, with dependents
+# parent    - target (newest)
+# target    - target (newer)
+# source    - source (oldest)
+#!file Jamfile
+rule Build
+{
+    Depends $(1) : $(2) ;
+}
+
+actions Build
+{
+    cat $(2) > $(1)
+}
+
+LOCATE on source = . ;
+LOCATE on target = . ;
+LOCATE on parent = . ;
+
+ALWAYS target ;
+
+Build target : source ;
+Build parent : target ;
+Depends all : parent ;
+
+#!file parent 0
+Old parent
+#!file target 1
+Old target
+#!file source 2
+Source file
+-
+#!file parent
+Source file
+#!file target
+Source file
+---
