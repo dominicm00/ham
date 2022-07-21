@@ -221,3 +221,23 @@ Depends all : pseudo ;
 #!file pseudo
 Built ./temp
 ---
+# ALWAYS overrides NOUPDATE
+#
+#!file Jamfile
+actions Build
+{
+    echo Built > $(1)
+}
+
+ALWAYS target ;
+NOUPDATE target ;
+
+Build target ;
+Depends all : target ;
+
+#!file target
+Old
+-
+#!file target
+Built
+---
