@@ -164,3 +164,60 @@ Source file
 #!file pseudo
 Source file
 ---
+# ALWAYS pseudotargets count as updated
+#
+#!file Jamfile
+rule BuildUpdated
+{
+    Depends $(1) : $(2) ;
+}
+
+actions updated BuildUpdated
+{
+    echo $(2) > $(1)
+}
+
+NOTFILE pseudo ;
+LOCATE on target = . ;
+
+ALWAYS pseudo ;
+
+BuildUpdated target : pseudo ;
+Depends all : target ;
+
+-
+#!file target
+pseudo
+---
+# ALWAYS pseudotargets build temporary sources
+#
+#!file Jamfile
+rule Build
+{
+    Depends $(1) : $(2) ;
+}
+
+actions Build
+{
+    cat $(2) > $(1)
+}
+
+actions BuildTemp
+{
+    echo Built $(1) > $(1)
+}
+
+NOTFILE pseudo ;
+LOCATE on temp = . ;
+TEMPORARY temp ;
+
+ALWAYS pseudo ;
+
+Build pseudo : temp ;
+BuildTemp temp ;
+Depends all : pseudo ;
+
+-
+#!file pseudo
+Built ./temp
+---
