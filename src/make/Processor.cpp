@@ -35,6 +35,8 @@
 #include <cctype>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -286,6 +288,17 @@ Processor::BuildTargets()
 		}
 	}
 
+	// Delete temporaries
+	std::uintmax_t filesRemoved = 0;
+	for (MakeTargetSet::Iterator it = fTemporaryTargets.GetIterator();
+		 it.HasNext();) {
+		MakeTarget* makeTarget = it.Next();
+		const std::filesystem::path path{makeTarget->BoundPath().ToStlString()};
+		filesRemoved += std::filesystem::remove_all(path);
+	}
+	std::cout << "...removed " << filesRemoved << " temporary files..."
+			  << std::endl;
+
 	if (targetsFailed > 0)
 		printf("...failed updating %zu target(s)...\n", targetsFailed);
 	if (targetsSkipped > 0)
@@ -460,9 +473,17 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		fate = MakeTarget::CANT_MAKE;
 
 	if (fate == MakeTarget::MAKE) {
-		// If target is temporary and not forced, downgrade to MAKE_IF_NEEDED.
-		if (target->IsTemporary() && !target->IsBuildAlways())
-			fate = MakeTarget::MAKE_IF_NEEDED;
+		if (target->IsTemporary()) {
+			if (target->IsBuildAlways()) {
+				// We know the temporary will be built, so add it to the temp
+				// target list
+				fTemporaryTargets.Append(makeTarget);
+			} else {
+				// If target is temporary and not forced, downgrade to
+				// MAKE_IF_NEEDED.
+				fate = MakeTarget::MAKE_IF_NEEDED;
+			}
+		}
 
 		if (!target->HasActionsCalls() && !isPseudoTarget) {
 			if (target->IsIgnoreIfMissing()) {
@@ -513,8 +534,11 @@ Processor::_SealTargetFateRecursively(
 
 	makeTarget->SetProcessingState(MakeTarget::PROCESSING);
 
-	if (makeTarget->GetFate() == MakeTarget::MAKE_IF_NEEDED && makeParent)
+	if (makeTarget->GetFate() == MakeTarget::MAKE_IF_NEEDED && makeParent) {
 		makeTarget->SetFate(MakeTarget::MAKE);
+		// Add upgraded targets to temp list
+		fTemporaryTargets.Append(makeTarget);
+	}
 
 	if (fOptions.IsPrintMakeTree()) {
 		_PrintMakeTreeStep(makeTarget, "make", nullptr, nullptr);

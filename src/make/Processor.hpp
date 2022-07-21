@@ -214,6 +214,7 @@ class Processor
 	Options fOptions;
 	StringList fPrimaryTargetNames;
 	MakeTargetSet fPrimaryTargets;
+	MakeTargetSet fTemporaryTargets;
 	MakeTargetMap fMakeTargets;
 	data::Time fNow;
 	int fMakeLevel;
