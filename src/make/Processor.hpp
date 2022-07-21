@@ -98,6 +98,7 @@ class Processor
 	MakeTarget* _GetMakeTarget(Target* target, bool create);
 	MakeTarget* _GetMakeTarget(const String& targetName, bool create);
 	bool _IsPseudoTarget(const MakeTarget* makeTarget) const;
+	bool _IsMakeableTarget(const MakeTarget* makeTarget) const;
 
 	/**
 	 * Binds and sets a tentative fate for a target and all of its dependencies.
