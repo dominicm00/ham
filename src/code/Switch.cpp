@@ -38,11 +38,6 @@ Switch::Evaluate(EvaluationContext& context)
 		if ((*it)->Matches(context, argument)) {
 			// found match -- execute the block
 			const StringList& result = (*it)->Evaluate(context);
-
-			// clear a break jump condition
-			if (context.GetJumpCondition() == JUMP_CONDITION_BREAK)
-				context.SetJumpCondition(JUMP_CONDITION_NONE);
-
 			return result;
 		}
 	}
