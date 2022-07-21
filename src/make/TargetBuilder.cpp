@@ -68,10 +68,17 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 				 it != command->WaitingBuildInfos().end();
 				 ++it) {
 				TargetBuildInfo* buildInfo = *it;
-				switch (command->GetState()) {
+
+				auto state = command->GetState();
+				if (command->Actions()->Actions()->IsIgnore()
+					&& state == Command::FAILED)
+					state = Command::SUCCEEDED;
+
+				switch (state) {
 					case Command::NOT_EXECUTED:
 					case Command::IN_PROGRESS:
 						// cannot happen
+						// TODO: exception?
 						break;
 					case Command::SUCCEEDED:
 						_ExecuteNextCommand(buildInfo);
