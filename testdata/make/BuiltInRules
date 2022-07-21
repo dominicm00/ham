@@ -51,3 +51,23 @@ Depends all : target ;
 -
 #!file target missing
 ---
+# ALWAYS rule, no sources
+#
+#!file Jamfile
+actions Build
+{
+    echo Built new > $(1)
+}
+
+LOCATE on target = . ;
+ALWAYS target ;
+
+Build target ;
+Depends all : target ;
+
+#!file target
+Old
+-
+#!file target
+Built new
+---
