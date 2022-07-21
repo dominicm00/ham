@@ -71,3 +71,33 @@ Old
 #!file target
 Built new
 ---
+# ALWAYS rule, with sources
+# target    - target (newer)
+# source    - source (older)
+#
+#!file Jamfile
+rule Build
+{
+    Depends $(1) : $(2) ;
+}
+
+actions Build
+{
+    cat $(2) > $(1)
+}
+
+LOCATE on source = . ;
+LOCATE on target = . ;
+ALWAYS target ;
+
+Build target : source ;
+Depends all : target ;
+
+#!file target 0
+Old target
+#!file source 1
+Source file
+-
+#!file target
+Source file
+---
