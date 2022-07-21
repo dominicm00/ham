@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "Piecemeal.hpp"
+#include "make/Piecemeal.hpp"
 
 #include "code/Leaf.hpp"
 #include "data/Target.hpp"

@@ -2,8 +2,8 @@
  * Copyright 2022, Dominic Martinez, dom@dominicm.dev.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HAM_MAKE_PROCESSOR_HPP
-#define HAM_MAKE_PROCESSOR_HPP
+#ifndef HAM_MAKE_PIECEMEAL_HPP
+#define HAM_MAKE_PIECEMEAL_HPP
 
 #include "code/EvaluationContext.hpp"
 #include "data/RuleActions.hpp"
@@ -31,4 +31,4 @@ class Piecemeal
 
 } // namespace ham::make
 
-#endif // HAM_MAKE_PROCESSOR_HPP
+#endif // HAM_MAKE_PIECEMEAL_HPP
