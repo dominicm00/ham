@@ -138,3 +138,30 @@ Source file
 #!file target
 Source file
 ---
+# ALWAYS rule, on pseudotarget
+#
+#!file Jamfile
+rule Build
+{
+    Depends $(1) : $(2) ;
+}
+
+actions Build
+{
+    cat $(2) > $(1)
+}
+
+NOTFILE pseudo ;
+LOCATE on source = . ;
+
+ALWAYS pseudo ;
+
+Build pseudo : source ;
+Depends all : pseudo ;
+
+#!file source
+Source file
+-
+#!file pseudo
+Source file
+---
