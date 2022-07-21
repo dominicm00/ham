@@ -423,8 +423,9 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 		newestDependencyTime = newestLeafTime;
 
 	// Consider a "don't update" target very old, so targets depending on it
-	// won't be remade unnecessarily.
-	if (target->IsDontUpdate()) {
+	// won't be remade unnecessarily. Forced updates take precedence over "don't
+	// update"
+	if (target->IsDontUpdate() && !target->IsBuildAlways()) {
 		time = newestDependencyTime = Time::MIN;
 		makeTarget->SetOriginalTime(time);
 	}
@@ -445,12 +446,15 @@ Processor::_PrepareTargetRecursively(MakeTarget* makeTarget)
 			fate = MakeTarget::MAKE;
 	}
 
+	if (target->IsBuildAlways())
+		fate = MakeTarget::MAKE;
+
 	if (fate == MakeTarget::MAKE && cantMake)
 		fate = MakeTarget::CANT_MAKE;
 
 	if (fate == MakeTarget::MAKE) {
-		// If target is temporary, downgrade to MAKE_IF_NEEDED.
-		if (target->IsTemporary())
+		// If target is temporary and not forced, downgrade to MAKE_IF_NEEDED.
+		if (target->IsTemporary() && !target->IsBuildAlways())
 			fate = MakeTarget::MAKE_IF_NEEDED;
 
 		if (!target->HasActionsCalls() && !isPseudoTarget) {
