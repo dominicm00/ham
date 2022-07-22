@@ -86,8 +86,8 @@ unimplemented_cli(const char* unimplementedOption, const char* issueLink)
 }
 
 static bool
-set_variable(
-	std::map<data::String, data::String>& variables,
+set_external_variable(
+	std::map<data::String, data::StringList>& variables,
 	const char* variable
 )
 {
@@ -96,7 +96,7 @@ set_variable(
 		return false;
 
 	variables[data::String(variable, equalSign - variable)] =
-		data::String(equalSign + 1);
+		data::StringList{data::String{equalSign + 1}};
 	return true;
 }
 
@@ -106,18 +106,19 @@ main(int argc, const char* const* argv)
 	const char* programName = argc >= 1 ? argv[0] : "ham";
 
 	// get standard variables
-	std::map<data::String, data::String> variables;
+	std::map<data::String, data::StringList> variables;
 	// TODO: Properly detect platform!
-	set_variable(variables, "UNIX=true");
-	set_variable(variables, "OS=LINUX");
-	set_variable(variables, "OSPLAT=X86");
-	set_variable(variables, "JAMVERSION=2.5-haiku-20111222");
+	variables["UNIX"] = {"true"};
+	variables["OS"] = {"LINUX"};
+	variables["OSPLAT"] = {"X86"};
+	variables["JAMVERSION"] = {"2.5-haiku-20220722"};
 
 	// import environment
 	// TODO: Platform specific!
 	// TODO: Split up PATH-type variables
-	for (size_t i = 0; environ[i] != nullptr; i++)
-		set_variable(variables, environ[i]);
+	for (size_t i = 0; environ[i] != nullptr; i++) {
+		set_external_variable(variables, environ[i]);
+	}
 
 	// parse arguments
 	std::string rulesetFile;
@@ -311,7 +312,7 @@ main(int argc, const char* const* argv)
 				break;
 
 			case 's': {
-				if (!set_variable(variables, argument.c_str()))
+				if (!set_external_variable(variables, argument.c_str()))
 					print_usage_end_exit(programName, true);
 				break;
 			}
@@ -344,20 +345,22 @@ main(int argc, const char* const* argv)
 	if (primaryTargets.IsEmpty())
 		primaryTargets.Append("all");
 
+	// Set JAM_TARGETS
+	variables["JAM_TARGETS"] = primaryTargets;
+
 	// dry-run implies printing commands, unless debug options have been
 	// specified explicitly.
 	if (dryRun && !debugSpecified)
 		printCommands = true;
 
-	make::Processor processor;
+	make::Processor processor{};
 
 	// set explicitly specified variables
-	for (std::map<data::String, data::String>::iterator it = variables.begin();
+	for (std::map<data::String, data::StringList>::iterator it =
+			 variables.begin();
 		 it != variables.end();
 		 ++it) {
-		data::StringList value;
-		value.Append(it->second);
-		processor.GlobalVariables().Set(it->first, value);
+		processor.GlobalVariables().Set(it->first, it->second);
 	}
 
 	// Set compatibility. If not specified explicitly, infer from the program
