@@ -105,3 +105,17 @@ Nested2
 Nested3
 1 2 3
 ---
+rule Optional cont : opt {
+     if $(cont) = true {
+        return [ Optional false ] ;
+     }
+     opt ?= No optional param ;
+     return $(opt) ;
+}
+
+rule Func {
+     return [ Optional true : Optional param ] ;
+}
+-
+No optional param
+---

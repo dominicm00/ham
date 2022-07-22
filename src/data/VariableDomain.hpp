@@ -21,6 +21,7 @@ class VariableDomain
 	inline StringList* Lookup(const String& variable);
 	inline StringList& LookupOrCreate(const String& variable);
 	inline void Set(const String& variable, const StringList& value);
+	inline void Unset(const String& variable);
 
   private:
 	typedef std::map<String, StringList> VariableMap;
@@ -55,6 +56,12 @@ void
 VariableDomain::Set(const String& variable, const StringList& value)
 {
 	fVariables[variable] = value;
+}
+
+void
+VariableDomain::Unset(const String& variable)
+{
+	fVariables[variable] = nullptr;
 }
 
 } // namespace ham::data
