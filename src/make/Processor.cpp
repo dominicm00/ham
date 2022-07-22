@@ -59,6 +59,7 @@ using std::unique_ptr;
 static const String kHeaderScanVariableName("HDRSCAN");
 static const String kHeaderRuleVariableName("HDRRULE");
 static const String kJamShellVariableName("JAMSHELL");
+static const String kTargetVariableName("JAM_TARGETS");
 
 // TODO: This should be determined dynamically
 static const size_t kMaxCommandLength = 8'000;
@@ -68,7 +69,6 @@ Processor::Processor()
 	  fTargets(),
 	  fEvaluationContext(fGlobalVariables, fTargets),
 	  fOptions(),
-	  fPrimaryTargetNames(),
 	  fPrimaryTargets(),
 	  fMakeTargets(),
 	  fMakeLevel(0),
@@ -134,7 +134,7 @@ Processor::SetErrorOutput(std::ostream& output)
 void
 Processor::SetPrimaryTargets(const StringList& targets)
 {
-	fPrimaryTargetNames = targets;
+	fGlobalVariables.Set(kTargetVariableName, targets);
 }
 
 void
@@ -186,12 +186,14 @@ Processor::PrepareTargets()
 	// TODO: Not used yet!
 
 	// Create make targets for the given primary target names.
-	if (fPrimaryTargetNames.IsEmpty())
+	const StringList& primaryTargetNames =
+		fGlobalVariables.LookupOrCreate(kTargetVariableName);
+	if (primaryTargetNames.IsEmpty())
 		throw MakeException("No targets specified");
 
-	size_t primaryTargetCount = fPrimaryTargetNames.Size();
+	size_t primaryTargetCount = primaryTargetNames.Size();
 	for (size_t i = 0; i < primaryTargetCount; i++) {
-		String targetName = fPrimaryTargetNames.ElementAt(i);
+		String targetName = primaryTargetNames.ElementAt(i);
 		Target* target = fTargets.Lookup(targetName);
 		if (target == nullptr) {
 			throw MakeException(
@@ -207,7 +209,7 @@ Processor::PrepareTargets()
 	fMakeLevel = 0;
 
 	for (size_t i = 0; i < primaryTargetCount; i++) {
-		String targetName = fPrimaryTargetNames.ElementAt(i);
+		String targetName = primaryTargetNames.ElementAt(i);
 		Target* target = fTargets.Lookup(targetName);
 		MakeTarget* makeTarget = _GetMakeTarget(target, false);
 		fPrimaryTargets.Append(makeTarget);

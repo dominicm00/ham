@@ -212,7 +212,6 @@ class Processor
 	data::TargetPool fTargets;
 	code::EvaluationContext fEvaluationContext;
 	Options fOptions;
-	StringList fPrimaryTargetNames;
 	MakeTargetSet fPrimaryTargets;
 	MakeTargetSet fTemporaryTargets;
 	MakeTargetMap fMakeTargets;

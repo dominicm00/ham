@@ -345,9 +345,6 @@ main(int argc, const char* const* argv)
 	if (primaryTargets.IsEmpty())
 		primaryTargets.Append("all");
 
-	// Set JAM_TARGETS
-	variables["JAM_TARGETS"] = primaryTargets;
-
 	// dry-run implies printing commands, unless debug options have been
 	// specified explicitly.
 	if (dryRun && !debugSpecified)
