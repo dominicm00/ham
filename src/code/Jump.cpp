@@ -28,8 +28,9 @@ template<typename JumpType>
 StringList
 Jump<JumpType>::Evaluate(EvaluationContext& context)
 {
+	const auto result = fResult->Evaluate(context);
 	JumpType::Setup(context);
-	return fResult->Evaluate(context);
+	return result;
 }
 
 template<typename JumpType>
