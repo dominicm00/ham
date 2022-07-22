@@ -394,16 +394,18 @@ main(int argc, const char* const* argv)
 
 	try {
 		// execute the jam code
-		processor.ProcessRuleset();
+		const bool shouldContinue = processor.ProcessRuleset();
 
-		// Set the targets that shall be made, even if up-to-date.
-		processor.SetForceUpdateTargets(forceUpdateTargets);
+		if (shouldContinue) {
+			// Set the targets that shall be made, even if up-to-date.
+			processor.SetForceUpdateTargets(forceUpdateTargets);
 
-		// prepare the targets
-		processor.PrepareTargets();
+			// prepare the targets
+			processor.PrepareTargets();
 
-		// build the targets
-		processor.BuildTargets();
+			// build the targets
+			processor.BuildTargets();
+		}
 	} catch (make::MakeException& exception) {
 		std::cerr << exception.Message() << std::endl;
 	} catch (util::TextFileException& exception) {
