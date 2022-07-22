@@ -75,3 +75,33 @@ rule Func {
 -
 1 2 3
 ---
+rule NestedFunc3 x {
+     local var3 = $(x) ;
+     Echo Nested3 ;
+     return $(var3) ;
+}
+
+rule NestedFunc2 x {
+     local var2 = $(x) 3 ;
+     Echo Nested2 ;
+     return [ NestedFunc3 $(var2) ] ;
+}
+
+rule NestedFunc1 x {
+     local var1 = $(x) 2 ;
+     Echo Nested1 ;
+     return [ NestedFunc2 $(var1) ] ;
+}
+
+rule Func {
+     local var = 1 ;
+     Echo Func ;
+     return [ NestedFunc1 $(var) ] ;
+}
+-
+Func
+Nested1
+Nested2
+Nested3
+1 2 3
+---
