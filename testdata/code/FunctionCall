@@ -1,0 +1,107 @@
+# Copyright 2022, Dominic Martinez, dom@dominicm.dev
+# Distributed under the terms of the MIT License.
+
+#!inputIsCode
+%1
+Echo [ Func ] ;
+---
+rule Func {
+     return 1 ;
+}
+-
+1
+---
+rule Func {
+     return 1 2 3 ;
+}
+-
+1 2 3
+---
+rule NestedFunc3 {
+     return 1 2 3 ;
+}
+
+rule NestedFunc2 {
+     return [ NestedFunc3 ] ;
+}
+
+rule NestedFunc1 {
+     return [ NestedFunc2 ] ;
+}
+
+rule Func {
+     return [ NestedFunc1 ] ;
+}
+-
+1 2 3
+---
+rule NestedFunc3 x : y : z {
+     return $(z) $(y) $(x) ;
+}
+
+rule NestedFunc2 x : y {
+     return [ NestedFunc3 $(x) : $(y) : 3 ] ;
+}
+
+rule NestedFunc1 x {
+     return [ NestedFunc2 $(x) : 2 ] ;
+}
+
+rule Func {
+     return [ NestedFunc1 1 ] ;
+}
+-
+3 2 1
+---
+rule NestedFunc3 x {
+     local var = $(x) ;
+     return $(var) ;
+}
+
+rule NestedFunc2 x {
+     local var = $(x) 3 ;
+     return [ NestedFunc3 $(var) ] ;
+}
+
+rule NestedFunc1 x {
+     local var = $(x) 2 ;
+     return [ NestedFunc2 $(var) ] ;
+}
+
+rule Func {
+     local var = 1 ;
+     return [ NestedFunc1 $(var) ] ;
+}
+-
+1 2 3
+---
+rule NestedFunc3 x {
+     local var3 = $(x) ;
+     Echo Nested3 ;
+     return $(var3) ;
+}
+
+rule NestedFunc2 x {
+     local var2 = $(x) 3 ;
+     Echo Nested2 ;
+     return [ NestedFunc3 $(var2) ] ;
+}
+
+rule NestedFunc1 x {
+     local var1 = $(x) 2 ;
+     Echo Nested1 ;
+     return [ NestedFunc2 $(var1) ] ;
+}
+
+rule Func {
+     local var = 1 ;
+     Echo Func ;
+     return [ NestedFunc1 $(var) ] ;
+}
+-
+Func
+Nested1
+Nested2
+Nested3
+1 2 3
+---
