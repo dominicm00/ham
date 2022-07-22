@@ -10,6 +10,7 @@
 #include "code/Block.hpp"
 #include "code/BuiltInRules.hpp"
 #include "code/Constant.hpp"
+#include "code/Defs.hpp"
 #include "code/EvaluationContext.hpp"
 #include "code/FunctionCall.hpp"
 #include "code/Leaf.hpp"
@@ -143,7 +144,7 @@ Processor::SetForceUpdateTargets(const StringList& /* targets */)
 	// TODO:...
 }
 
-void
+bool
 Processor::ProcessRuleset()
 {
 	// parse code
@@ -177,6 +178,9 @@ Processor::ProcessRuleset()
 
 	// execute the code
 	block->Evaluate(fEvaluationContext);
+
+	// TODO: Warn on top-level break/continue
+	return fEvaluationContext.GetJumpCondition() != code::JUMP_CONDITION_EXIT;
 }
 
 void

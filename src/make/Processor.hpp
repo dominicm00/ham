@@ -75,8 +75,11 @@ class Processor
 	 * a default built-in file is selected based on the compatibility mode.
 	 *
 	 * This method must be called before PrepareTargets and BuildTargets.
+	 *
+	 * \return Whether or not execution should continue. Is false on
+	 * non-exceptional exits (i.e. EXIT).
 	 */
-	void ProcessRuleset();
+	bool ProcessRuleset();
 
 	/**
 	 * Prepare targets for building by:
