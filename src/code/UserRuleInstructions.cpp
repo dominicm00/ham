@@ -65,8 +65,13 @@ UserRuleInstructions::Evaluate(
 
 	// set the named parameters
 	StringList::Iterator it = fParameterNames.GetIterator();
-	for (size_t i = 0; i < parameterCount && it.HasNext(); i++)
-		localVariables.Set(it.Next(), parameters[i]);
+	for (size_t i = 0; it.HasNext(); i++) {
+		if (i < parameterCount)
+			localVariables.Set(it.Next(), parameters[i]);
+		else
+			// Explicitly unset unused local params
+			localVariables.Unset(it.Next());
+	}
 
 	// set the local variable scope and the built-in variables
 	context.SetLocalScope(&localScope);
