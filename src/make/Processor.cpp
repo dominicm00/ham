@@ -715,12 +715,6 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 			break;
 	}
 
-	// Don't process dependencies if we don't need it
-	if (!needToMake) {
-		makeTarget->SetProcessingState(MakeTarget::PROCESSED);
-		return false;
-	}
-
 	size_t pendingDependencyCount = 0;
 	for (MakeTargetSet::Iterator it = makeTarget->Dependencies().GetIterator();
 		 it.HasNext();) {
@@ -730,11 +724,11 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 
 	makeTarget->SetPendingDependenciesCount(pendingDependencyCount);
 
-	if (pendingDependencyCount == 0)
+	if (pendingDependencyCount == 0 && needToMake)
 		fMakableTargets.Append(makeTarget);
 
 	makeTarget->SetProcessingState(MakeTarget::PROCESSED);
-	return true;
+	return needToMake;
 }
 
 CommandList
