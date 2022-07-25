@@ -21,10 +21,10 @@ class Piecemeal
 	 * Piecemeal a list of words based on a source list and max line length.
 	 */
 	static data::StringListList Words(
-		code::EvaluationContext context,
-		std::string actionName,
-		std::vector<std::pair<std::string_view, std::string_view>> words,
-		StringList boundSources,
+		code::EvaluationContext& externalContext,
+		const std::string& actionName,
+		const std::vector<std::pair<std::string_view, std::string_view>>& words,
+		const StringList& boundSources,
 		std::size_t maxLine
 	);
 };

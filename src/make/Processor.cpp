@@ -1065,7 +1065,7 @@ Processor::_BuildCommands(
 		sources = Piecemeal::Words(
 			fEvaluationContext,
 			actions->RuleName().ToStlString(),
-			words,
+			std::move(words),
 			boundSourceTargets,
 			maxLine
 		);

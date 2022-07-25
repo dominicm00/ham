@@ -5,6 +5,7 @@
 
 #include "make/Piecemeal.hpp"
 
+#include "code/EvaluationContext.hpp"
 #include "code/Leaf.hpp"
 #include "data/Target.hpp"
 #include "make/Command.hpp"
@@ -19,10 +20,10 @@ namespace ham::make
 
 data::StringListList
 Piecemeal::Words(
-	code::EvaluationContext context,
-	std::string actionName,
-	std::vector<std::pair<std::string_view, std::string_view>> words,
-	StringList boundSources,
+	code::EvaluationContext& context,
+	const std::string& actionName,
+	const std::vector<std::pair<std::string_view, std::string_view>>& words,
+	const StringList& boundSources,
 	std::size_t maxLine
 )
 {
@@ -84,8 +85,10 @@ Piecemeal::Words(
 	// Includes trailing space for length to be consistent
 	const auto getLength =
 		[&oldDomain,
-		 &context](data::VariableDomain* domain, std::string_view word) {
-		context.SetBuiltInVariables(domain);
+		 &context,
+		 genDomain](std::vector<const char*> vars, std::string_view word) {
+		auto domain = genDomain(vars);
+		context.SetBuiltInVariables(&domain);
 		const StringList list = code::Leaf::EvaluateString(
 			context,
 			word.cbegin(),
@@ -102,18 +105,13 @@ Piecemeal::Words(
 		return length;
 	};
 
-	// Test variable domains
-	auto singleDomain = genDomain({"a"});
-	auto longDomain = genDomain({"ab"});
-	auto dualDomain = genDomain({"a", "b"});
-
 	// Calculate basic word info
 	std::vector<std::tuple<std::size_t, std::size_t>> wordInfo{};
 	std::size_t baseCommandSize = 0;
 	for (const auto& [word, space] : words) {
-		const std::size_t singleLength = getLength(&singleDomain, word);
-		const std::size_t longLength = getLength(&longDomain, word);
-		const std::size_t dualLength = getLength(&dualDomain, word);
+		const std::size_t singleLength = getLength({"a"}, word);
+		const std::size_t longLength = getLength({"ab"}, word);
+		const std::size_t dualLength = getLength({"a", "b"}, word);
 
 		if (singleLength == 0 || longLength == 0 || dualLength == 0)
 			throw MakeException("Failed to calculate word length");
