@@ -242,6 +242,13 @@ Processor::BuildTargets()
 {
 	printf("...found %zu target(s)...\n", fMakeTargets.size());
 
+	// Reset the processing state.
+	for (MakeTargetMap::const_iterator it = fMakeTargets.begin();
+		 it != fMakeTargets.end();
+		 ++it) {
+		it->second->SetProcessingState(MakeTarget::UNPROCESSED);
+	}
+
 	for (MakeTargetSet::Iterator it = fPrimaryTargets.GetIterator();
 		 it.HasNext();) {
 		_CollectMakableTargets(it.Next());
@@ -671,6 +678,20 @@ Processor::_ScanForHeaders(MakeTarget* makeTarget)
 bool
 Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 {
+	// If make target was already collected return
+	if (makeTarget->GetProcessingState() != MakeTarget::UNPROCESSED) {
+		if (makeTarget->GetProcessingState() == MakeTarget::PROCESSING) {
+			throw MakeException(
+				"Target \"" + makeTarget->Name().ToStlString()
+				+ "\" depends on itself"
+			);
+		}
+
+		return makeTarget->GetFate() == MakeTarget::MAKE;
+	}
+
+	makeTarget->SetProcessingState(MakeTarget::PROCESSING);
+
 	bool needToMake = false;
 	switch (makeTarget->GetFate()) {
 		case MakeTarget::MAKE:
@@ -695,8 +716,10 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	}
 
 	// Don't process dependencies if we don't need it
-	if (!needToMake)
+	if (!needToMake) {
+		makeTarget->SetProcessingState(MakeTarget::PROCESSED);
 		return false;
+	}
 
 	size_t pendingDependencyCount = 0;
 	for (MakeTargetSet::Iterator it = makeTarget->Dependencies().GetIterator();
@@ -710,6 +733,7 @@ Processor::_CollectMakableTargets(MakeTarget* makeTarget)
 	if (pendingDependencyCount == 0)
 		fMakableTargets.Append(makeTarget);
 
+	makeTarget->SetProcessingState(MakeTarget::PROCESSED);
 	return true;
 }
 
