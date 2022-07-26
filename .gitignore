@@ -1,6 +1,7 @@
 ### Build artifacts ###
 
 generated
+build
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -11,6 +12,7 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+.cmake
 _deps
 **/*.lo
 **/*.o
@@ -19,6 +21,7 @@ _deps
 **/*.so
 **/.libs
 ham
+HamConfig.hpp
 libtool
 doxygen
 
