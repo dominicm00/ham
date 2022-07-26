@@ -14,3 +14,6 @@ target_include_directories(ham PUBLIC "${PROJECT_BINARY_DIR}")
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# PEGTL
+find_package(pegtl 3)
