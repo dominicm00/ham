@@ -3,10 +3,14 @@
 
 #import <string>
 
-class Parser
+namespace ham::parse
 {
+
+class Parser {
   public:
 	static void Parse(std::string in);
 };
+
+}
 
 #endif // HAM_PARSE_PARSER_HPP

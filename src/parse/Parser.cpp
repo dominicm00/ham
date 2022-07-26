@@ -1,56 +1,27 @@
 #include "parse/Parser.hpp"
 
+#include "parse/Grammar.hpp"
 #include "tao/pegtl.hpp"
+#include "tao/pegtl/contrib/parse_tree.hpp"
+#include "tao/pegtl/contrib/parse_tree_to_dot.hpp"
+#include "tao/pegtl/string_input.hpp"
 
+#include <iostream>
 #include <string>
 
-namespace pegtl = tao::pegtl;
-
-namespace hello
+namespace ham::parse
 {
-// Parsing rule that matches a literal "Hello, ".
-
-struct prefix : pegtl::string<'H', 'e', 'l', 'l', 'o', ',', ' '> {
-};
-
-// Parsing rule that matches a non-empty sequence of
-// alphabetic ascii-characters with greedy-matching.
-
-struct name : pegtl::plus<pegtl::alpha> {
-};
-
-// Parsing rule that matches a sequence of the 'prefix'
-// rule, the 'name' rule, a literal "!", and 'eof'
-// (end-of-file/input), and that throws an exception
-// on failure.
-
-struct grammar : pegtl::must<prefix, name, pegtl::one<'!'>, pegtl::eof> {
-};
-
-// Class template for user-defined actions that does
-// nothing by default.
-
-template<typename Rule>
-struct action {
-};
-
-// Specialisation of the user-defined action to do
-// something when the 'name' rule succeeds; is called
-// with the portion of the input that matched the rule.
-
-template<>
-struct action<name> {
-	template<typename ParseInput>
-	static void apply(const ParseInput& in, std::string& v)
-	{
-		v = in.string();
-	}
-};
-
-} // namespace hello
 
 void
-Parser::Parse(std::string in)
+Parser::Parse(std::string str)
 {
+	auto in = p::string_input{str, "main"};
+	const auto root =
+		p::parse_tree::parse<Grammar::Statements, Grammar::Selector>(in);
+	if (root) {
+		p::parse_tree::print_dot(std::cout, *root);
+	}
 	return;
 }
+
+} // namespace ham::parse
