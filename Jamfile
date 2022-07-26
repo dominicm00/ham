@@ -1,3 +1,0 @@
-SubDir HAM_TOP ;
-
-SubInclude HAM_TOP src ;
