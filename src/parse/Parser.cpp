@@ -1,6 +1,6 @@
 #include "parse/Parser.hpp"
 
-#include "code/Grammar.hpp"
+#include "parse/Grammar.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
 #include "tao/pegtl/contrib/parse_tree_to_dot.hpp"
