@@ -11,8 +11,9 @@ project(
 # configuration info
 configure_file(src/HamConfig.hpp.in HamConfig.hpp)
 
-# PEGTL
+# dependencies
 add_subdirectory(extern/pegtl)
+add_subdirectory(extern/catch)
 
 # headers
 add_subdirectory(include)
@@ -22,3 +23,6 @@ add_subdirectory(src)
 
 # Ham binary
 add_subdirectory(cmd)
+
+# Tests
+add_subdirectory(tests)

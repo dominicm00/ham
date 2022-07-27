@@ -7,17 +7,20 @@
 #include "tao/pegtl/internal/pegtl_string.hpp"
 #include "tao/pegtl/rules.hpp"
 
+#include <initializer_list>
+#include <memory>
+
 namespace p = tao::pegtl;
 
-namespace ham::parse::Grammar
+namespace ham::code
 {
 
 /**
- * Identifier: [a-zA-Z0-9-_]+
+ * Identifier: [a-zA-Z0-9]+
  *
- * TODO: Support Unicode identifiers
+ * TODO: Support Unicode identifiers?
  */
-struct Identifier : p::plus<p::sor<p::alnum, p::one<'-'>, p::one<'_'>>> {};
+struct Identifier : p::plus<p::alnum> {};
 
 /**
  * Whitespace: space+
@@ -37,7 +40,8 @@ template<typename Rule, typename Separator>
 struct Separate : p::seq<Rule, p::star<Separator, Rule>> {};
 
 /**
- * Variable: "$(" Identifier ")"
+ * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":" PathSelectors ]
+ * ")"
  */
 struct Variable : p::seq<
 					  p::string<'$', '('>,
@@ -84,6 +88,6 @@ using Selector = tao::pegtl::parse_tree::selector<
 	tao::pegtl::parse_tree::store_content::
 		on<Identifier, Variable, List, RuleInvocation, Statement, Statements>>;
 
-} // namespace ham::parse::Grammar
+} // namespace ham::code
 
 #endif // HAM_PARSE_GRAMMAR_HPP

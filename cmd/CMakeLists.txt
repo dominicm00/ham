@@ -8,3 +8,6 @@ target_include_directories(
 
 # link against main library
 target_link_libraries(ham PRIVATE ham_lib)
+
+# set minimum C++ version
+target_compile_features(ham PUBLIC cxx_std_20)

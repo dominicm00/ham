@@ -22,7 +22,7 @@ target_include_directories(
 target_compile_features(ham_lib PUBLIC cxx_std_20)
 
 # PEGTL
-target_link_libraries(ham_lib PRIVATE pegtl)
+target_link_libraries(ham_lib PRIVATE taocpp::pegtl)
 
 # IDEs should put the headers in a nice place
 source_group(
