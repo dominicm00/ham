@@ -2,16 +2,23 @@
 #include "code/Grammar.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
+#include "tao/pegtl/demangle.hpp"
 #include "tao/pegtl/memory_input.hpp"
 #include "tao/pegtl/rules.hpp"
 #include "tao/pegtl/string_input.hpp"
 
+#include <cstddef>
 #include <initializer_list>
 #include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
+#include <string_view>
 #include <type_traits>
+#include <vector>
 
 namespace p = tao::pegtl;
+using namespace ham::code;
 
 template<typename Rule>
 auto
@@ -33,9 +40,84 @@ decompose(std::unique_ptr<p::parse_tree::node>&& node, std::vector<int> indices)
 	return node;
 };
 
+struct NodeStructure {
+	NodeStructure(
+		std::string type,
+		std::string content = {},
+		std::vector<NodeStructure> children = {}
+	)
+		: type(type),
+		  content(content),
+		  children(children){};
+
+	std::string type;
+	std::string content;
+	std::vector<NodeStructure> children;
+};
+
+std::string
+strip(std::string_view type)
+{
+	const auto pos = type.find_last_of(':');
+	if (pos == std::string::npos) {
+		return std::string{type};
+	} else {
+		return std::string{type.substr(pos + 1)};
+	}
+}
+
+void
+check(
+	std::unique_ptr<p::parse_tree::node>& node,
+	NodeStructure ns,
+	std::size_t depth
+)
+{
+	std::string indent{"  ", depth};
+	std::string nodeType = strip(node->type);
+	std::string nodeString = node->has_content() ? node->string() : "";
+	std::stringstream infoMessage{};
+
+	infoMessage << indent << nodeType << '[' << nodeString << ']';
+	if (nodeType != ns.type
+		|| (!ns.content.empty() && (nodeString != ns.content))) {
+		infoMessage << " != " << ns.type << '[' << ns.content << ']';
+	}
+	INFO(infoMessage.str());
+
+	REQUIRE(nodeType == ns.type);
+	if (!ns.content.empty()) {
+		REQUIRE(nodeString == ns.content);
+	}
+	REQUIRE(node->children.size() == ns.children.size());
+	for (int i = 0; i < ns.children.size(); i++) {
+		check(node->children[i], ns.children[i], depth + 1);
+	}
+}
+
+void
+check(std::unique_ptr<p::parse_tree::node>& node, NodeStructure ns)
+{
+	check(node, ns, 0);
+}
+
+template<typename Type>
+NodeStructure
+T(std::string content = {}, std::vector<NodeStructure> children = {})
+{
+	return NodeStructure(strip(p::demangle<Type>()), content, children);
+}
+
+template<typename Type>
+NodeStructure
+T(std::vector<NodeStructure> children)
+{
+	return NodeStructure(strip(p::demangle<Type>()), "", children);
+}
+
 TEST_CASE("code/Words: Identifiers", "[grammar]")
 {
-	const auto parse = genericParse<ham::code::Identifier>;
+	const auto parse = genericParse<Identifier>;
 
 	SECTION("Alphanumeric identifiers are accepted")
 	{
@@ -72,7 +154,7 @@ TEST_CASE("code/Words: Identifiers", "[grammar]")
 
 TEST_CASE("code/Words: Simple variables", "[grammar]")
 {
-	const auto parse = genericParse<ham::code::Variable>;
+	const auto parse = genericParse<Variable>;
 
 	SECTION("Identifiers are not accepted")
 	{
@@ -102,10 +184,8 @@ TEST_CASE("code/Words: Simple variables", "[grammar]")
 	SECTION("Identifier is only child")
 	{
 		std::string str = "$(Variable)";
-		const auto var = decompose(parse(str), {0});
-		REQUIRE(var->children.size() == 1);
-		REQUIRE(var->children[0]->is_type<ham::code::Identifier>());
-		REQUIRE(var->children[0]->string() == "Variable");
+		auto var = decompose(parse(str), {0});
+		check(var, T<Variable>({T<Identifier>("Variable")}));
 	}
 }
 
@@ -116,56 +196,36 @@ TEST_CASE("code/Words: Subscripts", "[grammar]")
 	SECTION("Single element subscripts")
 	{
 		std::string str = "$(var[3])";
-		const auto var = decompose(parse(str), {0});
-		REQUIRE(var->children.size() == 2);
-
-		const auto& id = var->children[0];
-		const auto& subscript = var->children[1];
-		REQUIRE(id->is_type<ham::code::Identifier>());
-		REQUIRE(subscript->is_type<ham::code::Subscript>());
-		REQUIRE(subscript->children.size() == 1);
-
-		const auto& start = subscript->children[0];
-		REQUIRE(start->is_type<ham::code::Number>());
-		REQUIRE(start->string() == "3");
+		auto var = decompose(parse(str), {0});
+		check(
+			var,
+			T<Variable>({T<Identifier>("var"), T<Subscript>({T<Number>("3")})})
+		);
 	}
 
 	SECTION("Start-only range subscripts")
 	{
 		std::string str = "$(var[3-])";
-		const auto var = decompose(parse(str), {0});
-		REQUIRE(var->children.size() == 2);
-
-		const auto& id = var->children[0];
-		const auto& subscript = var->children[1];
-		REQUIRE(id->is_type<ham::code::Identifier>());
-		REQUIRE(subscript->is_type<ham::code::Subscript>());
-		REQUIRE(subscript->children.size() == 2);
-
-		const auto& start = subscript->children[0];
-		const auto& end = subscript->children[1];
-		REQUIRE(start->is_type<ham::code::Number>());
-		REQUIRE(start->string() == "3");
-		REQUIRE(end->is_type<ham::code::EndSubscript>());
+		auto var = decompose(parse(str), {0});
+		check(
+			var,
+			T<Variable>(
+				{T<Identifier>("var"),
+				 T<Subscript>({T<Number>("3"), T<EndSubscript>()})}
+			)
+		);
 	}
 
 	SECTION("Range subscripts")
 	{
 		std::string str = "$(var[3-5])";
-		const auto var = decompose(parse(str), {0});
-		REQUIRE(var->children.size() == 2);
-
-		const auto& id = var->children[0];
-		const auto& subscript = var->children[1];
-		REQUIRE(id->is_type<ham::code::Identifier>());
-		REQUIRE(subscript->is_type<ham::code::Subscript>());
-		REQUIRE(subscript->children.size() == 2);
-
-		const auto& start = subscript->children[0];
-		const auto& end = subscript->children[1];
-		REQUIRE(start->is_type<ham::code::Number>());
-		REQUIRE(start->string() == "3");
-		REQUIRE(end->is_type<ham::code::Number>());
-		REQUIRE(end->string() == "5");
+		auto var = decompose(parse(str), {0});
+		check(
+			var,
+			T<Variable>(
+				{T<Identifier>("var"),
+				 T<Subscript>({T<Number>("3"), T<Number>("5")})}
+			)
+		);
 	}
 }
