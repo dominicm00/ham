@@ -14,15 +14,16 @@
 namespace p = tao::pegtl;
 
 template<typename Rule>
-const auto genericParse = [](const std::string& str)
+auto
+genericParse(const std::string& str)
 {
 	auto input = p::memory_input{str, "tests"};
 	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::code::Selector>(input
 	);
 };
 
-const auto decompose =
-	[](std::unique_ptr<p::parse_tree::node>&& node, std::vector<int> indices)
+auto
+decompose(std::unique_ptr<p::parse_tree::node>&& node, std::vector<int> indices)
 {
 	for (int i = 0; i < indices.size(); i++) {
 		if (node->children.empty())
@@ -108,7 +109,63 @@ TEST_CASE("code/Words: Simple variables", "[grammar]")
 	}
 }
 
-TEST_CASE("code/Words: Path selectors", "[grammar]")
+TEST_CASE("code/Words: Subscripts", "[grammar]")
 {
 	const auto parse = genericParse<ham::code::Variable>;
+
+	SECTION("Single element subscripts")
+	{
+		std::string str = "$(var[3])";
+		const auto var = decompose(parse(str), {0});
+		REQUIRE(var->children.size() == 2);
+
+		const auto& id = var->children[0];
+		const auto& subscript = var->children[1];
+		REQUIRE(id->is_type<ham::code::Identifier>());
+		REQUIRE(subscript->is_type<ham::code::Subscript>());
+		REQUIRE(subscript->children.size() == 1);
+
+		const auto& start = subscript->children[0];
+		REQUIRE(start->is_type<ham::code::Number>());
+		REQUIRE(start->string() == "3");
+	}
+
+	SECTION("Start-only range subscripts")
+	{
+		std::string str = "$(var[3-])";
+		const auto var = decompose(parse(str), {0});
+		REQUIRE(var->children.size() == 2);
+
+		const auto& id = var->children[0];
+		const auto& subscript = var->children[1];
+		REQUIRE(id->is_type<ham::code::Identifier>());
+		REQUIRE(subscript->is_type<ham::code::Subscript>());
+		REQUIRE(subscript->children.size() == 2);
+
+		const auto& start = subscript->children[0];
+		const auto& end = subscript->children[1];
+		REQUIRE(start->is_type<ham::code::Number>());
+		REQUIRE(start->string() == "3");
+		REQUIRE(end->is_type<ham::code::EndSubscript>());
+	}
+
+	SECTION("Range subscripts")
+	{
+		std::string str = "$(var[3-5])";
+		const auto var = decompose(parse(str), {0});
+		REQUIRE(var->children.size() == 2);
+
+		const auto& id = var->children[0];
+		const auto& subscript = var->children[1];
+		REQUIRE(id->is_type<ham::code::Identifier>());
+		REQUIRE(subscript->is_type<ham::code::Subscript>());
+		REQUIRE(subscript->children.size() == 2);
+
+		const auto& start = subscript->children[0];
+		const auto& end = subscript->children[1];
+		REQUIRE(start->is_type<ham::code::Number>());
+		REQUIRE(start->string() == "3");
+		REQUIRE(end->is_type<ham::code::Number>());
+		REQUIRE(end->string() == "5");
+	}
 }
