@@ -32,7 +32,7 @@ const auto decompose =
 	return node;
 };
 
-TEST_CASE("Identifiers", "[grammar]")
+TEST_CASE("code/Words: Identifiers", "[grammar]")
 {
 	const auto parse = genericParse<ham::code::Identifier>;
 
@@ -69,7 +69,7 @@ TEST_CASE("Identifiers", "[grammar]")
 	}
 }
 
-TEST_CASE("Variables", "[grammar]")
+TEST_CASE("code/Words: Simple variables", "[grammar]")
 {
 	const auto parse = genericParse<ham::code::Variable>;
 
@@ -103,6 +103,12 @@ TEST_CASE("Variables", "[grammar]")
 		std::string str = "$(Variable)";
 		const auto var = decompose(parse(str), {0});
 		REQUIRE(var->children.size() == 1);
+		REQUIRE(var->children[0]->is_type<ham::code::Identifier>());
 		REQUIRE(var->children[0]->string() == "Variable");
 	}
+}
+
+TEST_CASE("code/Words: Path selectors", "[grammar]")
+{
+	const auto parse = genericParse<ham::code::Variable>;
 }

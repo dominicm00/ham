@@ -1,7 +1,7 @@
 add_executable(
   tests
 
-  parse/Words.cpp
+  code/Words.cpp
   )
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
