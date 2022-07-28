@@ -1,4 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -29,34 +30,43 @@ TEST_CASE("code/Words: Identifiers", "[grammar]")
 
 	SECTION("Alphanumeric identifiers are accepted")
 	{
-		REQUIRE(parse("Id"));
-		REQUIRE(parse("Id1"));
-		REQUIRE(parse("1id2"));
-		REQUIRE(parse("UPPERCASE"));
-		REQUIRE(parse("CamelCase"));
-		REQUIRE(parse("veryLong14Id31IWith9Things"));
+		auto id = GENERATE(
+			"Id",
+			"Id1",
+			"1id2",
+			"UPPERCASE",
+			"CamelCase",
+			"veryLong14Id31IWith9Things"
+		);
+		REQUIRE(parse(id));
 	}
 
 	SECTION("Symbols in identifiers are not accepted")
 	{
-		REQUIRE_FALSE(parse("id-with-dash"));
-		REQUIRE_FALSE(parse("id_underscore"));
-		REQUIRE_FALSE(parse("other~!@#$%^&*()"));
-		REQUIRE_FALSE(parse("{nobrack}"));
-		REQUIRE_FALSE(parse("(noparen)"));
-		REQUIRE_FALSE(parse("no\bslash"));
-		REQUIRE_FALSE(parse("no/slash"));
-		REQUIRE_FALSE(parse("\"noquote\""));
-		REQUIRE_FALSE(parse("'nosquote'"));
+		auto id = GENERATE(
+			"id-with-dash",
+			"id_underscore",
+			"other~!@#$%^&*()",
+			"{nobrack}",
+			"(noparen)",
+			"no\bslash",
+			"no/slash",
+			"\"noquote\"",
+			"'nosquote'"
+		);
+		REQUIRE_FALSE(parse(id));
 	}
 
 	SECTION("Whitespace in identifiers is not accepted")
 	{
-		REQUIRE_FALSE(parse("id with space"));
-		REQUIRE_FALSE(parse("id        many spaces"));
-		REQUIRE_FALSE(parse("id\t\ttabs"));
-		REQUIRE_FALSE(parse("id\nnewline"));
-		REQUIRE_FALSE(parse("id \t mixed \n up \f whitespace"));
+		auto id = GENERATE(
+			"id with space",
+			"id        many spaces",
+			"id\t\ttabs",
+			"id\nnewline",
+			"id \t mixed \n up \f whitespace"
+		);
+		REQUIRE_FALSE(parse(id));
 	}
 }
 
@@ -66,27 +76,26 @@ TEST_CASE("code/Words: Simple variables", "[grammar]")
 
 	SECTION("Identifiers are not accepted")
 	{
-		REQUIRE_FALSE(parse("Id"));
-		REQUIRE_FALSE(parse("Id1"));
-		REQUIRE_FALSE(parse("1id2"));
-		REQUIRE_FALSE(parse("UPPERCASE"));
-		REQUIRE_FALSE(parse("CamelCase"));
-		REQUIRE_FALSE(parse("veryLong14Id31IWith9Things"));
+		auto id = GENERATE("Id", "Id1", "1id2", "UPPERCASE", "CamelCase");
+		REQUIRE_FALSE(parse(id));
 	}
 
 	SECTION("Variable must be surrounded by '$()'")
 	{
-		REQUIRE_FALSE(parse("not$(surrounded)"));
-		REQUIRE_FALSE(parse("$(missingend"));
-		REQUIRE_FALSE(parse("missingbegin)"));
-		REQUIRE_FALSE(parse("(missingdollar)"));
-		REQUIRE_FALSE(parse("$(bad)suffix"));
+		auto id = GENERATE(
+			"not$(surrounded)",
+			"$(missingend",
+			"missingbegin)",
+			"(missingdollar)",
+			"$(bad)suffix"
+		);
+		REQUIRE_FALSE(parse(id));
 	}
 
 	SECTION("Whitespace is accepted between '$(  )'")
 	{
-		REQUIRE("$( Whitespace )");
-		REQUIRE("$(Uneven )");
+		auto id = GENERATE("$( Whitespace )", "$(UnevenF )", "$( UnevenB)");
+		REQUIRE(parse(id));
 	}
 
 	SECTION("Identifier is only child")
