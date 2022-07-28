@@ -1,7 +1,11 @@
 add_executable(
   tests
 
-  parse/Words.cpp
+  Utils.cpp
+
+  parse/Identifiers.cpp
+  parse/Variables.cpp
+  parse/Strings.cpp
   )
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)

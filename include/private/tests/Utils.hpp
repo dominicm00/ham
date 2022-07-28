@@ -10,31 +10,10 @@
 #include "tao/pegtl/rules.hpp"
 #include "tao/pegtl/string_input.hpp"
 
+#include <memory>
+
 namespace ham::tests
 {
-
-namespace p = tao::pegtl;
-
-template<typename Rule>
-inline auto
-genericParse(const std::string& str)
-{
-	auto input = p::memory_input{str, "tests"};
-	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::parse::selector>(
-		input
-	);
-};
-
-inline auto
-decompose(std::unique_ptr<p::parse_tree::node>&& node, std::vector<int> indices)
-{
-	for (int i = 0; i < indices.size(); i++) {
-		if (node->children.empty())
-			return std::unique_ptr<p::parse_tree::node>{};
-		node = std::move(node->children[indices[i]]);
-	}
-	return node;
-};
 
 struct NodeStructure {
 	NodeStructure(
@@ -51,51 +30,54 @@ struct NodeStructure {
 	std::vector<NodeStructure> children;
 };
 
-inline std::string
-strip(std::string_view type)
+template<typename Rule>
+std::unique_ptr<p::parse_tree::node>
+genericParse(const std::string& str)
 {
-	const auto pos = type.find_last_of(':');
-	if (pos == std::string::npos) {
-		return std::string{type};
-	} else {
-		return std::string{type.substr(pos + 1)};
-	}
+	auto input = p::memory_input{str, "tests"};
+	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::parse::selector>(
+		input
+	);
+};
+
+template<typename Rule>
+bool
+genericIdentity(const std::string& str)
+{
+	std::unique_ptr<p::parse_tree::node> node = genericParse<Rule>(str);
+	return node && node->has_content() && node->string_view() == str;
 }
 
-inline void
+template<typename Rule>
+std::string
+genericContent(const std::string& str)
+{
+	std::unique_ptr<p::parse_tree::node> node = genericParse<Rule>(str);
+	if (!node)
+		throw std::runtime_error("Failed to parse node.");
+	if (!node->has_content())
+		return "";
+	return node->string();
+}
+
+std::unique_ptr<p::parse_tree::node>
+decompose(
+	std::unique_ptr<p::parse_tree::node>&& node,
+	std::vector<int> indices
+);
+
+std::string
+strip(std::string_view type);
+
+void
 check(
 	std::unique_ptr<p::parse_tree::node>& node,
 	NodeStructure ns,
 	std::size_t depth
-)
-{
-	std::string indent{"  ", depth};
-	std::string nodeType = strip(node->type);
-	std::string nodeString = node->has_content() ? node->string() : "";
-	std::stringstream infoMessage{};
+);
 
-	infoMessage << indent << nodeType << '[' << nodeString << ']';
-	if (nodeType != ns.type
-		|| (!ns.content.empty() && (nodeString != ns.content))) {
-		infoMessage << " != " << ns.type << '[' << ns.content << ']';
-	}
-	INFO(infoMessage.str());
-
-	REQUIRE(nodeType == ns.type);
-	if (!ns.content.empty()) {
-		REQUIRE(nodeString == ns.content);
-	}
-	REQUIRE(node->children.size() == ns.children.size());
-	for (int i = 0; i < ns.children.size(); i++) {
-		check(node->children[i], ns.children[i], depth + 1);
-	}
-}
-
-inline void
-check(std::unique_ptr<p::parse_tree::node>& node, NodeStructure ns)
-{
-	check(node, ns, 0);
-}
+void
+check(std::unique_ptr<p::parse_tree::node>& node, NodeStructure ns);
 
 template<typename Type>
 NodeStructure
@@ -112,5 +94,10 @@ T(std::vector<NodeStructure> children)
 }
 
 } // namespace ham::tests
+
+#define PARSE_FUNCTIONS(rule)                 \
+	const auto parse = genericParse<rule>;    \
+	const auto identity = genericParse<rule>; \
+	const auto content = genericContent<rule>;
 
 #endif // HAM_TESTS_UTILS_HPP
