@@ -22,11 +22,11 @@
 namespace ham::tests
 {
 
-using namespace ham::code;
+using namespace ham::parse;
 
 TEST_CASE("code/Words: Identifiers", "[grammar]")
 {
-	const auto parse = genericParse<Identifier>;
+	const auto parse = genericParse<identifier>;
 
 	SECTION("Alphanumeric identifiers are accepted")
 	{
@@ -72,7 +72,7 @@ TEST_CASE("code/Words: Identifiers", "[grammar]")
 
 TEST_CASE("code/Words: Simple variables", "[grammar]")
 {
-	const auto parse = genericParse<Variable>;
+	const auto parse = genericParse<variable>;
 
 	SECTION("Identifiers are not accepted")
 	{
@@ -102,13 +102,13 @@ TEST_CASE("code/Words: Simple variables", "[grammar]")
 	{
 		std::string str = "$(Variable)";
 		auto var = decompose(parse(str), {0});
-		check(var, T<Variable>({T<Identifier>("Variable")}));
+		check(var, T<variable>({T<identifier>("Variable")}));
 	}
 }
 
 TEST_CASE("code/Words: Subscripts", "[grammar]")
 {
-	const auto parse = genericParse<ham::code::Variable>;
+	const auto parse = genericParse<variable>;
 
 	SECTION("Single element subscripts")
 	{
@@ -116,7 +116,7 @@ TEST_CASE("code/Words: Subscripts", "[grammar]")
 		auto var = decompose(parse(str), {0});
 		check(
 			var,
-			T<Variable>({T<Identifier>("var"), T<Subscript>({T<Number>("3")})})
+			T<variable>({T<identifier>("var"), T<subscript>({T<number>("3")})})
 		);
 	}
 
@@ -126,9 +126,9 @@ TEST_CASE("code/Words: Subscripts", "[grammar]")
 		auto var = decompose(parse(str), {0});
 		check(
 			var,
-			T<Variable>(
-				{T<Identifier>("var"),
-				 T<Subscript>({T<Number>("3"), T<EndSubscript>()})}
+			T<variable>(
+				{T<identifier>("var"),
+				 T<subscript>({T<number>("3"), T<end_subscript>()})}
 			)
 		);
 	}
@@ -139,9 +139,9 @@ TEST_CASE("code/Words: Subscripts", "[grammar]")
 		auto var = decompose(parse(str), {0});
 		check(
 			var,
-			T<Variable>(
-				{T<Identifier>("var"),
-				 T<Subscript>({T<Number>("3"), T<Number>("5")})}
+			T<variable>(
+				{T<identifier>("var"),
+				 T<subscript>({T<number>("3"), T<number>("5")})}
 			)
 		);
 	}

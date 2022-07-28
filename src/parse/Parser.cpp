@@ -18,12 +18,12 @@ Parser::Parse(std::string str)
 {
 	auto in = p::string_input{str, "main"};
 #if 0
-	p::print_debug<code::Statements>(std::cout);
+	p::print_debug<parse::statements>(std::cout);
 #endif
 
 #if 1
 	const auto root =
-		p::parse_tree::parse<code::Statements, code::Selector>(in);
+		p::parse_tree::parse<parse::statements, parse::selector>(in);
 	if (root) {
 		p::parse_tree::print_dot(std::cout, *root);
 	}

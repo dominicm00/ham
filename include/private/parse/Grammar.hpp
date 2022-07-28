@@ -16,29 +16,54 @@
 
 namespace p = tao::pegtl;
 
-namespace ham::code
+namespace ham::parse
 {
 
+/* Helper rules excluded from the AST. */
+namespace hidden
+{
+
+// Strings
+struct hex_escape;
+struct oct_escape;
+struct char_escape;
+struct escape;
+struct token_character;
+struct character;
+
+// Tokenization
+struct whitespace;
+template<typename... Rules>
+struct tokens;
+template<typename... Rules>
+struct maybe_tokens;
+struct rule_separator;
+
+// Objects
+struct word;
+
+} // namespace hidden
+
 template<typename Rule>
-struct Selector : std::false_type {};
+struct selector : std::false_type {};
 
 /**
  * Identifier: [a-zA-Z0-9]+
  *
  * TODO: Support Unicode identifiers?
  */
-struct Identifier : p::plus<p::alnum> {};
+struct identifier : p::plus<p::alnum> {};
 
 template<>
-struct Selector<Identifier> : std::true_type {};
+struct selector<identifier> : std::true_type {};
 
 /**
  * Number: [0-9]+
  */
-struct Number : p::plus<p::digit> {};
+struct number : p::plus<p::digit> {};
 
 template<>
-struct Selector<Number> : std::true_type {};
+struct selector<number> : std::true_type {};
 
 /**
  * String: A series of printable characters/escape sequences either between two
@@ -46,58 +71,63 @@ struct Selector<Number> : std::true_type {};
  */
 
 // Escape characters
-struct _HexEscape : p::if_must<p::one<'x', 'X'>, p::xdigit, p::xdigit> {};
-struct _OctEscape : p::if_must<p::odigit, p::odigit, p::odigit> {};
-struct _CharEscape
+struct hidden::hex_escape : p::if_must<p::one<'x', 'X'>, p::xdigit, p::xdigit> {
+};
+struct hidden::oct_escape : p::if_must<p::odigit, p::odigit, p::odigit> {};
+struct hidden::char_escape
 	: p::one<'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"'> {};
-struct _Escape
-	: p::if_must<p::one<'\\'>, p::sor<_CharEscape, _HexEscape, _OctEscape>> {};
+struct hidden::escape
+	: p::if_must<
+		  p::one<'\\'>,
+		  p::sor<hidden::char_escape, hidden::hex_escape, hidden::oct_escape>> {
+};
 
 // Characters for tokens
-struct _TokenCharacter
-	: p::sor<_Escape, p::seq<p::not_at<p::space>, p::print>> {};
+struct hidden::token_character
+	: p::sor<hidden::escape, p::seq<p::not_at<p::space>, p::print>> {};
 
 // Characters for quoted strings (_TokenCharacter + space or tab)
-struct _Character : p::sor<p::blank, _TokenCharacter> {};
+struct hidden::character : p::sor<p::blank, hidden::token_character> {};
 
 // If it starts with a quote, then treat it as a quoted string, otherwise it is
 // a token.
-struct String : p::if_must_else<
+struct string : p::if_must_else<
 					p::one<'"'>,
-					p::until<p::one<'"'>, _Character>,
-					_TokenCharacter> {};
+					p::until<p::one<'"'>, hidden::character>,
+					hidden::token_character> {};
 
 template<>
-struct Selector<String> : std::true_type {};
+struct selector<string> : std::true_type {};
 
 /**
  * Whitespace: space+
  */
-struct _Whitespace : p::plus<p::space> {};
+struct hidden::whitespace : p::plus<p::space> {};
 
 /**
  * Tokens: Separate each rule with Whitespace
  */
 template<typename... Rules>
-struct _Tokens : p::separated_seq<_Whitespace, Rules...> {};
+struct hidden::tokens : p::separated_seq<hidden::whitespace, Rules...> {};
 
 /**
  * MaybeTokens: Optionally separate each rule with Whitespace
  */
 template<typename... Rules>
-struct _MaybeTokens : p::separated_seq<p::opt<_Whitespace>, Rules...> {};
+struct hidden::maybe_tokens
+	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
 
-struct NumericallyEvaluable;
-struct StringEvaluable;
+struct evaluable_num;
+struct evaluable_string;
 
 /**
  * Subscript: "[" Number[ "-"[ Number]] "]"
  */
-struct EndSubscript
-	: p::seq<p::one<'-'>, p::opt<p::opt<_Whitespace>, NumericallyEvaluable>> {};
+struct end_subscript
+	: p::seq<p::one<'-'>, p::opt<p::opt<hidden::whitespace>, evaluable_num>> {};
 
 template<>
-struct Selector<EndSubscript> : std::true_type {
+struct selector<end_subscript> : std::true_type {
 	static void transform(std::unique_ptr<p::parse_tree::node>& node)
 	{
 		if (node->children.size() == 1) {
@@ -110,73 +140,78 @@ struct Selector<EndSubscript> : std::true_type {
 	}
 };
 
-struct Subscript : _MaybeTokens<
+struct subscript : hidden::maybe_tokens<
 					   p::one<'['>,
-					   NumericallyEvaluable,
-					   p::opt<EndSubscript>,
+					   evaluable_num,
+					   p::opt<end_subscript>,
 					   p::one<']'>> {};
 
 template<>
-struct Selector<Subscript> : std::true_type {};
+struct selector<subscript> : std::true_type {};
 
 /**
  * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":" PathSelectors ]
  * ")"
  */
-struct Variable : _MaybeTokens<
+struct variable : hidden::maybe_tokens<
 					  p::string<'$', '('>,
-					  Identifier,
-					  p::opt<Subscript>,
+					  identifier,
+					  p::opt<subscript>,
 					  p::one<')'>> {
 	static void transform(std::unique_ptr<p::parse_tree::node>& node) {}
 };
 
 template<>
-struct Selector<Variable> : std::true_type {};
+struct selector<variable> : std::true_type {};
 
-struct NumericallyEvaluable : p::sor<Variable, Number> {};
-struct StringEvaluable : p::sor<Variable, String> {};
+struct evaluable_num : p::sor<variable, number> {};
+struct evaluable_string : p::sor<variable, string> {};
 
 /**
  * Word: Variable|Identifier
  */
-struct _Word : p::sor<Variable, Identifier> {};
+struct hidden::word : p::sor<variable, identifier> {};
 
 /**
  * List: Word[ Word]*
  */
-struct List : p::seq<_Word, p::star<_Whitespace, _Word>> {};
+struct list : p::seq<hidden::word, p::star<hidden::whitespace, hidden::word>> {
+};
 
 template<>
-struct Selector<List> : std::true_type {};
+struct selector<list> : std::true_type {};
 
 /**
  * RuleInvocation: Identifier[ List[ ":" List]*]
  */
-struct _RuleSeparator : p::seq<_Whitespace, p::one<':'>, _Whitespace> {};
+struct hidden::rule_separator
+	: p::seq<hidden::whitespace, p::one<':'>, hidden::whitespace> {};
 
-struct RuleInvocation
+struct rule_invocation
 	: p::seq<
-		  Identifier,
-		  p::opt<_Whitespace, p::separated_seq<_RuleSeparator, List>>> {};
+		  identifier,
+		  p::opt<
+			  hidden::whitespace,
+			  p::separated_seq<hidden::rule_separator, list>>> {};
 
 template<>
-struct Selector<RuleInvocation> : std::true_type {};
+struct selector<rule_invocation> : std::true_type {};
 
 /**
  * Statement: return List ;|RuleInvocation ;
  *
  * TODO: Should end-of-line be enforced?
  */
-struct Statement : p::sor<
-					   _Tokens<TAO_PEGTL_STRING("return"), List, p::one<';'>>,
-					   _Tokens<RuleInvocation, p::one<';'>>> {};
+struct statement
+	: p::sor<
+		  hidden::tokens<TAO_PEGTL_STRING("return"), list, p::one<';'>>,
+		  hidden::tokens<rule_invocation, p::one<';'>>> {};
 
 /**
  * Statements: Statement[ Statement]*
  */
-struct Statements : p::separated_seq<_Whitespace, Statement> {};
+struct statements : p::separated_seq<hidden::whitespace, statement> {};
 
-} // namespace ham::code
+} // namespace ham::parse
 
 #endif // HAM_PARSE_GRAMMAR_HPP

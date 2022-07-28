@@ -20,7 +20,8 @@ inline auto
 genericParse(const std::string& str)
 {
 	auto input = p::memory_input{str, "tests"};
-	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::code::Selector>(input
+	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::parse::selector>(
+		input
 	);
 };
 
