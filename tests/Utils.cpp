@@ -57,12 +57,12 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 
 	for (int i = 0; i < std::min(node->children.size(), ns.children.size());
 		 i++) {
-		isValid = isValid
-			&& checkParse(
+		isValid = checkParse(
 					  std::forward<NodePointer>(node->children[i]),
 					  ns.children[i],
 					  depth + 1
-			);
+				  )
+			&& isValid;
 	}
 
 	return isValid;
