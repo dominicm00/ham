@@ -5,6 +5,8 @@
 #include "tao/pegtl/contrib/parse_tree.hpp"
 #include "tao/pegtl/contrib/parse_tree_to_dot.hpp"
 #include "tao/pegtl/contrib/print.hpp"
+#include "tao/pegtl/contrib/trace.hpp"
+#include "tao/pegtl/rules.hpp"
 #include "tao/pegtl/string_input.hpp"
 
 #include <iostream>
@@ -14,20 +16,32 @@ namespace ham::parse
 {
 
 void
-Parser::Parse(std::string str)
+Parser::Parse(std::string str, Debug debug)
 {
-	auto in = p::string_input{str, "main"};
-#if 0
-	p::print_debug<parse::statements>(std::cout);
-#endif
-
-#if 1
-	const auto root =
-		p::parse_tree::parse<parse::statements, parse::selector>(in);
-	if (root) {
-		p::parse_tree::print_dot(std::cout, *root);
+	if (debug == GRAMMAR) {
+		p::print_debug<parse::statements>(std::cout);
+		return;
 	}
-#endif
+
+	auto in = p::string_input{str, "main"};
+	const auto parse = [&in]()
+	{
+		return p::parse_tree::
+			parse<p::must<parse::statements>, parse::selector>(in);
+	};
+
+	switch (debug) {
+		case GRAMMAR:
+			return;
+		case NONE:
+			break;
+		case XDOT:
+			p::parse_tree::print_dot(std::cout, *parse());
+			break;
+		case TRACE:
+			p::standard_trace<p::must<parse::statements>>(in);
+			break;
+	}
 
 	return;
 }
