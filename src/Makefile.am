@@ -80,9 +80,6 @@ hamtest_SOURCES = 						\
 	tests/PathTest.cpp					\
 	tests/RegExpTest.cpp				\
 	tests/RulesetTest.cpp				\
-	tests/StringListTest.cpp			\
-	tests/StringPartTest.cpp			\
-	tests/StringTest.cpp				\
 	tests/TargetBinderTest.cpp			\
 	tests/TimeTest.cpp					\
 	tests/VariableExpansionTest.cpp		\

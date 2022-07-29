@@ -146,9 +146,6 @@ BinCommand ham-tests
 	PathTest.cpp
 	RegExpTest.cpp
 	RulesetTest.cpp
-	StringListTest.cpp
-	StringPartTest.cpp
-	StringTest.cpp
 	TargetBinderTest.cpp
 	TimeTest.cpp
 	VariableExpansionTest.cpp

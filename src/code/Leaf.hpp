@@ -6,14 +6,14 @@
 #define HAM_CODE_LEAF_HPP
 
 #include "code/Node.hpp"
+#include "data/StringListOperations.hpp"
+
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace ham
 {
-
-namespace data
-{
-class StringListOperations;
-}
 
 namespace code
 {
@@ -21,39 +21,34 @@ namespace code
 class Leaf : public Node
 {
   public:
-	Leaf(const String& string);
+	Leaf(std::string_view string);
 	virtual ~Leaf();
 
-	virtual StringList Evaluate(EvaluationContext& context);
-	virtual Node* Visit(NodeVisitor& visitor);
-	virtual void Dump(DumpContext& context) const;
+	virtual std::vector<std::string> Evaluate(EvaluationContext& context
+	) override;
+	virtual Node* Visit(NodeVisitor& visitor) override;
+	virtual void Dump(DumpContext& context) const override;
 
-	static StringList EvaluateString(
-		EvaluationContext& context,
-		const char* stringStart,
-		const char* stringEnd,
-		const String* originalString
-	);
+	static std::vector<std::string>
+	EvaluateString(EvaluationContext& context, std::string_view string);
 
   private:
 	static StringList _EvaluateVariableExpression(
 		EvaluationContext& context,
-		const char* variableStart,
-		const char* variableEnd,
+		std::string_view variable,
 		const std::vector<const char*>& colon,
-		const char* openingBracket,
-		const char* closingBracket,
+		std::string_view brackets,
 		bool recursive
 	);
 	static bool _ParseSubscripts(
-		const char* start,
-		const char* end,
+		std::string_view start,
+		std::string_view end,
 		size_t& _firstIndex,
 		size_t& _endIndex
 	);
 	static bool _ParseStringListOperationsRecursive(
 		EvaluationContext& context,
-		const std::vector<StringList>& operationsStringsList,
+		const std::vector<std::vector<std::string>>& operationsStringsList,
 		size_t operationsStringsListIndex,
 		data::StringListOperations operations,
 		std::vector<data::StringListOperations>& _operationsList
