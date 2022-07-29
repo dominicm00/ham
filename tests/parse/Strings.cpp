@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-PARSE_FUNCTIONS(string)
+const auto parse = genericParse<string>;
 
 /*
  * Tokens
@@ -22,7 +22,8 @@ TEST_CASE("Identifiers are tokens", "[grammar]")
 		"CamelCase",
 		"veryLong14Id31IWith9Things"
 	);
-	REQUIRE(identity(str));
+	INFO(str);
+	REQUIRE(parse(str));
 }
 
 TEST_CASE("Symbols are allowed in tokens", "[grammar]")
@@ -33,11 +34,12 @@ TEST_CASE("Symbols are allowed in tokens", "[grammar]")
 		"other~!@#$%^&*()",
 		"{brack}",
 		"(paren)",
-		"\bslash",
+		"\\bslash",
 		"/slash",
 		"<grist>a/relative/path.cpp(member)"
 	);
-	REQUIRE(identity(str));
+	INFO(str);
+	REQUIRE(parse(str));
 }
 
 TEST_CASE("Unquoted whitespace is not allowed in tokens", "[grammar]")
@@ -49,13 +51,21 @@ TEST_CASE("Unquoted whitespace is not allowed in tokens", "[grammar]")
 		"id\nnewline",
 		"id \t mixed \n up \f whitespace"
 	);
+	INFO(str);
 	REQUIRE_FALSE(parse(str));
 }
 
 TEST_CASE("Escape sequences are literals in tokens", "[grammar]")
 {
-	auto str = GENERATE("my\\newline", "\\t\\f\\a\\b", "\\\"\\\"", "\\'\\'");
-	REQUIRE(identity(str));
+	REQUIRE_PARSE(
+		"\\n\\t",
+		T<string>(
+			{T<string_char>("\\"),
+			 T<string_char>("n"),
+			 T<string_char>("\\"),
+			 T<string_char>("t")}
+		)
+	);
 }
 
 /*
@@ -63,47 +73,67 @@ TEST_CASE("Escape sequences are literals in tokens", "[grammar]")
  */
 TEST_CASE("Whitespace is allowed in quoted strings", "grammar")
 {
-	REQUIRE(
-		content("'lots of \t whitespace \n newline'")
-		== "lots of \t whitespace \n newline"
-	);
-	REQUIRE(
-		content("\"lots of \t whitespace \n newline\"")
-		== "lots of \t whitespace \n newline"
-	);
+	REQUIRE(parse("'lots of \t whitespace \n newline'"));
+	REQUIRE(parse("\"lots of \t whitespace \n newline\""));
 }
 
 TEST_CASE("Escape sequences are literals in single quoted string", "[grammar]")
 {
-	REQUIRE(content("'my\\newline'") == "my\\newline");
-	REQUIRE(content("'\\t\\f\\a\\b'") == "\\t\\f\\a\\b");
+	REQUIRE_PARSE(
+		"'\\n\\t'",
+		T<string>(
+			{T<string_char>("\\"),
+			 T<string_char>("n"),
+			 T<string_char>("\\"),
+			 T<string_char>("t")}
+		)
+	);
 }
 
 TEST_CASE("Escape sequences are parsed in double quoted string", "[grammar]")
 {
-	REQUIRE(content("\"my\\newline\"") == "my\newline");
-	REQUIRE(content("\"\\t\\f\\a\\b\"") == "\t\f\a\b");
+	REQUIRE_PARSE(
+		"\"\\n\\tx\\a\\b\"",
+		T<string>(
+			{T<special_escape>("n"),
+			 T<special_escape>("t"),
+			 T<string_char>("x"),
+			 T<special_escape>("a"),
+			 T<special_escape>("b")}
+		)
+	);
 }
 
 TEST_CASE("Quotes can be escaped in quoted strings", "[grammar]")
 {
-	REQUIRE(
-		content("'I\'m a single \\\"quoted\\\" string'")
-		== "I'm a single \"quoted\" string"
+	REQUIRE_PARSE(
+		"'\\'\\\"'",
+		T<string>({T<char_escape>("'"), T<char_escape>("\"")})
 	);
-	REQUIRE(
-		content("\"I\'m a double \\\"quoted\\\" string\"")
-		== "I'm a double \"quoted\" string"
+	REQUIRE_PARSE(
+		"\"\\'\\\"\"",
+		T<string>({T<char_escape>("'"), T<char_escape>("\"")})
 	);
 }
 
 TEST_CASE("Single quotes can be unescaped in double quotes", "[grammar]")
 {
-	REQUIRE(content("\"'This' is fin'e\"") == "'This' is fin'e");
+	REQUIRE_PARSE(
+		"\"a'b\"",
+		T<string>(
+			{T<string_char>("a"), T<string_char>("'"), T<string_char>("b")}
+		)
+	);
 }
 
 TEST_CASE("Double quotes can be unescaped in single quotes", "[grammar]")
 {
-	REQUIRE(content("'\"This\" is fin\"e'") == "\"This\" is fin\"e");
+	REQUIRE_PARSE(
+		"'a\"b'",
+		T<string>(
+			{T<string_char>("a"), T<string_char>("\""), T<string_char>("b")}
+		)
+	);
 }
+
 } // namespace ham::tests

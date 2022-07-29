@@ -1,21 +1,24 @@
 #include "tests/Utils.hpp"
 
+#include "catch2/catch_message.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
 
 #include <memory>
 #include <stdexcept>
+#include <utility>
 
 namespace ham::tests
 {
 
 namespace p = tao::pegtl;
+using NodePointer = std::unique_ptr<p::parse_tree::node>;
 
-std::unique_ptr<p::parse_tree::node>
-decompose(std::unique_ptr<p::parse_tree::node>&& node, std::vector<int> indices)
+NodePointer
+decompose(NodePointer&& node, std::vector<int> indices)
 {
 	for (int i = 0; i < indices.size(); i++) {
 		if (node->children.empty())
-			return std::unique_ptr<p::parse_tree::node>{};
+			return NodePointer{};
 		node = std::move(node->children[indices[i]]);
 	}
 	return node;
@@ -32,39 +35,43 @@ strip(std::string_view type)
 	}
 }
 
-void
-check(
-	std::unique_ptr<p::parse_tree::node>& node,
-	NodeStructure ns,
-	std::size_t depth
-)
+bool
+checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 {
 	std::string indent{"  ", depth};
 	std::string nodeType = strip(node->type);
 	std::string nodeString = node->has_content() ? node->string() : "";
 	std::stringstream infoMessage{};
+	bool isValid = true;
 
-	infoMessage << indent << nodeType << '[' << nodeString << ']';
+	infoMessage << indent << nodeType << '[' << node->children.size() << ']'
+				<< '{' << nodeString << '}';
 	if (nodeType != ns.type
-		|| (!ns.content.empty() && (nodeString != ns.content))) {
-		infoMessage << " != " << ns.type << '[' << ns.content << ']';
+		|| (!ns.content.empty() && (nodeString != ns.content))
+		|| node->children.size() != ns.children.size()) {
+		infoMessage << " != " << ns.type << '[' << ns.children.size() << ']'
+					<< '{' << ns.content << '}';
+		isValid = false;
 	}
-	INFO(infoMessage.str());
+	UNSCOPED_INFO(infoMessage.str());
 
-	REQUIRE(nodeType == ns.type);
-	if (!ns.content.empty()) {
-		REQUIRE(nodeString == ns.content);
+	for (int i = 0; i < std::min(node->children.size(), ns.children.size());
+		 i++) {
+		isValid = isValid
+			&& checkParse(
+					  std::forward<NodePointer>(node->children[i]),
+					  ns.children[i],
+					  depth + 1
+			);
 	}
-	REQUIRE(node->children.size() == ns.children.size());
-	for (int i = 0; i < ns.children.size(); i++) {
-		check(node->children[i], ns.children[i], depth + 1);
-	}
+
+	return isValid;
 }
 
-void
-check(std::unique_ptr<p::parse_tree::node>& node, NodeStructure ns)
+bool
+checkParse(NodePointer&& node, NodeStructure ns)
 {
-	check(node, ns, 0);
+	return checkParse(std::forward<NodePointer>(node), ns, 0);
 }
 
 } // namespace ham::tests

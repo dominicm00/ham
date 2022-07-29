@@ -40,26 +40,6 @@ genericParse(const std::string& str)
 	);
 };
 
-template<typename Rule>
-bool
-genericIdentity(const std::string& str)
-{
-	std::unique_ptr<p::parse_tree::node> node = genericParse<Rule>(str);
-	return node && node->has_content() && node->string_view() == str;
-}
-
-template<typename Rule>
-std::string
-genericContent(const std::string& str)
-{
-	std::unique_ptr<p::parse_tree::node> node = genericParse<Rule>(str);
-	if (!node)
-		throw std::runtime_error("Failed to parse node.");
-	if (!node->has_content())
-		return "";
-	return node->string();
-}
-
 std::unique_ptr<p::parse_tree::node>
 decompose(
 	std::unique_ptr<p::parse_tree::node>&& node,
@@ -69,15 +49,15 @@ decompose(
 std::string
 strip(std::string_view type);
 
-void
-check(
-	std::unique_ptr<p::parse_tree::node>& node,
+bool
+checkParse(
+	std::unique_ptr<p::parse_tree::node>&& node,
 	NodeStructure ns,
 	std::size_t depth
 );
 
-void
-check(std::unique_ptr<p::parse_tree::node>& node, NodeStructure ns);
+bool
+checkParse(std::unique_ptr<p::parse_tree::node>&& node, NodeStructure ns);
 
 template<typename Type>
 NodeStructure
@@ -95,9 +75,8 @@ T(std::vector<NodeStructure> children)
 
 } // namespace ham::tests
 
-#define PARSE_FUNCTIONS(rule)                 \
-	const auto parse = genericParse<rule>;    \
-	const auto identity = genericParse<rule>; \
-	const auto content = genericContent<rule>;
+#define REQUIRE_NODE(node, ns) REQUIRE(checkParse(node, ns))
+
+#define REQUIRE_PARSE(str, ns) REQUIRE_NODE(decompose(parse(str), {0}), ns)
 
 #endif // HAM_TESTS_UTILS_HPP

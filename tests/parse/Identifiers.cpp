@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-PARSE_FUNCTIONS(identifier);
+const auto parse = genericParse<identifier>;
 
 TEST_CASE("Valid identifiers", "[grammar]")
 {
@@ -19,7 +19,7 @@ TEST_CASE("Valid identifiers", "[grammar]")
 		"CamelCase",
 		"veryLong14Id31IWith9Things"
 	);
-	REQUIRE(identity(id));
+	REQUIRE(parse(id));
 }
 
 TEST_CASE("Invalid symbols in identifiers", "[grammar]")

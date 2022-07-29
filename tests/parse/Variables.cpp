@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-PARSE_FUNCTIONS(variable);
+const auto parse = genericParse<variable>;
 
 /*
  * Identifier only
@@ -38,46 +38,40 @@ TEST_CASE("Whitespace is accepted between '$(  )'", "[grammar]")
 
 TEST_CASE("Identifier is only child of simple variable", "[grammar]")
 {
-	std::string str = "$(Variable)";
-	auto var = decompose(parse(str), {0});
-	check(var, T<variable>({T<identifier>("Variable")}));
+	REQUIRE_PARSE("$(Variable)", T<variable>({T<identifier>("Variable")}));
 }
 
 /*
  * Subscripts
  */
+const auto makeInt = [](std::string i)
+{ return T<evaluable_num>({T<integer>(i)}); };
+
 TEST_CASE("Single element subscripts", "[grammar]")
 {
-	std::string str = "$(var[3])";
-	auto var = decompose(parse(str), {0});
-	check(
-		var,
-		T<variable>({T<identifier>("var"), T<subscript>({T<number>("3")})})
+	REQUIRE_PARSE(
+		"$(var[3])",
+		T<variable>({T<identifier>("var"), T<subscript>({makeInt("3")})})
 	);
 }
 
 TEST_CASE("Start-only range subscripts", "[grammar]")
 {
-	std::string str = "$(var[3-])";
-	auto var = decompose(parse(str), {0});
-	check(
-		var,
+	REQUIRE_PARSE(
+		"$(var[3-])",
 		T<variable>(
 			{T<identifier>("var"),
-			 T<subscript>({T<number>("3"), T<end_subscript>()})}
+			 T<subscript>({makeInt("3"), T<end_subscript>()})}
 		)
 	);
 }
 
 TEST_CASE("Range subscripts", "[grammar]")
 {
-	std::string str = "$(var[3-5])";
-	auto var = decompose(parse(str), {0});
-	check(
-		var,
+	REQUIRE_PARSE(
+		"$(var[3-5])",
 		T<variable>(
-			{T<identifier>("var"),
-			 T<subscript>({T<number>("3"), T<number>("5")})}
+			{T<identifier>("var"), T<subscript>({makeInt("3"), makeInt("5")})}
 		)
 	);
 }
