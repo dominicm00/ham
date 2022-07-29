@@ -38,6 +38,8 @@ template<typename... Rules>
 struct tokens;
 template<typename... Rules>
 struct maybe_tokens;
+template<typename Separator, typename... Rules>
+struct separated_list;
 struct rule_separator;
 
 // Objects
@@ -114,6 +116,13 @@ template<typename... Rules>
 struct hidden::maybe_tokens
 	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
 
+/**
+ * Separated: Parse a list of rules with separators
+ */
+template<typename Separator, typename... Rules>
+struct hidden::separated_list : p::seq<Rules..., p::star<Separator, Rules...>> {
+};
+
 struct evaluable_num;
 struct evaluable_string;
 
@@ -150,8 +159,7 @@ struct hidden::word : p::sor<variable, identifier> {};
 /**
  * List: Word[ Word]*
  */
-struct list : p::seq<hidden::word, p::star<hidden::whitespace, hidden::word>> {
-};
+struct list : hidden::separated_list<hidden::whitespace, hidden::word> {};
 
 /**
  * RuleInvocation: Identifier[ List[ ":" List]*]
@@ -164,7 +172,7 @@ struct rule_invocation
 		  identifier,
 		  p::opt<
 			  hidden::whitespace,
-			  p::separated_seq<hidden::rule_separator, list>>> {};
+			  hidden::separated_list<hidden::rule_separator, list>>> {};
 
 /**
  * Statement: return List ;|RuleInvocation ;
@@ -179,7 +187,7 @@ struct statement
 /**
  * Statements: Statement[ Statement]*
  */
-struct statements : p::separated_seq<hidden::whitespace, statement> {};
+struct statements : hidden::separated_list<hidden::whitespace, statement> {};
 
 /**
  * Selectors

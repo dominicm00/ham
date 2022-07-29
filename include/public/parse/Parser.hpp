@@ -8,9 +8,17 @@ namespace ham::parse
 
 class Parser {
   public:
-	static void Parse(std::string in);
+	enum Debug {
+		NONE,
+		XDOT,
+		TRACE,
+		GRAMMAR
+	};
+
+  public:
+	static void Parse(std::string in, Debug debug);
 };
 
-}
+} // namespace ham::parse
 
 #endif // HAM_PARSE_PARSER_HPP
