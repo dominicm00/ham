@@ -71,7 +71,7 @@ TEST_CASE("Escape sequences are literals in tokens", "[grammar]")
 /*
  * Quoted strings
  */
-TEST_CASE("Whitespace is allowed in quoted strings", "grammar")
+TEST_CASE("Whitespace is allowed in quoted strings", "[grammar]")
 {
 	REQUIRE(parse("'lots of \t whitespace \n newline'"));
 	REQUIRE(parse("\"lots of \t whitespace \n newline\""));
