@@ -20,8 +20,7 @@ Some problems arose with these goals.
 Ham had no concrete goals for user facing improvements other than speed (and, related, caching). Speed is definitely important, but there's also opportunities to make Jam itself more accessible. Because Jam's syntax is so simplistic, it is relatively easy to add new language extensions.
 
 #### Jam compatibility
-First, bug-for-bug compatibility with Jam is impossible in some situations
-(see [#50](https://github.com/dominicm00/ham/pull/50#issuecomment-1170568688). Ham could only replicate simple and reliable bugs, but it's questionable if that is actually helpful for the user. For example, when presented with a range selection with an end subscript before the end of the list (say, `[2-3]` on a list of length 5), the empty list would be returned. Ham will replicate this behavior, but that's likely not what a user expects.
+First, bug-for-bug compatibility with Jam is impossible in some situations (see [#50](https://github.com/dominicm00/ham/pull/50#issuecomment-1170568688)). Ham could only replicate simple and reliable bugs, but it's questionable if that is actually helpful for the user. For example, when presented with a range selection with an end subscript before the end of the list (say, `[2-3]` on a list of length 5), the empty list would be returned. Ham will replicate this behavior, but that's likely not what a user expects.
 
 The original reasoning behind this compatibility was so that Ham could be dropped into any existing Jam build system without any changes. However, if Ham doesn't offer significant improvements over Jam, there is no motivation to switch to it at all. Plus, there will inevitably be small implementation differences between Ham and Jam.
 
