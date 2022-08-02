@@ -20,14 +20,14 @@ TEST_CASE("Variables are not identifiers", "[grammar]")
 
 TEST_CASE("Variable must be surrounded by '$()'", "[grammar]")
 {
-	auto id = GENERATE(
-		"not$(surrounded)",
-		"$(missingend",
-		"missingbegin)",
-		"(missingdollar)",
-		"$(bad)suffix"
-	);
-	REQUIRE_FALSE(parse(id));
+	auto str = GENERATE("missingbegin)", "(missingdollar)", "$(bad)suffix");
+	REQUIRE_FALSE(parse(str));
+}
+
+TEST_CASE("Unmatched variable sequence errors '$()'", "[grammar]")
+{
+	auto str = GENERATE("$(missingend", "$( missingend[3-4]");
+	REQUIRE_THROWS(parse(str));
 }
 
 TEST_CASE("Whitespace is accepted between '$(  )'", "[grammar]")

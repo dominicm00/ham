@@ -26,7 +26,7 @@ namespace ham::parse
 namespace hidden
 {
 // Strings
-template<typename Quote, typename Escape>
+template<typename Quote, typename Escape, typename Nested>
 struct quote;
 struct literal;
 struct quoted_single;
@@ -38,12 +38,7 @@ template<typename... Rules>
 struct tokens;
 template<typename... Rules>
 struct maybe_tokens;
-template<typename Separator, typename... Rules>
-struct separated_list;
 struct rule_separator;
-
-// Objects
-struct word;
 
 } // namespace hidden
 
@@ -59,44 +54,50 @@ struct identifier : p::plus<p::alnum> {};
  */
 struct integer : p::plus<p::digit> {};
 
-/**
- * String: A series of printable characters/escape sequences either between two
- * unescaped quotes, or with no whitespace.
- */
+/** Words **/
+struct variable;
+struct word;
 
 // Characters
 struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
-struct char_escape : p::one<'\\', '\'', '"'> {};
+struct char_escape : p::one<'\\', '\'', '"', '$'> {};
 struct string_char : p::sor<p::print, p::space> {};
 
-// A literal is a series of consecutive characters, excluding quotes
+// A literal is a series of printable characters. If not at a special
+// sequence, must be an accepted character.
 struct hidden::literal
-	: p::plus<p::not_at<p::sor<p::space, p::one<'\'', '"'>>>, string_char> {};
+	: p::plus<p::if_must<
+		  p::not_at<p::sor<p::one<'$', '\'', '"'>, p::space, p::eolf>>,
+		  string_char>> {};
 
-// A quoted string is surrounded by quotes, and consists of printable characters
-// (excluding the quote) or character escapes. Escaped quotes are handled by
-// prioritizing escape sequences in matching. The quote is excluded from the
-// character matching. If a starting quote is matched, the quote must end.
-template<typename Quote, typename Escape>
+/**
+ * A quoted string is surrounded by quotes, and consists of printable characters
+ * (excluding the quote) or character escapes. Escaped quotes are handled by
+ * prioritizing escape sequences in matching. The quote is excluded from the
+ * character matching. If a starting quote is matched, the quote must end.
+ *
+ * Parts matching the Nested rule are processed after escapes, but before
+ * characters (used for variables).
+ */
+template<typename Quote, typename Escape, typename Nested>
 struct hidden::quote
 	: p::if_must<
 		  Quote,
-		  p::star<p::not_at<Quote>, p::sor<Escape, string_char>>,
+		  p::star<p::not_at<Quote>, p::sor<Escape, Nested, string_char>>,
 		  Quote> {};
 
-// Escape sequences are "optional" in single quotes
+// Escape sequences are "optional" in single quotes. Single quotes ignore
+// variables.
 struct hidden::quoted_single
-	: hidden::quote<p::one<'\''>, p::seq<p::one<'\\'>, char_escape>> {};
-// Escape sequences are mandatory in double quotes
+	: hidden::
+		  quote<p::one<'\''>, p::seq<p::one<'\\'>, char_escape>, p::failure> {};
+
+// Escape sequences are mandatory in double quotes. Double quotes use variables.
 struct hidden::quoted_double
 	: hidden::quote<
 		  p::one<'"'>,
-		  p::if_must<p::one<'\\'>, p::sor<char_escape, special_escape>>> {};
-
-struct string : p::plus<p::sor<
-					hidden::literal,
-					hidden::quoted_double,
-					hidden::quoted_single>> {};
+		  p::if_must<p::one<'\\'>, p::sor<char_escape, special_escape>>,
+		  p::if_must<p::at<p::one<'$'>>, variable>> {};
 
 /**
  * Whitespace: space+
@@ -116,15 +117,7 @@ template<typename... Rules>
 struct hidden::maybe_tokens
 	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
 
-/**
- * Separated: Parse a list of rules with separators
- */
-template<typename Separator, typename... Rules>
-struct hidden::separated_list : p::seq<Rules..., p::star<Separator, Rules...>> {
-};
-
 struct evaluable_num;
-struct evaluable_string;
 
 /**
  * Subscript: "[" Number[ "-"[ Number]] "]"
@@ -142,24 +135,29 @@ struct subscript : hidden::maybe_tokens<
  * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":" PathSelectors ]
  * ")"
  */
-struct variable : hidden::maybe_tokens<
-					  p::string<'$', '('>,
-					  identifier,
-					  p::opt<subscript>,
-					  p::one<')'>> {};
+struct variable : p::if_must<
+					  p::one<'$'>,
+					  hidden::maybe_tokens<
+						  p::one<'('>,
+						  p::sor<variable, identifier>,
+						  p::opt<subscript>,
+						  p::one<')'>>> {};
 
 struct evaluable_num : p::sor<variable, integer> {};
-struct evaluable_string : p::sor<variable, string> {};
 
 /**
- * Word: Variable|Identifier
+ * Word: (Single-quoted string|Double-quoted string|Variable|Literal)+
  */
-struct hidden::word : p::sor<variable, identifier> {};
+struct word : p::plus<p::sor<
+				  hidden::quoted_single,
+				  hidden::quoted_double,
+				  variable,
+				  hidden::literal>> {};
 
 /**
  * List: Word[ Word]*
  */
-struct list : hidden::separated_list<hidden::whitespace, hidden::word> {};
+struct list : p::list<word, hidden::whitespace> {};
 
 /**
  * RuleInvocation: Identifier[ List[ ":" List]*]
@@ -170,9 +168,7 @@ struct hidden::rule_separator
 struct rule_invocation
 	: p::seq<
 		  identifier,
-		  p::opt<
-			  hidden::whitespace,
-			  hidden::separated_list<hidden::rule_separator, list>>> {};
+		  p::opt<hidden::whitespace, p::list<list, hidden::rule_separator>>> {};
 
 /**
  * Statement: return List ;|RuleInvocation ;
@@ -187,7 +183,7 @@ struct statement
 /**
  * Statements: Statement[ Statement]*
  */
-struct statements : hidden::separated_list<hidden::whitespace, statement> {};
+struct statements : p::list<statement, hidden::whitespace> {};
 
 /**
  * Selectors
@@ -204,11 +200,10 @@ using selector = p::parse_tree::selector<
 		special_escape,
 		char_escape,
 		string_char,
-		string,
 		evaluable_num,
-		evaluable_string,
 		subscript,
 		variable,
+		word,
 		rule_invocation,
 		statement>,
 	p::parse_tree::remove_content::on<statements, list>,
