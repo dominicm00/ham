@@ -77,6 +77,10 @@ Ham **will** document its overall architecture.
 
 Ham **will** document any public-facing library functions.
 
+Ham **will** document, and update, these goals as necessary.
+
+Ham **will** document its contribution process.
+
 Ham **will probably** document key internal functions.
 
 Ham **will probably** develop tutorials. This should be done gradually due to time constraints.
