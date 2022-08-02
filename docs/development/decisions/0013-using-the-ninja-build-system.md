@@ -1,6 +1,25 @@
 # 12. Using the Ninja build system
 Date: 2022-08-01
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Status](#status)
+- [Context](#context)
+  - [Benefits of Ninja](#benefits-of-ninja)
+    - [Stability](#stability)
+    - [Debugging](#debugging)
+    - [Clangd support](#clangd-support)
+    - [Speed](#speed)
+  - [Downsides of Ninja](#downsides-of-ninja)
+    - [Runtime dependency](#runtime-dependency)
+    - [Loss of information](#loss-of-information)
+    - [Loss of control](#loss-of-control)
+- [Decision](#decision)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
+
 ## Status
 Accepted
 

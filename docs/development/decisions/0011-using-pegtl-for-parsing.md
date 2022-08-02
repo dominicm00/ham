@@ -1,9 +1,35 @@
 # 9. Using PEGTL as the parsing solution
-
 Date: 2022-08-01
 
-## Status
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
 
+- [Status](#status)
+- [Context](#context)
+  - [Parsing architectures](#parsing-architectures)
+    - [DSL vs library](#dsl-vs-library)
+    - [CFG vs PEG](#cfg-vs-peg)
+  - [Tools](#tools)
+    - [Flex/Bison](#flexbison)
+    - [ANTLR](#antlr)
+    - [Boost.Spirit](#boostspirit)
+    - [PEGTL](#pegtl)
+    - [Lexy](#lexy)
+- [Decision](#decision)
+  - [Simplicity](#simplicity)
+  - [C++ library](#c-library)
+  - [PEG parsing](#peg-parsing)
+  - [Parsing rules as units](#parsing-rules-as-units)
+  - [Separate actions and grammar](#separate-actions-and-grammar)
+  - [Mature and tested](#mature-and-tested)
+  - [Debugging](#debugging)
+  - [Exceptions](#exceptions)
+  - [AST support](#ast-support)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
+
+## Status
 Accepted
 
 ## Context

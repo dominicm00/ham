@@ -1,13 +1,18 @@
 # Forbid high power sources in piecemeal actions
-
 Date: 2022-07-20
 
-## Status
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
 
+- [Status](#status)
+- [Context](#context)
+
+<!-- markdown-toc end -->
+
+## Status
 Accepted
 
 ## Context
-
 High power sources occur when the source variable, directly or indirectly, occurs multiple times in a single word:
 ```
 # 2 = a b ;

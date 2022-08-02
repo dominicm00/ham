@@ -1,6 +1,30 @@
 # 9. Ham project goals
 Date: 2022-08-01
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Status](#status)
+- [Context](#context)
+  - [Original goals](#original-goals)
+    - [No user facing changes](#no-user-facing-changes)
+    - [Jam compatibility](#jam-compatibility)
+  - [Missing goals](#missing-goals)
+- [Decision](#decision)
+  - [Backwards compatibility](#backwards-compatibility)
+  - [Debugging](#debugging)
+  - [Documentation](#documentation)
+  - [Editor support](#editor-support)
+  - [Jambase](#jambase)
+  - [Language improvements](#language-improvements)
+  - [Speed](#speed)
+  - [Stability](#stability)
+  - [Simplicity](#simplicity)
+  - [Platform compatibility](#platform-compatibility)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
+
 ## Status
 Accepted
 

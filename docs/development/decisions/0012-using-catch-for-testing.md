@@ -1,6 +1,19 @@
 # 11. Using Catch for testing
 Date: 2022-08-01
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Status](#status)
+- [Context](#context)
+  - [Tools](#tools)
+- [Decision](#decision)
+  - [Section based](#section-based)
+  - [Data generators](#data-generators)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
+
 ## Status
 Accepted
 

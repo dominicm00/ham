@@ -1,6 +1,37 @@
 # 8. Creating a version 2
-
 Date: 2022-07-29
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Status](#status)
+- [Context](#context)
+  - [Current architectural problems](#current-architectural-problems)
+    - [Parsing](#parsing)
+    - [Testing](#testing)
+    - [Containers](#containers)
+    - [AST](#ast)
+    - [Caching](#caching)
+    - [Dependency Detection](#dependency-detection)
+    - [Jam Compatibility](#jam-compatibility)
+    - [Platform Compatibility](#platform-compatibility)
+    - [Lack of clear user-facing improvements](#lack-of-clear-user-facing-improvements)
+  - [Approaches moving forward](#approaches-moving-forward)
+    - [Keep current Ham architecture](#keep-current-ham-architecture)
+    - [Change Ham's architecture](#change-hams-architecture)
+      - [Use standard library, but no dependencies](#use-standard-library-but-no-dependencies)
+      - [Use dependencies, but no standard library](#use-dependencies-but-no-standard-library)
+      - [Use dependencies and standard library](#use-dependencies-and-standard-library)
+    - [Change method](#change-method)
+      - [Change gradually](#change-gradually)
+      - [Change all at once](#change-all-at-once)
+  - [Constraining factors](#constraining-factors)
+    - [GSoC timeline](#gsoc-timeline)
+    - [Reliability](#reliability)
+- [Decision](#decision)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
 
 ## Status
 Accepted

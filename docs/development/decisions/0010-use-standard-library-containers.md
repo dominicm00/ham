@@ -1,6 +1,16 @@
 # 10. Use standard library containers
 Date: 2022-08-01
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Consequences](#consequences)
+
+<!-- markdown-toc end -->
+
 ## Status
 Accepted
 
