@@ -123,6 +123,9 @@ Ham **will** be compatible with all platforms Haiku can be built on.
 
 Ham **will probably** be compatible with Windows. Windows compatibility is more complex than Unix platforms.
 
+### Simplicity
+Ham **will** prioritize simplicity in design. Simplicity should only be sacrificed for speed when benchmarks show a significant need. Marginal/theoretical improvements should not complicate the architecture.
+
 ## Consequences
 With a defined set of goals/non-goals Ham has a framework to evaluate architectural/development choices. The focus on debugging and user-facing improvements should give Ham the value proposition for projects to use it exclusively.
 
