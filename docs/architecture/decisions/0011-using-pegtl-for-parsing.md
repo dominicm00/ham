@@ -54,6 +54,9 @@ A relatively new library, Lexy is a PEG grammar tool with an operator based DSL.
 ## Decision
 Ham will use PEGTL as its parsing tool.
 
+### Simplicity
+PEGTL is a relatively simple tool, both in its construction and use, which supports Ham's simplicity goal.
+
 ### C++ library
 Having a parser as code makes it easier to test, and has a shorter learning curve than a dedicated tool. Ham does not need a language-independent grammar, so it doesn't suffer downsides from being locked into C++.
 

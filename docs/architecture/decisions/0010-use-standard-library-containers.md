@@ -12,7 +12,7 @@ Not using standard library containers also hampers interoperability with librari
 The standard library has some issues, such as a lack of helper functions, and poorly made modules like the regex module.
 
 ## Decision
-Ham will use standard library containers, instead of its own.
+Ham will use standard library containers, instead of its own. Using the standard library supports Ham's simplicity goal.
 
 ## Consequences
 The interfaces for containers will no longer be the same as Haiku, but they should be familiar to anyone who has coded modern C++ elsewhere.

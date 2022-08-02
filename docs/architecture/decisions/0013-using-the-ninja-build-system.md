@@ -35,6 +35,8 @@ Ham will use the Ninja build system.
 
 Matching Ninja's level of caching and incremental build speed is not feasible. Ninja will inevitably be faster and more stable than a custom solution for incremental builds (where speed is most important). If Ham delegates the entire make phase *and debugging output* to Ninja, it shouldn't need to access make information directly. Ninja's debugging output is likely more advanced than what Ham would be able to do by itself.
 
+Using Ninja supports Ham's simplicity goal.
+
 ## Consequences
 Using Ninja simplifies the make phase, cross-platform compatibility, and debugging.
 
