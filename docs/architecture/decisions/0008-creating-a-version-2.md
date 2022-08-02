@@ -8,8 +8,6 @@ Accepted
 ## Context
 
 ### Current architectural problems
-Ham has design choices that should be reconsidered.
-
 #### Parsing
 Ham implements a custom parser. This makes it difficult to change Ham's grammar, and adds more surface area for maintenance. The parser architecture also makes it difficult to unit test parsing rules, and there are currently no tests for the parser.
 
@@ -41,9 +39,7 @@ Ham's handling of paths/file access needs to be refactored to be compatible with
 #### Lack of clear user-facing improvements
 Ham's main goal is to be a better-architectured version of Jam to make future development easier. However, other than fixing bugs, Ham doesn't have clear targets for how it will provide user-facing improvements. Additionally, because of the limitation of being bug-for-bug compatible with Jam, Ham's behavior is necessarily similar to Jam's.
 
-### Moving Forward
-There are a few options moving forward.
-
+### Approaches moving forward
 #### Keep current Ham architecture
 Keeping the current architecture and fixing issues is the most straightforward option. Things that would have to be fixed for Ham to be considered production ready would be:
 - Expanding the testing infrastructure to cover parsing and command line input.
@@ -58,13 +54,13 @@ Using the standard library has many benefits in terms of implementation reliabil
 This requires maintaining boundaries between dependencies (which use the C++ STL) and Ham containers. Ham itself may also expose C++ STL types in its library API. Maintaining a boundary between internal/external types is difficult and inefficient. Besides, given the project would need to be refactored anyway to use the dependencies, it doesn't make much sense to avoid the standard library.
 
 ##### Use dependencies and standard library
-Adding dependencies has many benefits:
+Adding dependencies has the following benefits:
 - Use trusted implementations
 - Greatly eases work for platform compatibility
 - Makes cross-cutting changes easier
 - Adds new features (like debugging output) that could be exposed to users
 
-And some downsides:
+And downsides:
 - Increases build complexity
 - Possibility of external breakage
 - Possibility of abandoned dependencies

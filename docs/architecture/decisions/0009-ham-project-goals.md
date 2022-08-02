@@ -5,7 +5,7 @@ Date: 2022-08-01
 Accepted
 
 ## Context
-Ham is being refactored, as described in [ADR #8](creating-a-version-2.md). Ham needs to have defined project goals in order to evaluate architectural/feature choices.
+Ham is being refactored, as described in [ADR #8](creating-a-version-2.md). Ham should have defined project goals in order to evaluate architectural/feature choices.
 
 ### Original goals
 Ham's original goals were:
