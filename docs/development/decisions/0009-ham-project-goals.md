@@ -15,7 +15,7 @@ Date: 2022-08-01
   - [Debugging](#debugging)
   - [Documentation](#documentation)
   - [Editor support](#editor-support)
-  - [Jambase](#jambase)
+  - [Rulesets](#rulesets)
   - [Language improvements](#language-improvements)
   - [Speed](#speed)
   - [Stability](#stability)
@@ -116,12 +116,12 @@ Ham **will** work with the [`clangd`](https://clangd.llvm.org/) language server.
 
 Ham **may** provide plugins for common editors, including syntax highlighting, generating compilation databases automatically, or target selection/building directly in the editor. The scope is purposely broad so that Ham can slowly add features where possible.
 
-### Jambase
+### Rulesets
 Ham **will**, at a minimum, build-in and maintain the Perforce Jambase and Haiku Jambase. This includes modifying them if there are syntactical/behavioral changes.
 
 Ham **will probably not** include the Boost.Build build system. The `b2` interpreter has diverged from `jam`, and including it has questionable benefits (after all, `b2` is already a usable tool). This may change after discussions with the Boost.Build team.
 
-Ham **will probably not** develop its own Jambase. Ham is primarily used for projects with large, existing Jam build systems, not for new projects. Considering the availability modern tools, Ham is unlikely to see much use in newer projects.
+Ham **will probably not** develop its own ruleset. Ham is primarily used for projects with large, existing Jam build systems, not for new projects. Considering the availability modern tools, Ham is unlikely to see much use in newer projects.
 
 ### Language improvements
 New language features **will** be opt-in. Preferably the syntax of new language features should be optional, so that the original syntax and new syntax can be used at the same time. If that is not possible, the feature must be behind a flag. The default language must remain compatible with Jam.
