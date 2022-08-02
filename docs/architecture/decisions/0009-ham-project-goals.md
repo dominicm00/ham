@@ -36,6 +36,8 @@ Most of the time people spend working on build systems is debugging them. Debugg
 Modern editor support, especially for a C/C++ build system, is a must to get IDE features.
 
 ## Decision
+Ham will create a list of goals that apply to Ham as a general tool, not just a Haiku project. The only prerequisite for Ham to be ready for Haiku is building Haiku successfully on all platforms. These goals describe additional constraints for when Ham is ready outside of Haiku.
+
 Following is the new list of goals for Ham. Each goal is broken down into sub-goals with the following keyword format:
 
 - **will**: Top priority goals. These should be completed before the 1.0.0 release.
