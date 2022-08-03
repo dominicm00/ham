@@ -95,7 +95,7 @@ Ham **will** develop, and maintain, a complete language specification. Behavior 
 
 Ham **will** maintain a complete reference of command line options.
 
-Ham **will** maintain a complete reference of built-in rules for all integrated build systems.
+Ham **will** maintain a complete reference of built-in rules for all integrated rulesets.
 
 Ham **will** document architectural decisions with ADRs (like this one).
 
