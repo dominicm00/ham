@@ -4,6 +4,7 @@ add_executable(
   Utils.cpp
 
   parse/Identifiers.cpp
+  parse/Integers.cpp
   parse/Variables.cpp
   parse/Words.cpp
   )
