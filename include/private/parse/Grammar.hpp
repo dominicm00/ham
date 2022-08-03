@@ -25,6 +25,10 @@ namespace ham::parse
 /* Helper rules excluded from the AST. */
 namespace hidden
 {
+// General
+struct special_chars;
+struct grouping_chars;
+
 // Strings
 template<typename Quote, typename Escape, typename Nested>
 struct quote;
@@ -43,14 +47,45 @@ struct rule_separator;
 } // namespace hidden
 
 /**
- * Identifier: [a-zA-Z0-9]+
+ * Ham reserves the following special characters:
+ * - $      - variables
+ * - '      - single quoted strings
+ * - "      - double quoted strings
+ * - :      - rule separators
+ * - |      - N/A
+ *
+ * When unescaped, these characters may only be used in accordance with their
+ * special meaning, if they have any. When escaped, they can be used in words.
+ * They can never be used in identifiers.
+ *
+ * The following special characters are allowed in words (and possibly
+ * expressions), but not identifiers:
+ * - ( )
+ * - [ ]
+ * - { }
+ * - < >
+ *
+ * In words, these characters may have special meaning at runtime, but do not
+ * have meaning to the parser.
+ */
+struct hidden::special_chars : p::one<'$', '\'', '"', '|', ':'> {};
+struct hidden::grouping_chars : p::one<'(', ')', '{', '}', '[', ']', '<', '>'> {
+};
+
+/**
+ * Identifiers are consecutive characters that are not whitespace or symbols
+ * reserved by Ham.
  *
  * TODO: Support Unicode identifiers?
  */
-struct identifier : p::plus<p::alnum> {};
+struct identifier
+	: p::plus<
+		  p::not_at<
+			  p::sor<p::space, hidden::special_chars, hidden::grouping_chars>>,
+		  p::print> {};
 
 /**
- * Number: [0-9]+
+ * Integer: [0-9]+
  */
 struct integer : p::plus<p::digit> {};
 
@@ -60,15 +95,15 @@ struct word;
 
 // Characters
 struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
-struct char_escape : p::one<'\\', '\'', '"', '$'> {};
+struct char_escape : hidden::special_chars {};
 struct string_char : p::sor<p::print, p::space> {};
 
-// A literal is a series of printable characters. If not at a special
-// sequence, must be an accepted character.
+// A literal is a series of printable characters. Cancel if at a special
+// character or whitespace.
 struct hidden::literal
-	: p::plus<p::if_must<
-		  p::not_at<p::sor<p::one<'$', '\'', '"'>, p::space, p::eolf>>,
-		  string_char>> {};
+	: p::plus<
+		  p::not_at<p::sor<hidden::special_chars, p::space, p::eolf>>,
+		  string_char> {};
 
 /**
  * A quoted string is surrounded by quotes, and consists of printable characters

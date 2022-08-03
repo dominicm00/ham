@@ -9,7 +9,7 @@ namespace ham::tests
 using namespace ham::parse;
 const auto parse = genericParse<identifier>;
 
-TEST_CASE("Valid identifiers", "[grammar]")
+TEST_CASE("Alphanumeric identifiers", "[grammar]")
 {
 	auto id = GENERATE(
 		"Id",
@@ -22,19 +22,15 @@ TEST_CASE("Valid identifiers", "[grammar]")
 	REQUIRE(parse(id));
 }
 
+TEST_CASE("Valid symbols in identifiers", "[grammar]")
+{
+	auto id = GENERATE("!", "@", "#", "%", "-", "_", "/", "\\");
+	REQUIRE(parse(id));
+}
+
 TEST_CASE("Invalid symbols in identifiers", "[grammar]")
 {
-	auto id = GENERATE(
-		"id-with-dash",
-		"id_underscore",
-		"other~!@#$%^&*()",
-		"{nobrack}",
-		"(noparen)",
-		"no\bslash",
-		"no/slash",
-		"\"noquote\"",
-		"'nosquote'"
-	);
+	auto id = GENERATE("$", "'", "\"", "{}", "()", "[]", "<>");
 	REQUIRE_FALSE(parse(id));
 }
 
