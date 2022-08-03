@@ -152,7 +152,7 @@ TEST_CASE("Double quotes can be unescaped in single quotes", "[grammar]")
 /**
  * Complex words
  */
-TEST_CASE("Different types of wordss can be combined", "[grammar]")
+TEST_CASE("Different types of words can be combined", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a'b c'd\"\\n\"",
