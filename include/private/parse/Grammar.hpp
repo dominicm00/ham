@@ -78,11 +78,7 @@ struct hidden::grouping_chars : p::one<'(', ')', '{', '}', '[', ']', '<', '>'> {
  *
  * TODO: Support Unicode identifiers?
  */
-struct identifier
-	: p::plus<
-		  p::not_at<
-			  p::sor<p::space, hidden::special_chars, hidden::grouping_chars>>,
-		  p::print> {};
+struct identifier : p::identifier {};
 
 /**
  * Integer: [0-9]+
