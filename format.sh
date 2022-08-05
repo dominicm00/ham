@@ -1,2 +1,2 @@
 #!/bin/sh
-find src -type f -regex ".*\.\(cpp\|hpp\)$" | xargs clang-format -i
+find src cmd include -type f -regex ".*\.\(cpp\|hpp\)$" | xargs clang-format -i

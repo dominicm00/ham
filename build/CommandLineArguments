@@ -1,8 +1,0 @@
-# Rules related to processing of jam command line arguments.
-
-rule ProcessCommandLineArguments
-{
-	# analyze and optionally replace jam's target parameters
-	HAM_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
-	HAM_BUILD_PROFILE = ;
-}

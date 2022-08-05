@@ -1,0 +1,8 @@
+[submodule "extern/pegtl"]
+	path = extern/pegtl
+	url = https://github.com/taocpp/PEGTL
+	branch = 3.x
+[submodule "extern/catch"]
+	path = extern/catch
+	url = https://github.com/catchorg/Catch2
+	branch = devel
