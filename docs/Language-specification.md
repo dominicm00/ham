@@ -17,7 +17,7 @@
 - [Lists](#lists)
 - [Variables](#variables)
   - [Variable expressions](#variable-expressions)
-    - [Identifier](#identifier)
+    - [Variable identifier](#variable-identifier)
     - [Variable subscripts](#variable-subscripts)
     - [Variable modifiers](#variable-modifiers)
   - [Variable assignment](#variable-assignment)
@@ -224,7 +224,7 @@ Data inside variables must be accessed via variable expressions. Evaluating a va
 $( <identifier|variable>[subscript][modifiers] )
 ```
 
-#### Identifier
+#### Variable identifier
 Evaluating an identifier returns the associated string list:
 ```text
 X = 123 ;
