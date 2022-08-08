@@ -9,7 +9,12 @@ namespace ham::tests
 using namespace ham::parse;
 const auto parse = genericParse<rule_invocation>;
 
-TEST_CASE("Rule invocation, no arguments", "[grammar]")
+TEST_CASE("Rule invocation is non-empty", "[grammar]")
+{
+	REQUIRE_FALSE(parse(""));
+}
+
+TEST_CASE("Rule invocation, no argument", "[grammar]")
 {
 	auto rule = GENERATE("Rule", "dyn$(amic)", "with-symbols/");
 	REQUIRE_PARSE(rule, T<rule_invocation>({T<identifier>(rule)}));
