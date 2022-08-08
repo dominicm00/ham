@@ -216,8 +216,6 @@ Built-in rules that act on targets compare equality with the target's string rep
 
 **NOTE:** Ham is considering methods for better cross-platform file paths, but it is currently the user's responsibility. Using paths invalid on the running system is **undefined behavior**, and may or may not work with or without a warning.
 
-See [actions](#actions) for how targets are bound in commands.
-
 **Examples:**
 ```
 relative/path.cpp
@@ -231,6 +229,36 @@ C:\\another\absolute\path.cpp
 # These two are different targets to Ham
 nodir.cpp
 <grist>nodir.cpp
+```
+
+### Target binding
+Before being executed by commands, targets generally have to be bound to a filesystem path. The binding process differs between sources and generated targets:
+
+#### Source target binding
+[Source targets](#source-dependencies) are rooted at each directory in the target-local `$(SEARCH)` variable, and the first one where the file exists is set as the target path. If the target represents an absolute path, `$(SEARCH)` is ignored. If no existing file is found, an error is thrown.
+
+#### Generated target binding
+Generated targets are rooted at the target-local `$(LOCATE)` variable. If the target represents an absolute path, `$(LOCATE)` is ignored.
+
+**Examples:**
+```text
+# src/main.cpp already exists
+
+rule EchoCompile {
+  Depends $(1) : $(2) ;
+}
+
+actions EchoCompile {
+  echo Compiled $(1) with $(2) ;
+}
+
+SEARCH on main.cpp = extern src ;
+LOCATE on mybin = bin ;
+
+# main.cpp found in src/
+# mybin rooted at bin/
+EchoCompile mybin : main.cpp ; # Compiled bin/mybin with src/main.cpp
+Depends all : mybin ;
 ```
 
 ## Lists
@@ -520,7 +548,7 @@ actions <modifiers> <identifier> {
 ```
 
 `shell-input` is treated as a literal strings to be passed to the system's command shell, with the exception of the following special sequences:
-- `$(<variable-expression>)`: Target variables, source variables, and variables specified in the `bind` modifier are bound to filesystem paths. The whitespace-delimited portion containing the variable expression is then evaluated as a leaf.
+- `$(<variable-expression>)`: Targets, sources, and variables specified by the `bind` modifier are [bound](#target-binding). The whitespace-delimited portion containing the variable expression is then evaluated as a leaf.
 - `\$`: Escapes the `$` character and prevents it from being interpreted as a variable expression.
 - `\}`: Escapes the `}` character and prevents it from being interpreted as the end of the shell input.
 
@@ -666,6 +694,9 @@ The `MaybeIncludes` and `MaybeDepends` rules create order-only dependencies, whe
 - Updating the child does not update the parent
 
 This is useful if you don't know ahead of time if a source file includes a generated header. Using `MaybeIncludes` will generate the header on the first run, but only rebuild the parent if it actually ended up using the header.
+
+### Source dependencies
+Source dependencies are targets that don't have any associated actions, and cannot be built (e.g. source files). All source dependencies must be [bound](#target-binding) to an existing file, and cannot have any dependencies.
 
 ### Header dependencies
 Ham provides facilities to determine C/C++ header dependencies automatically. Using this requires compiler support, which all major Unix compilers and `msvc` provide.
