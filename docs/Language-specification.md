@@ -11,7 +11,7 @@
   - [Double quoted strings](#double-quoted-strings)
   - [Single quoted strings](#single-quoted-strings)
   - [String combinations](#string-combinations)
-- [Bracket expressions](#bracket-expressions)
+  - [Bracket expressions](#bracket-expressions)
   - [Leaf expansion](#leaf-expansion)
   - [Observations](#observations)
 - [Lists](#lists)
@@ -151,7 +151,7 @@ path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cp
 "combining "'forms 'in-any" which way"   => combining forms in-any which way
 ```
 
-## Bracket expressions
+### Bracket expressions
 Bracket expressions have the following form (literal `[]`, not optional):
 ```text
 [ <statement> ]
