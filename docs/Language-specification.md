@@ -68,7 +68,7 @@ The `$` character indicates the start of a variable expression. Not having a val
 ```text
 word
 !with#@symbols%^&(
-<grist>my/path/file.cpp(member)
+<grist>my/path/file.cpp
 C:\\%appdata%
 400.0
 $(myvar)
@@ -282,14 +282,12 @@ The following modifiers are available:
 | `:S`           | Select last filename suffix                 |
 | `:D`           | Select directory path                       |
 | `:G`           | Select grist                                |
-| `:M`           | Select archive member                       |
 | `:U`           | Uppercase contents                          |
 | `:L`           | Lowercase contents                          |
 | `:B=base`      | Replace base                                |
 | `:S=suffix`    | Replace suffix                              |
 | `:D=directory` | Replace directory path                      |
 | `:G=grist`     | Replace grist                               |
-| `:M=member`    | Replace member                              |
 | `:R=root`      | Root file if not an absolute path           |
 | `:E=value`     | Default value if variable is unset or empty |
 | `:J=separator` | Concatenate list elements with a separator  |
@@ -324,13 +322,11 @@ Changes from each modifier are "fed" into the next modifier. Modifiers have the 
 | `:S=suffix`    | 2                                |
 | `:D=directory` | 2                                |
 | `:G=grist`     | 2                                |
-| `:M=member`    | 2                                |
 | `:R=root`      | 2                                |
 | `:B`           | 3                                |
 | `:S`           | 3                                |
 | `:D`           | 3                                |
 | `:G`           | 3                                |
-| `:M`           | 3                                |
 | `:U`           | 4 (mutually exclusive with `:U`) |
 | `:L`           | 4 (mutually exclusive with `:L`) |
 | `:J=separator` | 5                                |
@@ -347,14 +343,11 @@ Echo $(X:R=/usr) ;   # /absolute/path.cpp /usr/relative/path.cpp
 Y = a/long/path/file.cpp ;
 Echo $(Y:D=home) ;   # home/file.cpp
 Echo $(Y:G=grist) ;  # <grist>a/long/path/file.cpp
-Echo $(Y:M=member) ; # a/long/path/file.cpp(member)
-
-W = <grist>path/to/file.cpp(member) ;
+W = <grist>path/to/file.cpp ;
 Echo $(W:B) ;        # file
 Echo $(W:S) ;        # .cpp
 Echo $(W:D) ;        # path/to
 Echo $(W:G) ;        # <grist>
-Echo $(W:M) ;        # (member)
 
 Echo $(Z:E=val) ;    # val
 
