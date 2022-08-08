@@ -479,6 +479,8 @@ Global and local variables are bound within the rule statement, but local variab
 
 Rule definitions have access to the special statement `return <list> ;`. When this statement is evaluated, the rule immediately stops and the value is the result of the rule evaluation. Passing more than one argument to `return` is an error. A single argument that is a list is valid.
 
+**NOTE:** Rules are defined in the _global scope_, even if they are not defined in a top-level block. You may have multiple definitions of a rule in the source code contained by conditional statements, but only one definition can be evaluated. Overwriting a rule definition is an error.
+
 ```text
 return 1 2 3 ;      # ok
 return 1 : 2 : 3 ;  # error
@@ -487,8 +489,10 @@ return 1 : 2 : 3 ;  # error
 ### Invoking rules
 Rules are invoked with the form:
 ```text
-<identifier> [<list> [: <list>]*] ;
+<word> [<list> [: <list>]*] ;
 ```
+
+The `word` should evaluate to an identifier representing a previously-defined rule.
 
 Any arguments not passed to the rule default to the empty list. Additional arguments past what the rule accepts are ignored.
 
@@ -502,6 +506,9 @@ Echo2 a b : 1 2 ; # a b 1 2
 Echo2 a b ;       # a b
 Echo2 ;           #
 Echo2 a : b : c ; # a b
+
+X = Echo2 ;
+$(X) a b ; # a b
 ```
 
 ### Built-in rules
@@ -556,6 +563,8 @@ actions <modifiers> <identifier> {
 - `$(<variable-expression>)`: Targets, sources, and variables specified by the `bind` modifier are [bound](#target-binding). The whitespace-delimited portion containing the variable expression is then evaluated as a leaf.
 - `\$`: Escapes the `$` character and prevents it from being interpreted as a variable expression.
 - `\}`: Escapes the `}` character and prevents it from being interpreted as the end of the shell input.
+
+**NOTE:** Actions are defined globally like [rules](#defining-rules), and must also be defined exactly once. See rule definitions for more.
 
 ### Invoking actions
 Actions are invoked just like rules, and can in fact have the same name as a rule. If an action and rule have the same name, the rule is evaluated first, and then the action is invoked.
