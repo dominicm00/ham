@@ -32,7 +32,7 @@ struct grouping_chars;
 // Strings
 template<typename Quote, typename Escape, typename Nested>
 struct quote;
-struct literal;
+struct words;
 struct quoted_single;
 struct quoted_double;
 
@@ -73,7 +73,7 @@ struct integer : p::plus<p::digit> {};
 
 /** Words **/
 struct variable;
-struct word;
+struct leaf;
 
 // Characters
 struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
@@ -82,7 +82,7 @@ struct string_char : p::sor<p::print, p::space> {};
 
 // A literal is a series of printable characters. Cancel if at a special
 // character or whitespace.
-struct hidden::literal
+struct hidden::words
 	: p::plus<
 		  p::not_at<p::sor<hidden::special_chars, p::space, p::eolf>>,
 		  string_char> {};
@@ -149,8 +149,11 @@ struct subscript : hidden::maybe_tokens<
 					   p::one<']'>> {};
 
 /**
- * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":" PathSelectors ]
+ * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":"
+ * VariableModifiers ]
  * ")"
+ *
+ * TODO: variable modifiers
  */
 struct variable : p::if_must<
 					  p::one<'$'>,
@@ -165,16 +168,16 @@ struct evaluable_num : p::sor<variable, integer> {};
 /**
  * Word: (Single-quoted string|Double-quoted string|Variable|Literal)+
  */
-struct word : p::plus<p::sor<
+struct leaf : p::plus<p::sor<
 				  hidden::quoted_single,
 				  hidden::quoted_double,
 				  variable,
-				  hidden::literal>> {};
+				  hidden::words>> {};
 
 /**
  * List: Word[ Word]*
  */
-struct list : p::list<word, hidden::whitespace> {};
+struct list : p::list<leaf, hidden::whitespace> {};
 
 /**
  * RuleInvocation: Identifier[ List[ ":" List]*]
@@ -220,7 +223,7 @@ using selector = p::parse_tree::selector<
 		evaluable_num,
 		subscript,
 		variable,
-		word,
+		leaf,
 		rule_invocation,
 		statement>,
 	p::parse_tree::remove_content::on<statements, list>,
