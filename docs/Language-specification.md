@@ -599,12 +599,16 @@ A statement may be run under the influence of target specific variables with the
 on <target> <statement>
 ```
 
+The `return` statement may be used within a target statement to return a value.
+
 **Examples:**
 ```text
 X on target = 1 2 3 ;
 
 on target for var in $(X) { Echo $(var) ; } # 1\n 2\n 3\n
 on target Echo $(X) ; # 1 2 3
+Y = [ on target return $(X[2]) ] ;
+Echo $(Y) ; # 2
 ```
 
 ## Dependencies
