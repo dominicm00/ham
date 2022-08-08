@@ -5,6 +5,7 @@ add_executable(
 
   parse/Identifiers.cpp
   parse/Leafs.cpp
+  parse/Lists.cpp
   parse/Variables.cpp
   )
 
