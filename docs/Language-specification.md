@@ -14,6 +14,10 @@
   - [Bracket expressions](#bracket-expressions)
   - [Leaf expansion](#leaf-expansion)
   - [Observations](#observations)
+- [Targets](#targets)
+  - [Target binding](#target-binding)
+    - [Source target binding](#source-target-binding)
+    - [Generated target binding](#generated-target-binding)
 - [Lists](#lists)
 - [Variables](#variables)
   - [Variable expressions](#variable-expressions)
@@ -40,6 +44,7 @@
   - [Direct dependencies](#direct-dependencies)
   - [Sibling dependencies](#sibling-dependencies)
   - [Order dependencies](#order-dependencies)
+  - [Source dependencies](#source-dependencies)
   - [Header dependencies](#header-dependencies)
   - [Pseudotargets](#pseudotargets)
 
