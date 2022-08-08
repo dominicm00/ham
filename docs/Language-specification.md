@@ -207,6 +207,32 @@ $(myroot)/path/'Big Directory'/file
 - Only double quotes can describe a `'` character.
 - Expansions are exponential based on the number of variable expressions; be careful.
 
+## Targets
+A target is a string consisting of (in order):
+- An optional grist surrounded by `<>` brackets
+- A relative or absolute filepath valid _on the running system_
+
+Built-in rules that act on targets compare equality with the target's string representation.
+
+**NOTE:** Ham is considering methods for better cross-platform file paths, but it is currently the user's responsibility. Using paths invalid on the running system is **undefined behavior**, and may or may not work with or without a warning.
+
+See [actions](#actions) for how targets are bound in commands.
+
+**Examples:**
+```
+relative/path.cpp
+
+# Absolute path for Unix
+/my/absolute/path.cpp
+
+# Absolute path for Windows
+C:\\another\absolute\path.cpp
+
+# These two are different targets to Ham
+nodir.cpp
+<grist>nodir.cpp
+```
+
 ## Lists
 Lists contain 0 or more leafs. A list literal is a whitespace delimited list of leafs.
 
