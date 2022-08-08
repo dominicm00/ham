@@ -7,12 +7,12 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<word>;
+const auto parse = genericParse<leaf>;
 
 /*
- * Literals
+ * Words
  */
-TEST_CASE("Identifiers are literals", "[grammar]")
+TEST_CASE("Identifiers are words", "[grammar]")
 {
 	auto str = GENERATE(
 		"Id",
@@ -26,7 +26,7 @@ TEST_CASE("Identifiers are literals", "[grammar]")
 	REQUIRE(parse(str));
 }
 
-TEST_CASE("Symbols are allowed in literals", "[grammar]")
+TEST_CASE("Symbols are allowed in words", "[grammar]")
 {
 	auto str = GENERATE(
 		"id-with-dash",
@@ -56,7 +56,7 @@ TEST_CASE("Unclosed variables are not allowed", "[grammar]")
 	REQUIRE_THROWS(parse(str));
 }
 
-TEST_CASE("Unquoted whitespace is not allowed in literals", "[grammar]")
+TEST_CASE("Unquoted whitespace is not allowed in words", "[grammar]")
 {
 	auto str = GENERATE(
 		"id with space",
@@ -69,11 +69,11 @@ TEST_CASE("Unquoted whitespace is not allowed in literals", "[grammar]")
 	REQUIRE_FALSE(parse(str));
 }
 
-TEST_CASE("Escape sequences are literals in literals", "[grammar]")
+TEST_CASE("Escape sequences are literalss in words", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\\n\\t",
-		T<word>(
+		T<leaf>(
 			{T<string_char>("\\"),
 			 T<string_char>("n"),
 			 T<string_char>("\\"),
@@ -97,7 +97,7 @@ TEST_CASE("Escape sequences are literals in single quoted string", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"'\\n\\t'",
-		T<word>(
+		T<leaf>(
 			{T<string_char>("\\"),
 			 T<string_char>("n"),
 			 T<string_char>("\\"),
@@ -110,7 +110,7 @@ TEST_CASE("Escape sequences are parsed in double quoted string", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"\\n\\tx\\a\\b\"",
-		T<word>(
+		T<leaf>(
 			{T<special_escape>("n"),
 			 T<special_escape>("t"),
 			 T<string_char>("x"),
@@ -124,11 +124,11 @@ TEST_CASE("Quotes can be escaped in quoted strings", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"'\\'\\\"'",
-		T<word>({T<char_escape>("'"), T<char_escape>("\"")})
+		T<leaf>({T<char_escape>("'"), T<char_escape>("\"")})
 	);
 	REQUIRE_PARSE(
 		"\"\\'\\\"\"",
-		T<word>({T<char_escape>("'"), T<char_escape>("\"")})
+		T<leaf>({T<char_escape>("'"), T<char_escape>("\"")})
 	);
 }
 
@@ -136,7 +136,7 @@ TEST_CASE("Single quotes can be unescaped in double quotes", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"a'b\"",
-		T<word>({T<string_char>("a"), T<string_char>("'"), T<string_char>("b")})
+		T<leaf>({T<string_char>("a"), T<string_char>("'"), T<string_char>("b")})
 	);
 }
 
@@ -144,19 +144,19 @@ TEST_CASE("Double quotes can be unescaped in single quotes", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"'a\"b'",
-		T<word>({T<string_char>("a"), T<string_char>("\""), T<string_char>("b")}
+		T<leaf>({T<string_char>("a"), T<string_char>("\""), T<string_char>("b")}
 		)
 	);
 }
 
 /**
- * Complex words
+ * Complex leafs
  */
-TEST_CASE("Different types of words can be combined", "[grammar]")
+TEST_CASE("Different types of leafs can be combined", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a'b c'd\"\\n\"",
-		T<word>(
+		T<leaf>(
 			{T<string_char>("a"),
 			 T<string_char>("b"),
 			 T<string_char>(" "),
@@ -167,17 +167,17 @@ TEST_CASE("Different types of words can be combined", "[grammar]")
 	);
 }
 
-TEST_CASE("Complex words reject token whitespace", "[grammar]")
+TEST_CASE("Complex leafs reject word whitespace", "[grammar]")
 {
 	auto str = GENERATE("a'b c'd e", "\"a b c\" d");
 	REQUIRE_FALSE(parse(str));
 }
 
-TEST_CASE("Literals nest variables", "[grammar]")
+TEST_CASE("Words nest variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a$(b)",
-		T<word>({T<string_char>("a"), T<variable>({T<identifier>("b")})})
+		T<leaf>({T<string_char>("a"), T<variable>({T<identifier>("b")})})
 	);
 }
 
@@ -185,7 +185,7 @@ TEST_CASE("Double quotes nest variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"a$(b)\"",
-		T<word>({T<string_char>("a"), T<variable>({T<identifier>("b")})})
+		T<leaf>({T<string_char>("a"), T<variable>({T<identifier>("b")})})
 	);
 }
 
@@ -193,7 +193,7 @@ TEST_CASE("Single quotes don't nest variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"'a$(b)'",
-		T<word>(
+		T<leaf>(
 			{T<string_char>("a"),
 			 T<string_char>("$"),
 			 T<string_char>("("),

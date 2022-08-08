@@ -34,7 +34,6 @@ TEST_CASE("Invalid symbols in identifiers", "[grammar]")
 		"!",
 		"@",
 		"#",
-		"$",
 		"%",
 		"^",
 		"&",
@@ -62,6 +61,14 @@ TEST_CASE("Invalid whitespace in identifiers", "[grammar]")
 		"id \t mixed \n up \f whitespace"
 	);
 	REQUIRE_FALSE(parse(id));
+}
+
+TEST_CASE("Variables in identifiers", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"a$(b)",
+		T<identifier>({T<id_char>("a"), T<variable>("$(b)")})
+	);
 }
 
 } // namespace ham::tests

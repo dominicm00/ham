@@ -59,7 +59,27 @@ Statements are a series of [rule invocations](#invoking-rules), [action invocati
 ## Identifiers
 Identifiers are the names of rules, actions, and variables. Identifiers may consist of the characters `a-z A-Z 0-9 _ - / \`
 
+Identifiers can be determined dynamically with embedded variable expressions, but each variable expression must evaluate to exactly one element, and the resulting identifier must have only the characters specified above.
+
 Ham identifiers are case sensitive.
+
+**Examples:**
+```text
+X = target ;
+A on $(X)1 = hello
+B on $(X)2 = world
+
+on target1 Echo $(A) ; # hello
+on target2 Echo $(B) ; # world
+
+# with great power comes great responsibility...
+RulePrefix = rule ;
+rule $(RulePrefix)_echox {
+  Echo "X: $(1)" ;
+}
+
+rule_echox abc ; # X: abc
+```
 
 ## Leafs
 Leafs are the core data structure in Ham, and consist of everything that can be evaluated to a string list (even a string list of size 0 or 1). A leaf literal is comprised of one or more string forms, [variables](#variables), or [bracket expressions](#bracket-expressions) not separated by whitespace. There are three string forms:
@@ -280,7 +300,7 @@ Variables names are identifiers. Variables hold lists. Variables are either glob
 ### Variable expressions
 Data inside variables must be accessed via variable expressions. Evaluating a variable expression always results in a list, even if the list contains 0 or 1 element. Variables are evaluated with the following form: 
 ```text
-$( <identifier|variable>[subscript][modifiers] )
+$( <identifier>[subscript][modifiers] )
 ```
 
 #### Variable identifier
@@ -290,18 +310,20 @@ X = 123 ;
 Echo $(X) ; # 123
 ```
 
-Alternatively, the identifier can be determined dynamically with another variable expression:
+Alternatively, the identifier can be determined dynamically with any leaf expression:
 ```text
 X = 123 ;
+XZ = 456 ;
 Y = X ;
 Echo $(Y) ; # X
 Echo $($(Y)) ; # 123
+Echo $($(Y)Z) ; # 456
 ```
 
 This can be nested arbitrarily.
 
 #### Variable subscripts
-A subscript is of the form `[<leaf>]` (literal `[]`, not optional), where the leaf evaluates to one of the following:
+A subscript is of the form `[<identifier>]` (literal `[]`, not optional), where the identifier evaluates to one of the following:
 - `<integer>`
 - `<integer>-`
 - `<integer>-<integer>`

@@ -19,15 +19,18 @@ struct NodeStructure {
 	NodeStructure(
 		std::string type,
 		std::string content = {},
-		std::vector<NodeStructure> children = {}
+		std::vector<NodeStructure> children = {},
+		bool leaf = false
 	)
 		: type(type),
 		  content(content),
-		  children(children){};
+		  children(children),
+		  leaf(leaf){};
 
 	std::string type;
 	std::string content;
 	std::vector<NodeStructure> children;
+	bool leaf;
 };
 
 template<typename Rule>
@@ -61,16 +64,30 @@ checkParse(std::unique_ptr<p::parse_tree::node>&& node, NodeStructure ns);
 
 template<typename Type>
 NodeStructure
-T(std::string content = {}, std::vector<NodeStructure> children = {})
+T(std::string content = {})
 {
-	return NodeStructure(strip(p::demangle<Type>()), content, children);
+	return NodeStructure(strip(p::demangle<Type>()), content, {}, true);
+}
+
+template<typename Type>
+NodeStructure
+T(std::string content, std::vector<NodeStructure> children)
+{
+	return NodeStructure(strip(p::demangle<Type>()), content, children, false);
+}
+
+template<typename Type>
+NodeStructure
+T(std::string content, bool leaf)
+{
+	return NodeStructure(strip(p::demangle<Type>()), content, {}, leaf);
 }
 
 template<typename Type>
 NodeStructure
 T(std::vector<NodeStructure> children)
 {
-	return NodeStructure(strip(p::demangle<Type>()), "", children);
+	return NodeStructure(strip(p::demangle<Type>()), "", children, false);
 }
 
 } // namespace ham::tests

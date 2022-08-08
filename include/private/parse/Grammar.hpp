@@ -27,12 +27,12 @@ namespace hidden
 {
 // General
 struct special_chars;
-struct grouping_chars;
+struct id_chars;
 
 // Strings
 template<typename Quote, typename Escape, typename Nested>
 struct quote;
-struct words;
+struct word;
 struct quoted_single;
 struct quoted_double;
 
@@ -60,19 +60,17 @@ struct rule_separator;
 struct hidden::special_chars : p::one<'$', '\'', '"', '|', ':'> {};
 
 /**
- * Identifiers: [a-zA-Z0-9/\\_-]
+ * Identifier characters: [a-zA-Z0-9/\\_-]
+ *
+ * Identifiers are composed of id characters with embedded variable expressions.
  *
  * TODO: Support Unicode identifiers?
  */
-struct identifier : p::plus<p::sor<p::alnum, p::one<'/', '\\', '_', '-'>>> {};
-
-/**
- * Integer: [0-9]+
- */
-struct integer : p::plus<p::digit> {};
-
-/** Words **/
 struct variable;
+struct id_char : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
+struct identifier : p::plus<p::sor<variable, id_char>> {};
+
+/** Leafs **/
 struct leaf;
 
 // Characters
@@ -80,9 +78,9 @@ struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
 struct char_escape : hidden::special_chars {};
 struct string_char : p::sor<p::print, p::space> {};
 
-// A literal is a series of printable characters. Cancel if at a special
+// A word is a series of printable characters. Cancel if at a special
 // character or whitespace.
-struct hidden::words
+struct hidden::word
 	: p::plus<
 		  p::not_at<p::sor<hidden::special_chars, p::space, p::eolf>>,
 		  string_char> {};
@@ -134,24 +132,14 @@ template<typename... Rules>
 struct hidden::maybe_tokens
 	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
 
-struct evaluable_num;
-
 /**
- * Subscript: "[" Number[ "-"[ Number]] "]"
+ * Subscript: "[" DynamicId "]"
  */
-struct end_subscript
-	: p::seq<p::one<'-'>, p::opt<p::opt<hidden::whitespace>, evaluable_num>> {};
-
-struct subscript : hidden::maybe_tokens<
-					   p::one<'['>,
-					   evaluable_num,
-					   p::opt<end_subscript>,
-					   p::one<']'>> {};
+struct subscript : hidden::maybe_tokens<p::one<'['>, identifier, p::one<']'>> {
+};
 
 /**
- * Variable: "$(" Variable|Identifier[ "[" Subscript "]" ][ ":"
- * VariableModifiers ]
- * ")"
+ * Variable: "$(" DynamicId[ "[" Subscript "]" ][ ":" VariableModifiers ] ")"
  *
  * TODO: variable modifiers
  */
@@ -159,28 +147,26 @@ struct variable : p::if_must<
 					  p::one<'$'>,
 					  hidden::maybe_tokens<
 						  p::one<'('>,
-						  p::sor<variable, identifier>,
+						  identifier,
 						  p::opt<subscript>,
 						  p::one<')'>>> {};
 
-struct evaluable_num : p::sor<variable, integer> {};
-
 /**
- * Word: (Single-quoted string|Double-quoted string|Variable|Literal)+
+ * Leaf: (Single-quoted string|Double-quoted string|Variable|Literal)+
  */
 struct leaf : p::plus<p::sor<
 				  hidden::quoted_single,
 				  hidden::quoted_double,
 				  variable,
-				  hidden::words>> {};
+				  hidden::word>> {};
 
 /**
- * List: Word[ Word]*
+ * List: Leaf[ Leaf]*
  */
 struct list : p::list<leaf, hidden::whitespace> {};
 
 /**
- * RuleInvocation: Identifier[ List[ ":" List]*]
+ * RuleInvocation: DynamicId[ List[ ":" List]*]
  */
 struct hidden::rule_separator
 	: p::seq<hidden::whitespace, p::one<':'>, hidden::whitespace> {};
@@ -215,19 +201,17 @@ template<typename Rule>
 using selector = p::parse_tree::selector<
 	Rule,
 	p::parse_tree::store_content::on<
+		id_char,
 		identifier,
-		integer,
 		special_escape,
 		char_escape,
 		string_char,
-		evaluable_num,
 		subscript,
 		variable,
 		leaf,
 		rule_invocation,
 		statement>,
-	p::parse_tree::remove_content::on<statements, list>,
-	p::parse_tree::fold_one::on<end_subscript>>;
+	p::parse_tree::remove_content::on<statements, list>>;
 
 } // namespace ham::parse
 

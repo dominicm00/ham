@@ -48,12 +48,21 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 				<< '{' << nodeString << '}';
 	if (nodeType != ns.type
 		|| (!ns.content.empty() && (nodeString != ns.content))
-		|| node->children.size() != ns.children.size()) {
-		infoMessage << " != " << ns.type << '[' << ns.children.size() << ']'
-					<< '{' << ns.content << '}';
+		|| (!ns.leaf && node->children.size() != ns.children.size())) {
+		infoMessage << " != " << ns.type << '[';
+
+		if (ns.leaf)
+			infoMessage << "?";
+		else
+			infoMessage << ns.children.size();
+
+		infoMessage << ']' << '{' << ns.content << '}';
 		isValid = false;
 	}
 	UNSCOPED_INFO(infoMessage.str());
+
+	if (ns.leaf)
+		return isValid;
 
 	for (int i = 0; i < std::min(node->children.size(), ns.children.size());
 		 i++) {

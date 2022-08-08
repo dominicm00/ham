@@ -41,17 +41,24 @@ TEST_CASE("Identifier is only child of simple variable", "[grammar]")
 	REQUIRE_PARSE("$(Variable)", T<variable>({T<identifier>("Variable")}));
 }
 
+TEST_CASE("Nested variables", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"$(a$(b))",
+		T<variable>({T<identifier>(
+			{T<id_char>("a"), T<variable>({T<identifier>("b")})}
+		)})
+	);
+}
+
 /*
  * Subscripts
  */
-const auto makeInt = [](std::string i)
-{ return T<evaluable_num>({T<integer>(i)}); };
-
 TEST_CASE("Single element subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3])",
-		T<variable>({T<identifier>("var"), T<subscript>({makeInt("3")})})
+		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3")})})
 	);
 }
 
@@ -59,10 +66,7 @@ TEST_CASE("Start-only range subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3-])",
-		T<variable>(
-			{T<identifier>("var"),
-			 T<subscript>({makeInt("3"), T<end_subscript>()})}
-		)
+		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3-")})})
 	);
 }
 
@@ -70,8 +74,7 @@ TEST_CASE("Range subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3-5])",
-		T<variable>(
-			{T<identifier>("var"), T<subscript>({makeInt("3"), makeInt("5")})}
+		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3-5")})}
 		)
 	);
 }
