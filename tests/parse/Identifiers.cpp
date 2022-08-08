@@ -24,13 +24,31 @@ TEST_CASE("Alphanumeric identifiers", "[grammar]")
 
 TEST_CASE("Valid symbols in identifiers", "[grammar]")
 {
-	auto id = GENERATE("!", "@", "#", "%", "-", "_", "/", "\\");
+	auto id = GENERATE("_", "_hi", "test_", "-dash-", "/", "\\");
 	REQUIRE(parse(id));
 }
 
 TEST_CASE("Invalid symbols in identifiers", "[grammar]")
 {
-	auto id = GENERATE("$", "'", "\"", "{}", "()", "[]", "<>");
+	auto id = GENERATE(
+		"!",
+		"@",
+		"#",
+		"$",
+		"%",
+		"^",
+		"&",
+		"*",
+		"|",
+		":",
+		";",
+		"'",
+		"\"",
+		"{}",
+		"()",
+		"[]",
+		"<>"
+	);
 	REQUIRE_FALSE(parse(id));
 }
 

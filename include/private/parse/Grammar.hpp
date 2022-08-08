@@ -54,31 +54,17 @@ struct rule_separator;
  * - :      - rule separators
  * - |      - N/A
  *
- * When unescaped, these characters may only be used in accordance with their
- * special meaning, if they have any. When escaped, they can be used in words.
- * They can never be used in identifiers.
- *
- * The following special characters are allowed in words (and possibly
- * expressions), but not identifiers:
- * - ( )
- * - [ ]
- * - { }
- * - < >
- *
- * In words, these characters may have special meaning at runtime, but do not
- * have meaning to the parser.
+ * When outside a quotation, these characters may only be used in accordance
+ * with their special meaning, if they have any.
  */
 struct hidden::special_chars : p::one<'$', '\'', '"', '|', ':'> {};
-struct hidden::grouping_chars : p::one<'(', ')', '{', '}', '[', ']', '<', '>'> {
-};
 
 /**
- * Identifiers are consecutive characters that are not whitespace or symbols
- * reserved by Ham.
+ * Identifiers: [a-zA-Z0-9/\\_-]
  *
  * TODO: Support Unicode identifiers?
  */
-struct identifier : p::identifier {};
+struct identifier : p::plus<p::sor<p::alnum, p::one<'/', '\\', '_', '-'>>> {};
 
 /**
  * Integer: [0-9]+

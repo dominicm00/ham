@@ -57,7 +57,7 @@ Comments start with `#` and continue until the end of the line.
 Statements are a series of [rule invocations](#invoking-rules), [action invocations](#invoking-actions), [variable assignments](#variable-assignment), [control structures](#control-structures), or [target statements](#target-statements).
 
 ## Identifiers
-Identifiers are the names of rules, actions, and variables. Ham uses the same identifier scheme as C. The first character must be a non-digit of the form `a-z A-Z _`, and the remaining characters must be of the form `a-z A-Z _ 0-9`.
+Identifiers are the names of rules, actions, and variables. Identifiers may consist of the characters `a-z A-Z 0-9 _ - / \`
 
 Ham identifiers are case sensitive.
 
