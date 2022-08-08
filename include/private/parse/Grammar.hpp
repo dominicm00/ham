@@ -70,6 +70,8 @@ struct variable;
 struct id_char : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
 struct identifier : p::plus<p::sor<variable, id_char>> {};
 
+struct hidden::whitespace : p::plus<p::space> {};
+
 /** Leafs **/
 struct leaf;
 
@@ -115,31 +117,26 @@ struct hidden::quoted_double
 		  p::if_must<p::at<p::one<'$'>>, variable>> {};
 
 /**
- * Whitespace: space+
- */
-struct hidden::whitespace : p::plus<p::space> {};
-
-/**
- * Tokens: Separate each rule with Whitespace
+ * Separate each rule with whitespace
  */
 template<typename... Rules>
 struct hidden::tokens : p::separated_seq<hidden::whitespace, Rules...> {};
 
 /**
- * MaybeTokens: Optionally separate each rule with Whitespace
+ * Optionally separate each rule with Whitespace
  */
 template<typename... Rules>
 struct hidden::maybe_tokens
 	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
 
 /**
- * Subscript: "[" DynamicId "]"
+ * subscript: '[' <identifier> ']'
  */
 struct subscript : hidden::maybe_tokens<p::one<'['>, identifier, p::one<']'>> {
 };
 
 /**
- * Variable: "$(" DynamicId[ "[" Subscript "]" ][ ":" VariableModifiers ] ")"
+ * variable: $(<identifier>[<subscript>][<variable_modifiers>])
  *
  * TODO: variable modifiers
  */
@@ -152,7 +149,7 @@ struct variable : p::if_must<
 						  p::one<')'>>> {};
 
 /**
- * Leaf: (Single-quoted string|Double-quoted string|Variable|Literal)+
+ * leaf: (<single-quoted string>|<double-quoted string>|<variable>|<word>)+
  */
 struct leaf : p::plus<p::sor<
 				  hidden::quoted_single,
@@ -161,12 +158,12 @@ struct leaf : p::plus<p::sor<
 				  hidden::word>> {};
 
 /**
- * List: Leaf[ Leaf]*
+ * list: <leaf>[ <leaf>]*
  */
 struct list : p::list<leaf, hidden::whitespace> {};
 
 /**
- * RuleInvocation: DynamicId[ List[ ":" List]*]
+ * rule_invocation: <identifier>[ <list>[ : <list>]*]
  */
 struct hidden::rule_separator
 	: p::seq<hidden::whitespace, p::one<':'>, hidden::whitespace> {};
@@ -177,19 +174,15 @@ struct rule_invocation
 		  p::opt<hidden::whitespace, p::list<list, hidden::rule_separator>>> {};
 
 /**
- * Statement: return List ;|RuleInvocation ;
- *
- * TODO: Should end-of-line be enforced?
+ * statement: <rule_invocation>
  */
-struct statement
-	: p::sor<
-		  hidden::tokens<TAO_PEGTL_STRING("return"), list, p::one<';'>>,
-		  hidden::tokens<rule_invocation, p::one<';'>>> {};
+struct statement : rule_invocation {};
 
 /**
- * Statements: Statement[ Statement]*
+ * statements: <statement> ;[ <statement> ;]*
  */
-struct statements : p::list<statement, hidden::whitespace> {};
+struct statements
+	: p::list<hidden::tokens<statement, p::one<';'>>, hidden::whitespace> {};
 
 /**
  * Selectors
