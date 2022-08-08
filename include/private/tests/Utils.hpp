@@ -37,7 +37,7 @@ template<typename Rule>
 std::unique_ptr<p::parse_tree::node>
 genericParse(const std::string& str)
 {
-	auto input = p::memory_input{str, "tests"};
+	p::memory_input input{str, "tests"};
 	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::parse::selector>(
 		input
 	);

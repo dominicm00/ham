@@ -16,8 +16,11 @@ using NodePointer = std::unique_ptr<p::parse_tree::node>;
 NodePointer
 decompose(NodePointer&& node, std::vector<int> indices)
 {
+	if (!node)
+		return NodePointer{};
+
 	for (int i = 0; i < indices.size(); i++) {
-		if (node->children.empty())
+		if (!node || node->children.empty())
 			return NodePointer{};
 		node = std::move(node->children[indices[i]]);
 	}
@@ -38,6 +41,10 @@ strip(std::string_view type)
 bool
 checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 {
+	if (!node) {
+		UNSCOPED_INFO("Node is empty.");
+		return false;
+	}
 	std::string indent{"  ", depth};
 	std::string nodeType = strip(node->type);
 	std::string nodeString = node->has_content() ? node->string() : "";
