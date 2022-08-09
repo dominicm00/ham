@@ -4,6 +4,7 @@ add_executable(
   Utils.cpp
 
   parse/ActionDefinitions.cpp
+  parse/Conditions.cpp
   parse/Identifiers.cpp
   parse/Leafs.cpp
   parse/Lists.cpp

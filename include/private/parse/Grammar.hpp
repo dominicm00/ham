@@ -20,6 +20,9 @@
 
 namespace p = tao::pegtl;
 
+#define WITH_ERROR(errRule, errMessage, rule) \
+	p::if_then_else<errRule, TAO_PEGTL_RAISE_MESSAGE(errMessage), rule>
+
 namespace ham::parse
 {
 
@@ -239,6 +242,112 @@ struct action_definition : p::seq<
 
 							   p::must<p::one<'}'>>> {};
 
+/**
+ * Conditions
+ */
+struct condition;
+struct condition_leaf;
+struct leaf_comparator : p::sor<
+							 p::string<'<', '='>,
+							 p::string<'>', '='>,
+							 p::string<'!', '='>,
+							 p::string<'i', 'n'>,
+							 p::string<'='>,
+							 p::string<'<'>,
+							 p::string<'>'>> {};
+struct logical_and : p::string<'&', '&'> {};
+struct logical_or : p::string<'|', '|'> {};
+struct logical_not : p::one<'!'> {};
+
+struct bool_expression : p::seq<
+							 leaf,
+							 p::opt<p::if_must<
+								 p::seq<hidden::whitespace, leaf_comparator>,
+								 hidden::whitespace,
+								 leaf>>> {};
+
+struct condition_leaf : p::seq<
+							p::opt<logical_not, p::opt<hidden::whitespace>>,
+							p::sor<
+								p::if_must<
+									p::one<'('>,
+									p::opt<hidden::whitespace>,
+									condition,
+									p::opt<hidden::whitespace>,
+									p::one<')'>>,
+								bool_expression>> {};
+
+struct condition_conjunction
+	: p::seq<
+		  condition_leaf,
+		  p::opt<
+			  hidden::whitespace,
+			  WITH_ERROR(
+				  logical_or,
+				  "cannot have || in conjunction (&&) statement",
+				  logical_and
+			  ),
+			  hidden::whitespace,
+			  condition_conjunction>> {};
+
+struct condition_disjunction
+	: p::seq<
+		  condition_leaf,
+		  p::opt<
+			  hidden::whitespace,
+			  WITH_ERROR(
+				  logical_and,
+				  "cannot have && in disjunction (||) statement",
+				  logical_or
+			  ),
+			  hidden::whitespace,
+			  condition_disjunction>> {};
+
+struct condition
+	: p::seq<
+		  condition_leaf,
+		  p::opt<
+			  hidden::whitespace,
+			  p::sor<
+				  hidden::tokens<logical_and, condition_conjunction>,
+				  hidden::tokens<logical_or, condition_disjunction>>>> {};
+
+struct rearrange_unary_operator
+	: p::parse_tree::apply<rearrange_unary_operator> {
+	template<typename Node, typename... States>
+	static void transform(std::unique_ptr<Node>& n, States&&... st)
+	{
+		if (n->children.size() == 2) {
+			// Make operands child of operator if present
+			auto operand = std::move(n->children.back());
+			n = std::move(n->children[0]);
+			n->children.emplace_back(std::move(operand));
+		} else {
+			// Otherwise replace with first child
+			n = std::move(n->children[0]);
+		}
+	}
+};
+
+struct rearrange_binary_operator
+	: p::parse_tree::apply<rearrange_binary_operator> {
+	template<typename Node, typename... States>
+	static void transform(std::unique_ptr<Node>& n, States&&... st)
+	{
+		if (n->children.size() == 3) {
+			// Make operands child of operator if present
+			auto left = std::move(n->children.front());
+			auto right = std::move(n->children.back());
+			n = std::move(n->children[1]);
+			n->children.emplace_back(std::move(left));
+			n->children.emplace_back(std::move(right));
+		} else {
+			// Otherwise replace with first child
+			n = std::move(n->children[0]);
+		}
+	}
+};
+
 struct statement_block : p::list<
 							 p::sor<
 								 hidden::tokens<statement, p::one<';'>>,
@@ -267,13 +376,23 @@ using selector = p::parse_tree::selector<
 		rule_invocation,
 		rule_signature,
 		action_escape,
-		action_string>,
+		action_string,
+		leaf_comparator>,
 	p::parse_tree::remove_content::on<
 		statement_block,
 		list,
 		rule_separator,
 		rule_definition,
-		action_definition>>;
+		action_definition,
+		logical_and,
+		logical_or,
+		logical_not>,
+	rearrange_binary_operator::on<
+		condition,
+		condition_conjunction,
+		condition_disjunction,
+		bool_expression>,
+	rearrange_unary_operator::on<condition_leaf>>;
 
 } // namespace ham::parse
 
