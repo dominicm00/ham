@@ -6,8 +6,9 @@ add_executable(
   parse/Identifiers.cpp
   parse/Leafs.cpp
   parse/Lists.cpp
-  parse/Variables.cpp
   parse/RuleInvocations.cpp
+  parse/StatementBlocks.cpp
+  parse/Variables.cpp
   )
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)

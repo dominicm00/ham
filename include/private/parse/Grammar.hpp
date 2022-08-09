@@ -8,6 +8,7 @@
 #include "tao/pegtl/internal/pegtl_string.hpp"
 #include "tao/pegtl/nothing.hpp"
 #include "tao/pegtl/rules.hpp"
+#include "tao/pegtl/type_list.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -42,7 +43,6 @@ template<typename... Rules>
 struct tokens;
 template<typename... Rules>
 struct maybe_tokens;
-struct rule_separator;
 
 } // namespace hidden
 
@@ -52,12 +52,13 @@ struct rule_separator;
  * - '      - single quoted strings
  * - "      - double quoted strings
  * - :      - rule separators
+ * - ;      - statement separators
  * - |      - N/A
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct hidden::special_chars : p::one<'$', '\'', '"', '|', ':'> {};
+struct hidden::special_chars : p::one<'$', '\'', '"', ':', ';', '|'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -165,23 +166,24 @@ struct list : p::list<leaf, hidden::whitespace> {};
 /**
  * rule_invocation: <identifier>[ <list>[ : <list>]*]
  */
-struct hidden::rule_separator
-	: p::seq<hidden::whitespace, p::one<':'>, hidden::whitespace> {};
+struct rule_separator : p::one<':'> {};
 
 struct rule_invocation
 	: p::seq<
 		  identifier,
-		  p::opt<hidden::whitespace, p::list<list, hidden::rule_separator>>> {};
+		  p::opt<
+			  hidden::whitespace,
+			  p::list<p::sor<rule_separator, list>, hidden::whitespace>>> {};
 
 /**
  * statement: <rule_invocation>
  */
-struct statement : rule_invocation {};
+struct statement : p::sor<rule_invocation> {};
 
 /**
  * statements: <statement> ;[ <statement> ;]*
  */
-struct statements
+struct statement_block
 	: p::list<hidden::tokens<statement, p::one<';'>>, hidden::whitespace> {};
 
 /**
@@ -202,9 +204,8 @@ using selector = p::parse_tree::selector<
 		subscript,
 		variable,
 		leaf,
-		rule_invocation,
-		statement>,
-	p::parse_tree::remove_content::on<statements, list>>;
+		rule_invocation>,
+	p::parse_tree::remove_content::on<statement_block, list, rule_separator>>;
 
 } // namespace ham::parse
 

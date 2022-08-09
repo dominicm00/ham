@@ -48,7 +48,7 @@ TEST_CASE("Invalid symbols in identifiers", "[grammar]")
 		"[]",
 		"<>"
 	);
-	REQUIRE_FALSE(parse(id));
+	REQUIRE_THROWS(parse(id));
 }
 
 TEST_CASE("Invalid whitespace in identifiers", "[grammar]")
@@ -60,7 +60,7 @@ TEST_CASE("Invalid whitespace in identifiers", "[grammar]")
 		"id\nnewline",
 		"id \t mixed \n up \f whitespace"
 	);
-	REQUIRE_FALSE(parse(id));
+	REQUIRE_THROWS(parse(id));
 }
 
 TEST_CASE("Variables in identifiers", "[grammar]")

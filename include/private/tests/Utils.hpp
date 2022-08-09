@@ -38,9 +38,8 @@ std::unique_ptr<p::parse_tree::node>
 genericParse(const std::string& str)
 {
 	p::memory_input input{str, "tests"};
-	return p::parse_tree::parse<p::seq<Rule, p::eof>, ham::parse::selector>(
-		input
-	);
+	return p::parse_tree::
+		parse<p::must<p::seq<Rule, p::eof>>, ham::parse::selector>(input);
 };
 
 std::unique_ptr<p::parse_tree::node>

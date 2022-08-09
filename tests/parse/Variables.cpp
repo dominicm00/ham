@@ -15,18 +15,18 @@ const auto parse = genericParse<variable>;
 TEST_CASE("Variables are not identifiers", "[grammar]")
 {
 	auto id = GENERATE("Id", "Id1", "1id2", "UPPERCASE", "CamelCase");
-	REQUIRE_FALSE(parse(id));
+	REQUIRE_THROWS(parse(id));
 }
 
 TEST_CASE("Variable must be surrounded by '$()'", "[grammar]")
 {
 	auto str = GENERATE("missingbegin)", "(missingdollar)", "$(bad)suffix");
-	REQUIRE_FALSE(parse(str));
+	REQUIRE_THROWS(parse(str));
 }
 
 TEST_CASE("Unmatched variable sequence errors '$()'", "[grammar]")
 {
-	auto str = GENERATE("$(missingend", "$( missingend[3-4]");
+	auto str = GENERATE("$(missingend", "$( missingend[3-4]", "$onlystart");
 	REQUIRE_THROWS(parse(str));
 }
 

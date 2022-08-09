@@ -49,6 +49,13 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 	REQUIRE(parse(str));
 }
 
+TEST_CASE("Reserved symbols are not allowed in words", "[grammar]")
+{
+	auto str = GENERATE("$", "'", "\"", ":", ";", "|");
+	INFO(str);
+	REQUIRE_THROWS(parse(str));
+}
+
 TEST_CASE("Unclosed variables are not allowed", "[grammar]")
 {
 	auto str = GENERATE("$", "$(", "$(var[2-3]");
@@ -66,7 +73,7 @@ TEST_CASE("Unquoted whitespace is not allowed in words", "[grammar]")
 		"id \t mixed \n up \f whitespace"
 	);
 	INFO(str);
-	REQUIRE_FALSE(parse(str));
+	REQUIRE_THROWS(parse(str));
 }
 
 TEST_CASE("Escape sequences are literalss in words", "[grammar]")
@@ -82,7 +89,7 @@ TEST_CASE("Escape sequences are literalss in words", "[grammar]")
 	);
 }
 
-TEST_CASE("Strings cannot be empty", "[grammar]") { REQUIRE_FALSE(parse("")); }
+TEST_CASE("Strings cannot be empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
 /*
  * Quoted strings
@@ -170,7 +177,7 @@ TEST_CASE("Different types of leafs can be combined", "[grammar]")
 TEST_CASE("Complex leafs reject word whitespace", "[grammar]")
 {
 	auto str = GENERATE("a'b c'd e", "\"a b c\" d");
-	REQUIRE_FALSE(parse(str));
+	REQUIRE_THROWS(parse(str));
 }
 
 TEST_CASE("Words nest variables", "[grammar]")

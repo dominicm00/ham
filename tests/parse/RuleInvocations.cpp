@@ -11,12 +11,20 @@ const auto parse = genericParse<rule_invocation>;
 
 TEST_CASE("Rule invocation is non-empty", "[grammar]")
 {
-	REQUIRE_FALSE(parse(""));
+	REQUIRE_THROWS(parse(""));
+}
+
+TEST_CASE("Rule invocation doesn't consume trailing whitespace", "[grammar]")
+{
+	auto rule = GENERATE("Rule ", "Rule a ", "Rule a : b ", "Rule : ");
+	INFO(rule);
+	REQUIRE_THROWS(parse(rule));
 }
 
 TEST_CASE("Rule invocation, no argument", "[grammar]")
 {
-	auto rule = GENERATE("Rule", "dyn$(amic)", "with-symbols/");
+	std::string rule = GENERATE("Rule", "dyn$(amic)", "with-symbols/");
+	INFO(rule);
 	REQUIRE_PARSE(rule, T<rule_invocation>({T<identifier>(rule)}));
 }
 
@@ -42,6 +50,7 @@ TEST_CASE("Rule invocation, 2 arguments", "[grammar]")
 		T<rule_invocation>(
 			{T<identifier>("Rule"),
 			 T<list>({T<leaf>("a")}),
+			 T<rule_separator>(),
 			 T<list>({T<leaf>("b")})}
 		)
 	);
@@ -50,8 +59,33 @@ TEST_CASE("Rule invocation, 2 arguments", "[grammar]")
 		T<rule_invocation>(
 			{T<identifier>("Rule"),
 			 T<list>({T<leaf>("a"), T<leaf>("b"), T<leaf>("c")}),
+			 T<rule_separator>(),
 			 T<list>({T<leaf>("d"), T<leaf>("e"), T<leaf>("f")})}
 		)
+	);
+}
+
+TEST_CASE("Rule invocation, empty arguments", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"Rule : b",
+		T<rule_invocation>(
+			{T<identifier>("Rule"),
+			 T<rule_separator>(),
+			 T<list>({T<leaf>("b")})}
+		)
+	);
+	REQUIRE_PARSE(
+		"Rule a :",
+		T<rule_invocation>(
+			{T<identifier>("Rule"),
+			 T<list>({T<leaf>("a")}),
+			 T<rule_separator>()}
+		)
+	);
+	REQUIRE_PARSE(
+		"Rule :",
+		T<rule_invocation>({T<identifier>("Rule"), T<rule_separator>()})
 	);
 }
 

@@ -19,7 +19,7 @@ void
 Parser::Parse(std::string str, Debug debug)
 {
 	if (debug == GRAMMAR) {
-		p::print_debug<parse::statements>(std::cout);
+		p::print_debug<parse::statement_block>(std::cout);
 		return;
 	}
 
@@ -27,7 +27,7 @@ Parser::Parse(std::string str, Debug debug)
 	const auto parse = [&in]()
 	{
 		return p::parse_tree::
-			parse<p::must<parse::statements>, parse::selector>(in);
+			parse<p::must<parse::statement_block>, parse::selector>(in);
 	};
 
 	switch (debug) {
@@ -39,7 +39,7 @@ Parser::Parse(std::string str, Debug debug)
 			p::parse_tree::print_dot(std::cout, *parse());
 			break;
 		case TRACE:
-			p::standard_trace<p::must<parse::statements>>(in);
+			p::standard_trace<p::must<parse::statement_block>>(in);
 			break;
 	}
 
