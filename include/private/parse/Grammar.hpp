@@ -197,6 +197,9 @@ struct hidden::bracketed_block
 struct statement_block
 	: p::list<hidden::tokens<statement, p::one<';'>>, hidden::whitespace> {};
 
+/**
+ * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
+ */
 struct rule_signature : p::seq<
 							TAO_PEGTL_STRING("rule"),
 							hidden::whitespace,
@@ -212,6 +215,31 @@ struct rule_signature : p::seq<
 
 struct rule_definition
 	: hidden::tokens<rule_signature, hidden::bracketed_block> {};
+
+// action escape chars
+struct action_escape : p::one<'$', '}'> {};
+struct action_string : p::plus<p::not_one<'$', '}'>> {};
+struct action_definition : p::seq<
+							   // action(s)
+							   TAO_PEGTL_STRING("action"),
+							   p::opt<p::one<'s'>>,
+							   hidden::whitespace,
+
+							   identifier,
+							   hidden::whitespace,
+
+							   p::one<'{'>,
+							   p::opt<hidden::whitespace>,
+
+							   p::star<p::sor<
+								   // check escape sequence
+								   p::seq<p::one<'$'>, action_escape>,
+								   // otherwise $ must be a variable
+								   p::if_must<p::at<p::one<'$'>>, variable>,
+								   // otherwise capture the string
+								   action_string>>,
+
+							   p::must<p::one<'}'>>> {};
 
 /**
  * Selectors
@@ -232,9 +260,15 @@ using selector = p::parse_tree::selector<
 		variable,
 		leaf,
 		rule_invocation,
-		rule_signature>,
-	p::parse_tree::remove_content::
-		on<statement_block, list, rule_separator, rule_definition>>;
+		rule_signature,
+		action_escape,
+		action_string>,
+	p::parse_tree::remove_content::on<
+		statement_block,
+		list,
+		rule_separator,
+		rule_definition,
+		action_definition>>;
 
 } // namespace ham::parse
 
