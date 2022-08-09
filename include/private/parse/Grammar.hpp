@@ -192,12 +192,6 @@ struct hidden::bracketed_block
 		  hidden::tokens<p::one<'{'>, p::one<'}'>>> {};
 
 /**
- * statements: <statement> ;[ <statement> ;]*
- */
-struct statement_block
-	: p::list<hidden::tokens<statement, p::one<';'>>, hidden::whitespace> {};
-
-/**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
  */
 struct rule_signature : p::seq<
@@ -240,6 +234,13 @@ struct action_definition : p::seq<
 								   action_string>>,
 
 							   p::must<p::one<'}'>>> {};
+
+struct statement_block : p::list<
+							 p::sor<
+								 hidden::tokens<statement, p::one<';'>>,
+								 rule_definition,
+								 action_definition>,
+							 hidden::whitespace> {};
 
 /**
  * Selectors

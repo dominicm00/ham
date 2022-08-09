@@ -45,7 +45,7 @@ TEST_CASE("Statement block, 2 statements", "[grammar]")
 	);
 }
 
-TEST_CASE("Statements, 3 statements", "[grammar]")
+TEST_CASE("Statement block, 3 statements", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Rule a ; Echo b ; Do c : b ;",
@@ -53,6 +53,16 @@ TEST_CASE("Statements, 3 statements", "[grammar]")
 			{T<rule_invocation>("Rule a"),
 			 T<rule_invocation>("Echo b"),
 			 T<rule_invocation>("Do c : b")}
+		)
+	);
+}
+
+TEST_CASE("Statement block, definitions", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"actions Action { } Echo x ; rule Rule { }",
+		T<statement_block>(
+			{T<action_definition>(), T<rule_invocation>(), T<rule_definition>()}
 		)
 	);
 }
