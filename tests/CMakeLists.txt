@@ -6,7 +6,9 @@ add_executable(
   parse/Identifiers.cpp
   parse/Leafs.cpp
   parse/Lists.cpp
+  parse/RuleDefinitions.cpp
   parse/RuleInvocations.cpp
+  parse/RuleSignatures.cpp
   parse/StatementBlocks.cpp
   parse/Variables.cpp
   )

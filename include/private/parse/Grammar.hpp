@@ -44,6 +44,9 @@ struct tokens;
 template<typename... Rules>
 struct maybe_tokens;
 
+// Blocks
+struct bracketed_block;
+
 } // namespace hidden
 
 /**
@@ -53,12 +56,14 @@ struct maybe_tokens;
  * - "      - double quoted strings
  * - :      - rule separators
  * - ;      - statement separators
+ * - { }    - block delimiters
  * - |      - N/A
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct hidden::special_chars : p::one<'$', '\'', '"', ':', ';', '|'> {};
+struct hidden::special_chars : p::one<'$', '\'', '"', ':', ';', '|', '{', '}'> {
+};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -180,11 +185,33 @@ struct rule_invocation
  */
 struct statement : p::sor<rule_invocation> {};
 
+struct statement_block;
+struct hidden::bracketed_block
+	: p::sor<
+		  hidden::tokens<p::one<'{'>, p::opt<statement_block>, p::one<'}'>>,
+		  hidden::tokens<p::one<'{'>, p::one<'}'>>> {};
+
 /**
  * statements: <statement> ;[ <statement> ;]*
  */
 struct statement_block
 	: p::list<hidden::tokens<statement, p::one<';'>>, hidden::whitespace> {};
+
+struct rule_signature : p::seq<
+							TAO_PEGTL_STRING("rule"),
+							hidden::whitespace,
+							identifier,
+							p::opt<
+								hidden::whitespace,
+								p::list<
+									identifier,
+									p::seq<
+										hidden::whitespace,
+										p::one<':'>,
+										hidden::whitespace>>>> {};
+
+struct rule_definition
+	: hidden::tokens<rule_signature, hidden::bracketed_block> {};
 
 /**
  * Selectors
@@ -204,8 +231,10 @@ using selector = p::parse_tree::selector<
 		subscript,
 		variable,
 		leaf,
-		rule_invocation>,
-	p::parse_tree::remove_content::on<statement_block, list, rule_separator>>;
+		rule_invocation,
+		rule_signature>,
+	p::parse_tree::remove_content::
+		on<statement_block, list, rule_separator, rule_definition>>;
 
 } // namespace ham::parse
 

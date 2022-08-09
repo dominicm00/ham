@@ -35,7 +35,6 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 		"/slash",
 		"<grist>a/relative/path.cpp(member)",
 		"(paren)",
-		"b{rack}",
 		"[squ]are",
 		"!",
 		"@",
@@ -51,7 +50,7 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 
 TEST_CASE("Reserved symbols are not allowed in words", "[grammar]")
 {
-	auto str = GENERATE("$", "'", "\"", ":", ";", "|");
+	auto str = GENERATE("$", "'", "\"", ":", ";", "|", "{brack}");
 	INFO(str);
 	REQUIRE_THROWS(parse(str));
 }
