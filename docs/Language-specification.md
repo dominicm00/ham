@@ -583,8 +583,10 @@ actions <modifiers> <identifier> {
 
 `shell-input` is treated as a literal strings to be passed to the system's command shell, with the exception of the following special sequences:
 - `$(<variable-expression>)`: Targets, sources, and variables specified by the `bind` modifier are [bound](#target-binding). The whitespace-delimited portion containing the variable expression is then evaluated as a leaf.
-- `\$`: Escapes the `$` character and prevents it from being interpreted as a variable expression.
-- `\}`: Escapes the `}` character and prevents it from being interpreted as the end of the shell input.
+- `$$`: Escapes the `$` character and prevents it from being interpreted as a variable expression.
+- `$}`: Escapes the `}` character and prevents it from being interpreted as the end of the shell input.
+
+The strange escape sequence structure is so that it's natural to use paths, but also possible to type all literal sequences as quoting is not respected in actions.
 
 **NOTE:** Actions are defined globally like [rules](#defining-rules), and must also be defined exactly once. See rule definitions for more.
 
