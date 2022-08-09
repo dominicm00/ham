@@ -3,6 +3,8 @@
 ## Disclaimer
 Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for experimental/development purposes.
 
+This branch is an in-progress rewrite of the original Ham project. The rationale behind the rewrite is in [ADR #8](docs/development/decisions/0008-creating-a-version-2.md). The original code is in the `legacy` branch.
+
 ## Introduction
 Ham is a replacement for the [Jam build system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). Its primary goal is to replace [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), as Haiku's official build system. However, any idiomatic Jam project should also work with Ham.
 
