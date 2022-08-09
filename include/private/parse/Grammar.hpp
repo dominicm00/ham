@@ -83,7 +83,7 @@ struct leaf;
 
 // Characters
 struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
-struct char_escape : hidden::special_chars {};
+struct char_escape : p::one<'$', '\'', '"'> {};
 struct string_char : p::sor<p::print, p::space> {};
 
 // A word is a series of printable characters. Cancel if at a special
@@ -109,18 +109,22 @@ struct hidden::quote
 		  p::star<p::not_at<Quote>, p::sor<Escape, Nested, string_char>>,
 		  Quote> {};
 
-// Escape sequences are "optional" in single quotes. Single quotes ignore
-// variables.
+// Single quotes don't accept escapes or nested variables
 struct hidden::quoted_single
-	: hidden::
-		  quote<p::one<'\''>, p::seq<p::one<'\\'>, char_escape>, p::failure> {};
+	: hidden::quote<p::one<'\''>, p::failure, p::failure> {};
 
 // Escape sequences are mandatory in double quotes. Double quotes use variables.
 struct hidden::quoted_double
 	: hidden::quote<
 		  p::one<'"'>,
-		  p::if_must<p::one<'\\'>, p::sor<char_escape, special_escape>>,
-		  p::if_must<p::at<p::one<'$'>>, variable>> {};
+		  // if character after $ is not ( it must be a valid escape sequence
+		  p::seq<
+			  p::one<'$'>,
+			  p::if_must<
+				  p::at<p::not_one<'('>>,
+				  p::sor<char_escape, special_escape>>>,
+		  // if at $( it must be a variable
+		  p::if_must<p::at<p::string<'$', '('>>, variable>> {};
 
 /**
  * Separate each rule with whitespace

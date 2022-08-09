@@ -75,19 +75,6 @@ TEST_CASE("Unquoted whitespace is not allowed in words", "[grammar]")
 	REQUIRE_THROWS(parse(str));
 }
 
-TEST_CASE("Escape sequences are literalss in words", "[grammar]")
-{
-	REQUIRE_PARSE(
-		"\\n\\t",
-		T<leaf>(
-			{T<string_char>("\\"),
-			 T<string_char>("n"),
-			 T<string_char>("\\"),
-			 T<string_char>("t")}
-		)
-	);
-}
-
 TEST_CASE("Strings cannot be empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
 /*
@@ -102,12 +89,14 @@ TEST_CASE("Whitespace is allowed in quoted strings", "[grammar]")
 TEST_CASE("Escape sequences are literals in single quoted string", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"'\\n\\t'",
+		"'$n$t$\"'",
 		T<leaf>(
-			{T<string_char>("\\"),
+			{T<string_char>("$"),
 			 T<string_char>("n"),
-			 T<string_char>("\\"),
-			 T<string_char>("t")}
+			 T<string_char>("$"),
+			 T<string_char>("t"),
+			 T<string_char>("$"),
+			 T<string_char>("\"")}
 		)
 	);
 }
@@ -115,7 +104,7 @@ TEST_CASE("Escape sequences are literals in single quoted string", "[grammar]")
 TEST_CASE("Escape sequences are parsed in double quoted string", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"\"\\n\\tx\\a\\b\"",
+		"\"$n$tx$a$b\"",
 		T<leaf>(
 			{T<special_escape>("n"),
 			 T<special_escape>("t"),
@@ -126,16 +115,17 @@ TEST_CASE("Escape sequences are parsed in double quoted string", "[grammar]")
 	);
 }
 
-TEST_CASE("Quotes can be escaped in quoted strings", "[grammar]")
+TEST_CASE("Quotes can be escaped in double quoted strings", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"'\\'\\\"'",
+		"\"$'$\"\"",
 		T<leaf>({T<char_escape>("'"), T<char_escape>("\"")})
 	);
-	REQUIRE_PARSE(
-		"\"\\'\\\"\"",
-		T<leaf>({T<char_escape>("'"), T<char_escape>("\"")})
-	);
+}
+
+TEST_CASE("Quotes cannot be escaped in single quoted strings", "[grammar]")
+{
+	REQUIRE_THROWS(parse("'$''"));
 }
 
 TEST_CASE("Single quotes can be unescaped in double quotes", "[grammar]")
@@ -155,13 +145,21 @@ TEST_CASE("Double quotes can be unescaped in single quotes", "[grammar]")
 	);
 }
 
+TEST_CASE("Escape sequences must be valid", "[grammar]")
+{
+	std::string escape = GENERATE(":", ";", "\\", "|");
+	INFO(escape);
+	std::string str = "\"$" + escape + "\"";
+	REQUIRE_THROWS(parse(str));
+}
+
 /**
  * Complex leafs
  */
 TEST_CASE("Different types of leafs can be combined", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"a'b c'd\"\\n\"",
+		"a'b c'd\"$n\"",
 		T<leaf>(
 			{T<string_char>("a"),
 			 T<string_char>("b"),

@@ -110,23 +110,24 @@ Double quoted strings recognize the following escape sequences:
 
 | Sequence | ASCII byte | Meaning         |
 |:---------|:-----------|-----------------|
-| `\a`     | `0x07`     | audible bell    |
-| `\b`     | `0x08`     | backspace       |
-| `\f`     | `0x0c`     | form feed       |
-| `\n`     | `0x0a`     | new line        |
-| `\r`     | `0x0d`     | carriage return |
-| `\t`     | `0x09`     | horizontal tab  |
-| `\v`     | `0x0b`     | vertical tab    |
-| `\'`     | `0x27`     | single quote    |
-| `\"`     | `0x22`     | double quote    |
-| `\\`     | `0x5c`     | backslash       |
-| `\$`     | `0x24`     | dollar sign     |
+| `$a`     | `0x07`     | audible bell    |
+| `$b`     | `0x08`     | backspace       |
+| `$f`     | `0x0c`     | form feed       |
+| `$n`     | `0x0a`     | new line        |
+| `$r`     | `0x0d`     | carriage return |
+| `$t`     | `0x09`     | horizontal tab  |
+| `$v`     | `0x0b`     | vertical tab    |
+| `$'`     | `0x27`     | single quote    |
+| `$"`     | `0x22`     | double quote    |
+| `$$`     | `0x5c`     | dollar sign     |
 
-A `\` followed by an invalid escape sequence is an error. Use `\\` for literal backslashes.
+The use of `$` for escape sequences is used to make writing paths easier, and introduce only a single special character. If the string does not contain `$`, it is taken literally.
 
-The `\'` escape sequence is permitted, but optional.
+A `$` followed by an invalid escape sequence is an error. Use `$$` for literal dollar signs.
 
-The `$` character indicates the start of a variable expression. Not having a valid variable expression after a `$` in a double quoted string is an error. The escape sequence `\$` can be used to insert `$` as a literal.
+The `$'` escape sequence is permitted, but optional.
+
+`$(` indicates the start of a variable expression. Not having a valid variable expression after a `$(` in a double quoted string is an error. The escape sequence `$$(` can be used to insert `$(` as a literal.
 
 Note that literal whitespace is allowed, and will be translated as-is.
 
@@ -135,11 +136,11 @@ The string will be terminated at the first non-escaped double quote. Not having 
 **Examples:**
 ```text
 "quoted string"
-"\a with \t escape \n sequences \t"
+"$a with $t escape $n sequences $t"
 "a $(valid) variable"
-"\$400.0"
+"$$400.0"
 "with 'single quotes' nested"
-"escaped \" quote"
+"escaped $" quote"
 
 "with
 literal whitespace"
@@ -148,7 +149,7 @@ literal whitespace"
 ```
 
 ### Single quoted strings
-Single quoted strings are character sequences of printable characters (ASCII 32-126), tab, newline, carriage return, vertical tab, and form feed, surrounded by non-escaped single quotes.
+Single quoted strings are character sequences of printable characters (ASCII 32-126), tab, newline, carriage return, vertical tab, and form feed, surrounded by single quotes.
 
 Single quoted strings *do not recognize escape sequences or variable expansions*.
 
@@ -164,7 +165,7 @@ The string will be terminated at the first single quote. Not having an end quote
 literal whitespace'
 
 # Escape sequences are not recognized so the below counts as having an unclosed quote.
-'\''    # NOT a valid single quoted string.
+'$''    # NOT a valid single quoted string.
 ```
 
 ### String combinations
