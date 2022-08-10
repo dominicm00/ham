@@ -328,6 +328,13 @@ struct if_statement : p::seq<
 struct while_loop
 	: tokens<TAO_PEGTL_STRING("while"), condition, bracketed_block> {};
 
+struct for_loop : tokens<
+					  TAO_PEGTL_STRING("for"),
+					  identifier,
+					  TAO_PEGTL_STRING("in"),
+					  leaf,
+					  bracketed_block> {};
+
 struct statement_block : p::list<
 							 p::sor<
 								 rule_definition,
@@ -368,6 +375,8 @@ using selector = p::parse_tree::selector<
 		action_definition,
 		empty_block,
 		if_statement,
+		while_loop,
+		for_loop,
 		logical_and,
 		logical_or,
 		logical_not>,
