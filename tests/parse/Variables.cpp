@@ -79,4 +79,55 @@ TEST_CASE("Range subscripts", "[grammar]")
 	);
 }
 
+/**
+ * Modifiers
+ */
+TEST_CASE("Variable modifier clause requires arguments", "[grammar]")
+{
+	REQUIRE_THROWS(parse("$(X:)"));
+}
+
+TEST_CASE("Variable selectors", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"$(X:GB)",
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_selector>("G"),
+			 T<variable_selector>("B")}
+		)
+	);
+
+	REQUIRE_PARSE(
+		"$(X:G)",
+		{T<variable>({T<identifier>("X"), T<variable_selector>("G")})}
+	);
+}
+
+TEST_CASE("Variable modifiers", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"$(X:G=<grist>)",
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_replacer>(
+				 {T<variable_selector>("G"), T<leaf>("<grist>")}
+			 )}
+		)
+	);
+}
+
+TEST_CASE("Mixed modifiers", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"$(X:GB=a:D)",
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_selector>("G"),
+			 T<variable_replacer>({T<variable_selector>("B"), T<leaf>("a")}),
+			 T<variable_selector>("D")}
+		)
+	);
+}
+
 } // namespace ham::tests

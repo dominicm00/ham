@@ -119,6 +119,20 @@ struct maybe_tokens : p::separated_seq<p::opt<whitespace>, Rules...> {};
 struct subscript : maybe_tokens<p::one<'['>, identifier, p::one<']'>> {};
 
 /**
+ * variable_modifiers: (:<selectors*><replacer?>)*
+ */
+struct variable_selector : p::alpha {};
+struct variable_replacer
+	: p::seq<variable_selector, p::if_must<p::one<'='>, leaf>> {};
+struct variable_mod_sequence
+	: p::seq<
+		  p::star<variable_selector, p::not_at<p::one<'='>>>,
+		  p::opt<variable_replacer>> {};
+struct variable_modifiers
+	: p::star<p::if_must<p::one<':'>, p::at<p::alpha>, variable_mod_sequence>> {
+};
+
+/**
  * variable: $(<identifier>[<subscript>][<variable_modifiers>])
  *
  * TODO: variable modifiers
@@ -129,6 +143,7 @@ struct variable : p::if_must<
 						  p::one<'('>,
 						  identifier,
 						  p::opt<subscript>,
+						  p::opt<variable_modifiers>,
 						  p::one<')'>>> {};
 
 /**
@@ -361,6 +376,8 @@ using selector = p::parse_tree::selector<
 		char_escape,
 		string_char,
 		subscript,
+		variable_selector,
+		variable_replacer,
 		variable,
 		leaf,
 		rule_invocation,
