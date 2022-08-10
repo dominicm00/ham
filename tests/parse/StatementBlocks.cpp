@@ -1,6 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
+#include "tao/pegtl/contrib/trace.hpp"
+#include "tao/pegtl/string_input.hpp"
 #include "tests/Utils.hpp"
 
 namespace ham::tests
@@ -63,6 +65,19 @@ TEST_CASE("Statement block, definitions", "[grammar]")
 		"actions Action { } Echo x ; rule Rule { }",
 		T<statement_block>(
 			{T<action_definition>(), T<rule_invocation>(), T<rule_definition>()}
+		)
+	);
+}
+
+TEST_CASE("Statement block, if statement", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"Echo x ; if x { } else { } Echo again ;",
+		T<statement_block>(
+			{T<rule_invocation>("Echo x"),
+			 T<if_statement>({T<leaf>("x"), T<empty_block>(), T<empty_block>()}
+			 ),
+			 T<rule_invocation>("Echo again")}
 		)
 	);
 }

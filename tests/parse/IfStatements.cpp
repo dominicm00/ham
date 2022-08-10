@@ -55,4 +55,28 @@ TEST_CASE("If-else statement", "[grammar]")
 	);
 }
 
+TEST_CASE("If statements with empty blocks", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"if x { } else { }",
+		T<if_statement>({T<leaf>("x"), T<empty_block>(), T<empty_block>()})
+	);
+	REQUIRE_PARSE(
+		"if x { Rule ; } else { }",
+		T<if_statement>(
+			{T<leaf>("x"),
+			 T<statement_block>({T<rule_invocation>("Rule")}),
+			 T<empty_block>()}
+		)
+	);
+	REQUIRE_PARSE(
+		"if x { } else { Rule ; }",
+		T<if_statement>(
+			{T<leaf>("x"),
+			 T<empty_block>(),
+			 T<statement_block>({T<rule_invocation>("Rule")})}
+		)
+	);
+}
+
 } // namespace ham::tests

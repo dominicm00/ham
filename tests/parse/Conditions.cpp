@@ -11,6 +11,12 @@ const auto parse = genericParse<condition>;
 
 TEST_CASE("Condition is non-empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
+TEST_CASE("Leafs reduce to conditions", "[grammar]")
+{
+	std::string str = GENERATE("x", "$(x)", "'a string'");
+	REQUIRE_PARSE(str, T<leaf>(str));
+}
+
 /**
  * Comparators
  */

@@ -158,10 +158,11 @@ struct rule_invocation
 struct statement : p::sor<rule_invocation> {};
 
 struct statement_block;
+struct empty_block : p::success {};
 struct bracketed_block
 	: p::sor<
-		  tokens<p::one<'{'>, p::opt<statement_block>, p::one<'}'>>,
-		  tokens<p::one<'{'>, p::one<'}'>>> {};
+		  maybe_tokens<p::one<'{'>, statement_block, p::one<'}'>>,
+		  maybe_tokens<p::one<'{'>, empty_block, p::one<'}'>>> {};
 
 /**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
@@ -326,9 +327,10 @@ struct if_statement : p::seq<
 
 struct statement_block : p::list<
 							 p::sor<
-								 tokens<statement, p::one<';'>>,
 								 rule_definition,
-								 action_definition>,
+								 action_definition,
+								 if_statement,
+								 tokens<statement, p::one<';'>>>,
 							 whitespace> {};
 
 /**
@@ -360,6 +362,8 @@ using selector = p::parse_tree::selector<
 		rule_separator,
 		rule_definition,
 		action_definition,
+		empty_block,
+		if_statement,
 		logical_and,
 		logical_or,
 		logical_not>,
