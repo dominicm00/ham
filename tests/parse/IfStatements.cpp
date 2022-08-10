@@ -27,7 +27,7 @@ TEST_CASE("If statement requires block", "[grammar]")
 
 TEST_CASE("Else requires valid if statement", "[grammar]")
 {
-	auto stmt = GENERATE("else { }", "if else { }", "if a else { }");
+	auto stmt = GENERATE("else { }", "if { } else { }", "if a else { }");
 	INFO(stmt);
 	REQUIRE_THROWS(parse(stmt));
 }

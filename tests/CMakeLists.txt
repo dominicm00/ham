@@ -5,7 +5,9 @@ add_executable(
 
   parse/ActionDefinitions.cpp
   parse/Conditions.cpp
+  parse/ForLoops.cpp
   parse/Identifiers.cpp
+  parse/IfStatements.cpp
   parse/Leafs.cpp
   parse/Lists.cpp
   parse/RuleDefinitions.cpp
@@ -13,6 +15,7 @@ add_executable(
   parse/RuleSignatures.cpp
   parse/StatementBlocks.cpp
   parse/Variables.cpp
+  parse/WhileLoops.cpp
   )
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
