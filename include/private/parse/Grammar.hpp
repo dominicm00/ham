@@ -26,32 +26,6 @@ namespace p = tao::pegtl;
 namespace ham::parse
 {
 
-/* Helper rules excluded from the AST. */
-namespace hidden
-{
-// General
-struct special_chars;
-struct id_chars;
-
-// Strings
-template<typename Quote, typename Escape, typename Nested>
-struct quote;
-struct word;
-struct quoted_single;
-struct quoted_double;
-
-// Tokenization
-struct whitespace;
-template<typename... Rules>
-struct tokens;
-template<typename... Rules>
-struct maybe_tokens;
-
-// Blocks
-struct bracketed_block;
-
-} // namespace hidden
-
 /**
  * Ham reserves the following special characters:
  * - $      - variables
@@ -65,8 +39,7 @@ struct bracketed_block;
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct hidden::special_chars : p::one<'$', '\'', '"', ':', ';', '|', '{', '}'> {
-};
+struct special_chars : p::one<'$', '\'', '"', ':', ';', '|', '{', '}'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -79,7 +52,7 @@ struct variable;
 struct id_char : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
 struct identifier : p::plus<p::sor<variable, id_char>> {};
 
-struct hidden::whitespace : p::plus<p::space> {};
+struct whitespace : p::plus<p::space> {};
 
 /** Leafs **/
 struct leaf;
@@ -91,10 +64,9 @@ struct string_char : p::sor<p::print, p::space> {};
 
 // A word is a series of printable characters. Cancel if at a special
 // character or whitespace.
-struct hidden::word
-	: p::plus<
-		  p::not_at<p::sor<hidden::special_chars, p::space, p::eolf>>,
-		  string_char> {};
+struct word : p::plus<
+				  p::not_at<p::sor<special_chars, p::space, p::eolf>>,
+				  string_char> {};
 
 /**
  * A quoted string is surrounded by quotes, and consists of printable characters
@@ -106,19 +78,18 @@ struct hidden::word
  * characters (used for variables).
  */
 template<typename Quote, typename Escape, typename Nested>
-struct hidden::quote
+struct quote
 	: p::if_must<
 		  Quote,
 		  p::star<p::not_at<Quote>, p::sor<Escape, Nested, string_char>>,
 		  Quote> {};
 
 // Single quotes don't accept escapes or nested variables
-struct hidden::quoted_single
-	: hidden::quote<p::one<'\''>, p::failure, p::failure> {};
+struct quoted_single : quote<p::one<'\''>, p::failure, p::failure> {};
 
 // Escape sequences are mandatory in double quotes. Double quotes use variables.
-struct hidden::quoted_double
-	: hidden::quote<
+struct quoted_double
+	: quote<
 		  p::one<'"'>,
 		  // if character after $ is not ( it must be a valid escape sequence
 		  p::seq<
@@ -133,20 +104,18 @@ struct hidden::quoted_double
  * Separate each rule with whitespace
  */
 template<typename... Rules>
-struct hidden::tokens : p::separated_seq<hidden::whitespace, Rules...> {};
+struct tokens : p::separated_seq<whitespace, Rules...> {};
 
 /**
  * Optionally separate each rule with Whitespace
  */
 template<typename... Rules>
-struct hidden::maybe_tokens
-	: p::separated_seq<p::opt<hidden::whitespace>, Rules...> {};
+struct maybe_tokens : p::separated_seq<p::opt<whitespace>, Rules...> {};
 
 /**
  * subscript: '[' <identifier> ']'
  */
-struct subscript : hidden::maybe_tokens<p::one<'['>, identifier, p::one<']'>> {
-};
+struct subscript : maybe_tokens<p::one<'['>, identifier, p::one<']'>> {};
 
 /**
  * variable: $(<identifier>[<subscript>][<variable_modifiers>])
@@ -155,7 +124,7 @@ struct subscript : hidden::maybe_tokens<p::one<'['>, identifier, p::one<']'>> {
  */
 struct variable : p::if_must<
 					  p::one<'$'>,
-					  hidden::maybe_tokens<
+					  maybe_tokens<
 						  p::one<'('>,
 						  identifier,
 						  p::opt<subscript>,
@@ -164,16 +133,12 @@ struct variable : p::if_must<
 /**
  * leaf: (<single-quoted string>|<double-quoted string>|<variable>|<word>)+
  */
-struct leaf : p::plus<p::sor<
-				  hidden::quoted_single,
-				  hidden::quoted_double,
-				  variable,
-				  hidden::word>> {};
+struct leaf : p::plus<p::sor<quoted_single, quoted_double, variable, word>> {};
 
 /**
  * list: <leaf>[ <leaf>]*
  */
-struct list : p::list<leaf, hidden::whitespace> {};
+struct list : p::list<leaf, whitespace> {};
 
 /**
  * rule_invocation: <identifier>[ <list>[ : <list>]*]
@@ -184,8 +149,8 @@ struct rule_invocation
 	: p::seq<
 		  identifier,
 		  p::opt<
-			  hidden::whitespace,
-			  p::list<p::sor<rule_separator, list>, hidden::whitespace>>> {};
+			  whitespace,
+			  p::list<p::sor<rule_separator, list>, whitespace>>> {};
 
 /**
  * statement: <rule_invocation>
@@ -193,29 +158,26 @@ struct rule_invocation
 struct statement : p::sor<rule_invocation> {};
 
 struct statement_block;
-struct hidden::bracketed_block
+struct bracketed_block
 	: p::sor<
-		  hidden::tokens<p::one<'{'>, p::opt<statement_block>, p::one<'}'>>,
-		  hidden::tokens<p::one<'{'>, p::one<'}'>>> {};
+		  tokens<p::one<'{'>, p::opt<statement_block>, p::one<'}'>>,
+		  tokens<p::one<'{'>, p::one<'}'>>> {};
 
 /**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
  */
-struct rule_signature : p::seq<
-							TAO_PEGTL_STRING("rule"),
-							hidden::whitespace,
-							identifier,
-							p::opt<
-								hidden::whitespace,
-								p::list<
-									identifier,
-									p::seq<
-										hidden::whitespace,
-										p::one<':'>,
-										hidden::whitespace>>>> {};
+struct rule_signature
+	: p::seq<
+		  TAO_PEGTL_STRING("rule"),
+		  whitespace,
+		  identifier,
+		  p::opt<
+			  whitespace,
+			  p::list<
+				  identifier,
+				  p::seq<whitespace, p::one<':'>, whitespace>>>> {};
 
-struct rule_definition
-	: hidden::tokens<rule_signature, hidden::bracketed_block> {};
+struct rule_definition : tokens<rule_signature, bracketed_block> {};
 
 // action escape chars
 struct action_escape : p::one<'$', '}'> {};
@@ -224,13 +186,13 @@ struct action_definition : p::seq<
 							   // action(s)
 							   TAO_PEGTL_STRING("action"),
 							   p::opt<p::one<'s'>>,
-							   hidden::whitespace,
+							   whitespace,
 
 							   identifier,
-							   hidden::whitespace,
+							   whitespace,
 
 							   p::one<'{'>,
-							   p::opt<hidden::whitespace>,
+							   p::opt<whitespace>,
 
 							   p::star<p::sor<
 								   // check escape sequence
@@ -262,18 +224,18 @@ struct logical_not : p::one<'!'> {};
 struct bool_expression : p::seq<
 							 leaf,
 							 p::opt<p::if_must<
-								 p::seq<hidden::whitespace, leaf_comparator>,
-								 hidden::whitespace,
+								 p::seq<whitespace, leaf_comparator>,
+								 whitespace,
 								 leaf>>> {};
 
 struct condition_leaf : p::seq<
-							p::opt<logical_not, p::opt<hidden::whitespace>>,
+							p::opt<logical_not, p::opt<whitespace>>,
 							p::sor<
 								p::if_must<
 									p::one<'('>,
-									p::opt<hidden::whitespace>,
+									p::opt<whitespace>,
 									condition,
-									p::opt<hidden::whitespace>,
+									p::opt<whitespace>,
 									p::one<')'>>,
 								bool_expression>> {};
 
@@ -281,36 +243,35 @@ struct condition_conjunction
 	: p::seq<
 		  condition_leaf,
 		  p::opt<
-			  hidden::whitespace,
+			  whitespace,
 			  WITH_ERROR(
 				  logical_or,
 				  "cannot have || in conjunction (&&) statement",
 				  logical_and
 			  ),
-			  hidden::whitespace,
+			  whitespace,
 			  condition_conjunction>> {};
 
 struct condition_disjunction
 	: p::seq<
 		  condition_leaf,
 		  p::opt<
-			  hidden::whitespace,
+			  whitespace,
 			  WITH_ERROR(
 				  logical_and,
 				  "cannot have && in disjunction (||) statement",
 				  logical_or
 			  ),
-			  hidden::whitespace,
+			  whitespace,
 			  condition_disjunction>> {};
 
-struct condition
-	: p::seq<
-		  condition_leaf,
-		  p::opt<
-			  hidden::whitespace,
-			  p::sor<
-				  hidden::tokens<logical_and, condition_conjunction>,
-				  hidden::tokens<logical_or, condition_disjunction>>>> {};
+struct condition : p::seq<
+					   condition_leaf,
+					   p::opt<
+						   whitespace,
+						   p::sor<
+							   tokens<logical_and, condition_conjunction>,
+							   tokens<logical_or, condition_disjunction>>>> {};
 
 struct rearrange_unary_operator
 	: p::parse_tree::apply<rearrange_unary_operator> {
@@ -353,22 +314,22 @@ struct rearrange_binary_operator
  */
 struct if_statement : p::seq<
 						  TAO_PEGTL_STRING("if"),
-						  hidden::whitespace,
+						  whitespace,
 						  condition,
-						  hidden::whitespace,
-						  hidden::bracketed_block,
+						  whitespace,
+						  bracketed_block,
 						  p::opt<
-							  hidden::whitespace,
+							  whitespace,
 							  TAO_PEGTL_STRING("else"),
-							  hidden::whitespace,
-							  hidden::bracketed_block>> {};
+							  whitespace,
+							  bracketed_block>> {};
 
 struct statement_block : p::list<
 							 p::sor<
-								 hidden::tokens<statement, p::one<';'>>,
+								 tokens<statement, p::one<';'>>,
 								 rule_definition,
 								 action_definition>,
-							 hidden::whitespace> {};
+							 whitespace> {};
 
 /**
  * Selectors
