@@ -82,4 +82,16 @@ TEST_CASE("Statement block, if statement", "[grammar]")
 	);
 }
 
+TEST_CASE("Statement block, while loop", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"Echo x ; while x { } Echo again ;",
+		T<statement_block>(
+			{T<rule_invocation>("Echo x"),
+			 T<while_loop>({T<leaf>("x"), T<empty_block>()}),
+			 T<rule_invocation>("Echo again")}
+		)
+	);
+}
+
 } // namespace ham::tests

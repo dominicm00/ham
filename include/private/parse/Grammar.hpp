@@ -333,6 +333,7 @@ struct statement_block : p::list<
 								 rule_definition,
 								 action_definition,
 								 if_statement,
+								 while_loop,
 								 tokens<statement, p::one<';'>>>,
 							 whitespace> {};
 
