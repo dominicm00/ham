@@ -161,7 +161,7 @@ struct statement_block;
 struct empty_block : p::success {};
 struct bracketed_block
 	: p::sor<
-		  maybe_tokens<p::one<'{'>, statement_block, p::one<'}'>>,
+		  tokens<p::one<'{'>, statement_block, p::one<'}'>>,
 		  maybe_tokens<p::one<'{'>, empty_block, p::one<'}'>>> {};
 
 /**
@@ -230,13 +230,13 @@ struct bool_expression : p::seq<
 								 leaf>>> {};
 
 struct condition_leaf : p::seq<
-							p::opt<logical_not, p::opt<whitespace>>,
+							p::opt<logical_not, whitespace>,
 							p::sor<
 								p::if_must<
 									p::one<'('>,
-									p::opt<whitespace>,
+									whitespace,
 									condition,
-									p::opt<whitespace>,
+									whitespace,
 									p::one<')'>>,
 								bool_expression>> {};
 
