@@ -348,6 +348,21 @@ struct rearrange_binary_operator
 	}
 };
 
+/**
+ * Control flow
+ */
+struct if_statement : p::seq<
+						  TAO_PEGTL_STRING("if"),
+						  hidden::whitespace,
+						  condition,
+						  hidden::whitespace,
+						  hidden::bracketed_block,
+						  p::opt<
+							  hidden::whitespace,
+							  TAO_PEGTL_STRING("else"),
+							  hidden::whitespace,
+							  hidden::bracketed_block>> {};
+
 struct statement_block : p::list<
 							 p::sor<
 								 hidden::tokens<statement, p::one<';'>>,

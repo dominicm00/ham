@@ -9,6 +9,8 @@ namespace ham::tests
 using namespace ham::parse;
 const auto parse = genericParse<condition>;
 
+TEST_CASE("Condition is non-empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
+
 /**
  * Comparators
  */
