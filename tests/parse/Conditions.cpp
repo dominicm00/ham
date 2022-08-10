@@ -110,4 +110,30 @@ TEST_CASE("Grouping", "[grammar]")
 	);
 }
 
+/**
+ * Not expressions
+ */
+TEST_CASE("Not on leaf", "[grammar]")
+{
+	REQUIRE_PARSE("! a", T<logical_not>({T<leaf>("a")}));
+}
+
+TEST_CASE("Not on boolean expression", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"! a = b",
+		T<logical_not>({T<leaf_comparator>("=", {T<leaf>("a"), T<leaf>("b")})})
+	);
+}
+
+TEST_CASE("Not on condition", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"! ( a && b && c )",
+		T<logical_not>({T<logical_and>(
+			{T<leaf>("a"), T<logical_and>({T<leaf>("b"), T<leaf>("c")})}
+		)})
+	);
+}
+
 } // namespace ham::tests
