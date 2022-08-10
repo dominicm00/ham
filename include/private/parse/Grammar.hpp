@@ -325,6 +325,9 @@ struct if_statement : p::seq<
 							  whitespace,
 							  bracketed_block>> {};
 
+struct while_loop
+	: tokens<TAO_PEGTL_STRING("while"), condition, bracketed_block> {};
+
 struct statement_block : p::list<
 							 p::sor<
 								 rule_definition,
