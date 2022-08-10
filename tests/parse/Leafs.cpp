@@ -33,8 +33,7 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 		"id_underscore",
 		"\\bslash",
 		"/slash",
-		"<grist>a/relative/path.cpp(member)",
-		"(paren)",
+		"<grist>a/relative/path.cpp",
 		"[squ]are",
 		"!",
 		"@",
@@ -50,7 +49,7 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 
 TEST_CASE("Reserved symbols are not allowed in words", "[grammar]")
 {
-	auto str = GENERATE("$", "'", "\"", ":", ";", "|", "{brack}");
+	auto str = GENERATE("$", "'", "\"", ":", ";", "|", "{brack}", "(paren)");
 	INFO(str);
 	REQUIRE_THROWS(parse(str));
 }

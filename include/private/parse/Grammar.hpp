@@ -28,7 +28,7 @@ namespace ham::parse
 
 /**
  * Ham reserves the following special characters:
- * - $      - variables
+ * - $ ( )  - variables
  * - '      - single quoted strings
  * - "      - double quoted strings
  * - :      - rule separators
@@ -39,7 +39,8 @@ namespace ham::parse
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct special_chars : p::one<'$', '\'', '"', ':', ';', '|', '{', '}'> {};
+struct special_chars
+	: p::one<'$', '\'', '"', ':', ';', '|', '{', '}', '(', ')'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
