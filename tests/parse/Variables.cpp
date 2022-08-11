@@ -87,31 +87,60 @@ TEST_CASE("Variable modifier clause requires arguments", "[grammar]")
 	REQUIRE_THROWS(parse("$(X:)"));
 }
 
-TEST_CASE("Variable selectors", "[grammar]")
+TEST_CASE("Variable selectors, one", "[grammar]")
 {
-	REQUIRE_PARSE(
-		"$(X:GB)",
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_selector>("G"),
-			 T<variable_selector>("B")}
-		)
-	);
-
 	REQUIRE_PARSE(
 		"$(X:G)",
 		{T<variable>({T<identifier>("X"), T<variable_selector>("G")})}
 	);
 }
 
-TEST_CASE("Variable modifiers", "[grammar]")
+TEST_CASE("Variable selectors, two", "[grammar]")
 {
+	auto var = GENERATE("$(X:GB)", "$(X:G:B)");
 	REQUIRE_PARSE(
-		"$(X:G=<grist>)",
+		var,
 		T<variable>(
 			{T<identifier>("X"),
+			 T<variable_selector>("G"),
+			 T<variable_selector>("B")}
+		)
+	);
+}
+
+TEST_CASE("Variable selectors, three", "[grammar]")
+{
+	auto var = GENERATE("$(X:DBS)", "$(X:DB:S)", "$(X:D:BS)", "$(X:D:B:S)");
+	REQUIRE_PARSE(
+		var,
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_selector>("D"),
+			 T<variable_selector>("B"),
+			 T<variable_selector>("S")}
+		)
+	);
+}
+
+TEST_CASE("Variable replacers", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"$(X:G=grist)",
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_replacer>({T<variable_selector>("G"), T<leaf>("grist")}
+			 )}
+		)
+	);
+
+	REQUIRE_PARSE(
+		"$(X:G='a b':B=\"x \"y)",
+		T<variable>(
+			{T<identifier>("X"),
+			 T<variable_replacer>({T<variable_selector>("G"), T<leaf>("'a b'")}
+			 ),
 			 T<variable_replacer>(
-				 {T<variable_selector>("G"), T<leaf>("<grist>")}
+				 {T<variable_selector>("B"), T<leaf>("\"x \"y")}
 			 )}
 		)
 	);
