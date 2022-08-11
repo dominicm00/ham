@@ -35,13 +35,15 @@ namespace ham::parse
  * - ;      - statement separators
  * - { }    - block delimiters
  * - [ ]    - bracket expressions
+ * - #      - comments
  * - |      - N/A
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
 struct special_chars
-	: p::one<'$', '\'', '"', ':', ';', '|', '{', '}', '(', ')', '[', ']'> {};
+	: p::one<'$', '\'', '"', ':', ';', '{', '}', '(', ')', '[', ']', '#', '|'> {
+};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
