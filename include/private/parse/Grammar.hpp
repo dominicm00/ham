@@ -375,6 +375,8 @@ struct statement_block
 		  p::sor<definition, control_flow, target_statement, rule_statement>,
 		  whitespace> {};
 
+struct ham_grammar : p::seq<statement_block, p::eolf> {};
+
 /**
  * Selectors
  */

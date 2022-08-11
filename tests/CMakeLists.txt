@@ -7,6 +7,7 @@ add_executable(
   parse/BracketExpressions.cpp
   parse/Conditions.cpp
   parse/ForLoops.cpp
+  parse/GrammarAnalysis.cpp
   parse/Identifiers.cpp
   parse/IfStatements.cpp
   parse/Leafs.cpp
