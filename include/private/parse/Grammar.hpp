@@ -64,13 +64,11 @@ struct leaf;
 // Characters
 struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
 struct char_escape : p::one<'$', '\'', '"'> {};
-struct string_char : p::sor<p::print, p::space> {};
 
 // A word is a series of printable characters. Cancel if at a special
 // character or whitespace.
-struct word : p::plus<
-				  p::not_at<p::sor<special_chars, p::space, p::eolf>>,
-				  string_char> {};
+struct word
+	: p::plus<p::not_at<p::sor<special_chars, p::space, p::eolf>>, p::print> {};
 
 /**
  * A quoted string is surrounded by quotes, and consists of printable characters
@@ -81,17 +79,21 @@ struct word : p::plus<
  * Parts matching the Nested rule are processed after escapes, but before
  * characters (used for variables).
  */
-template<typename Quote, typename Escape, typename Nested>
-struct quote
-	: p::if_must<
-		  Quote,
-		  p::star<p::not_at<Quote>, p::sor<Escape, Nested, string_char>>,
-		  Quote> {};
+template<typename Quote, typename Escape, typename Nested, typename Char>
+struct quote : p::if_must<
+				   Quote,
+				   p::star<p::not_at<Quote>, p::sor<Escape, Nested, Char>>,
+				   Quote> {};
 
 // Single quotes don't accept escapes or nested variables
-struct quoted_single : quote<p::one<'\''>, p::failure, p::failure> {};
+struct quoted_single_content
+	: p::star<p::not_at<p::one<'\''>>, p::sor<p::print, p::space>> {};
+struct quoted_single
+	: p::seq<p::one<'\''>, quoted_single_content, p::one<'\''>> {};
 
 // Escape sequences are mandatory in double quotes. Double quotes use variables.
+// Double quotes are parsed character by character.
+struct quoted_char : p::sor<p::print, p::space> {};
 struct quoted_double
 	: quote<
 		  p::one<'"'>,
@@ -102,7 +104,8 @@ struct quoted_double
 				  p::at<p::not_one<'('>>,
 				  p::sor<char_escape, special_escape>>>,
 		  // if at $( it must be a variable
-		  p::if_must<p::at<p::string<'$', '('>>, variable>> {};
+		  p::if_must<p::at<p::string<'$', '('>>, variable>,
+		  quoted_char> {};
 
 /**
  * Separate each rule with whitespace
@@ -397,20 +400,23 @@ using selector = p::parse_tree::selector<
 		logical_and,
 		logical_not,
 		logical_or,
+		quoted_char,
+		quoted_double,
+		quoted_single_content,
 		rule_definition,
 		rule_invocation,
 		rule_separator,
 		rule_signature,
 		special_escape,
 		statement_block,
-		string_char,
 		subscript,
 		target_rule_invocation,
 		target_statement,
 		variable,
 		variable_replacer,
 		variable_selector,
-		while_loop>,
+		while_loop,
+		word>,
 	rearrange_binary_operator::on<
 		bool_expression,
 		condition_conjunction,
