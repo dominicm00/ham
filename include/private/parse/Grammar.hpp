@@ -168,11 +168,7 @@ struct rule_invocation
 			  whitespace,
 			  p::list<p::sor<rule_separator, list>, whitespace>>> {};
 
-/**
- * statement: <rule_invocation>
- */
-struct statement : p::sor<rule_invocation> {};
-
+struct statement;
 struct statement_block;
 struct empty_block : p::success {};
 struct bracketed_block
@@ -351,14 +347,17 @@ struct for_loop : tokens<
 					  leaf,
 					  bracketed_block> {};
 
-struct statement_block : p::list<
-							 p::sor<
-								 rule_definition,
-								 action_definition,
-								 if_statement,
-								 while_loop,
-								 tokens<statement, p::one<';'>>>,
-							 whitespace> {};
+struct definition : p::sor<rule_definition, action_definition> {};
+struct control_flow : p::sor<if_statement, while_loop, for_loop> {};
+struct rule_statement : tokens<rule_invocation, p::one<';'>> {};
+struct target_statement : tokens<
+							  TAO_PEGTL_STRING("on"),
+							  leaf,
+							  p::sor<control_flow, rule_statement>> {};
+struct statement_block
+	: p::list<
+		  p::sor<definition, control_flow, target_statement, rule_statement>,
+		  whitespace> {};
 
 /**
  * Selectors
@@ -395,6 +394,7 @@ using selector = p::parse_tree::selector<
 		if_statement,
 		while_loop,
 		for_loop,
+		target_statement,
 		logical_and,
 		logical_or,
 		logical_not>,

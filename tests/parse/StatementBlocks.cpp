@@ -94,4 +94,34 @@ TEST_CASE("Statement block, while loop", "[grammar]")
 	);
 }
 
+TEST_CASE("Statement block, for loop", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"Echo x ; for x in $(a) { } Echo again ;",
+		T<statement_block>(
+			{T<rule_invocation>("Echo x"),
+			 T<for_loop>(
+				 {T<identifier>("x"),
+				  T<leaf>({T<variable>("$(a)")}),
+				  T<empty_block>()}
+			 ),
+			 T<rule_invocation>("Echo again")}
+		)
+	);
+}
+
+TEST_CASE("Statement block, target statement", "[grammar]")
+{
+	REQUIRE_PARSE(
+		"Echo x ; on target Echo x ; Echo again ;",
+		T<statement_block>(
+			{T<rule_invocation>("Echo x"),
+			 T<target_statement>(
+				 {T<leaf>("target"), T<rule_invocation>("Echo x")}
+			 ),
+			 T<rule_invocation>("Echo again")}
+		)
+	);
+}
+
 } // namespace ham::tests

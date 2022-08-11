@@ -682,8 +682,10 @@ The `break ;` and `continue ;` statements may be used inside loops to exit the l
 ## Target statements
 A statement may be run under the influence of target specific variables with the following form:
 ```text
-on <target> <statement>
+on <target> <statement> ;
 ```
+
+The statement may be a rule invocation or control flow, but _not_ a definition.
 
 The `return` statement may be used within a target statement to return a value.
 
