@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<list>;
+const auto parse = genericParse<List>;
 
 TEST_CASE("Lists cannot be empty", "[grammar]")
 {
@@ -31,7 +31,7 @@ TEST_CASE("Lists, size 1", "[grammar]")
 		"\"conca ten\"ated",
 		"lots'of quoted white'\"space present\""
 	);
-	REQUIRE_PARSE(lst, T<list>({T<leaf>()}));
+	REQUIRE_PARSE(lst, T<List>({T<Leaf>()}));
 }
 
 TEST_CASE("Lists, size 2", "[grammar]")
@@ -42,7 +42,7 @@ TEST_CASE("Lists, size 2", "[grammar]")
 		"\"concaten\"ated forms",
 		"lots'of quoted white'\"space present\" word"
 	);
-	REQUIRE_PARSE(lst, T<list>({T<leaf>(), T<leaf>()}));
+	REQUIRE_PARSE(lst, T<List>({T<Leaf>(), T<Leaf>()}));
 }
 
 TEST_CASE("Lists, size 3", "[grammar]")
@@ -53,7 +53,7 @@ TEST_CASE("Lists, size 3", "[grammar]")
 		"\"concaten\"ated forms twice",
 		"'something' lots'of quoted white'\"space present\" word"
 	);
-	REQUIRE_PARSE(lst, T<list>({T<leaf>(), T<leaf>(), T<leaf>()}));
+	REQUIRE_PARSE(lst, T<List>({T<Leaf>(), T<Leaf>(), T<Leaf>()}));
 }
 
 } // namespace ham::tests

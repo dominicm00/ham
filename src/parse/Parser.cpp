@@ -19,16 +19,13 @@ void
 Parser::Parse(std::string str, Debug debug)
 {
 	if (debug == GRAMMAR) {
-		p::print_debug<parse::statement_block>(std::cout);
+		p::print_debug<parse::HamGrammar>(std::cout);
 		return;
 	}
 
 	auto in = p::string_input{str, "main"};
 	const auto parse = [&in]()
-	{
-		return p::parse_tree::
-			parse<p::must<parse::statement_block>, parse::selector>(in);
-	};
+	{ return p::parse_tree::parse<parse::HamGrammar, parse::Selector>(in); };
 
 	switch (debug) {
 		case GRAMMAR:
@@ -39,7 +36,7 @@ Parser::Parse(std::string str, Debug debug)
 			p::parse_tree::print_dot(std::cout, *parse());
 			break;
 		case TRACE:
-			p::standard_trace<p::must<parse::statement_block>>(in);
+			p::standard_trace<parse::HamGrammar>(in);
 			break;
 	}
 

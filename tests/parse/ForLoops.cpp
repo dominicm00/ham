@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<for_loop>;
+const auto parse = genericParse<ForLoop>;
 
 TEST_CASE("For loop is non-empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
@@ -51,10 +51,10 @@ TEST_CASE("For loop", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"for x in $(y) { Echo ; }",
-		T<for_loop>(
-			{T<identifier>("x"),
-			 T<leaf>({T<variable>({T<identifier>("y")})}),
-			 T<statement_block>({T<rule_invocation>({T<identifier>("Echo")})})}
+		T<ForLoop>(
+			{T<Identifier>("x"),
+			 T<Leaf>({T<Variable>({T<Identifier>("y")})}),
+			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
 		)
 	);
 }
@@ -63,10 +63,10 @@ TEST_CASE("For loop with empty block", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"for x in $(y) { }",
-		T<for_loop>(
-			{T<identifier>("x"),
-			 T<leaf>({T<variable>({T<identifier>("y")})}),
-			 T<empty_block>()}
+		T<ForLoop>(
+			{T<Identifier>("x"),
+			 T<Leaf>({T<Variable>({T<Identifier>("y")})}),
+			 T<EmptyBlock>()}
 		)
 	);
 }

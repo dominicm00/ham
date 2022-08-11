@@ -9,7 +9,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<statement_block>;
+const auto parse = genericParse<StatementBlock>;
 
 TEST_CASE("Statement blocks are non-empty", "[grammar]")
 {
@@ -26,23 +26,20 @@ TEST_CASE("Statements in block need semicolons", "[grammar]")
 TEST_CASE("Statements in block are separated by whitespace", "[grammar]")
 {
 	auto stmt = GENERATE("Rule B ;", "Rule a Echo c ;");
-	REQUIRE_PARSE(stmt, T<statement_block>({T<rule_invocation>()}));
+	REQUIRE_PARSE(stmt, T<StatementBlock>({T<RuleInvocation>()}));
 }
 
 TEST_CASE("Statement block, 1 statement", "[grammar]")
 {
-	REQUIRE_PARSE(
-		"Rule a ;",
-		T<statement_block>({T<rule_invocation>("Rule a")})
-	);
+	REQUIRE_PARSE("Rule a ;", T<StatementBlock>({T<RuleInvocation>("Rule a")}));
 }
 
 TEST_CASE("Statement block, 2 statements", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Rule a ; Echo b ;",
-		T<statement_block>(
-			{T<rule_invocation>("Rule a"), T<rule_invocation>("Echo b")}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Rule a"), T<RuleInvocation>("Echo b")}
 		)
 	);
 }
@@ -51,10 +48,10 @@ TEST_CASE("Statement block, 3 statements", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Rule a ; Echo b ; Do c : b ;",
-		T<statement_block>(
-			{T<rule_invocation>("Rule a"),
-			 T<rule_invocation>("Echo b"),
-			 T<rule_invocation>("Do c : b")}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Rule a"),
+			 T<RuleInvocation>("Echo b"),
+			 T<RuleInvocation>("Do c : b")}
 		)
 	);
 }
@@ -63,8 +60,8 @@ TEST_CASE("Statement block, definitions", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"actions Action { } Echo x ; rule Rule { }",
-		T<statement_block>(
-			{T<action_definition>(), T<rule_invocation>(), T<rule_definition>()}
+		T<StatementBlock>(
+			{T<ActionDefinition>(), T<RuleInvocation>(), T<RuleDefinition>()}
 		)
 	);
 }
@@ -73,11 +70,10 @@ TEST_CASE("Statement block, if statement", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Echo x ; if x { } else { } Echo again ;",
-		T<statement_block>(
-			{T<rule_invocation>("Echo x"),
-			 T<if_statement>({T<leaf>("x"), T<empty_block>(), T<empty_block>()}
-			 ),
-			 T<rule_invocation>("Echo again")}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Echo x"),
+			 T<IfStatement>({T<Leaf>("x"), T<EmptyBlock>(), T<EmptyBlock>()}),
+			 T<RuleInvocation>("Echo again")}
 		)
 	);
 }
@@ -86,10 +82,10 @@ TEST_CASE("Statement block, while loop", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Echo x ; while x { } Echo again ;",
-		T<statement_block>(
-			{T<rule_invocation>("Echo x"),
-			 T<while_loop>({T<leaf>("x"), T<empty_block>()}),
-			 T<rule_invocation>("Echo again")}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Echo x"),
+			 T<WhileLoop>({T<Leaf>("x"), T<EmptyBlock>()}),
+			 T<RuleInvocation>("Echo again")}
 		)
 	);
 }
@@ -98,14 +94,14 @@ TEST_CASE("Statement block, for loop", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Echo x ; for x in $(a) { } Echo again ;",
-		T<statement_block>(
-			{T<rule_invocation>("Echo x"),
-			 T<for_loop>(
-				 {T<identifier>("x"),
-				  T<leaf>({T<variable>("$(a)")}),
-				  T<empty_block>()}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Echo x"),
+			 T<ForLoop>(
+				 {T<Identifier>("x"),
+				  T<Leaf>({T<Variable>("$(a)")}),
+				  T<EmptyBlock>()}
 			 ),
-			 T<rule_invocation>("Echo again")}
+			 T<RuleInvocation>("Echo again")}
 		)
 	);
 }
@@ -114,12 +110,11 @@ TEST_CASE("Statement block, target statement", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"Echo x ; on target Echo x ; Echo again ;",
-		T<statement_block>(
-			{T<rule_invocation>("Echo x"),
-			 T<target_statement>(
-				 {T<leaf>("target"), T<rule_invocation>("Echo x")}
+		T<StatementBlock>(
+			{T<RuleInvocation>("Echo x"),
+			 T<TargetStatement>({T<Leaf>("target"), T<RuleInvocation>("Echo x")}
 			 ),
-			 T<rule_invocation>("Echo again")}
+			 T<RuleInvocation>("Echo again")}
 		)
 	);
 }

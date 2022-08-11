@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<identifier>;
+const auto parse = genericParse<Identifier>;
 
 TEST_CASE("Alphanumeric identifiers", "[grammar]")
 {
@@ -67,7 +67,7 @@ TEST_CASE("Variables in identifiers", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a$(b)",
-		T<identifier>({T<id_char>("a"), T<variable>("$(b)")})
+		T<Identifier>({T<IdChar>("a"), T<Variable>("$(b)")})
 	);
 }
 

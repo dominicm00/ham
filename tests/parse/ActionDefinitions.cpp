@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<action_definition>;
+const auto parse = genericParse<ActionDefinition>;
 
 TEST_CASE("Action definition is non-empty", "[grammar]")
 {
@@ -37,8 +37,8 @@ TEST_CASE("Action definition, simple content", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"action Action { echo x }",
-		T<action_definition>(
-			{T<identifier>("Action"), T<action_string>("echo x ")}
+		T<ActionDefinition>(
+			{T<Identifier>("Action"), T<ActionString>("echo x ")}
 		)
 	);
 }
@@ -47,11 +47,11 @@ TEST_CASE("Action definition, variable", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"action Action { echo $(y) }",
-		T<action_definition>(
-			{T<identifier>("Action"),
-			 T<action_string>("echo "),
-			 T<variable>("$(y)"),
-			 T<action_string>(" ")}
+		T<ActionDefinition>(
+			{T<Identifier>("Action"),
+			 T<ActionString>("echo "),
+			 T<Variable>("$(y)"),
+			 T<ActionString>(" ")}
 		)
 	);
 }
@@ -60,11 +60,11 @@ TEST_CASE("Action definition, escape sequences", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"action Action { $$$}test }",
-		T<action_definition>(
-			{T<identifier>("Action"),
-			 T<action_escape>("$"),
-			 T<action_escape>("}"),
-			 T<action_string>("test ")}
+		T<ActionDefinition>(
+			{T<Identifier>("Action"),
+			 T<ActionEscape>("$"),
+			 T<ActionEscape>("}"),
+			 T<ActionString>("test ")}
 		)
 	);
 }

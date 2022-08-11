@@ -9,7 +9,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<target_statement>;
+const auto parse = genericParse<TargetStatement>;
 
 TEST_CASE("Target statements are non-empty", "[grammar]")
 {
@@ -21,9 +21,9 @@ TEST_CASE("Target statements, rule invocations", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"on target Echo $(X) ;",
-		T<target_statement>(
-			{T<leaf>("target"),
-			 T<rule_invocation>({T<identifier>("Echo"), T<list>()})}
+		T<TargetStatement>(
+			{T<Leaf>("target"),
+			 T<RuleInvocation>({T<Identifier>("Echo"), T<List>()})}
 		)
 	);
 }
@@ -32,7 +32,7 @@ TEST_CASE("Target statements, control flow", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"on target for var in $(X) { Echo $(var) ; }",
-		T<target_statement>({T<leaf>("target"), T<for_loop>()})
+		T<TargetStatement>({T<Leaf>("target"), T<ForLoop>()})
 	);
 }
 

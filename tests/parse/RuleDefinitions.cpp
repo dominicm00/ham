@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<rule_definition>;
+const auto parse = genericParse<RuleDefinition>;
 
 TEST_CASE("Rule definition is non-empty", "[grammar]")
 {

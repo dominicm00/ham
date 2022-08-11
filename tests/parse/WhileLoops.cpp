@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<while_loop>;
+const auto parse = genericParse<WhileLoop>;
 
 TEST_CASE("While loop is non-empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
@@ -26,19 +26,16 @@ TEST_CASE("While loop", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"while a { Echo ; }",
-		T<while_loop>(
-			{T<leaf>("a"),
-			 T<statement_block>({T<rule_invocation>({T<identifier>("Echo")})})}
+		T<WhileLoop>(
+			{T<Leaf>("a"),
+			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
 		)
 	);
 }
 
 TEST_CASE("While loop with empty block", "[grammar]")
 {
-	REQUIRE_PARSE(
-		"while x { }",
-		T<while_loop>({T<leaf>("x"), T<empty_block>()})
-	);
+	REQUIRE_PARSE("while x { }", T<WhileLoop>({T<Leaf>("x"), T<EmptyBlock>()}));
 }
 
 } // namespace ham::tests

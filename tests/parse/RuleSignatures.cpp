@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<rule_signature>;
+const auto parse = genericParse<RuleSignature>;
 
 TEST_CASE("Rule signature is non-empty", "[grammar]")
 {
@@ -23,24 +23,24 @@ TEST_CASE("Rule signature does not consume trailing whitespace", "[grammar]")
 
 TEST_CASE("Rule signature, identifiers", "[grammar]")
 {
-	REQUIRE_PARSE("rule Rule", T<rule_signature>({T<identifier>("Rule")}));
+	REQUIRE_PARSE("rule Rule", T<RuleSignature>({T<Identifier>("Rule")}));
 	REQUIRE_PARSE(
 		"rule Rule x",
-		T<rule_signature>({T<identifier>("Rule"), T<identifier>("x")})
+		T<RuleSignature>({T<Identifier>("Rule"), T<Identifier>("x")})
 	);
 	REQUIRE_PARSE(
 		"rule Rule x : y",
-		T<rule_signature>(
-			{T<identifier>("Rule"), T<identifier>("x"), T<identifier>("y")}
+		T<RuleSignature>(
+			{T<Identifier>("Rule"), T<Identifier>("x"), T<Identifier>("y")}
 		)
 	);
 	REQUIRE_PARSE(
 		"rule Rule x : y : z",
-		T<rule_signature>(
-			{T<identifier>("Rule"),
-			 T<identifier>("x"),
-			 T<identifier>("y"),
-			 T<identifier>("z")}
+		T<RuleSignature>(
+			{T<Identifier>("Rule"),
+			 T<Identifier>("x"),
+			 T<Identifier>("y"),
+			 T<Identifier>("z")}
 		)
 	);
 }

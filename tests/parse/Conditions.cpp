@@ -7,14 +7,14 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<condition>;
+const auto parse = genericParse<Condition>;
 
 TEST_CASE("Condition is non-empty", "[grammar]") { REQUIRE_THROWS(parse("")); }
 
 TEST_CASE("Leafs reduce to conditions", "[grammar]")
 {
 	std::string str = GENERATE("x", "$(x)", "'a string'");
-	REQUIRE_PARSE(str, T<leaf>(str));
+	REQUIRE_PARSE(str, T<Leaf>(str));
 }
 
 /**
@@ -29,7 +29,7 @@ TEST_CASE("Available comparators", "[grammar]")
 	{
 		REQUIRE_PARSE(
 			"1 " + comparator + " 2",
-			T<leaf_comparator>(comparator, {T<leaf>("1"), T<leaf>("2")})
+			T<LeafComparator>(comparator, {T<Leaf>("1"), T<Leaf>("2")})
 		);
 	}
 
@@ -56,23 +56,21 @@ TEST_CASE("Comparators don't accept conditionals", "[grammar]")
  */
 TEST_CASE("Simple conjunction", "[grammar]")
 {
-	REQUIRE_PARSE("1 && 2", T<logical_and>({T<leaf>("1"), T<leaf>("2")}));
+	REQUIRE_PARSE("1 && 2", T<LogicalAnd>({T<Leaf>("1"), T<Leaf>("2")}));
 	REQUIRE_PARSE(
 		"1 && 2 && 3",
-		T<logical_and>(
-			{T<leaf>("1"), T<logical_and>({T<leaf>("2"), T<leaf>("3")})}
+		T<LogicalAnd>(
+			{T<Leaf>("1"), T<LogicalAnd>({T<Leaf>("2"), T<Leaf>("3")})}
 		)
 	);
 }
 
 TEST_CASE("Simple disjunction", "[grammar]")
 {
-	REQUIRE_PARSE("1 || 2", T<logical_or>({T<leaf>("1"), T<leaf>("2")}));
+	REQUIRE_PARSE("1 || 2", T<LogicalOr>({T<Leaf>("1"), T<Leaf>("2")}));
 	REQUIRE_PARSE(
 		"1 || 2 || 3",
-		T<logical_or>(
-			{T<leaf>("1"), T<logical_or>({T<leaf>("2"), T<leaf>("3")})}
-		)
+		T<LogicalOr>({T<Leaf>("1"), T<LogicalOr>({T<Leaf>("2"), T<Leaf>("3")})})
 	);
 }
 
@@ -92,19 +90,18 @@ TEST_CASE("Grouping", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"( 1 ) && ( 2 = 3 )",
-		T<logical_and>(
-			{T<leaf>("1"),
-			 T<leaf_comparator>("=", {T<leaf>("2"), T<leaf>("3")})}
+		T<LogicalAnd>(
+			{T<Leaf>("1"), T<LeafComparator>("=", {T<Leaf>("2"), T<Leaf>("3")})}
 		)
 	);
 
 	REQUIRE_PARSE(
 		"( 1 && 2 ) || ( 4 && 5 ) || 7 < 8",
-		T<logical_or>(
-			{T<logical_and>({T<leaf>("1"), T<leaf>("2")}),
-			 T<logical_or>(
-				 {T<logical_and>({T<leaf>("4"), T<leaf>("5")}),
-				  T<leaf_comparator>("<", {T<leaf>("7"), T<leaf>("8")})}
+		T<LogicalOr>(
+			{T<LogicalAnd>({T<Leaf>("1"), T<Leaf>("2")}),
+			 T<LogicalOr>(
+				 {T<LogicalAnd>({T<Leaf>("4"), T<Leaf>("5")}),
+				  T<LeafComparator>("<", {T<Leaf>("7"), T<Leaf>("8")})}
 			 )}
 		)
 	);
@@ -115,14 +112,14 @@ TEST_CASE("Grouping", "[grammar]")
  */
 TEST_CASE("Not on leaf", "[grammar]")
 {
-	REQUIRE_PARSE("! a", T<logical_not>({T<leaf>("a")}));
+	REQUIRE_PARSE("! a", T<LogicalNot>({T<Leaf>("a")}));
 }
 
 TEST_CASE("Not on boolean expression", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"! a = b",
-		T<logical_not>({T<leaf_comparator>("=", {T<leaf>("a"), T<leaf>("b")})})
+		T<LogicalNot>({T<LeafComparator>("=", {T<Leaf>("a"), T<Leaf>("b")})})
 	);
 }
 
@@ -130,8 +127,8 @@ TEST_CASE("Not on condition", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"! ( a && b && c )",
-		T<logical_not>({T<logical_and>(
-			{T<leaf>("a"), T<logical_and>({T<leaf>("b"), T<leaf>("c")})}
+		T<LogicalNot>({T<LogicalAnd>(
+			{T<Leaf>("a"), T<LogicalAnd>({T<Leaf>("b"), T<Leaf>("c")})}
 		)})
 	);
 }

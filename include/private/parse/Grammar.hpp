@@ -41,7 +41,7 @@ namespace ham::parse
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct special_chars
+struct SpecialChars
 	: p::one<'$', '\'', '"', ':', ';', '{', '}', '(', ')', '[', ']', '#', '|'> {
 };
 
@@ -52,23 +52,23 @@ struct special_chars
  *
  * TODO: Support Unicode identifiers?
  */
-struct variable;
-struct id_char : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
-struct identifier : p::plus<p::sor<variable, id_char>> {};
+struct Variable;
+struct IdChar : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
+struct Identifier : p::plus<p::sor<Variable, IdChar>> {};
 
-struct whitespace : p::plus<p::space> {};
+struct Whitespace : p::plus<p::space> {};
 
 /** Leafs **/
-struct leaf;
+struct Leaf;
 
 // Characters
-struct special_escape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
-struct char_escape : p::one<'$', '\'', '"'> {};
+struct SpecialEscape : p::one<'a', 'b', 'f', 'n', 'r', 't', 'v'> {};
+struct CharEscape : p::one<'$', '\'', '"'> {};
 
 // A word is a series of printable characters. Cancel if at a special
 // character or whitespace.
-struct word
-	: p::plus<p::not_at<p::sor<special_chars, p::space, p::eolf>>, p::print> {};
+struct Word
+	: p::plus<p::not_at<p::sor<SpecialChars, p::space, p::eolf>>, p::print> {};
 
 /**
  * A quoted string is surrounded by quotes, and consists of printable characters
@@ -79,231 +79,229 @@ struct word
  * Parts matching the Nested rule are processed after escapes, but before
  * characters (used for variables).
  */
-template<typename Quote, typename Escape, typename Nested, typename Char>
-struct quote : p::if_must<
-				   Quote,
-				   p::star<p::not_at<Quote>, p::sor<Escape, Nested, Char>>,
-				   Quote> {};
+template<typename QuoteChar, typename Escape, typename Nested, typename Char>
+struct Quote : p::if_must<
+				   QuoteChar,
+				   p::star<p::not_at<QuoteChar>, p::sor<Escape, Nested, Char>>,
+				   QuoteChar> {};
 
 // Single quotes don't accept escapes or nested variables
-struct quoted_single_content
+struct QuotedSingleContent
 	: p::star<p::not_at<p::one<'\''>>, p::sor<p::print, p::space>> {};
-struct quoted_single
-	: p::seq<p::one<'\''>, quoted_single_content, p::one<'\''>> {};
+struct QuotedSingle : p::seq<p::one<'\''>, QuotedSingleContent, p::one<'\''>> {
+};
 
 // Escape sequences are mandatory in double quotes. Double quotes use variables.
 // Double quotes are parsed character by character.
-struct quoted_char : p::sor<p::print, p::space> {};
-struct quoted_double
-	: quote<
+struct QuotedChar : p::sor<p::print, p::space> {};
+struct QuotedDouble
+	: Quote<
 		  p::one<'"'>,
 		  // if character after $ is not ( it must be a valid escape sequence
 		  p::seq<
 			  p::one<'$'>,
 			  p::if_must<
 				  p::at<p::not_one<'('>>,
-				  p::sor<char_escape, special_escape>>>,
+				  p::sor<CharEscape, SpecialEscape>>>,
 		  // if at $( it must be a variable
-		  p::if_must<p::at<p::string<'$', '('>>, variable>,
-		  quoted_char> {};
+		  p::if_must<p::at<p::string<'$', '('>>, Variable>,
+		  QuotedChar> {};
 
 /**
  * Separate each rule with whitespace
  */
 template<typename... Rules>
-struct tokens : p::separated_seq<whitespace, Rules...> {};
+struct Tokens : p::separated_seq<Whitespace, Rules...> {};
 
 /**
  * Optionally separate each rule with Whitespace
  */
 template<typename... Rules>
-struct maybe_tokens : p::separated_seq<p::opt<whitespace>, Rules...> {};
+struct MaybeTokens : p::separated_seq<p::opt<Whitespace>, Rules...> {};
 
 /**
  * subscript: '[' <identifier> ']'
  */
-struct subscript : maybe_tokens<p::one<'['>, identifier, p::one<']'>> {};
+struct Subscript : MaybeTokens<p::one<'['>, Identifier, p::one<']'>> {};
 
 /**
  * variable_modifiers: (:<selectors*><replacer?>)*
  */
-struct variable_selector : p::alpha {};
-struct variable_replacer
-	: p::seq<variable_selector, p::if_must<p::one<'='>, leaf>> {};
-struct variable_mod_sequence
+struct VariableSelector : p::alpha {};
+struct VariableReplacer
+	: p::seq<VariableSelector, p::if_must<p::one<'='>, Leaf>> {};
+struct VariableModSequence
 	: p::seq<
-		  p::star<variable_selector, p::not_at<p::one<'='>>>,
-		  p::opt<variable_replacer>> {};
-struct variable_modifiers
-	: p::star<p::if_must<p::one<':'>, p::at<p::alpha>, variable_mod_sequence>> {
-};
+		  p::star<VariableSelector, p::not_at<p::one<'='>>>,
+		  p::opt<VariableReplacer>> {};
+struct VariableModifiers
+	: p::star<p::if_must<p::one<':'>, p::at<p::alpha>, VariableModSequence>> {};
 
 /**
  * variable: $(<identifier>[<subscript>][<variable_modifiers>])
  *
  * TODO: variable modifiers
  */
-struct variable : p::if_must<
+struct Variable : p::if_must<
 					  p::one<'$'>,
-					  maybe_tokens<
+					  MaybeTokens<
 						  p::one<'('>,
-						  identifier,
-						  p::opt<subscript>,
-						  p::opt<variable_modifiers>,
+						  Identifier,
+						  p::opt<Subscript>,
+						  p::opt<VariableModifiers>,
 						  p::one<')'>>> {};
 
-struct rule_invocation;
-struct target_rule_invocation
-	: tokens<TAO_PEGTL_STRING("on"), leaf, rule_invocation> {};
-struct bracket_expression : p::if_must<
-								p::one<'['>,
-								whitespace,
-								p::sor<target_rule_invocation, rule_invocation>,
-								whitespace,
-								p::one<']'>> {};
+struct RuleInvocation;
+struct TargetRuleInvocation
+	: Tokens<TAO_PEGTL_STRING("on"), Leaf, RuleInvocation> {};
+struct BracketExpression : p::if_must<
+							   p::one<'['>,
+							   Whitespace,
+							   p::sor<TargetRuleInvocation, RuleInvocation>,
+							   Whitespace,
+							   p::one<']'>> {};
 
-struct leaf
-	: p::sor<
-		  bracket_expression,
-		  p::plus<p::sor<quoted_single, quoted_double, variable, word>>> {};
+struct Leaf : p::sor<
+				  BracketExpression,
+				  p::plus<p::sor<QuotedSingle, QuotedDouble, Variable, Word>>> {
+};
 
 /**
  * list: <leaf>[ <leaf>]*
  */
-struct list : p::list<leaf, whitespace> {};
+struct List : p::list<Leaf, Whitespace> {};
 
 /**
  * rule_invocation: <identifier>[ <list>[ : <list>]*]
  */
-struct rule_separator : p::one<':'> {};
+struct RuleSeparator : p::one<':'> {};
 
-struct rule_invocation
+struct RuleInvocation
 	: p::seq<
-		  identifier,
+		  Identifier,
 		  p::opt<
-			  whitespace,
-			  p::list<p::sor<rule_separator, list>, whitespace>>> {};
+			  Whitespace,
+			  p::list<p::sor<RuleSeparator, List>, Whitespace>>> {};
 
-struct statement;
-struct statement_block;
-struct empty_block : p::success {};
-struct bracketed_block
-	: p::sor<
-		  tokens<p::one<'{'>, statement_block, p::one<'}'>>,
-		  maybe_tokens<p::one<'{'>, empty_block, p::one<'}'>>> {};
+struct Statement;
+struct StatementBlock;
+struct EmptyBlock : p::success {};
+struct BracketedBlock : p::sor<
+							Tokens<p::one<'{'>, StatementBlock, p::one<'}'>>,
+							MaybeTokens<p::one<'{'>, EmptyBlock, p::one<'}'>>> {
+};
 
 /**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
  */
-struct rule_signature
+struct RuleSignature
 	: p::seq<
 		  TAO_PEGTL_STRING("rule"),
-		  whitespace,
-		  identifier,
+		  Whitespace,
+		  Identifier,
 		  p::opt<
-			  whitespace,
+			  Whitespace,
 			  p::list<
-				  identifier,
-				  p::seq<whitespace, p::one<':'>, whitespace>>>> {};
+				  Identifier,
+				  p::seq<Whitespace, p::one<':'>, Whitespace>>>> {};
 
-struct rule_definition : tokens<rule_signature, bracketed_block> {};
+struct RuleDefinition : Tokens<RuleSignature, BracketedBlock> {};
 
 // action escape chars
-struct action_escape : p::one<'$', '}'> {};
-struct action_string : p::plus<p::not_one<'$', '}'>> {};
-struct action_definition : p::seq<
-							   // action(s)
-							   TAO_PEGTL_STRING("action"),
-							   p::opt<p::one<'s'>>,
-							   whitespace,
+struct ActionEscape : p::one<'$', '}'> {};
+struct ActionString : p::plus<p::not_one<'$', '}'>> {};
+struct ActionDefinition : p::seq<
+							  // action(s)
+							  TAO_PEGTL_STRING("action"),
+							  p::opt<p::one<'s'>>,
+							  Whitespace,
 
-							   identifier,
-							   whitespace,
+							  Identifier,
+							  Whitespace,
 
-							   p::one<'{'>,
-							   p::opt<whitespace>,
+							  p::one<'{'>,
+							  p::opt<Whitespace>,
 
-							   p::star<p::sor<
-								   // check escape sequence
-								   p::seq<p::one<'$'>, action_escape>,
-								   // otherwise $ must be a variable
-								   p::if_must<p::at<p::one<'$'>>, variable>,
-								   // otherwise capture the string
-								   action_string>>,
+							  p::star<p::sor<
+								  // check escape sequence
+								  p::seq<p::one<'$'>, ActionEscape>,
+								  // otherwise $ must be a variable
+								  p::if_must<p::at<p::one<'$'>>, Variable>,
+								  // otherwise capture the string
+								  ActionString>>,
 
-							   p::must<p::one<'}'>>> {};
+							  p::must<p::one<'}'>>> {};
 
 /**
  * Conditions
  */
-struct condition;
-struct condition_leaf;
-struct leaf_comparator : p::sor<
-							 p::string<'<', '='>,
-							 p::string<'>', '='>,
-							 p::string<'!', '='>,
-							 p::string<'i', 'n'>,
-							 p::string<'='>,
-							 p::string<'<'>,
-							 p::string<'>'>> {};
-struct logical_and : p::string<'&', '&'> {};
-struct logical_or : p::string<'|', '|'> {};
-struct logical_not : p::one<'!'> {};
+struct Condition;
+struct ConditionLeaf;
+struct LeafComparator : p::sor<
+							p::string<'<', '='>,
+							p::string<'>', '='>,
+							p::string<'!', '='>,
+							p::string<'i', 'n'>,
+							p::string<'='>,
+							p::string<'<'>,
+							p::string<'>'>> {};
+struct LogicalAnd : p::string<'&', '&'> {};
+struct LogicalOr : p::string<'|', '|'> {};
+struct LogicalNot : p::one<'!'> {};
 
-struct bool_expression : p::seq<
-							 leaf,
-							 p::opt<p::if_must<
-								 p::seq<whitespace, leaf_comparator>,
-								 whitespace,
-								 leaf>>> {};
+struct BoolExpression : p::seq<
+							Leaf,
+							p::opt<p::if_must<
+								p::seq<Whitespace, LeafComparator>,
+								Whitespace,
+								Leaf>>> {};
 
-struct condition_leaf : p::seq<
-							p::opt<logical_not, whitespace>,
-							p::sor<
-								p::if_must<
-									p::one<'('>,
-									whitespace,
-									condition,
-									whitespace,
-									p::one<')'>>,
-								bool_expression>> {};
-
-struct condition_conjunction
-	: p::seq<
-		  condition_leaf,
-		  p::opt<
-			  whitespace,
-			  WITH_ERROR(
-				  logical_or,
-				  "cannot have || in conjunction (&&) statement",
-				  logical_and
-			  ),
-			  whitespace,
-			  condition_conjunction>> {};
-
-struct condition_disjunction
-	: p::seq<
-		  condition_leaf,
-		  p::opt<
-			  whitespace,
-			  WITH_ERROR(
-				  logical_and,
-				  "cannot have && in disjunction (||) statement",
-				  logical_or
-			  ),
-			  whitespace,
-			  condition_disjunction>> {};
-
-struct condition : p::seq<
-					   condition_leaf,
-					   p::opt<
-						   whitespace,
+struct ConditionLeaf : p::seq<
+						   p::opt<LogicalNot, Whitespace>,
 						   p::sor<
-							   tokens<logical_and, condition_conjunction>,
-							   tokens<logical_or, condition_disjunction>>>> {};
+							   p::if_must<
+								   p::one<'('>,
+								   Whitespace,
+								   Condition,
+								   Whitespace,
+								   p::one<')'>>,
+							   BoolExpression>> {};
 
-struct rearrange_unary_operator
-	: p::parse_tree::apply<rearrange_unary_operator> {
+struct ConditionConjunction
+	: p::seq<
+		  ConditionLeaf,
+		  p::opt<
+			  Whitespace,
+			  WITH_ERROR(
+				  LogicalOr,
+				  "cannot have || in conjunction (&&) statement",
+				  LogicalAnd
+			  ),
+			  Whitespace,
+			  ConditionConjunction>> {};
+
+struct ConditionDisjunction
+	: p::seq<
+		  ConditionLeaf,
+		  p::opt<
+			  Whitespace,
+			  WITH_ERROR(
+				  LogicalAnd,
+				  "cannot have && in disjunction (||) statement",
+				  LogicalOr
+			  ),
+			  Whitespace,
+			  ConditionDisjunction>> {};
+
+struct Condition : p::seq<
+					   ConditionLeaf,
+					   p::opt<
+						   Whitespace,
+						   p::sor<
+							   Tokens<LogicalAnd, ConditionConjunction>,
+							   Tokens<LogicalOr, ConditionDisjunction>>>> {};
+
+struct RearrangeUnaryOperator : p::parse_tree::apply<RearrangeUnaryOperator> {
 	template<typename Node, typename... States>
 	static void transform(std::unique_ptr<Node>& n, States&&... st)
 	{
@@ -319,8 +317,7 @@ struct rearrange_unary_operator
 	}
 };
 
-struct rearrange_binary_operator
-	: p::parse_tree::apply<rearrange_binary_operator> {
+struct RearrangeBinaryOperator : p::parse_tree::apply<RearrangeBinaryOperator> {
 	template<typename Node, typename... States>
 	static void transform(std::unique_ptr<Node>& n, States&&... st)
 	{
@@ -341,90 +338,89 @@ struct rearrange_binary_operator
 /**
  * Control flow
  */
-struct if_statement : p::seq<
-						  TAO_PEGTL_STRING("if"),
-						  whitespace,
-						  condition,
-						  whitespace,
-						  bracketed_block,
-						  p::opt<
-							  whitespace,
-							  TAO_PEGTL_STRING("else"),
-							  whitespace,
-							  bracketed_block>> {};
+struct IfStatement : p::seq<
+						 TAO_PEGTL_STRING("if"),
+						 Whitespace,
+						 Condition,
+						 Whitespace,
+						 BracketedBlock,
+						 p::opt<
+							 Whitespace,
+							 TAO_PEGTL_STRING("else"),
+							 Whitespace,
+							 BracketedBlock>> {};
 
-struct while_loop
-	: tokens<TAO_PEGTL_STRING("while"), condition, bracketed_block> {};
+struct WhileLoop
+	: Tokens<TAO_PEGTL_STRING("while"), Condition, BracketedBlock> {};
 
-struct for_loop : tokens<
-					  TAO_PEGTL_STRING("for"),
-					  identifier,
-					  TAO_PEGTL_STRING("in"),
-					  leaf,
-					  bracketed_block> {};
+struct ForLoop : Tokens<
+					 TAO_PEGTL_STRING("for"),
+					 Identifier,
+					 TAO_PEGTL_STRING("in"),
+					 Leaf,
+					 BracketedBlock> {};
 
-struct definition : p::sor<rule_definition, action_definition> {};
-struct control_flow : p::sor<if_statement, while_loop, for_loop> {};
-struct rule_statement : tokens<rule_invocation, p::one<';'>> {};
-struct target_statement : tokens<
-							  TAO_PEGTL_STRING("on"),
-							  leaf,
-							  p::sor<control_flow, rule_statement>> {};
-struct statement_block
+struct Definition : p::sor<RuleDefinition, ActionDefinition> {};
+struct ControlFlow : p::sor<IfStatement, WhileLoop, ForLoop> {};
+struct RuleStatement : Tokens<RuleInvocation, p::one<';'>> {};
+struct TargetStatement
+	: Tokens<TAO_PEGTL_STRING("on"), Leaf, p::sor<ControlFlow, RuleStatement>> {
+};
+struct StatementBlock
 	: p::list<
-		  p::sor<definition, control_flow, target_statement, rule_statement>,
-		  whitespace> {};
+		  p::sor<Definition, ControlFlow, TargetStatement, RuleStatement>,
+		  Whitespace> {};
 
-struct ham_grammar : p::seq<statement_block, p::eolf> {};
+struct HamGrammar : p::must<p::seq<StatementBlock, p::eolf>> {};
 
 /**
  * Selectors
  */
 template<typename Rule>
-struct true_selector : std::true_type {};
+struct AllSelector : std::true_type {};
 
 template<typename Rule>
-using selector = p::parse_tree::selector<
+using Selector = p::parse_tree::selector<
 	Rule,
 	p::parse_tree::store_content::on<
-		action_definition,
-		action_escape,
-		action_string,
-		char_escape,
-		empty_block,
-		for_loop,
-		id_char,
-		identifier,
-		if_statement,
-		leaf,
-		leaf_comparator,
-		list,
-		logical_and,
-		logical_not,
-		logical_or,
-		quoted_char,
-		quoted_double,
-		quoted_single_content,
-		rule_definition,
-		rule_invocation,
-		rule_separator,
-		rule_signature,
-		special_escape,
-		statement_block,
-		subscript,
-		target_rule_invocation,
-		target_statement,
-		variable,
-		variable_replacer,
-		variable_selector,
-		while_loop,
-		word>,
-	rearrange_binary_operator::on<
-		bool_expression,
-		condition_conjunction,
-		condition_disjunction,
-		condition>,
-	rearrange_unary_operator::on<condition_leaf>>;
+		ActionDefinition,
+		ActionEscape,
+		ActionString,
+		CharEscape,
+		EmptyBlock,
+		ForLoop,
+		IdChar,
+		Identifier,
+		IfStatement,
+		Leaf,
+		LeafComparator,
+		List,
+		LogicalAnd,
+		LogicalNot,
+		LogicalOr,
+		QuotedChar,
+		QuotedDouble,
+		QuotedSingleContent,
+		RuleDefinition,
+		RuleInvocation,
+		RuleSeparator,
+		RuleSignature,
+		SpecialEscape,
+		StatementBlock,
+		Subscript,
+		TargetRuleInvocation,
+		TargetStatement,
+		Variable,
+		VariableReplacer,
+		VariableSelector,
+		WhileLoop,
+		Word>,
+	RearrangeBinaryOperator::on<
+		BoolExpression,
+		ConditionConjunction,
+		ConditionDisjunction,
+		Condition>,
+	RearrangeUnaryOperator::on<ConditionLeaf>>;
 
 } // namespace ham::parse
 

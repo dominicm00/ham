@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<if_statement>;
+const auto parse = genericParse<IfStatement>;
 
 TEST_CASE("If statement is non-empty", "[grammar]")
 {
@@ -36,9 +36,9 @@ TEST_CASE("If statement", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"if a { Echo ; }",
-		T<if_statement>(
-			{T<leaf>("a"),
-			 T<statement_block>({T<rule_invocation>({T<identifier>("Echo")})})}
+		T<IfStatement>(
+			{T<Leaf>("a"),
+			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
 		)
 	);
 }
@@ -47,10 +47,10 @@ TEST_CASE("If-else statement", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"if a { Echo ; } else { Rule ; }",
-		T<if_statement>(
-			{T<leaf>("a"),
-			 T<statement_block>({T<rule_invocation>({T<identifier>("Echo")})}),
-			 T<statement_block>({T<rule_invocation>({T<identifier>("Rule")})})}
+		T<IfStatement>(
+			{T<Leaf>("a"),
+			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})}),
+			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Rule")})})}
 		)
 	);
 }
@@ -59,22 +59,22 @@ TEST_CASE("If statements with empty blocks", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"if x { } else { }",
-		T<if_statement>({T<leaf>("x"), T<empty_block>(), T<empty_block>()})
+		T<IfStatement>({T<Leaf>("x"), T<EmptyBlock>(), T<EmptyBlock>()})
 	);
 	REQUIRE_PARSE(
 		"if x { Rule ; } else { }",
-		T<if_statement>(
-			{T<leaf>("x"),
-			 T<statement_block>({T<rule_invocation>("Rule")}),
-			 T<empty_block>()}
+		T<IfStatement>(
+			{T<Leaf>("x"),
+			 T<StatementBlock>({T<RuleInvocation>("Rule")}),
+			 T<EmptyBlock>()}
 		)
 	);
 	REQUIRE_PARSE(
 		"if x { } else { Rule ; }",
-		T<if_statement>(
-			{T<leaf>("x"),
-			 T<empty_block>(),
-			 T<statement_block>({T<rule_invocation>("Rule")})}
+		T<IfStatement>(
+			{T<Leaf>("x"),
+			 T<EmptyBlock>(),
+			 T<StatementBlock>({T<RuleInvocation>("Rule")})}
 		)
 	);
 }

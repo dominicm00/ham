@@ -11,7 +11,7 @@ using namespace ham::parse;
 
 TEST_CASE("Grammar passes analysis", "[grammar]")
 {
-	const std::size_t issues = p::analyze<ham_grammar>(1);
+	const std::size_t issues = p::analyze<HamGrammar>(1);
 	REQUIRE(issues == 0);
 }
 

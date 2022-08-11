@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<variable>;
+const auto parse = genericParse<Variable>;
 
 /*
  * Identifier only
@@ -38,16 +38,16 @@ TEST_CASE("Whitespace is accepted between '$(  )'", "[grammar]")
 
 TEST_CASE("Identifier is only child of simple variable", "[grammar]")
 {
-	REQUIRE_PARSE("$(Variable)", T<variable>({T<identifier>("Variable")}));
+	REQUIRE_PARSE("$(Variable)", T<Variable>({T<Identifier>("Variable")}));
 }
 
 TEST_CASE("Nested variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(a$(b))",
-		T<variable>({T<identifier>(
-			{T<id_char>("a"), T<variable>({T<identifier>("b")})}
-		)})
+		T<Variable>(
+			{T<Identifier>({T<IdChar>("a"), T<Variable>({T<Identifier>("b")})})}
+		)
 	);
 }
 
@@ -58,7 +58,7 @@ TEST_CASE("Single element subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3])",
-		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3")})})
+		T<Variable>({T<Identifier>("var"), T<Subscript>({T<Identifier>("3")})})
 	);
 }
 
@@ -66,7 +66,7 @@ TEST_CASE("Start-only range subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3-])",
-		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3-")})})
+		T<Variable>({T<Identifier>("var"), T<Subscript>({T<Identifier>("3-")})})
 	);
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("Range subscripts", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(var[3-5])",
-		T<variable>({T<identifier>("var"), T<subscript>({T<identifier>("3-5")})}
+		T<Variable>({T<Identifier>("var"), T<Subscript>({T<Identifier>("3-5")})}
 		)
 	);
 }
@@ -91,7 +91,7 @@ TEST_CASE("Variable selectors, one", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(X:G)",
-		{T<variable>({T<identifier>("X"), T<variable_selector>("G")})}
+		{T<Variable>({T<Identifier>("X"), T<VariableSelector>("G")})}
 	);
 }
 
@@ -100,10 +100,10 @@ TEST_CASE("Variable selectors, two", "[grammar]")
 	auto var = GENERATE("$(X:GB)", "$(X:G:B)");
 	REQUIRE_PARSE(
 		var,
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_selector>("G"),
-			 T<variable_selector>("B")}
+		T<Variable>(
+			{T<Identifier>("X"),
+			 T<VariableSelector>("G"),
+			 T<VariableSelector>("B")}
 		)
 	);
 }
@@ -113,11 +113,11 @@ TEST_CASE("Variable selectors, three", "[grammar]")
 	auto var = GENERATE("$(X:DBS)", "$(X:DB:S)", "$(X:D:BS)", "$(X:D:B:S)");
 	REQUIRE_PARSE(
 		var,
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_selector>("D"),
-			 T<variable_selector>("B"),
-			 T<variable_selector>("S")}
+		T<Variable>(
+			{T<Identifier>("X"),
+			 T<VariableSelector>("D"),
+			 T<VariableSelector>("B"),
+			 T<VariableSelector>("S")}
 		)
 	);
 }
@@ -126,21 +126,18 @@ TEST_CASE("Variable replacers", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(X:G=grist)",
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_replacer>({T<variable_selector>("G"), T<leaf>("grist")}
-			 )}
+		T<Variable>(
+			{T<Identifier>("X"),
+			 T<VariableReplacer>({T<VariableSelector>("G"), T<Leaf>("grist")})}
 		)
 	);
 
 	REQUIRE_PARSE(
 		"$(X:G='a b':B=\"x \"y)",
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_replacer>({T<variable_selector>("G"), T<leaf>("'a b'")}
-			 ),
-			 T<variable_replacer>(
-				 {T<variable_selector>("B"), T<leaf>("\"x \"y")}
+		T<Variable>(
+			{T<Identifier>("X"),
+			 T<VariableReplacer>({T<VariableSelector>("G"), T<Leaf>("'a b'")}),
+			 T<VariableReplacer>({T<VariableSelector>("B"), T<Leaf>("\"x \"y")}
 			 )}
 		)
 	);
@@ -150,11 +147,11 @@ TEST_CASE("Mixed modifiers", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(X:GB=a:D)",
-		T<variable>(
-			{T<identifier>("X"),
-			 T<variable_selector>("G"),
-			 T<variable_replacer>({T<variable_selector>("B"), T<leaf>("a")}),
-			 T<variable_selector>("D")}
+		T<Variable>(
+			{T<Identifier>("X"),
+			 T<VariableSelector>("G"),
+			 T<VariableReplacer>({T<VariableSelector>("B"), T<Leaf>("a")}),
+			 T<VariableSelector>("D")}
 		)
 	);
 }

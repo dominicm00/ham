@@ -7,7 +7,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<leaf>;
+const auto parse = genericParse<Leaf>;
 
 /*
  * Words
@@ -85,19 +85,19 @@ TEST_CASE("Whitespace is allowed in quoted strings", "[grammar]")
 
 TEST_CASE("Escape sequences are literals in single quoted string", "[grammar]")
 {
-	REQUIRE_PARSE("'$n$t$\"'", T<leaf>({T<quoted_single_content>("$n$t$\"")}));
+	REQUIRE_PARSE("'$n$t$\"'", T<Leaf>({T<QuotedSingleContent>("$n$t$\"")}));
 }
 
 TEST_CASE("Escape sequences are parsed in double quoted string", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"$n$tx$a$b\"",
-		T<leaf>({T<quoted_double>(
-			{T<special_escape>("n"),
-			 T<special_escape>("t"),
-			 T<quoted_char>("x"),
-			 T<special_escape>("a"),
-			 T<special_escape>("b")}
+		T<Leaf>({T<QuotedDouble>(
+			{T<SpecialEscape>("n"),
+			 T<SpecialEscape>("t"),
+			 T<QuotedChar>("x"),
+			 T<SpecialEscape>("a"),
+			 T<SpecialEscape>("b")}
 		)})
 	);
 }
@@ -106,7 +106,7 @@ TEST_CASE("Quotes can be escaped in double quoted strings", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"$'$\"\"",
-		T<leaf>({T<quoted_double>({T<char_escape>("'"), T<char_escape>("\"")})})
+		T<Leaf>({T<QuotedDouble>({T<CharEscape>("'"), T<CharEscape>("\"")})})
 	);
 }
 
@@ -119,15 +119,15 @@ TEST_CASE("Single quotes can be unescaped in double quotes", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"a'b\"",
-		T<leaf>({T<quoted_double>(
-			{T<quoted_char>("a"), T<quoted_char>("'"), T<quoted_char>("b")}
+		T<Leaf>({T<QuotedDouble>(
+			{T<QuotedChar>("a"), T<QuotedChar>("'"), T<QuotedChar>("b")}
 		)})
 	);
 }
 
 TEST_CASE("Double quotes can be unescaped in single quotes", "[grammar]")
 {
-	REQUIRE_PARSE("'a\"b'", T<leaf>({T<quoted_single_content>("a\"b")}));
+	REQUIRE_PARSE("'a\"b'", T<Leaf>({T<QuotedSingleContent>("a\"b")}));
 }
 
 TEST_CASE("Escape sequences must be valid", "[grammar]")
@@ -143,11 +143,11 @@ TEST_CASE("Escape sequences must be valid", "[grammar]")
  */
 TEST_CASE("Bracket expressions recognized as leafs", "[grammar]")
 {
-	REQUIRE_PARSE("[ Rule ]", T<leaf>({T<rule_invocation>("Rule")}));
+	REQUIRE_PARSE("[ Rule ]", T<Leaf>({T<RuleInvocation>("Rule")}));
 	REQUIRE_PARSE(
 		"[ on target Rule ]",
-		T<leaf>({T<target_rule_invocation>(
-			{T<leaf>("target"), T<rule_invocation>("Rule")}
+		T<Leaf>({T<TargetRuleInvocation>(
+			{T<Leaf>("target"), T<RuleInvocation>("Rule")}
 		)})
 	);
 }
@@ -157,13 +157,13 @@ TEST_CASE("Embedded bracket expressions ignored", "[grammar]")
 	REQUIRE_THROWS(parse("a[ B ]"));
 	REQUIRE_PARSE(
 		"\"a[ B ]\"",
-		T<leaf>({T<quoted_double>(
-			{T<quoted_char>("a"),
-			 T<quoted_char>("["),
-			 T<quoted_char>(" "),
-			 T<quoted_char>("B"),
-			 T<quoted_char>(" "),
-			 T<quoted_char>("]")}
+		T<Leaf>({T<QuotedDouble>(
+			{T<QuotedChar>("a"),
+			 T<QuotedChar>("["),
+			 T<QuotedChar>(" "),
+			 T<QuotedChar>("B"),
+			 T<QuotedChar>(" "),
+			 T<QuotedChar>("]")}
 		)})
 	);
 }
@@ -175,16 +175,16 @@ TEST_CASE("Different types of leafs can be combined", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a'b c'd\"$n\"",
-		T<leaf>(
-			{T<word>("a"),
-			 T<quoted_single_content>("b c"),
-			 T<word>("d"),
-			 T<quoted_double>({T<special_escape>("n")})}
+		T<Leaf>(
+			{T<Word>("a"),
+			 T<QuotedSingleContent>("b c"),
+			 T<Word>("d"),
+			 T<QuotedDouble>({T<SpecialEscape>("n")})}
 		)
 	);
 }
 
-TEST_CASE("Complex leafs reject word whitespace", "[grammar]")
+TEST_CASE("Complex leafs reject Word whitespace", "[grammar]")
 {
 	auto str = GENERATE("a'b c'd e", "\"a b c\" d");
 	REQUIRE_THROWS(parse(str));
@@ -194,7 +194,7 @@ TEST_CASE("Words nest variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"a$(b)",
-		T<leaf>({T<word>("a"), T<variable>({T<identifier>("b")})})
+		T<Leaf>({T<Word>("a"), T<Variable>({T<Identifier>("b")})})
 	);
 }
 
@@ -202,15 +202,15 @@ TEST_CASE("Double quotes nest variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"\"a$(b)\"",
-		T<leaf>({T<quoted_double>(
-			{T<quoted_char>("a"), T<variable>({T<identifier>("b")})}
+		T<Leaf>({T<QuotedDouble>(
+			{T<QuotedChar>("a"), T<Variable>({T<Identifier>("b")})}
 		)})
 	);
 }
 
 TEST_CASE("Single quotes don't nest variables", "[grammar]")
 {
-	REQUIRE_PARSE("'a$(b)'", T<leaf>({T<quoted_single_content>("a$(b)")}));
+	REQUIRE_PARSE("'a$(b)'", T<Leaf>({T<QuotedSingleContent>("a$(b)")}));
 }
 
 } // namespace ham::tests

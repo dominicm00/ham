@@ -9,7 +9,7 @@ namespace ham::tests
 {
 
 using namespace ham::parse;
-const auto parse = genericParse<bracket_expression>;
+const auto parse = genericParse<BracketExpression>;
 
 TEST_CASE("Bracket expressions are non-empty", "[grammar]")
 {
@@ -31,15 +31,14 @@ TEST_CASE("Bracket expressions don't contain non-value structures", "[grammar]")
 
 TEST_CASE("Bracket expression, rule invocation", "[grammar]")
 {
-	REQUIRE_PARSE("[ Rule x ]", T<rule_invocation>("Rule x"));
+	REQUIRE_PARSE("[ Rule x ]", T<RuleInvocation>("Rule x"));
 }
 
 TEST_CASE("Bracket expression, target invocation", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"[ on target Rule x ]",
-		T<target_rule_invocation>(
-			{T<leaf>("target"), T<rule_invocation>("Rule x")}
+		T<TargetRuleInvocation>({T<Leaf>("target"), T<RuleInvocation>("Rule x")}
 		)
 	);
 }
