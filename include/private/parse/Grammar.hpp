@@ -34,13 +34,14 @@ namespace ham::parse
  * - :      - rule separators
  * - ;      - statement separators
  * - { }    - block delimiters
+ * - [ ]    - bracket expressions
  * - |      - N/A
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
 struct special_chars
-	: p::one<'$', '\'', '"', ':', ';', '|', '{', '}', '(', ')'> {};
+	: p::one<'$', '\'', '"', ':', ';', '|', '{', '}', '(', ')', '[', ']'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -146,10 +147,20 @@ struct variable : p::if_must<
 						  p::opt<variable_modifiers>,
 						  p::one<')'>>> {};
 
-/**
- * leaf: (<single-quoted string>|<double-quoted string>|<variable>|<word>)+
- */
-struct leaf : p::plus<p::sor<quoted_single, quoted_double, variable, word>> {};
+struct rule_invocation;
+struct target_rule_invocation
+	: tokens<TAO_PEGTL_STRING("on"), leaf, rule_invocation> {};
+struct bracket_expression : p::if_must<
+								p::one<'['>,
+								whitespace,
+								p::sor<target_rule_invocation, rule_invocation>,
+								whitespace,
+								p::one<']'>> {};
+
+struct leaf
+	: p::sor<
+		  bracket_expression,
+		  p::plus<p::sor<quoted_single, quoted_double, variable, word>>> {};
 
 /**
  * list: <leaf>[ <leaf>]*
@@ -395,6 +406,7 @@ using selector = p::parse_tree::selector<
 		while_loop,
 		for_loop,
 		target_statement,
+		target_rule_invocation,
 		logical_and,
 		logical_or,
 		logical_not>,

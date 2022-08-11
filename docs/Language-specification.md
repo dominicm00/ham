@@ -85,7 +85,7 @@ rule_echox abc ; # X: abc
 Leafs are the core data structure in Ham, and consist of everything that can be evaluated to a string list (even a string list of size 0 or 1). A leaf literal is comprised of one or more string forms, [variables](#variables), or [bracket expressions](#bracket-expressions) not separated by whitespace. There are three string forms:
 
 ### Words
-Words are character sequences of all printable, non-whitespace characters (ASCII 33-126), _excluding the following:_ `$ " ' : ; | { } ( )`.
+Words are character sequences of all printable, non-whitespace characters (ASCII 33-126), _excluding the following:_ `$ " ' : ; | { } ( ) [ ]`.
 
 The `$` character indicates the start of a variable expression. Not having a valid variable expression after a `$` in a word is an error.
 
@@ -180,10 +180,14 @@ path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cp
 ### Bracket expressions
 Bracket expressions have the following form (literal `[]`, not optional):
 ```text
-[ <statement> ]
+[ <rule_invocation>|on <target> <rule_invocation> ]
 ```
 
+Where `value_invocation` is either a `rule_invocation`, or a `target_statement` holding a `rule_invocation`.
+
 A bracket expression evaluates to the result of the `statement`. They may only be used with statements that have a value (i.e. no control structures).
+
+Standalone bracket expressions can be used as leafs, but they cannot be embedded words/double quoted strings like variables can.
 
 **Examples:**
 ```text

@@ -4,6 +4,7 @@ add_executable(
   Utils.cpp
 
   parse/ActionDefinitions.cpp
+  parse/BracketExpressions.cpp
   parse/Conditions.cpp
   parse/ForLoops.cpp
   parse/Identifiers.cpp

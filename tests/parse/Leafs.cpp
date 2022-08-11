@@ -34,7 +34,6 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 		"\\bslash",
 		"/slash",
 		"<grist>a/relative/path.cpp",
-		"[squ]are",
 		"!",
 		"@",
 		"#",
@@ -153,6 +152,36 @@ TEST_CASE("Escape sequences must be valid", "[grammar]")
 }
 
 /**
+ * Bracket expressions
+ */
+TEST_CASE("Bracket expressions recognized as leafs", "[grammar]")
+{
+	REQUIRE_PARSE("[ Rule ]", T<leaf>({T<rule_invocation>("Rule")}));
+	REQUIRE_PARSE(
+		"[ on target Rule ]",
+		T<leaf>({T<target_rule_invocation>(
+			{T<leaf>("target"), T<rule_invocation>("Rule")}
+		)})
+	);
+}
+
+TEST_CASE("Embedded bracket expressions ignored", "[grammar]")
+{
+	REQUIRE_THROWS(parse("a[ B ]"));
+	REQUIRE_PARSE(
+		"\"a[ B ]\"",
+		T<leaf>(
+			{T<string_char>("a"),
+			 T<string_char>("["),
+			 T<string_char>(" "),
+			 T<string_char>("B"),
+			 T<string_char>(" "),
+			 T<string_char>("]")}
+		)
+	);
+}
+
+/**
  * Complex leafs
  */
 TEST_CASE("Different types of leafs can be combined", "[grammar]")
@@ -205,4 +234,5 @@ TEST_CASE("Single quotes don't nest variables", "[grammar]")
 		)
 	);
 }
+
 } // namespace ham::tests
