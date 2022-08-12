@@ -593,7 +593,7 @@ actions <modifiers> <identifier> {
 
 The strange escape sequence structure is so that it's natural to use paths, but also possible to type all literal sequences as quoting is not respected in actions.
 
-**NOTE:** Actions are defined globally like [rules](#defining-rules), and must also be defined exactly once. See rule definitions for more.
+**NOTE:** Actions are defined globally like rules, and must also be defined exactly once. See [rule definitions](#defining-rules) for more.
 
 ### Invoking actions
 Actions are invoked just like rules, and can in fact have the same name as a rule. If an action and rule have the same name, the rule is evaluated first, and then the action is invoked.
