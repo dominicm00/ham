@@ -442,9 +442,9 @@ Echo $(A:BSB=head) ; # head.cpp
 Echo $(A:UD=root) ;  # ROOT/FILE.CPP
 
 B = file1.cpp file2.cpp file3.cpp ;
-Echo $(B:J=", ") ; # file1.cpp, file2.cpp, file3.cpp
-Echo $(B:BJ=", ") ; # file1, file2, file3
-Echo $(B:UJ=x) ;    # FILE1xFILE2xFILE3
+Echo $(B:J=", ") ;   # file1.cpp, file2.cpp, file3.cpp
+Echo $(B:BJ=", ") ;  # file1, file2, file3
+Echo $(B:UJ=x) ;     # FILE1xFILE2xFILE3
 ```
 
 ### Variable assignment
