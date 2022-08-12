@@ -646,14 +646,14 @@ Let `a` and `b` be leaf expressions, and `cond` represent another condition. A c
 | `a`              | any element of `a` is a non-empty string                           |
 | `a = b`          | all elements of `a` and `b` are equal                              |
 | `a != b`         | `a = b` is false                                                   |
-| `a < b `         | `a[i] < b[i]`, where `i` is the first element where `a[i] != b[i]` |
+| `a < b`          | `a[i] < b[i]`, where `i` is the first element where `a[i] != b[i]` |
 | `a > b`          | `a[i] > b[i]`, where `i` is the first element where `a[i] != b[i]` |
 | `a <= b`         | `a[i] <= b[i]` holds for all `i < min(len(a), len(b))`             |
 | `a >= b`         | `a[i] >= b[i]` holds for all `i < min(len(a), len(b))`             |
 | `a in b`         | `a` is a subset of `b`, or `a` is empty                            |
 | `! cond`         | `cond` is false                                                    |
 | `cond && cond`   | both conditions are true                                           |
-| `cond || cond`   | either condition is true                                           |
+| `cond \|\| cond`   | either condition is true                                           |
 | `(cond)`         | precedence grouping                                                |
 
 ### If statement
