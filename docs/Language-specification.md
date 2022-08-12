@@ -125,7 +125,7 @@ The use of `$` for escape sequences is used to make writing paths easier, and in
 
 A `$` followed by an invalid escape sequence is an error. Use `$$` for literal dollar signs.
 
-The `$'` escape sequence is permitted, but optional.
+The `$'` escape sequence is permitted, but optional. (`'` may appear in double-quoted strings without escaping.)
 
 `$(` indicates the start of a variable expression. Not having a valid variable expression after a `$(` in a double quoted string is an error. The escape sequence `$$(` can be used to insert `$(` as a literal.
 
@@ -173,14 +173,14 @@ Adjacent string forms or variables are treated as a single leaf and concatenated
 
 **Examples:**
 ```text
-path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cp
+path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cpp
 "combining "'forms 'in-any" which way"   => combining forms in-any which way
 ```
 
 ### Bracket expressions
 Bracket expressions have the following form (literal `[]`, not optional):
 ```text
-[ <rule_invocation>|on <target> <rule_invocation> ]
+[ <rule_invocation>|on <target> <value_invocation> ]
 ```
 
 Where `value_invocation` is either a `rule_invocation`, or a `target_statement` holding a `rule_invocation`.
@@ -413,8 +413,8 @@ Changes from each modifier are "fed" into the next modifier. Modifiers have the 
 | `:S`           | 3                                |
 | `:D`           | 3                                |
 | `:G`           | 3                                |
-| `:U`           | 4 (mutually exclusive with `:U`) |
-| `:L`           | 4 (mutually exclusive with `:L`) |
+| `:U`           | 4 (mutually exclusive with `:L`) |
+| `:L`           | 4 (mutually exclusive with `:U`) |
 | `:J=separator` | 5                                |
 
 If a modifier follows another modifier without an argument, the colon may be omitted. For instance, `:BS` selects the filename (base + suffix). Colons must be included to separate modifiers with arguments, such as `:R=/:D=usr`. Notably, this means words used as a modifier argument cannot contain `:`; you should use double/single quoted strings instead.
