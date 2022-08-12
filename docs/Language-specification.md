@@ -506,12 +506,12 @@ Global and local variables are bound within the rule statement, but local variab
 
 Rule definitions have access to the special statement `return <list> ;`. When this statement is evaluated, the rule immediately stops and the value is the result of the rule evaluation. Passing more than one argument to `return` is an error. A single argument that is a list is valid.
 
-**NOTE:** Rules are defined in the _global scope_, even if they are not defined in a top-level block. You may have multiple definitions of a rule in the source code contained by conditional statements, but only one definition can be evaluated. Overwriting a rule definition is an error.
-
 ```text
 return 1 2 3 ;      # ok
 return 1 : 2 : 3 ;  # error
 ```
+
+**NOTE:** Rules are defined in the _global scope_, even if they are not defined in a top-level block. You may have multiple definitions of a rule in the source code contained by conditional statements, but only one definition can be evaluated. Overwriting a rule definition is an error.
 
 ### Invoking rules
 Rules are invoked with the form:
