@@ -732,6 +732,8 @@ Depends foo.o : foo.c ; # bang! can't build foo.c
 
 `foo.c` would no longer be a leaf source, and Ham would not know how to build it.
 
+TODO: The above example has errors in it, but I am not sure _exactly_ where. I suppose `Includes` needs to be replaced with `Depends`. But do we also need to replace `can't build foo.c` with `can't build foo.o`? Also, I don't get it. Why does foo.c need to be a leave source? Why is not generated.h becoming the leave source instead?
+
 ### Order dependencies
 The `MaybeIncludes` and `MaybeDepends` rules create order-only dependencies, where:
 
