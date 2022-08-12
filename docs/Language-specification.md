@@ -766,6 +766,8 @@ rule deps[msvc] Cc {
 }
 ```
 
+TODO: The `$` in the statement irritates me. Does it not need to be escaped?
+
 Then globally define the prefix `msvc` prints before each dependency:
 ```text
 MSVC_DEPS_PREFIX = "Note: including file:" ;
