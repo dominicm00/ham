@@ -1,6 +1,7 @@
 #ifndef HAM_PARSE_GRAMMAR_HPP
 #define HAM_PARSE_GRAMMAR_HPP
 
+#include "parse/ParseException.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/ascii.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -20,11 +21,18 @@
 
 namespace p = tao::pegtl;
 
-#define WITH_ERROR(errRule, errMessage, rule) \
-	p::if_then_else<errRule, TAO_PEGTL_RAISE_MESSAGE(errMessage), rule>
-
 namespace ham::parse
 {
+
+template<unsigned char Error, typename Predicate, typename... Rule>
+struct if_must_else_error
+	: p::if_then_else<
+		  Predicate,
+		  p::sor<p::seq<Rule...>, p::raise_message<Error>>,
+		  p::failure> {};
+
+template<unsigned char Error, typename... Rule>
+struct must_else_error : p::sor<p::seq<Rule...>, p::raise_message<Error>> {};
 
 /**
  * Ham reserves the following special characters:
@@ -122,27 +130,36 @@ struct MaybeTokens : p::separated_seq<p::opt<Whitespace>, Rules...> {};
 /**
  * subscript: '[' <identifier> ']'
  */
-struct Subscript : MaybeTokens<p::one<'['>, Identifier, p::one<']'>> {};
+struct Subscript : if_must_else_error<
+					   INVALID_SUBSCRIPT,
+					   p::one<'['>,
+					   Identifier,
+					   p::one<']'>> {};
 
 /**
  * variable_modifiers: (:<selectors*><replacer?>)*
  */
 struct VariableSelector : p::alpha {};
 struct VariableReplacer
-	: p::seq<VariableSelector, p::if_must<p::one<'='>, Leaf>> {};
+	: p::seq<
+		  VariableSelector,
+		  if_must_else_error<INVALID_REPLACER_ARGUMENT, p::one<'='>, Leaf>> {};
 struct VariableModSequence
 	: p::seq<
 		  p::star<VariableSelector, p::not_at<p::one<'='>>>,
 		  p::opt<VariableReplacer>> {};
-struct VariableModifiers
-	: p::star<p::if_must<p::one<':'>, p::at<p::alpha>, VariableModSequence>> {};
+struct VariableModifiers : p::star<if_must_else_error<
+							   MISSING_VARIABLE_MODIFIER,
+							   p::one<':'>,
+							   p::at<p::alpha>,
+							   VariableModSequence>> {};
 
 /**
  * variable: $(<identifier>[<subscript>][<variable_modifiers>])
  *
  * TODO: variable modifiers
  */
-struct Variable : p::if_must<
+struct Variable : p::seq<
 					  p::one<'$'>,
 					  MaybeTokens<
 						  p::one<'('>,
@@ -153,13 +170,18 @@ struct Variable : p::if_must<
 
 struct RuleInvocation;
 struct TargetRuleInvocation
-	: Tokens<TAO_PEGTL_STRING("on"), Leaf, RuleInvocation> {};
-struct BracketExpression : p::if_must<
-							   p::one<'['>,
-							   Whitespace,
-							   p::sor<TargetRuleInvocation, RuleInvocation>,
-							   Whitespace,
-							   p::one<']'>> {};
+	: Tokens<
+		  TAO_PEGTL_STRING("on"),
+		  must_else_error<TARGET_STATEMENT_MISSING_TARGET, Leaf>,
+		  RuleInvocation> {};
+struct BracketExpression
+	: if_must_else_error<
+		  INVALID_BRACKET_EXPRESSION,
+		  p::one<'['>,
+		  Whitespace,
+		  p::sor<TargetRuleInvocation, RuleInvocation>,
+		  Whitespace,
+		  must_else_error<MISSING_CLOSING_SQUARE_BRACE, p::one<']'>>> {};
 
 struct Leaf : p::sor<
 				  BracketExpression,
@@ -186,10 +208,14 @@ struct RuleInvocation
 struct Statement;
 struct StatementBlock;
 struct EmptyBlock : p::success {};
-struct BracketedBlock : p::sor<
-							Tokens<p::one<'{'>, StatementBlock, p::one<'}'>>,
-							MaybeTokens<p::one<'{'>, EmptyBlock, p::one<'}'>>> {
-};
+struct BracketedBlock
+	: if_must_else_error<
+		  INVALID_BRACKET_BLOCK,
+		  p::one<'{'>,
+		  Whitespace,
+		  p::sor<StatementBlock, EmptyBlock>,
+		  p::opt<Whitespace>,
+		  must_else_error<MISSING_CLOSING_CURLY_BRACE, p::one<'}'>>> {};
 
 /**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
@@ -198,39 +224,46 @@ struct RuleSignature
 	: p::seq<
 		  TAO_PEGTL_STRING("rule"),
 		  Whitespace,
-		  Identifier,
+		  must_else_error<INVALID_IDENTIFIER, Identifier>,
 		  p::opt<
 			  Whitespace,
 			  p::list<
 				  Identifier,
 				  p::seq<Whitespace, p::one<':'>, Whitespace>>>> {};
 
-struct RuleDefinition : Tokens<RuleSignature, BracketedBlock> {};
+struct RuleDefinition
+	: Tokens<
+		  RuleSignature,
+		  must_else_error<RULE_DEF_MISSING_BLOCK, BracketedBlock>> {};
 
 // action escape chars
 struct ActionEscape : p::one<'$', '}'> {};
 struct ActionString : p::plus<p::not_one<'$', '}'>> {};
-struct ActionDefinition : p::seq<
-							  // action(s)
-							  TAO_PEGTL_STRING("action"),
-							  p::opt<p::one<'s'>>,
-							  Whitespace,
+struct ActionDefinition
+	: p::seq<
+		  // action(s)
+		  TAO_PEGTL_STRING("action"),
+		  p::opt<p::one<'s'>>,
+		  Whitespace,
 
-							  Identifier,
-							  Whitespace,
+		  Identifier,
+		  Whitespace,
 
-							  p::one<'{'>,
-							  p::opt<Whitespace>,
+		  p::one<'{'>,
+		  p::opt<Whitespace>,
 
-							  p::star<p::sor<
-								  // check escape sequence
-								  p::seq<p::one<'$'>, ActionEscape>,
-								  // otherwise $ must be a variable
-								  p::if_must<p::at<p::one<'$'>>, Variable>,
-								  // otherwise capture the string
-								  ActionString>>,
+		  p::star<p::sor<
+			  // check escape sequence
+			  p::seq<p::one<'$'>, ActionEscape>,
+			  // otherwise $ must be a variable
+			  if_must_else_error<
+				  MISSING_VARIABLE_EXPRESSION_OR_ESCAPE,
+				  p::at<p::one<'$'>>,
+				  Variable>,
+			  // otherwise capture the string
+			  ActionString>>,
 
-							  p::must<p::one<'}'>>> {};
+		  must_else_error<MISSING_CLOSING_CURLY_BRACE, p::one<'}'>>> {};
 
 /**
  * Conditions
@@ -256,42 +289,47 @@ struct BoolExpression : p::seq<
 								Whitespace,
 								Leaf>>> {};
 
-struct ConditionLeaf : p::seq<
-						   p::opt<LogicalNot, Whitespace>,
-						   p::sor<
-							   p::if_must<
-								   p::one<'('>,
-								   Whitespace,
-								   Condition,
-								   Whitespace,
-								   p::one<')'>>,
-							   BoolExpression>> {};
-
-struct ConditionConjunction
+struct ConditionLeaf
 	: p::seq<
-		  ConditionLeaf,
+		  p::opt<LogicalNot, Whitespace>,
+		  p::sor<
+			  if_must_else_error<
+				  MISSING_GROUPED_CONDITIONAL,
+				  p::one<'('>,
+				  Whitespace,
+				  Condition,
+				  Whitespace,
+				  must_else_error<MISSING_CLOSING_PAREN, p::one<')'>>>,
+			  BoolExpression>> {};
+
+template<
+	typename Cond,
+	unsigned char MissingConditional,
+	unsigned char MixedOp,
+	typename Op,
+	typename OtherOp>
+struct BoolOp
+	: p::seq<
+		  must_else_error<MissingConditional, ConditionLeaf>,
 		  p::opt<
 			  Whitespace,
-			  WITH_ERROR(
-				  LogicalOr,
-				  "cannot have || in conjunction (&&) statement",
-				  LogicalAnd
-			  ),
+			  p::if_then_else<p::at<OtherOp>, p::raise_message<MixedOp>, Op>,
 			  Whitespace,
-			  ConditionConjunction>> {};
+			  Cond>> {};
 
-struct ConditionDisjunction
-	: p::seq<
-		  ConditionLeaf,
-		  p::opt<
-			  Whitespace,
-			  WITH_ERROR(
-				  LogicalAnd,
-				  "cannot have && in disjunction (||) statement",
-				  LogicalOr
-			  ),
-			  Whitespace,
-			  ConditionDisjunction>> {};
+struct ConditionConjunction : BoolOp<
+								  ConditionConjunction,
+								  MISSING_CONDITIONAL_AFTER_CONJUNCTION,
+								  DISJUNCTION_IN_CONJUNCTION,
+								  LogicalAnd,
+								  LogicalOr> {};
+
+struct ConditionDisjunction : BoolOp<
+								  ConditionDisjunction,
+								  MISSING_CONDITIONAL_AFTER_DISJUNCTION,
+								  CONJUNCTION_IN_DISJUNCTION,
+								  LogicalOr,
+								  LogicalAnd> {};
 
 struct Condition : p::seq<
 					   ConditionLeaf,
@@ -338,34 +376,39 @@ struct RearrangeBinaryOperator : p::parse_tree::apply<RearrangeBinaryOperator> {
 /**
  * Control flow
  */
-struct IfStatement : p::seq<
-						 TAO_PEGTL_STRING("if"),
-						 Whitespace,
-						 Condition,
-						 Whitespace,
-						 BracketedBlock,
-						 p::opt<
-							 Whitespace,
-							 TAO_PEGTL_STRING("else"),
-							 Whitespace,
-							 BracketedBlock>> {};
+struct IfStatement
+	: p::seq<
+		  TAO_PEGTL_STRING("if"),
+		  Whitespace,
+		  must_else_error<IF_MISSING_CONDITION, Condition>,
+		  Whitespace,
+		  must_else_error<IF_MISSING_BLOCK, BracketedBlock>,
+		  p::opt<
+			  Whitespace,
+			  TAO_PEGTL_STRING("else"),
+			  Whitespace,
+			  must_else_error<ELSE_MISSING_BLOCK, BracketedBlock>>> {};
 
-struct WhileLoop
-	: Tokens<TAO_PEGTL_STRING("while"), Condition, BracketedBlock> {};
+struct WhileLoop : Tokens<
+					   TAO_PEGTL_STRING("while"),
+					   must_else_error<WHILE_MISSING_CONDITION, Condition>,
+					   must_else_error<WHILE_MISSING_BLOCK, BracketedBlock>> {};
 
 struct ForLoop : Tokens<
 					 TAO_PEGTL_STRING("for"),
-					 Identifier,
-					 TAO_PEGTL_STRING("in"),
-					 Leaf,
-					 BracketedBlock> {};
+					 must_else_error<FOR_MISSING_IDENTIFIER, Identifier>,
+					 must_else_error<FOR_MISSING_IN, TAO_PEGTL_STRING("in")>,
+					 must_else_error<FOR_MISSING_LEAF, Leaf>,
+					 must_else_error<FOR_MISSING_BLOCK, BracketedBlock>> {};
 
 struct Definition : p::sor<RuleDefinition, ActionDefinition> {};
 struct ControlFlow : p::sor<IfStatement, WhileLoop, ForLoop> {};
 struct RuleStatement : Tokens<RuleInvocation, p::one<';'>> {};
 struct TargetStatement
-	: Tokens<TAO_PEGTL_STRING("on"), Leaf, p::sor<ControlFlow, RuleStatement>> {
-};
+	: Tokens<
+		  TAO_PEGTL_STRING("on"),
+		  must_else_error<TARGET_STATEMENT_MISSING_TARGET, Leaf>,
+		  p::sor<ControlFlow, RuleStatement>> {};
 struct StatementBlock
 	: p::list<
 		  p::sor<Definition, ControlFlow, TargetStatement, RuleStatement>,
