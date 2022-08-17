@@ -2,6 +2,8 @@
 add_library(
   ham_lib
 
+  HamError.cpp
+
   parse/Parser.cpp
 
   ${HAM_PUBLIC_HEADER_FILES}
