@@ -180,12 +180,10 @@ path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cpp
 ### Bracket expressions
 Bracket expressions have the following form (literal `[]`, not optional):
 ```text
-[ <rule_invocation>|on <target> <value_invocation> ]
+[ <rule_invocation>|on <target> <rule_invocation> ]
 ```
 
-Where `value_invocation` is either a `rule_invocation`, or a `target_statement` holding a `rule_invocation`.
-
-A bracket expression evaluates to the result of the `statement`. They may only be used with statements that have a value (i.e. no control structures).
+A bracket expression evaluates to the result of the `rule_invocation`. 
 
 Standalone bracket expressions can be used as leafs, but they cannot be embedded words/double quoted strings like variables can.
 
@@ -197,8 +195,10 @@ rule Return1 {
 
 Echo [ Return1 ] ; # 1
 
-X on target = 2 ;
-Echo [ on target $(X) ] ; # 2
+X on target = 2 3 ;
+Echo [ on target $(X) ] ; # 2 3
+
+Echo [ Return1 ] [ on target $(X) ] 4 ; # 1 2 3 4
 ```
 
 ### Leaf expansion
