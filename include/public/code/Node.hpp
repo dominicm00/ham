@@ -2,6 +2,7 @@
 #define HAM_CODE_NODE_HPP
 
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -16,8 +17,6 @@ class Node;
  */
 class NodeVisitor {
   public:
-	virtual ~NodeVisitor();
-
 	/**
 	 * Called on all Node objects in a subtree.
 	 *
@@ -46,7 +45,7 @@ class AstContext {
 };
 
 /**
- * Context for evaluating AST
+ * Context for evaluating the AST
  */
 class EvaluationContext {};
 
@@ -60,7 +59,7 @@ class NodeDump {
 	// string content of this node if appropriate
 	std::optional<std::string> content;
 	// *all* nodes held interally by this node
-	std::vector<std::reference_wrapper<const Node>> children;
+	std::vector<std::unique_ptr<const Node>> children;
 };
 
 /**
@@ -87,7 +86,8 @@ class Node {
 	 * associated with the expression result, otherwise return
 	 * StringList::kFalse.
 	 */
-	virtual std::vector<std::string> Evaluate(EvaluationContext& context) = 0;
+	virtual std::vector<std::string> Evaluate(EvaluationContext& context
+	) const = 0;
 
 	/**
 	 * Visit nodes recursively until NodeVisitor::VisitNode returns true. Nodes
@@ -102,19 +102,20 @@ class Node {
 	 if (visitor.VisitNode(this))
 	   return this;
 
-	 if (Node& result = fLeft.Visit(visitor))
-	   return result;
+	 if (auto result = fLeft.Visit(visitor))
+	   return result.value();
 
-	 if (Node& result = fRight.Visit(visitor))
-	   return result;
+	 if (auto result = fRight.Visit(visitor))
+	   return result.value();
+
+	 return {};
 	 \endcode
 
 	 * \param[in] visitor Contains NodeVisitor::VisitNode predicate.
 	 *
 	 * \result First Node to match predicate.
 	 */
-	virtual std::optional<std::reference_wrapper<Node>> Visit(
-		NodeVisitor& visitor
+	virtual std::optional<std::unique_ptr<Node>> Visit(NodeVisitor& visitor
 	) const = 0;
 
   private:
