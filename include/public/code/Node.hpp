@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace ham::code
@@ -117,6 +118,12 @@ class Node {
 	 */
 	virtual std::optional<std::unique_ptr<Node>> Visit(NodeVisitor& visitor
 	) const = 0;
+
+  public:
+	/**
+	 * A string representation of the class.
+	 */
+	std::string_view type;
 
   private:
 	/**
