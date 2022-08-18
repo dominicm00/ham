@@ -724,15 +724,20 @@ Includes foo.c : generated.h ;
 Depends foo.o : foo.c ; # generated.h needs to be built before we try and build foo.o
 ```
 
-Notice that this is **not the same** as just using `Depends`. If we did the following:
+Notice that this is **not the same** as just using `Depends`. It feels natural for `foo.c` to depend on `generated.h`, but the header file is only used to build `foo.o`. While the code in `foo.c` and `generated.h` might be related, in terms of the build dependency tree their contents are independent.
+```
+# Notice that foo.c and foo.h are both sources used to build foo.o
+gcc -Ifoo.h foo.c -o foo.o
+```
+
+If you do try to use `Depends`, you get an error:
 ```text
-Includes foo.c : generated.h ; 
+Depends foo.c : generated.h ;
 Depends foo.o : foo.c ; # bang! can't build foo.c
 ```
 
-`foo.c` would no longer be a leaf source, and Ham would not know how to build it.
+Ham would treat `foo.c` as a _generated_ object, not a source file, and try to build it. Because we don't tell Ham how to build `foo.c` (source files aren't built), it causes an error.
 
-TODO: The above example has errors in it, but I am not sure _exactly_ where. I suppose `Includes` needs to be replaced with `Depends`. But do we also need to replace `can't build foo.c` with `can't build foo.o`? Also, I don't get it. Why does foo.c need to be a leave source? Why is not generated.h becoming the leave source instead?
 
 ### Order dependencies
 The `MaybeIncludes` and `MaybeDepends` rules create order-only dependencies, where:
