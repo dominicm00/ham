@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <initializer_list>
 #include <optional>
 #include <ostream>
 #include <sstream>
@@ -21,14 +22,8 @@ struct FilePosition {
 
 class Position {
   public:
-	Position() = delete;
-	Position(FilePosition file_position)
-		: file_positions{file_position} {};
-
-	void AddFilePosition(FilePosition file_position)
-	{
-		file_positions.push_back(file_position);
-	}
+	Position(std::initializer_list<FilePosition> file_positions)
+		: file_positions(file_positions){};
 
 	std::vector<FilePosition> FilePositions() const noexcept
 	{
@@ -41,7 +36,7 @@ class Position {
 	std::vector<FilePosition> file_positions;
 };
 
-class HamError : std::exception {
+class HamError : public std::exception {
   public:
 	enum Phase {
 		PARSE,
@@ -57,6 +52,8 @@ class HamError : std::exception {
 		std::string message
 	);
 	HamError(Phase phase, std::string message);
+
+	HamError(const HamError& other) noexcept = default;
 
 	const char* what() const noexcept override;
 

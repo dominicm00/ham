@@ -1,7 +1,6 @@
 #ifndef HAM_PARSE_GRAMMAR_HPP
 #define HAM_PARSE_GRAMMAR_HPP
 
-#include "parse/ParseException.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/ascii.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -24,15 +23,44 @@ namespace p = tao::pegtl;
 namespace ham::parse
 {
 
-template<unsigned char Error, typename Predicate, typename... Rule>
-struct if_must_else_error
-	: p::if_then_else<
-		  Predicate,
-		  p::sor<p::seq<Rule...>, p::raise_message<Error>>,
-		  p::failure> {};
+template<typename>
+inline constexpr const char* error_message = nullptr;
 
-template<unsigned char Error, typename... Rule>
-struct must_else_error : p::sor<p::seq<Rule...>, p::raise_message<Error>> {};
+// Paired rules
+struct OpenParen : p::one<'('> {};
+template<>
+inline constexpr auto error_message<OpenParen> = "expected opening (";
+struct CloseParen : p::one<')'> {};
+template<>
+inline constexpr auto error_message<CloseParen> = "expected closing )";
+
+struct OpenCurlyBrace : p::one<'{'> {};
+template<>
+inline constexpr auto error_message<OpenCurlyBrace> = "expected opening {";
+struct CloseCurlyBrace : p::one<'}'> {};
+template<>
+inline constexpr auto error_message<CloseCurlyBrace> = "expected closing }";
+
+struct OpenSquareBracket : p::one<'['> {};
+template<>
+inline constexpr auto error_message<OpenSquareBracket> = "expected opening [";
+struct CloseSquareBracket : p::one<']'> {};
+template<>
+inline constexpr auto error_message<CloseSquareBracket> = "expected closing ]";
+
+struct OpenSingleQuote : p::one<'\''> {};
+template<>
+inline constexpr auto error_message<OpenSingleQuote> = "expected opening '";
+struct CloseSingleQuote : p::one<'\''> {};
+template<>
+inline constexpr auto error_message<CloseSingleQuote> = "expected closing '";
+
+struct OpenDoubleQuote : p::one<'"'> {};
+template<>
+inline constexpr auto error_message<OpenDoubleQuote> = "expected opening \"";
+struct CloseDoubleQuote : p::one<'"'> {};
+template<>
+inline constexpr auto error_message<CloseDoubleQuote> = "expected closing \"";
 
 /**
  * Ham reserves the following special characters:
@@ -44,14 +72,27 @@ struct must_else_error : p::sor<p::seq<Rule...>, p::raise_message<Error>> {};
  * - { }    - block delimiters
  * - [ ]    - bracket expressions
  * - #      - comments
- * - |      - N/A
+ * - ! & |  - boolean expressions
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
  */
-struct SpecialChars
-	: p::one<'$', '\'', '"', ':', ';', '{', '}', '(', ')', '[', ']', '#', '|'> {
-};
+struct SpecialChars : p::one<
+						  '$',
+						  '\'',
+						  '"',
+						  ':',
+						  ';',
+						  '{',
+						  '}',
+						  '(',
+						  ')',
+						  '[',
+						  ']',
+						  '#',
+						  '!',
+						  '&',
+						  '|'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -62,9 +103,13 @@ struct SpecialChars
  */
 struct Variable;
 struct IdChar : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
-struct Identifier : p::plus<p::sor<Variable, IdChar>> {};
+struct Identifier : p::plus<p::sor<IdChar, Variable>> {};
+template<>
+inline constexpr auto error_message<Identifier> = "expected identifier";
 
 struct Whitespace : p::plus<p::space> {};
+template<>
+inline constexpr auto error_message<Whitespace> = "expected whitespace";
 
 /** Leafs **/
 struct Leaf;
@@ -78,48 +123,33 @@ struct CharEscape : p::one<'$', '\'', '"'> {};
 struct Word
 	: p::plus<p::not_at<p::sor<SpecialChars, p::space, p::eolf>>, p::print> {};
 
-/**
- * A quoted string is surrounded by quotes, and consists of printable characters
- * (excluding the quote) or character escapes. Escaped quotes are handled by
- * prioritizing escape sequences in matching. The quote is excluded from the
- * character matching. If a starting quote is matched, the quote must end.
- *
- * Parts matching the Nested rule are processed after escapes, but before
- * characters (used for variables).
- */
-template<typename QuoteChar, typename Escape, typename Nested, typename Char>
-struct Quote : p::if_must<
-				   QuoteChar,
-				   p::star<p::not_at<QuoteChar>, p::sor<Escape, Nested, Char>>,
-				   QuoteChar> {};
-
 // Single quotes don't accept escapes or nested variables
 struct QuotedSingleContent
 	: p::star<p::not_at<p::one<'\''>>, p::sor<p::print, p::space>> {};
-struct QuotedSingle : p::seq<p::one<'\''>, QuotedSingleContent, p::one<'\''>> {
+struct QuotedSingle
+	: p::seq<OpenSingleQuote, QuotedSingleContent, p::must<CloseSingleQuote>> {
 };
 
-// Escape sequences are mandatory in double quotes. Double quotes use variables.
-// Double quotes are parsed character by character.
-struct QuotedChar : p::sor<p::print, p::space> {};
-struct QuotedDouble
-	: Quote<
-		  p::one<'"'>,
-		  // if character after $ is not ( it must be a valid escape sequence
-		  p::seq<
-			  p::one<'$'>,
-			  p::if_must<
-				  p::at<p::not_one<'('>>,
-				  p::sor<CharEscape, SpecialEscape>>>,
-		  // if at $( it must be a variable
-		  p::if_must<p::at<p::string<'$', '('>>, Variable>,
-		  QuotedChar> {};
+struct QuotedChar : p::seq<p::not_at<p::one<'"'>>, p::sor<p::print, p::space>> {
+};
 
-/**
- * Separate each rule with whitespace
- */
-template<typename... Rules>
-struct Tokens : p::separated_seq<Whitespace, Rules...> {};
+struct QuotedEscape : p::sor<CharEscape, SpecialEscape> {};
+template<>
+inline constexpr auto error_message<QuotedEscape> =
+	"unknown escape sequence after '$'";
+
+template<typename Escape>
+struct EscapeOrVariable : p::if_then_else<
+							  p::at<p::string<'$', '('>>,
+							  Variable,
+							  p::seq<p::one<'$'>, p::must<Escape>>> {};
+
+// Double quotes are parsed character by character and include escape sequences
+struct QuotedDouble
+	: p::seq<
+		  OpenDoubleQuote,
+		  p::star<p::sor<EscapeOrVariable<QuotedEscape>, QuotedChar>>,
+		  p::must<CloseDoubleQuote>> {};
 
 /**
  * Optionally separate each rule with Whitespace
@@ -130,63 +160,86 @@ struct MaybeTokens : p::separated_seq<p::opt<Whitespace>, Rules...> {};
 /**
  * subscript: '[' <identifier> ']'
  */
-struct Subscript : if_must_else_error<
-					   INVALID_SUBSCRIPT,
-					   p::one<'['>,
-					   Identifier,
-					   p::one<']'>> {};
+struct SubscriptContents : p::seq<Identifier> {};
+template<>
+inline constexpr auto error_message<SubscriptContents> = "invalid subscript";
+
+struct Subscript
+	: p::if_must<OpenSquareBracket, SubscriptContents, CloseSquareBracket> {};
 
 /**
  * variable_modifiers: (:<selectors*><replacer?>)*
  */
 struct VariableSelector : p::alpha {};
+
+struct hVariableSelector : p::alpha {};
+template<>
+inline constexpr auto error_message<hVariableSelector> =
+	"expected variable modifier after ':'";
+
+struct VariableReplacerArg : p::seq<Leaf> {};
+template<>
+inline constexpr auto error_message<VariableReplacerArg> =
+	"expected argument after '='";
+
 struct VariableReplacer
-	: p::seq<
-		  VariableSelector,
-		  if_must_else_error<INVALID_REPLACER_ARGUMENT, p::one<'='>, Leaf>> {};
+	: p::seq<VariableSelector, p::one<'='>, p::must<VariableReplacerArg>> {};
 struct VariableModSequence
 	: p::seq<
 		  p::star<VariableSelector, p::not_at<p::one<'='>>>,
 		  p::opt<VariableReplacer>> {};
-struct VariableModifiers : p::star<if_must_else_error<
-							   MISSING_VARIABLE_MODIFIER,
+struct VariableModifiers : p::star<
 							   p::one<':'>,
-							   p::at<p::alpha>,
-							   VariableModSequence>> {};
+							   p::at<p::must<hVariableSelector>>,
+							   VariableModSequence> {};
 
 /**
  * variable: $(<identifier>[<subscript>][<variable_modifiers>])
- *
- * TODO: variable modifiers
  */
-struct Variable : p::seq<
-					  p::one<'$'>,
-					  MaybeTokens<
-						  p::one<'('>,
-						  Identifier,
-						  p::opt<Subscript>,
-						  p::opt<VariableModifiers>,
-						  p::one<')'>>> {};
+struct VariableContents : MaybeTokens<
+							  OpenParen,
+							  p::must<Identifier>,
+							  p::opt<Subscript>,
+							  p::opt<VariableModifiers>,
+							  p::must<CloseParen>> {};
+template<>
+inline constexpr auto error_message<VariableContents> =
+	"expected variable expression after '$'";
+
+struct Variable : p::seq<p::one<'$'>, p::must<VariableContents>> {};
 
 struct RuleInvocation;
+
+struct TargetRuleTarget : p::seq<Leaf> {};
+template<>
+inline constexpr auto error_message<TargetRuleTarget> =
+	"expected target after 'on'";
+
 struct TargetRuleInvocation
-	: Tokens<
+	: p::seq<
 		  TAO_PEGTL_STRING("on"),
-		  must_else_error<TARGET_STATEMENT_MISSING_TARGET, Leaf>,
-		  RuleInvocation> {};
-struct BracketExpression
-	: if_must_else_error<
-		  INVALID_BRACKET_EXPRESSION,
-		  p::one<'['>,
 		  Whitespace,
-		  p::sor<TargetRuleInvocation, RuleInvocation>,
-		  Whitespace,
-		  must_else_error<MISSING_CLOSING_SQUARE_BRACE, p::one<']'>>> {};
+		  p::must<TargetRuleTarget, Whitespace, RuleInvocation>> {};
+
+struct BracketExpressionContents
+	: p::sor<TargetRuleInvocation, RuleInvocation> {};
+template<>
+inline constexpr auto error_message<BracketExpressionContents> =
+	"expected (target) rule invocation in '[ ]'";
+
+struct BracketExpression : p::seq<
+							   OpenSquareBracket,
+							   p::opt<Whitespace>,
+							   p::must<BracketExpressionContents>,
+							   p::opt<Whitespace>,
+							   p::must<CloseSquareBracket>> {};
 
 struct Leaf : p::sor<
 				  BracketExpression,
 				  p::plus<p::sor<QuotedSingle, QuotedDouble, Variable, Word>>> {
 };
+template<>
+inline constexpr auto error_message<Leaf> = "expected leaf";
 
 /**
  * list: <leaf>[ <leaf>]*
@@ -204,18 +257,22 @@ struct RuleInvocation
 		  p::opt<
 			  Whitespace,
 			  p::list<p::sor<RuleSeparator, List>, Whitespace>>> {};
+template<>
+inline constexpr auto error_message<RuleInvocation> =
+	"expected rule invocation";
 
 struct Statement;
 struct StatementBlock;
 struct EmptyBlock : p::success {};
 struct BracketedBlock
-	: if_must_else_error<
-		  INVALID_BRACKET_BLOCK,
-		  p::one<'{'>,
-		  Whitespace,
-		  p::sor<StatementBlock, EmptyBlock>,
-		  p::opt<Whitespace>,
-		  must_else_error<MISSING_CLOSING_CURLY_BRACE, p::one<'}'>>> {};
+	: p::seq<
+		  OpenCurlyBrace,
+		  p::must<Whitespace>,
+		  p::sor<p::seq<StatementBlock, p::must<Whitespace>>, EmptyBlock>,
+		  p::must<CloseCurlyBrace>> {};
+template<>
+inline constexpr auto error_message<BracketedBlock> =
+	"expected a '{ }' statement block";
 
 /**
  * rule_signature: rule <identifier> [<identifier> (: <identifier)*]
@@ -224,20 +281,22 @@ struct RuleSignature
 	: p::seq<
 		  TAO_PEGTL_STRING("rule"),
 		  Whitespace,
-		  must_else_error<INVALID_IDENTIFIER, Identifier>,
+		  p::must<Identifier>,
 		  p::opt<
 			  Whitespace,
 			  p::list<
 				  Identifier,
-				  p::seq<Whitespace, p::one<':'>, Whitespace>>>> {};
+				  p::seq<Whitespace, p::one<':'>, p::must<Whitespace>>>>> {};
 
 struct RuleDefinition
-	: Tokens<
-		  RuleSignature,
-		  must_else_error<RULE_DEF_MISSING_BLOCK, BracketedBlock>> {};
+	: p::seq<RuleSignature, p::opt<Whitespace>, p::must<BracketedBlock>> {};
 
 // action escape chars
 struct ActionEscape : p::one<'$', '}'> {};
+template<>
+inline constexpr auto error_message<ActionEscape> =
+	"unknown escape sequence after '$'";
+
 struct ActionString : p::plus<p::not_one<'$', '}'>> {};
 struct ActionDefinition
 	: p::seq<
@@ -246,24 +305,12 @@ struct ActionDefinition
 		  p::opt<p::one<'s'>>,
 		  Whitespace,
 
-		  Identifier,
-		  Whitespace,
-
-		  p::one<'{'>,
+		  p::must<Identifier, Whitespace, OpenCurlyBrace>,
 		  p::opt<Whitespace>,
 
-		  p::star<p::sor<
-			  // check escape sequence
-			  p::seq<p::one<'$'>, ActionEscape>,
-			  // otherwise $ must be a variable
-			  if_must_else_error<
-				  MISSING_VARIABLE_EXPRESSION_OR_ESCAPE,
-				  p::at<p::one<'$'>>,
-				  Variable>,
-			  // otherwise capture the string
-			  ActionString>>,
+		  p::star<p::sor<EscapeOrVariable<ActionEscape>, ActionString>>,
 
-		  must_else_error<MISSING_CLOSING_CURLY_BRACE, p::one<'}'>>> {};
+		  p::must<CloseCurlyBrace>> {};
 
 /**
  * Conditions
@@ -288,56 +335,69 @@ struct BoolExpression : p::seq<
 								p::seq<Whitespace, LeafComparator>,
 								Whitespace,
 								Leaf>>> {};
+template<>
+inline constexpr auto error_message<BoolExpression> =
+	"expected a leaf or comparison";
 
-struct ConditionLeaf
-	: p::seq<
-		  p::opt<LogicalNot, Whitespace>,
-		  p::sor<
-			  if_must_else_error<
-				  MISSING_GROUPED_CONDITIONAL,
-				  p::one<'('>,
-				  Whitespace,
-				  Condition,
-				  Whitespace,
-				  must_else_error<MISSING_CLOSING_PAREN, p::one<')'>>>,
-			  BoolExpression>> {};
+struct ConditionLeaf : p::seq<
+						   p::opt<LogicalNot, p::opt<Whitespace>>,
+						   p::sor<
+							   p::seq<
+								   OpenParen,
+								   p::opt<Whitespace>,
+								   p::must<Condition>,
+								   p::opt<Whitespace>,
+								   p::must<CloseParen>>,
+							   p::must<BoolExpression>>> {};
 
-template<
-	typename Cond,
-	unsigned char MissingConditional,
-	unsigned char MixedOp,
-	typename Op,
-	typename OtherOp>
-struct BoolOp
-	: p::seq<
-		  must_else_error<MissingConditional, ConditionLeaf>,
-		  p::opt<
-			  Whitespace,
-			  p::if_then_else<p::at<OtherOp>, p::raise_message<MixedOp>, Op>,
-			  Whitespace,
-			  Cond>> {};
+template<typename Cond, typename Err, typename Op, typename OtherOp>
+struct BoolOp : p::seq<
+					ConditionLeaf,
+					p::opt<
+						p::opt<Whitespace>,
+						p::if_then_else<p::at<OtherOp>, Err, Op>,
+						p::opt<Whitespace>,
+						p::must<Cond>>> {};
 
-struct ConditionConjunction : BoolOp<
-								  ConditionConjunction,
-								  MISSING_CONDITIONAL_AFTER_CONJUNCTION,
-								  DISJUNCTION_IN_CONJUNCTION,
-								  LogicalAnd,
-								  LogicalOr> {};
+struct ConditionConjunction
+	: BoolOp<
+		  ConditionConjunction,
+		  TAO_PEGTL_RAISE_MESSAGE(
+			  "cannot use disjunction (||) in conjunction (&&)"
+		  ),
+		  LogicalAnd,
+		  LogicalOr> {};
+template<>
+inline constexpr auto error_message<ConditionConjunction> =
+	"expected a condition after &&";
 
-struct ConditionDisjunction : BoolOp<
-								  ConditionDisjunction,
-								  MISSING_CONDITIONAL_AFTER_DISJUNCTION,
-								  CONJUNCTION_IN_DISJUNCTION,
-								  LogicalOr,
-								  LogicalAnd> {};
+struct ConditionDisjunction
+	: BoolOp<
+		  ConditionDisjunction,
+		  TAO_PEGTL_RAISE_MESSAGE(
+			  "cannot use conjunction (&&) inside disjunction (||)"
+		  ),
+		  LogicalOr,
+		  LogicalAnd> {};
+template<>
+inline constexpr auto error_message<ConditionDisjunction> =
+	"expected a condition after ||";
 
 struct Condition : p::seq<
 					   ConditionLeaf,
 					   p::opt<
 						   Whitespace,
 						   p::sor<
-							   Tokens<LogicalAnd, ConditionConjunction>,
-							   Tokens<LogicalOr, ConditionDisjunction>>>> {};
+							   p::seq<
+								   LogicalAnd,
+								   p::opt<Whitespace>,
+								   p::must<ConditionConjunction>>,
+							   p::seq<
+								   LogicalOr,
+								   p::opt<Whitespace>,
+								   p::must<ConditionDisjunction>>>>> {};
+template<>
+inline constexpr auto error_message<Condition> = "expected a condition";
 
 struct RearrangeUnaryOperator : p::parse_tree::apply<RearrangeUnaryOperator> {
 	template<typename Node, typename... States>
@@ -376,48 +436,69 @@ struct RearrangeBinaryOperator : p::parse_tree::apply<RearrangeBinaryOperator> {
 /**
  * Control flow
  */
-struct IfStatement
-	: p::seq<
-		  TAO_PEGTL_STRING("if"),
-		  Whitespace,
-		  must_else_error<IF_MISSING_CONDITION, Condition>,
-		  Whitespace,
-		  must_else_error<IF_MISSING_BLOCK, BracketedBlock>,
-		  p::opt<
-			  Whitespace,
-			  TAO_PEGTL_STRING("else"),
-			  Whitespace,
-			  must_else_error<ELSE_MISSING_BLOCK, BracketedBlock>>> {};
+struct IfStatement : p::seq<
+						 TAO_PEGTL_STRING("if"),
+						 Whitespace,
+						 p::must<Condition, Whitespace, BracketedBlock>,
+						 p::opt<
+							 p::opt<Whitespace>,
+							 TAO_PEGTL_STRING("else"),
+							 p::opt<Whitespace>,
+							 p::must<BracketedBlock>>> {};
 
-struct WhileLoop : Tokens<
+struct WhileLoop : p::seq<
 					   TAO_PEGTL_STRING("while"),
-					   must_else_error<WHILE_MISSING_CONDITION, Condition>,
-					   must_else_error<WHILE_MISSING_BLOCK, BracketedBlock>> {};
+					   Whitespace,
+					   p::must<Condition, Whitespace, BracketedBlock>> {};
 
-struct ForLoop : Tokens<
+struct ForIn : p::string<'i', 'n'> {};
+template<>
+inline constexpr auto error_message<ForIn> =
+	"expected 'in' after for identifier";
+
+struct ForLoop : p::seq<
 					 TAO_PEGTL_STRING("for"),
-					 must_else_error<FOR_MISSING_IDENTIFIER, Identifier>,
-					 must_else_error<FOR_MISSING_IN, TAO_PEGTL_STRING("in")>,
-					 must_else_error<FOR_MISSING_LEAF, Leaf>,
-					 must_else_error<FOR_MISSING_BLOCK, BracketedBlock>> {};
+					 Whitespace,
+					 p::must<
+						 Identifier,
+						 Whitespace,
+						 ForIn,
+						 Whitespace,
+						 Leaf,
+						 Whitespace,
+						 BracketedBlock>> {};
+
+struct Semicolon : p::one<';'> {};
+template<>
+inline constexpr auto error_message<Semicolon> = "expected ';'";
 
 struct Definition : p::sor<RuleDefinition, ActionDefinition> {};
-struct ControlFlow : p::sor<IfStatement, WhileLoop, ForLoop> {};
-struct RuleStatement : Tokens<RuleInvocation, p::one<';'>> {};
+struct Scope : p::sor<BracketedBlock, IfStatement, WhileLoop, ForLoop> {};
+struct RuleStatement
+	: p::seq<RuleInvocation, p::opt<Whitespace>, p::must<Semicolon>> {};
+
+struct TargetStatementInvocation : p::sor<Scope, RuleStatement> {};
+template<>
+inline constexpr auto error_message<TargetStatementInvocation> =
+	"expected block, for/while/if, or rule invocation after 'on'";
+
 struct TargetStatement
-	: Tokens<
+	: p::seq<
 		  TAO_PEGTL_STRING("on"),
-		  must_else_error<TARGET_STATEMENT_MISSING_TARGET, Leaf>,
-		  p::sor<ControlFlow, RuleStatement>> {};
+		  Whitespace,
+		  p::must<Leaf, Whitespace, TargetStatementInvocation>> {};
 struct StatementBlock
 	: p::list<
-		  p::sor<Definition, ControlFlow, TargetStatement, RuleStatement>,
+		  p::sor<Definition, Scope, TargetStatement, RuleStatement>,
 		  Whitespace> {};
 
-struct HamGrammar : p::must<p::seq<StatementBlock, p::eolf>> {};
+struct HamGrammar : p::seq<StatementBlock, p::eolf> {};
+template<>
+inline constexpr auto error_message<HamGrammar> =
+	"error encountered at end of file";
 
 /**
- * Selectors
+ * Parse control types
  */
 template<typename Rule>
 struct AllSelector : std::true_type {};
@@ -464,6 +545,16 @@ using Selector = p::parse_tree::selector<
 		ConditionDisjunction,
 		Condition>,
 	RearrangeUnaryOperator::on<ConditionLeaf>>;
+
+struct Error {
+	template<typename Rule>
+	static constexpr bool raise_on_failure = false;
+	template<typename Rule>
+	static constexpr auto message = error_message<Rule>;
+};
+
+template<typename Rule>
+using Control = p::must_if<Error>::control<Rule>;
 
 } // namespace ham::parse
 

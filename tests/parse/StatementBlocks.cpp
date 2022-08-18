@@ -19,7 +19,7 @@ TEST_CASE("Statement blocks are non-empty", "[grammar]")
 
 TEST_CASE("Statements in block need semicolons", "[grammar]")
 {
-	auto stmt = GENERATE("Rule", "Rule a b", "Rule a b : c d;");
+	auto stmt = GENERATE("Rule", "Rule a b", "Rule a b : c d");
 	REQUIRE_THROWS(parse(stmt));
 }
 

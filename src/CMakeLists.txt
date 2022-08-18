@@ -4,7 +4,7 @@ add_library(
 
   HamError.cpp
 
-  parse/Parser.cpp
+  parse/NodeParser.cpp
 
   ${HAM_PUBLIC_HEADER_FILES}
   )

@@ -3,12 +3,15 @@
 
 #include "catch2/catch_test_macros.hpp"
 #include "parse/Grammar.hpp"
+#include "parse/NodeParser.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
 #include "tao/pegtl/demangle.hpp"
+#include "tao/pegtl/internal/pegtl_string.hpp"
 #include "tao/pegtl/memory_input.hpp"
 #include "tao/pegtl/rules.hpp"
 #include "tao/pegtl/string_input.hpp"
+#include "tao/pegtl/tracking_mode.hpp"
 
 #include <memory>
 
@@ -37,9 +40,11 @@ template<typename Rule>
 std::unique_ptr<p::parse_tree::node>
 genericParse(const std::string& str)
 {
-	p::memory_input input{str, "tests"};
-	return p::parse_tree::
-		parse<p::must<p::seq<Rule, p::eof>>, ham::parse::Selector>(input);
+	return parse::NodeParser::ParseNode<p::sor<
+		p::seq<Rule, p::eof>,
+		TAO_PEGTL_RAISE_MESSAGE("failed to match whole string")>>(
+		p::memory_input<p::tracking_mode::eager>{str, "tests"}
+	);
 };
 
 std::unique_ptr<p::parse_tree::node>

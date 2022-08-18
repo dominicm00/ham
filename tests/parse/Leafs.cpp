@@ -1,6 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
+#include "parse/NodeParser.hpp"
+#include "tao/pegtl/string_input.hpp"
 #include "tests/Utils.hpp"
 
 namespace ham::tests
@@ -34,11 +36,9 @@ TEST_CASE("Symbols are allowed in words", "[grammar]")
 		"\\bslash",
 		"/slash",
 		"<grist>a/relative/path.cpp",
-		"!",
 		"@",
 		"%",
 		"^",
-		"&",
 		"*"
 	);
 	INFO(str);
