@@ -125,7 +125,7 @@ The use of `$` for escape sequences is used to make writing paths easier, and in
 
 A `$` followed by an invalid escape sequence is an error. Use `$$` for literal dollar signs.
 
-The `$'` escape sequence is permitted, but optional.
+The `$'` escape sequence is permitted, but optional (`'` may appear in double-quoted strings without escaping).
 
 `$(` indicates the start of a variable expression. Not having a valid variable expression after a `$(` in a double quoted string is an error. The escape sequence `$$(` can be used to insert `$(` as a literal.
 
@@ -173,7 +173,7 @@ Adjacent string forms or variables are treated as a single leaf and concatenated
 
 **Examples:**
 ```text
-path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cp
+path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cpp
 "combining "'forms 'in-any" which way"   => combining forms in-any which way
 ```
 
@@ -183,9 +183,7 @@ Bracket expressions have the following form (literal `[]`, not optional):
 [ <rule_invocation>|on <target> <rule_invocation> ]
 ```
 
-Where `value_invocation` is either a `rule_invocation`, or a `target_statement` holding a `rule_invocation`.
-
-A bracket expression evaluates to the result of the `statement`. They may only be used with statements that have a value (i.e. no control structures).
+A bracket expression evaluates to the result of the `rule_invocation`. 
 
 Standalone bracket expressions can be used as leafs, but they cannot be embedded words/double quoted strings like variables can.
 
@@ -197,8 +195,10 @@ rule Return1 {
 
 Echo [ Return1 ] ; # 1
 
-X on target = 2 ;
-Echo [ on target $(X) ] ; # 2
+X on target = 2 3 ;
+Echo [ on target $(X) ] ; # 2 3
+
+Echo [ Return1 ] [ on target $(X) ] 4 ; # 1 2 3 4
 ```
 
 ### Leaf expansion
@@ -292,11 +292,16 @@ Depends all : mybin ;
 ```
 
 ## Lists
-Lists contain 0 or more leafs. A list literal is a whitespace delimited list of leafs.
+Lists contain 0 or more leafs.
+
+A list literal is a whitespace delimited list of leafs. The elements in the leafs are appended.
 
 **Examples:**
 ```text
 this is "a list" # [this, is, a list]
+
+# X = 1 2
+elements are appended $(X) # [elements, are, appended, 1, 2]
 ```
 
 ## Variables
@@ -413,8 +418,8 @@ Changes from each modifier are "fed" into the next modifier. Modifiers have the 
 | `:S`           | 3                                |
 | `:D`           | 3                                |
 | `:G`           | 3                                |
-| `:U`           | 4 (mutually exclusive with `:U`) |
-| `:L`           | 4 (mutually exclusive with `:L`) |
+| `:U`           | 4 (mutually exclusive with `:L`) |
+| `:L`           | 4 (mutually exclusive with `:U`) |
 | `:J=separator` | 5                                |
 
 If a modifier follows another modifier without an argument, the colon may be omitted. For instance, `:BS` selects the filename (base + suffix). Colons must be included to separate modifiers with arguments, such as `:R=/:D=usr`. Notably, this means words used as a modifier argument cannot contain `:`; you should use double/single quoted strings instead.
@@ -442,9 +447,9 @@ Echo $(A:BSB=head) ; # head.cpp
 Echo $(A:UD=root) ;  # ROOT/FILE.CPP
 
 B = file1.cpp file2.cpp file3.cpp ;
-Echo $(B:J=", ") ; # file1.cpp, file2.cpp, file3.cpp
-Echo $(B:BJ=", ") ; # file1, file2, file3
-Echo $(B:UJ=x) ;    # FILE1xFILE2xFILE3
+Echo $(B:J=", ") ;   # file1.cpp, file2.cpp, file3.cpp
+Echo $(B:BJ=", ") ;  # file1, file2, file3
+Echo $(B:UJ=x) ;     # FILE1xFILE2xFILE3
 ```
 
 ### Variable assignment
@@ -506,12 +511,12 @@ Global and local variables are bound within the rule statement, but local variab
 
 Rule definitions have access to the special statement `return <list> ;`. When this statement is evaluated, the rule immediately stops and the value is the result of the rule evaluation. Passing more than one argument to `return` is an error. A single argument that is a list is valid.
 
-**NOTE:** Rules are defined in the _global scope_, even if they are not defined in a top-level block. You may have multiple definitions of a rule in the source code contained by conditional statements, but only one definition can be evaluated. Overwriting a rule definition is an error.
-
 ```text
 return 1 2 3 ;      # ok
 return 1 : 2 : 3 ;  # error
 ```
+
+**NOTE:** Rules are defined in the _global scope_, even if they are not defined in a top-level block. You may have multiple definitions of a rule in the source code contained by conditional statements, but only one definition can be evaluated. Overwriting a rule definition is an error.
 
 ### Invoking rules
 Rules are invoked with the form:
@@ -593,7 +598,7 @@ actions <modifiers> <identifier> {
 
 The strange escape sequence structure is so that it's natural to use paths, but also possible to type all literal sequences as quoting is not respected in actions.
 
-**NOTE:** Actions are defined globally like [rules](#defining-rules), and must also be defined exactly once. See rule definitions for more.
+**NOTE:** Actions are defined globally like rules, and must also be defined exactly once. See [rule definitions](#defining-rules) for more.
 
 ### Invoking actions
 Actions are invoked just like rules, and can in fact have the same name as a rule. If an action and rule have the same name, the rule is evaluated first, and then the action is invoked.
@@ -646,14 +651,14 @@ Let `a` and `b` be leaf expressions, and `cond` represent another condition. A c
 | `a`              | any element of `a` is a non-empty string                           |
 | `a = b`          | all elements of `a` and `b` are equal                              |
 | `a != b`         | `a = b` is false                                                   |
-| `a < b `         | `a[i] < b[i]`, where `i` is the first element where `a[i] != b[i]` |
+| `a < b`          | `a[i] < b[i]`, where `i` is the first element where `a[i] != b[i]` |
 | `a > b`          | `a[i] > b[i]`, where `i` is the first element where `a[i] != b[i]` |
 | `a <= b`         | `a[i] <= b[i]` holds for all `i < min(len(a), len(b))`             |
 | `a >= b`         | `a[i] >= b[i]` holds for all `i < min(len(a), len(b))`             |
 | `a in b`         | `a` is a subset of `b`, or `a` is empty                            |
 | `! cond`         | `cond` is false                                                    |
 | `cond && cond`   | both conditions are true                                           |
-| `cond || cond`   | either condition is true                                           |
+| `cond \|\| cond` | either condition is true                                           |
 | `(cond)`         | precedence grouping                                                |
 
 ### If statement
@@ -724,13 +729,20 @@ Includes foo.c : generated.h ;
 Depends foo.o : foo.c ; # generated.h needs to be built before we try and build foo.o
 ```
 
-Notice that this is **not the same** as just using `Depends`. If we did the following:
+Notice that this is **not the same** as just using `Depends`. It feels natural for `foo.c` to depend on `generated.h`, but the header file is only used to build `foo.o`. While the code in `foo.c` and `generated.h` might be related, in terms of the build dependency tree their contents are independent.
+```
+# Notice that foo.c and foo.h are both sources used to build foo.o
+gcc -Ifoo.h foo.c -o foo.o
+```
+
+If you do try to use `Depends`, you get an error:
 ```text
-Includes foo.c : generated.h ; 
+Depends foo.c : generated.h ;
 Depends foo.o : foo.c ; # bang! can't build foo.c
 ```
 
-`foo.c` would no longer be a leaf source, and Ham would not know how to build it.
+Ham would treat `foo.c` as a _generated_ object, not a source file, and try to build it. Because we don't tell Ham how to build `foo.c` (source files aren't built), it causes an error.
+
 
 ### Order dependencies
 The `MaybeIncludes` and `MaybeDepends` rules create order-only dependencies, where:
@@ -760,7 +772,7 @@ Note that the deps files are considered temporaries and removed automatically.
 `msvc` supports a different dependency format, and prints to standard output instead of a file. To enable `msvc` dependencies, first define your action as before:
 ```text
 rule deps[msvc] Cc {
-  cl /showIncludes -c $in /Fo$out
+  cl /showIncludes -c $(2) /Fo"$(1)"
 }
 ```
 
