@@ -125,7 +125,7 @@ The use of `$` for escape sequences is used to make writing paths easier, and in
 
 A `$` followed by an invalid escape sequence is an error. Use `$$` for literal dollar signs.
 
-The `$'` escape sequence is permitted, but optional. (`'` may appear in double-quoted strings without escaping.)
+The `$'` escape sequence is permitted, but optional (`'` may appear in double-quoted strings without escaping).
 
 `$(` indicates the start of a variable expression. Not having a valid variable expression after a `$(` in a double quoted string is an error. The escape sequence `$$(` can be used to insert `$(` as a literal.
 
