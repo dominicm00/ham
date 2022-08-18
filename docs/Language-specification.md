@@ -85,7 +85,7 @@ rule_echox abc ; # X: abc
 Leafs are the core data structure in Ham, and consist of everything that can be evaluated to a string list (even a string list of size 0 or 1). A leaf literal is comprised of one or more string forms, [variables](#variables), or [bracket expressions](#bracket-expressions) not separated by whitespace. There are three string forms:
 
 ### Words
-Words are character sequences of all printable, non-whitespace characters (ASCII 33-126), _excluding the following:_ `$ " ' : ; | # { } ( ) [ ]`.
+Words are character sequences of all printable, non-whitespace characters (ASCII 33-126), _excluding the following:_ `$ ' " : ; { } ( ) [ ] # ! & | = + ?`.
 
 The `$` character indicates the start of a variable expression. Not having a valid variable expression after a `$` in a word is an error.
 
