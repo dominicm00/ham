@@ -292,11 +292,16 @@ Depends all : mybin ;
 ```
 
 ## Lists
-Lists contain 0 or more leafs. A list literal is a whitespace delimited list of leafs.
+Lists contain 0 or more leafs.
+
+A list literal is a whitespace delimited list of leafs. The elements in the leafs are appended.
 
 **Examples:**
 ```text
 this is "a list" # [this, is, a list]
+
+# X = 1 2
+elements are appended $(X) # [elements, are, appended, 1, 2]
 ```
 
 ## Variables
