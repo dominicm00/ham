@@ -73,6 +73,7 @@ inline constexpr auto error_message<CloseDoubleQuote> = "expected closing \"";
  * - [ ]    - bracket expressions
  * - #      - comments
  * - ! & |  - boolean expressions
+ * - = + ?  - variable assignment
  *
  * When outside a quotation, these characters may only be used in accordance
  * with their special meaning, if they have any.
@@ -92,7 +93,10 @@ struct SpecialChars : p::one<
 						  '#',
 						  '!',
 						  '&',
-						  '|'> {};
+						  '|',
+						  '=',
+						  '+',
+						  '?'> {};
 
 /**
  * Identifier characters: [a-zA-Z0-9/\\_-]
@@ -245,6 +249,8 @@ inline constexpr auto error_message<Leaf> = "expected leaf";
  * list: <leaf>[ <leaf>]*
  */
 struct List : p::list<Leaf, Whitespace> {};
+template<>
+inline constexpr auto error_message<List> = "expected list";
 
 /**
  * rule_invocation: <identifier>[ <list>[ : <list>]*]
@@ -487,6 +493,54 @@ struct TargetStatement
 		  TAO_PEGTL_STRING("on"),
 		  Whitespace,
 		  p::must<Leaf, Whitespace, TargetStatementInvocation>> {};
+
+struct AssignmentOperator
+	: p::sor<p::string<'+', '='>, p::string<'?', '='>, p::string<'='>> {};
+template<>
+inline constexpr auto error_message<AssignmentOperator> =
+	"expected assignment with =, +=, or ?=";
+
+struct LocalVariableModifier : TAO_PEGTL_STRING("local") {};
+struct TargetVariableModifier
+	: p::seq<
+		  p::string<'o', 'n'>,
+		  Whitespace,
+		  // Error only if an assignment operator is next, otherwise it might be
+		  // a rule
+		  p::if_then_else<
+			  p::at<AssignmentOperator>,
+			  TAO_PEGTL_RAISE_MESSAGE("expected target(s) after 'on'"),
+			  List>> {};
+
+struct VariableAssignment
+	: p::seq<
+		  p::if_then_else<
+			  p::seq<LocalVariableModifier, Whitespace>,
+			  // If "local" is present, we can expect a variable assignment.
+			  p::seq<
+				  p::must<Identifier>,
+				  p::opt<Whitespace>,
+				  // Check assignment is not both scope and target local.
+				  p::if_then_else<
+					  p::at<TargetVariableModifier>,
+					  TAO_PEGTL_RAISE_MESSAGE("assignment cannot be scope and "
+											  "target local simultaneously"),
+					  p::success>,
+				  p::must<AssignmentOperator>>,
+			  // Otherwise it might be a rule, so we only know after the
+			  // operator.
+			  p::seq<
+				  Identifier,
+				  p::opt<Whitespace>,
+				  p::opt<TargetVariableModifier, p::opt<Whitespace>>,
+				  AssignmentOperator>>,
+		  // Now it is definitely a variable assignment
+		  p::opt<Whitespace>,
+		  // Can assign to empty list
+		  p::opt<List>,
+		  p::opt<Whitespace>,
+		  p::must<Semicolon>> {};
+
 struct StatementBlock
 	: p::list<
 		  p::sor<Definition, Scope, TargetStatement, RuleStatement>,
@@ -510,6 +564,7 @@ using Selector = p::parse_tree::selector<
 		ActionDefinition,
 		ActionEscape,
 		ActionString,
+		AssignmentOperator,
 		CharEscape,
 		EmptyBlock,
 		ForLoop,
@@ -535,9 +590,11 @@ using Selector = p::parse_tree::selector<
 		TargetRuleInvocation,
 		TargetStatement,
 		Variable,
+		VariableAssignment,
 		VariableReplacer,
 		VariableSelector,
 		WhileLoop,
+		LocalVariableModifier,
 		Word>,
 	RearrangeBinaryOperator::on<
 		BoolExpression,

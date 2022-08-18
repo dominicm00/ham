@@ -17,6 +17,7 @@ add_executable(
   parse/RuleSignatures.cpp
   parse/StatementBlocks.cpp
   parse/TargetStatements.cpp
+  parse/VariableAssignment.cpp
   parse/Variables.cpp
   parse/WhileLoops.cpp
   )
