@@ -762,11 +762,9 @@ Note that the deps files are considered temporaries and removed automatically.
 `msvc` supports a different dependency format, and prints to standard output instead of a file. To enable `msvc` dependencies, first define your action as before:
 ```text
 rule deps[msvc] Cc {
-  cl /showIncludes -c $in /Fo$out
+  cl /showIncludes -c $(2) /Fo"$(1)"
 }
 ```
-
-TODO: The `$` in the statement irritates me. Does it not need to be escaped?
 
 Then globally define the prefix `msvc` prints before each dependency:
 ```text
