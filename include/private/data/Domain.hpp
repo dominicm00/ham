@@ -12,11 +12,15 @@
 namespace ham::data
 {
 
-class Domain {
+/**
+ * References all accessible variables in a given scope.
+ */
+class Scope {
   public:
-	Domain() = delete;
-	Domain(std::vector<Scope>& scopes)
-		: scopes(scopes){};
+	Scope() = delete;
+	Scope(std::vector<VariableMap>& scopes, std::size_t level)
+		: scopes(scopes),
+		  level{level} {};
 
 	std::optional<const List*> Find(std::string_view var);
 
@@ -30,8 +34,19 @@ class Domain {
 	}
 
   private:
-	std::vector<Scope>& scopes;
+	std::vector<VariableMap>& scopes;
 	std::size_t level;
+};
+
+/**
+ * Holds data for individual domains. Must outlive all generated domains.
+ */
+class Domain {
+  public:
+	Scope GlobalScope() { return Scope(scopes, 0); }
+
+  private:
+	std::vector<VariableMap> scopes;
 };
 
 } // namespace ham::data
