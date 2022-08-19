@@ -1,4 +1,4 @@
-#include "HamError.hpp"
+#include "util/HamError.hpp"
 
 namespace ham
 {
