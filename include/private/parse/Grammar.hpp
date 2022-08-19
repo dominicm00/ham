@@ -1,6 +1,7 @@
 #ifndef HAM_PARSE_GRAMMAR_HPP
 #define HAM_PARSE_GRAMMAR_HPP
 
+#include "data/Types.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/ascii.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -17,8 +18,6 @@
 #include <stdexcept>
 #include <string_view>
 #include <type_traits>
-
-namespace p = tao::pegtl;
 
 namespace ham::parse
 {
