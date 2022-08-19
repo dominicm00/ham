@@ -4,9 +4,9 @@ add_library(
 
   HamError.cpp
 
+  code/Context.cpp
+  data/VariableScope.cpp
   parse/PegtlParser.cpp
-  parse/Parser.cpp
-  data/Domain.cpp
 
   ${HAM_PUBLIC_HEADER_FILES}
   )

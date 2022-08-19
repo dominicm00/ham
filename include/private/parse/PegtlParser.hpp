@@ -1,7 +1,6 @@
 #ifndef HAM_PARSE_PEGTLPARSER_HPP
 #define HAM_PARSE_PEGTLPARSER_HPP
 
-#include "data/Types.hpp"
 #include "parse/Grammar.hpp"
 #include "parse/Parser.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -17,8 +16,6 @@
 
 namespace ham::parse
 {
-
-namespace p = tao::pegtl;
 
 class PegtlParser {
   public:

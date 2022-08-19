@@ -19,6 +19,8 @@
 #include <string_view>
 #include <type_traits>
 
+namespace p = tao::pegtl;
+
 namespace ham::parse
 {
 

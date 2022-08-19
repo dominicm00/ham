@@ -1,6 +1,9 @@
 #ifndef HAM_CODE_NODE_HPP
 #define HAM_CODE_NODE_HPP
 
+#include "code/Context.hpp"
+#include "data/Types.hpp"
+
 #include <functional>
 #include <memory>
 #include <optional>
@@ -28,29 +31,6 @@ class NodeVisitor {
 };
 
 /**
- * Context for building the AST.
- */
-class AstContext {
-  public:
-	void EnterLoop()
-	{
-		loop_depth++;
-		block_depth++;
-	}
-
-	void EnterBlock() { block_depth++; }
-
-  public:
-	unsigned int loop_depth;
-	unsigned int block_depth;
-};
-
-/**
- * Context for evaluating the AST
- */
-class EvaluationContext {};
-
-/**
  * Information dumped from node
  */
 class NodeDump {
@@ -60,7 +40,7 @@ class NodeDump {
 	// string content of this node if appropriate
 	std::optional<std::string> content;
 	// *all* nodes held interally by this node
-	std::vector<std::unique_ptr<const Node>> children;
+	std::vector<std::reference_wrapper<const Node>> children;
 };
 
 /**
@@ -87,9 +67,8 @@ class Node {
 	 * associated with the expression result, otherwise return
 	 * StringList::kFalse.
 	 */
-	virtual std::unique_ptr<std::vector<std::string>> Evaluate(
-		EvaluationContext& context
-	) const = 0;
+	virtual std::unique_ptr<std::vector<std::string>>
+	Evaluate(EvaluationContext&) const = 0;
 
 	/**
 	 * Visit nodes recursively until NodeVisitor::VisitNode returns true. Nodes
@@ -117,9 +96,8 @@ class Node {
 	 *
 	 * \result First Node to match predicate.
 	 */
-	virtual std::optional<std::reference_wrapper<const Node>> Visit(
-		NodeVisitor& visitor
-	) const = 0;
+	virtual std::optional<std::reference_wrapper<const Node>>
+	Visit(NodeVisitor&) const = 0;
 
   public:
 	/**
