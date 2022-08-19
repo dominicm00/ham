@@ -87,7 +87,8 @@ class Node {
 	 * associated with the expression result, otherwise return
 	 * StringList::kFalse.
 	 */
-	virtual std::vector<std::string> Evaluate(EvaluationContext& context
+	virtual std::unique_ptr<std::vector<std::string>> Evaluate(
+		EvaluationContext& context
 	) const = 0;
 
 	/**
@@ -101,7 +102,7 @@ class Node {
 
 	 \code
 	 if (visitor.VisitNode(this))
-	   return this;
+	   return *this;
 
 	 if (auto result = fLeft.Visit(visitor))
 	   return result.value();
@@ -116,7 +117,8 @@ class Node {
 	 *
 	 * \result First Node to match predicate.
 	 */
-	virtual std::optional<std::unique_ptr<Node>> Visit(NodeVisitor& visitor
+	virtual std::optional<std::reference_wrapper<const Node>> Visit(
+		NodeVisitor& visitor
 	) const = 0;
 
   public:

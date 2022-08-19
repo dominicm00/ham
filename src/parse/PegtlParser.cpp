@@ -1,6 +1,7 @@
-#include "parse/NodeParser.hpp"
+#include "parse/PegtlParser.hpp"
 
-#include "HamError.hpp"
+#include "data/Types.hpp"
+#include "util/HamError.hpp"
 
 #include <string>
 
@@ -8,7 +9,7 @@ namespace ham::parse
 {
 
 HamError
-NodeParser::ConvertToHamError(tao::pegtl::parse_error pegtl_err)
+PegtlParser::ConvertToHamError(p::parse_error pegtl_err)
 {
 	Position pos{};
 

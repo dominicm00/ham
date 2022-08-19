@@ -1,22 +1,23 @@
 #ifndef HAM_PARSE_PARSER_HPP
 #define HAM_PARSE_PARSER_HPP
 
-#import <string>
+#include "code/Node.hpp"
+
+#include <string>
 
 namespace ham::parse
 {
 
-class NodeParser {
+class Parser {
   public:
 	enum Debug {
-		NONE,
 		XDOT,
 		TRACE,
 		GRAMMAR
 	};
 
   public:
-	static void Parse(std::string in, Debug debug);
+	// static code::Node Parse(std::string in);
 };
 
 } // namespace ham::parse

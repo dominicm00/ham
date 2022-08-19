@@ -24,7 +24,7 @@ decompose(NodePointer&& node, std::vector<int> indices)
 			return NodePointer{};
 		node = std::move(node->children[indices[i]]);
 	}
-	return node;
+	return std::move(node);
 };
 
 std::string
