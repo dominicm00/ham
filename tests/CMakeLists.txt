@@ -3,6 +3,7 @@ add_executable(
 
   Utils.cpp
 
+  data/VariableScope.cpp
   parse/ActionDefinitions.cpp
   parse/BracketExpressions.cpp
   parse/Conditions.cpp
