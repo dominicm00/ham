@@ -15,6 +15,21 @@ namespace ham::code
  */
 class GlobalContext {
   public:
+	GlobalContext() = delete;
+	GlobalContext(data::List& targets)
+		: targets(targets){};
+
+	// Contexts cannot be copied
+	GlobalContext(const GlobalContext&) = delete;
+	GlobalContext& operator=(const GlobalContext&) = delete;
+
+	// Contexts can be moved
+	GlobalContext(GlobalContext&&) = default;
+
+	// Contexts cannot be overwritten
+	GlobalContext& operator=(GlobalContext&) = delete;
+
+  public:
 	data::List targets;
 };
 
@@ -23,6 +38,20 @@ class GlobalContext {
  */
 class AstContext {
   public:
+	AstContext() = delete;
+	AstContext(GlobalContext& global_context)
+		: global_context(global_context){};
+
+	// Contexts cannot be copied
+	AstContext(const AstContext&) = delete;
+	AstContext& operator=(const AstContext&) = delete;
+
+	// Contexts can be moved
+	AstContext(AstContext&&) = default;
+
+	// Contexts cannot be overwritten
+	AstContext& operator=(AstContext&) = delete;
+
 	void EnterLoop()
 	{
 		loop_depth++;
@@ -61,6 +90,16 @@ class EvaluationContext {
 		: global_context(global_context),
 		  variable_scope(std::move(variable_scope)),
 		  jump_condition(NONE){};
+
+	// Contexts cannot be copied
+	EvaluationContext(const EvaluationContext&) = delete;
+	EvaluationContext& operator=(const EvaluationContext&) = delete;
+
+	// Contexts can be moved
+	EvaluationContext(EvaluationContext&&) = default;
+
+	// Contexts cannot be overwritten
+	EvaluationContext& operator=(EvaluationContext&) = delete;
 
   public:
 	JumpCondition jump_condition;
