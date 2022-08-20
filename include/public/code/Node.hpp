@@ -67,8 +67,7 @@ class Node {
 	 * associated with the expression result, otherwise return
 	 * StringList::kFalse.
 	 */
-	virtual std::unique_ptr<std::vector<std::string>>
-	Evaluate(EvaluationContext&) const = 0;
+	virtual data::List Evaluate(EvaluationContext&) const = 0;
 
 	/**
 	 * Visit nodes recursively until NodeVisitor::VisitNode returns true. Nodes
@@ -111,6 +110,7 @@ class Node {
 	 */
 	virtual NodeDump Dump() const = 0;
 };
+
 } // namespace ham::code
 
 #endif // HAM_CODE_NODE_HPP

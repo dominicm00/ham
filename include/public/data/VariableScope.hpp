@@ -27,13 +27,14 @@ class VariableScope {
 	VariableScope(VariableScope&&) = default;
 	VariableScope& operator=(VariableScope&&) = default;
 
-	template<class A, class B>
-	void Set(std::string_view&& var, std::unique_ptr<List>&& list)
+	template<class M>
+	void Set(std::string&& var, M&& list)
 	{
-		var_map.insert_or_assign(std::forward<A>(var), std::forward<B>(list));
+		var_map.insert_or_assign(std::move(var), std::forward<M>(list));
 	}
 
-	std::optional<const List*> Find(std::string_view var);
+	std::optional<std::reference_wrapper<const List>> Find(std::string_view var
+	);
 	VariableScope CreateSubscope();
 
   private:

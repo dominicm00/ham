@@ -2,18 +2,19 @@
 
 #include "data/Types.hpp"
 
+#include <functional>
 #include <memory>
 #include <string_view>
 
 namespace ham::data
 {
 
-std::optional<const List*>
+std::optional<std::reference_wrapper<const List>>
 VariableScope::Find(std::string_view var)
 {
 	auto entry = var_map.find(var);
 	if (entry != var_map.end()) {
-		return entry->second.get();
+		return entry->second;
 	} else if (parent) {
 		return parent.value().get().Find(var);
 	} else {

@@ -12,7 +12,7 @@ namespace ham::data
 
 // Common types used internally in Ham
 using List = std::vector<std::string>;
-using VariableMap = std::map<std::string, std::unique_ptr<List>, std::less<>>;
+using VariableMap = std::map<std::string, List, std::less<>>;
 
 } // namespace ham::data
 
