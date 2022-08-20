@@ -23,7 +23,7 @@ TEST_CASE("Target statements, rule invocations", "[grammar]")
 		"on target Echo $(X) ;",
 		T<TargetStatement>(
 			{T<Leaf>("target"),
-			 T<RuleInvocation>({T<Identifier>("Echo"), T<List>()})}
+			 T<RuleActionInvocation>({T<Identifier>("Echo"), T<List>()})}
 		)
 	);
 }

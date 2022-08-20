@@ -38,7 +38,8 @@ TEST_CASE("If statement", "[grammar]")
 		"if a { Echo ; }",
 		T<IfStatement>(
 			{T<Leaf>("a"),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Echo")}
+			 )})}
 		)
 	);
 }
@@ -49,8 +50,10 @@ TEST_CASE("If-else statement", "[grammar]")
 		"if a { Echo ; } else { Rule ; }",
 		T<IfStatement>(
 			{T<Leaf>("a"),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})}),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Rule")})})}
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Echo")}
+			 )}),
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Rule")}
+			 )})}
 		)
 	);
 }
@@ -65,7 +68,7 @@ TEST_CASE("If statements with empty blocks", "[grammar]")
 		"if x { Rule ; } else { }",
 		T<IfStatement>(
 			{T<Leaf>("x"),
-			 T<StatementBlock>({T<RuleInvocation>("Rule")}),
+			 T<StatementBlock>({T<RuleActionInvocation>("Rule")}),
 			 T<EmptyBlock>()}
 		)
 	);
@@ -74,7 +77,7 @@ TEST_CASE("If statements with empty blocks", "[grammar]")
 		T<IfStatement>(
 			{T<Leaf>("x"),
 			 T<EmptyBlock>(),
-			 T<StatementBlock>({T<RuleInvocation>("Rule")})}
+			 T<StatementBlock>({T<RuleActionInvocation>("Rule")})}
 		)
 	);
 }

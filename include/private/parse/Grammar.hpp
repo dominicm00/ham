@@ -213,7 +213,7 @@ inline constexpr auto error_message<VariableContents> =
 
 struct Variable : p::seq<p::one<'$'>, p::must<VariableContents>> {};
 
-struct RuleInvocation;
+struct RuleActionInvocation;
 
 struct TargetRuleTarget : p::seq<Leaf> {};
 template<>
@@ -224,10 +224,10 @@ struct TargetRuleInvocation
 	: p::seq<
 		  TAO_PEGTL_STRING("on"),
 		  Whitespace,
-		  p::must<TargetRuleTarget, Whitespace, RuleInvocation>> {};
+		  p::must<TargetRuleTarget, Whitespace, RuleActionInvocation>> {};
 
 struct BracketExpressionContents
-	: p::sor<TargetRuleInvocation, RuleInvocation> {};
+	: p::sor<TargetRuleInvocation, RuleActionInvocation> {};
 template<>
 inline constexpr auto error_message<BracketExpressionContents> =
 	"expected (target) rule invocation in '[ ]'";
@@ -258,14 +258,14 @@ inline constexpr auto error_message<List> = "expected list";
  */
 struct RuleSeparator : p::one<':'> {};
 
-struct RuleInvocation
+struct RuleActionInvocation
 	: p::seq<
 		  Identifier,
 		  p::opt<
 			  Whitespace,
 			  p::list<p::sor<RuleSeparator, List>, Whitespace>>> {};
 template<>
-inline constexpr auto error_message<RuleInvocation> =
+inline constexpr auto error_message<RuleActionInvocation> =
 	"expected rule invocation";
 
 struct Statement;
@@ -482,7 +482,7 @@ inline constexpr auto error_message<Semicolon> = "expected ';'";
 struct Definition : p::sor<RuleDefinition, ActionDefinition> {};
 struct Scope : p::sor<BracketedBlock, IfStatement, WhileLoop, ForLoop> {};
 struct RuleStatement
-	: p::seq<RuleInvocation, p::opt<Whitespace>, p::must<Semicolon>> {};
+	: p::seq<RuleActionInvocation, p::opt<Whitespace>, p::must<Semicolon>> {};
 
 struct TargetStatementInvocation : p::sor<Scope, RuleStatement> {};
 template<>
@@ -575,14 +575,15 @@ using Selector = p::parse_tree::selector<
 		Leaf,
 		LeafComparator,
 		List,
+		LocalVariableModifier,
 		LogicalAnd,
 		LogicalNot,
 		LogicalOr,
 		QuotedChar,
 		QuotedDouble,
 		QuotedSingleContent,
+		RuleActionInvocation,
 		RuleDefinition,
-		RuleInvocation,
 		RuleSeparator,
 		RuleSignature,
 		SpecialEscape,
@@ -595,7 +596,6 @@ using Selector = p::parse_tree::selector<
 		VariableReplacer,
 		VariableSelector,
 		WhileLoop,
-		LocalVariableModifier,
 		Word>,
 	RearrangeBinaryOperator::on<
 		BoolExpression,

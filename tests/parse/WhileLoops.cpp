@@ -28,7 +28,8 @@ TEST_CASE("While loop", "[grammar]")
 		"while a { Echo ; }",
 		T<WhileLoop>(
 			{T<Leaf>("a"),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Echo")}
+			 )})}
 		)
 	);
 }

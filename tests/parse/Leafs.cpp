@@ -143,11 +143,11 @@ TEST_CASE("Escape sequences must be valid", "[grammar]")
  */
 TEST_CASE("Bracket expressions recognized as leafs", "[grammar]")
 {
-	REQUIRE_PARSE("[ Rule ]", T<Leaf>({T<RuleInvocation>("Rule")}));
+	REQUIRE_PARSE("[ Rule ]", T<Leaf>({T<RuleActionInvocation>("Rule")}));
 	REQUIRE_PARSE(
 		"[ on target Rule ]",
 		T<Leaf>({T<TargetRuleInvocation>(
-			{T<Leaf>("target"), T<RuleInvocation>("Rule")}
+			{T<Leaf>("target"), T<RuleActionInvocation>("Rule")}
 		)})
 	);
 }

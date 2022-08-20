@@ -54,7 +54,8 @@ TEST_CASE("For loop", "[grammar]")
 		T<ForLoop>(
 			{T<Identifier>("x"),
 			 T<Leaf>({T<Variable>({T<Identifier>("y")})}),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Echo")}
+			 )})}
 		)
 	);
 }
