@@ -102,7 +102,7 @@ class Node {
 	/**
 	 * A string representation of the class.
 	 */
-	std::string_view type;
+	static constexpr std::string_view type;
 
   private:
 	/**
