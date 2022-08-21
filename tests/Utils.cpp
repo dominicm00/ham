@@ -73,11 +73,8 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 
 	for (int i = 0; i < std::min(node->children.size(), ns.children.size());
 		 i++) {
-		isValid = checkParse(
-					  std::forward<NodePointer>(node->children[i]),
-					  ns.children[i],
-					  depth + 1
-				  )
+		isValid =
+			checkParse(std::move(node->children[i]), ns.children[i], depth + 1)
 			&& isValid;
 	}
 
@@ -87,7 +84,7 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 bool
 checkParse(NodePointer&& node, NodeStructure ns)
 {
-	return checkParse(std::forward<NodePointer>(node), ns, 0);
+	return checkParse(std::move(node), ns, 0);
 }
 
 } // namespace ham::tests
