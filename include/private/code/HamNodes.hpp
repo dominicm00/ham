@@ -51,24 +51,24 @@ class LeafNode : public BasicNode<T> {
 /**
  * Ham nodes
  */
-class Identifier : public BasicNode<Identifier> {};
-class Leaf : public BasicNode<Leaf> {};
-class List : public BasicNode<List> {};
+class Identifier;
+class Leaf;
+class List;
 
-class ForLoop : public BasicNode<ForLoop> {};
-class IfStatement : public BasicNode<IfStatement> {};
-class WhileLoop : public BasicNode<WhileLoop> {};
+class ForLoop;
+class IfStatement;
+class WhileLoop;
 
-class ActionDefinition : public BasicNode<ActionDefinition> {};
-class RuleActionInvocation : public BasicNode<RuleActionInvocation> {};
-class RuleDefinition : public BasicNode<RuleDefinition> {};
-class StatementBlock : public BasicNode<StatementBlock> {};
-class VariableAssignment : public BasicNode<VariableAssignment> {};
+class ActionDefinition;
+class RuleActionInvocation;
+class RuleDefinition;
+class StatementBlock;
+class VariableAssignment;
 
-class BooleanExpression : public BasicNode<BooleanExpression> {};
-class LeafComparator : public BasicNode<LeafComparator> {};
-class TargetExpression : public BasicNode<TargetExpression> {};
-class VariableExpression : public BasicNode<VariableExpression> {};
+class BooleanExpression;
+class LeafComparator;
+class TargetExpression;
+class VariableExpression;
 
 } // namespace ham::code
 
