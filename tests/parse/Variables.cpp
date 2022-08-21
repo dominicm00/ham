@@ -45,9 +45,9 @@ TEST_CASE("Nested variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(a$(b))",
-		T<Variable>(
-			{T<Identifier>({T<IdChar>("a"), T<Variable>({T<Identifier>("b")})})}
-		)
+		T<Variable>({T<Identifier>(
+			{T<IdString>("a"), T<Variable>({T<Identifier>("b")})}
+		)})
 	);
 }
 

@@ -66,8 +66,8 @@ TEST_CASE("Invalid whitespace in identifiers", "[grammar]")
 TEST_CASE("Variables in identifiers", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"a$(b)",
-		T<Identifier>({T<IdChar>("a"), T<Variable>("$(b)")})
+		"a12$(b)",
+		T<Identifier>({T<IdString>("a12"), T<Variable>("$(b)")})
 	);
 }
 

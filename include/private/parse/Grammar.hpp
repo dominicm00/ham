@@ -107,8 +107,8 @@ struct SpecialChars : p::one<
  * TODO: Support Unicode identifiers?
  */
 struct Variable;
-struct IdChar : p::sor<p::alnum, p::one<'/', '\\', '_', '-'>> {};
-struct Identifier : p::plus<p::sor<IdChar, Variable>> {};
+struct IdString : p::plus<p::sor<p::alnum, p::one<'/', '\\', '_', '-'>>> {};
+struct Identifier : p::plus<p::sor<IdString, Variable>> {};
 template<>
 inline constexpr auto error_message<Identifier> = "expected identifier";
 
@@ -569,7 +569,7 @@ using Selector = p::parse_tree::selector<
 		CharEscape,
 		EmptyBlock,
 		ForLoop,
-		IdChar,
+		IdString,
 		Identifier,
 		IfStatement,
 		Leaf,
