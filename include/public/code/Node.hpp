@@ -33,12 +33,11 @@ class NodeVisitor {
 /**
  * Information dumped from node
  */
-class NodeDump {
-  public:
+struct NodeDump {
 	// class name as determined by PEGTL demangle
-	std::string class_name;
+	std::string_view class_name;
 	// string content of this node if appropriate
-	std::optional<std::string> content;
+	std::optional<std::string_view> content;
 	// *all* nodes held interally by this node
 	std::vector<std::reference_wrapper<const Node>> children;
 };
@@ -79,7 +78,7 @@ class Node {
 	 * match. A simple example is provided below:
 
 	 \code
-	 if (visitor.VisitNode(this))
+	 if (visitor.VisitNode(*this))
 	   return *this;
 
 	 if (auto result = fLeft.Visit(visitor))
