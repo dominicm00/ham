@@ -48,8 +48,7 @@ struct NodeDump {
  */
 class Node {
   public:
-	// Nodes should only be constructed via subclasses.
-	Node() = delete;
+	Node() = default;
 	// The AST is final; nodes should not be copied or moved.
 	Node(const Node&) = delete;
 	Node(const Node&&) = delete;
