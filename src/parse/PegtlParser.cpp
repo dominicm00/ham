@@ -14,7 +14,7 @@ PegtlParser::ConvertToHamError(p::parse_error pegtl_err)
 {
 	return HamError(
 		HamError::PARSE,
-		ConvertToHamPosition(pegtl_err.positions()),
+		ConvertToHamPosition(pegtl_err.positions().back()),
 		std::string{pegtl_err.message()}
 	);
 }

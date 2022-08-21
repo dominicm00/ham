@@ -5,6 +5,7 @@ add_library(
   HamError.cpp
 
   code/Context.cpp
+  code/Identifier.cpp
   data/VariableScope.cpp
   parse/PegtlParser.cpp
   parse/PegtlUtils.cpp

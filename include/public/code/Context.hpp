@@ -4,6 +4,7 @@
 #include "data/Types.hpp"
 #include "data/VariableScope.hpp"
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -16,8 +17,9 @@ namespace ham::code
 class GlobalContext {
   public:
 	GlobalContext() = delete;
-	GlobalContext(data::List& targets)
-		: targets(targets){};
+	GlobalContext(data::List& targets, std::ostream& warning_stream)
+		: targets(targets),
+		  warning_stream(warning_stream){};
 
 	// Contexts cannot be copied
 	GlobalContext(const GlobalContext&) = delete;
@@ -31,6 +33,7 @@ class GlobalContext {
 
   public:
 	data::List targets;
+	std::ostream& warning_stream;
 };
 
 /**
@@ -51,6 +54,8 @@ class AstContext {
 
 	// Contexts cannot be overwritten
 	AstContext& operator=(AstContext&) = delete;
+
+	operator GlobalContext&() { return global_context; }
 
 	void EnterLoop()
 	{
@@ -100,6 +105,8 @@ class EvaluationContext {
 
 	// Contexts cannot be overwritten
 	EvaluationContext& operator=(EvaluationContext&) = delete;
+
+	operator GlobalContext&() { return global_context; }
 
   public:
 	JumpCondition jump_condition;

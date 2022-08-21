@@ -17,13 +17,16 @@ ConvertToHamFilePosition(p::position pegtl_file_pos)
 }
 
 Position
-ConvertToHamPosition(std::vector<p::position> pegtl_pos)
+ConvertToHamPosition(p::position start, std::optional<p::position> end)
 {
-	Position pos{};
-	for (auto pegtl_file_pos : pegtl_pos) {
-		pos.FilePositions().push_back(ConvertToHamFilePosition(pegtl_file_pos));
+	if (end) {
+		return Position(
+			ConvertToHamFilePosition(start),
+			ConvertToHamFilePosition(end.value())
+		);
+	} else {
+		return Position(ConvertToHamFilePosition(start));
 	}
-	return pos;
 }
 
 } // namespace ham::parse
