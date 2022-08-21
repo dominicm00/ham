@@ -7,6 +7,7 @@ add_library(
   code/Context.cpp
   data/VariableScope.cpp
   parse/PegtlParser.cpp
+  parse/PegtlUtils.cpp
 
   ${HAM_PUBLIC_HEADER_FILES}
   )
