@@ -3,7 +3,7 @@
 #include "parse/Grammar.hpp"
 #include "parse/PegtlParser.hpp"
 #include "tao/pegtl/string_input.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {

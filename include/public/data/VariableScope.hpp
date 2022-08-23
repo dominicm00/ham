@@ -19,9 +19,9 @@ class VariableScope {
   public:
 	VariableScope() = default;
 
-	// Owns variable data; cannot be copied
-	VariableScope(const VariableScope&) = delete;
-	VariableScope& operator=(const VariableScope&) = delete;
+	// Copying scopes are expensive; avoid when possible
+	VariableScope(const VariableScope&) = default;
+	VariableScope& operator=(const VariableScope&) = default;
 
 	// May be moved
 	VariableScope(VariableScope&&) = default;
@@ -33,9 +33,8 @@ class VariableScope {
 		var_map.insert_or_assign(std::move(var), std::forward<M>(list));
 	}
 
-	std::optional<std::reference_wrapper<const List>> Find(std::string_view var
-	);
-	VariableScope CreateSubscope();
+	std::optional<std::reference_wrapper<List>> Find(std::string_view var);
+	VariableScope CreateSubscope() const;
 
   private:
 	std::optional<std::reference_wrapper<VariableScope>> parent;

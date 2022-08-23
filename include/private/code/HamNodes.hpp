@@ -3,14 +3,20 @@
 
 #include "code/Context.hpp"
 #include "code/Node.hpp"
+#include "data/Types.hpp"
 #include "parse/PegtlUtils.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
 #include "tao/pegtl/demangle.hpp"
+#include "tao/pegtl/internal/frobnicator.hpp"
 #include "util/HamError.hpp"
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <string_view>
 #include <variant>
 
@@ -32,6 +38,8 @@ class BasicNode : public Node {
 			parse::ConvertToHamPosition(pegtl_node->begin(), pegtl_node->end())
 		){};
 
+	virtual ~BasicNode<T>() = default;
+
 	void Warning(GlobalContext& global_context, std::string_view message) const
 	{
 		HamWarning(global_context, pos, message);
@@ -42,8 +50,15 @@ class BasicNode : public Node {
 		return HamError(pos, message);
 	}
 
-	virtual data::List Evaluate(EvaluationContext&) const override = 0;
-	virtual NodeDump Dump() const override = 0;
+	std::string_view Type() const override { return type; }
+
+	// TODO: Redesign the class heiarchy to avoid this nonsense
+	virtual data::List Evaluate(EvaluationContext&) const override
+	{
+		assert(false);
+	};
+	virtual std::string String() const override { assert(false); };
+	virtual NodeDump Dump() const override { assert(false); };
 
   public:
 	static constexpr std::string_view type = tao::pegtl::demangle<T>();
@@ -52,6 +67,64 @@ class BasicNode : public Node {
 	Position pos;
 	std::string_view content;
 };
+
+/**
+ * Testing code
+ */
+class TestNode : public tao::pegtl::parse_tree::node {
+  public:
+	TestNode(std::string a_str_info)
+		: str_info(std::move(a_str_info))
+	{
+		m_begin = tao::pegtl::internal::frobnicator(str_info.data());
+		m_end = tao::pegtl::internal::frobnicator(
+			str_info.data() + str_info.size()
+		);
+		source = std::string_view{str_info};
+	};
+
+	std::string str_info;
+};
+
+template<class T>
+requires std::derived_from<T, BasicNode<T>>
+class Identity : public Node {
+  public:
+	Identity<T>(PegtlNode&& pnode)
+	{
+		const TestNode* node = static_cast<const TestNode*>(pnode.get());
+		if (node->str_info != tao::pegtl::demangle<T>()) {
+			std::stringstream err;
+			err << "tried to build " << tao::pegtl::demangle<T>() << " with "
+				<< node->str_info;
+			throw std::runtime_error(err.str());
+		}
+
+		// Use children as list elements
+		for (const PegtlNode& child : node->children) {
+			list.push_back(static_cast<const TestNode*>(child.get())->str_info);
+		}
+	};
+
+	data::List Evaluate(EvaluationContext&) const { return list; }
+	std::string String() const { return "Identity"; }
+	std::string_view Type() const { return tao::pegtl::demangle<T>(); }
+	NodeDump Dump() const { return {}; }
+
+  private:
+	data::List list;
+};
+
+template<class T>
+requires std::derived_from<T, BasicNode<T>> std::unique_ptr<Node>
+CreateNode(AstContext& ast_context, PegtlNode&& pegtl_node)
+{
+	if (ast_context.global_context.testing) {
+		return std::make_unique<Identity<T>>(std::move(pegtl_node));
+	} else {
+		return std::make_unique<T>(ast_context, std::move(pegtl_node));
+	}
+}
 
 /**
  * Ham nodes
@@ -96,14 +169,17 @@ overloaded(Ts...) -> overloaded<Ts...>;
  * Identifier
  */
 class Identifier : public BasicNode<Identifier> {
-	using IdPart = std::variant<std::string, std::unique_ptr<Variable>>;
+	using IdPart = std::variant<std::string, std::unique_ptr<Node>>;
 
   public:
 	Identifier(AstContext& ast_context, PegtlNode&& pegtl_node);
 
 	data::List Evaluate(EvaluationContext& eval_context) const;
+	std::string String() const;
 	NodeDump Dump() const;
-	friend std::ostream& operator<<(std::ostream&, const Identifier&);
+
+  private:
+	bool IsIdChar(unsigned char) const;
 
   private:
 	std::string content;
@@ -115,13 +191,18 @@ class Variable : public BasicNode<Variable> {
 	Variable(AstContext& ast_context, PegtlNode&& pegtl_node);
 
 	data::List Evaluate(EvaluationContext& eval_context) const;
+	std::string String() const;
 	NodeDump Dump() const;
-	friend std::ostream& operator<<(std::ostream&, const Variable&);
+
+  private:
+	data::List
+	DoSubscript(EvaluationContext& eval_context, const std::string&, const data::List&)
+		const;
 
   private:
 	std::string content;
-	std::unique_ptr<Identifier> id;
-	std::unique_ptr<Identifier> subscript;
+	std::unique_ptr<Node> id;
+	std::unique_ptr<Node> subscript;
 };
 
 } // namespace ham::code

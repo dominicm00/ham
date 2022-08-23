@@ -1,9 +1,14 @@
 add_executable(
   tests
 
-  Utils.cpp
+  ParseUtils.cpp
+  CodeUtils.cpp
+
+  code/Identifier.cpp
+  code/Variable.cpp
 
   data/VariableScope.cpp
+
   parse/ActionDefinitions.cpp
   parse/BracketExpressions.cpp
   parse/Conditions.cpp

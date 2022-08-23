@@ -1,5 +1,5 @@
-#ifndef HAM_TESTS_UTILS_HPP
-#define HAM_TESTS_UTILS_HPP
+#ifndef HAM_TESTS_PARSEUTILS_HPP
+#define HAM_TESTS_PARSEUTILS_HPP
 
 #include "catch2/catch_test_macros.hpp"
 #include "parse/Grammar.hpp"
@@ -100,4 +100,4 @@ T(std::vector<NodeStructure> children)
 
 #define REQUIRE_PARSE(str, ns) REQUIRE_NODE(decompose(parse(str), {0}), ns)
 
-#endif // HAM_TESTS_UTILS_HPP
+#endif // HAM_TESTS_PARSEUTILS_HPP

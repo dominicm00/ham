@@ -44,7 +44,8 @@ HamWarning(
 	std::string_view message
 )
 {
-	global_context.warning_stream << "warning: " << pos << " " << message;
+	global_context.warning_stream << "warning: " << pos << " " << message
+								  << std::endl;
 }
 
 } // namespace ham

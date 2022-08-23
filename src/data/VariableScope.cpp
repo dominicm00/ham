@@ -9,7 +9,7 @@
 namespace ham::data
 {
 
-std::optional<std::reference_wrapper<const List>>
+std::optional<std::reference_wrapper<List>>
 VariableScope::Find(std::string_view var)
 {
 	auto entry = var_map.find(var);
@@ -23,7 +23,7 @@ VariableScope::Find(std::string_view var)
 }
 
 VariableScope
-VariableScope::CreateSubscope()
+VariableScope::CreateSubscope() const
 {
 	VariableScope scope{};
 	scope.parent = *this;

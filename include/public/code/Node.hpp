@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <ostream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -34,9 +35,7 @@ struct NodeDump {
  */
 class Node {
   public:
-	// The AST is final; nodes should not be copied.
-	Node(const Node&) = delete;
-	Node& operator=(const Node&) = delete;
+	virtual ~Node() = default;
 
 	/**
 	 * Evaluate the current node. This generally involves evaluating any
@@ -51,15 +50,19 @@ class Node {
 	virtual data::List Evaluate(EvaluationContext&) const = 0;
 
 	/**
+	 * String representation of the node type
+	 */
+	virtual std::string_view Type() const = 0;
+
+	/**
+	 * String representation of current node (error/warning output)
+	 */
+	virtual std::string String() const = 0;
+
+	/**
 	 * This method is used for testing. Dumps all node information.
 	 */
 	virtual NodeDump Dump() const = 0;
-
-  public:
-	/**
-	 * A string representation of the class.
-	 */
-	static constexpr std::string_view type;
 };
 
 } // namespace ham::code

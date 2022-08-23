@@ -17,9 +17,18 @@ namespace ham::code
 class GlobalContext {
   public:
 	GlobalContext() = delete;
-	GlobalContext(data::List& targets, std::ostream& warning_stream)
-		: targets(targets),
-		  warning_stream(warning_stream){};
+	GlobalContext(data::List targets, std::ostream& warning_stream)
+		: targets(std::move(targets)),
+		  warning_stream(warning_stream),
+		  testing(false){};
+	GlobalContext(
+		data::List targets,
+		std::ostream& warning_stream,
+		bool testing
+	)
+		: targets(std::move(targets)),
+		  warning_stream(warning_stream),
+		  testing(testing){};
 
 	// Contexts cannot be copied
 	GlobalContext(const GlobalContext&) = delete;
@@ -34,6 +43,7 @@ class GlobalContext {
   public:
 	data::List targets;
 	std::ostream& warning_stream;
+	bool testing;
 };
 
 /**
@@ -106,7 +116,14 @@ class EvaluationContext {
 	// Contexts cannot be overwritten
 	EvaluationContext& operator=(EvaluationContext&) = delete;
 
-	operator GlobalContext&() { return global_context; }
+	operator GlobalContext&() const { return global_context; }
+
+	EvaluationContext CreateSubscopeContext() const
+	{
+		return EvaluationContext{
+			global_context,
+			variable_scope.CreateSubscope()};
+	};
 
   public:
 	JumpCondition jump_condition;
