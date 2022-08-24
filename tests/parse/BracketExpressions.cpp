@@ -3,7 +3,7 @@
 #include "parse/Grammar.hpp"
 #include "tao/pegtl/contrib/trace.hpp"
 #include "tao/pegtl/string_input.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -31,14 +31,15 @@ TEST_CASE("Bracket expressions don't contain non-value structures", "[grammar]")
 
 TEST_CASE("Bracket expression, rule invocation", "[grammar]")
 {
-	REQUIRE_PARSE("[ Rule x ]", T<RuleInvocation>("Rule x"));
+	REQUIRE_PARSE("[ Rule x ]", T<RuleActionInvocation>("Rule x"));
 }
 
 TEST_CASE("Bracket expression, target invocation", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"[ on target Rule x ]",
-		T<TargetRuleInvocation>({T<Leaf>("target"), T<RuleInvocation>("Rule x")}
+		T<TargetRuleInvocation>(
+			{T<Leaf>("target"), T<RuleActionInvocation>("Rule x")}
 		)
 	);
 }

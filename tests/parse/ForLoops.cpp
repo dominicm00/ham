@@ -1,7 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -54,7 +54,8 @@ TEST_CASE("For loop", "[grammar]")
 		T<ForLoop>(
 			{T<Identifier>("x"),
 			 T<Leaf>({T<Variable>({T<Identifier>("y")})}),
-			 T<StatementBlock>({T<RuleInvocation>({T<Identifier>("Echo")})})}
+			 T<StatementBlock>({T<RuleActionInvocation>({T<Identifier>("Echo")}
+			 )})}
 		)
 	);
 }

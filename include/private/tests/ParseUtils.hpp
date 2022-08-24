@@ -1,9 +1,9 @@
-#ifndef HAM_TESTS_UTILS_HPP
-#define HAM_TESTS_UTILS_HPP
+#ifndef HAM_TESTS_PARSEUTILS_HPP
+#define HAM_TESTS_PARSEUTILS_HPP
 
 #include "catch2/catch_test_macros.hpp"
 #include "parse/Grammar.hpp"
-#include "parse/NodeParser.hpp"
+#include "parse/PegtlParser.hpp"
 #include "tao/pegtl.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
 #include "tao/pegtl/demangle.hpp"
@@ -40,7 +40,7 @@ template<typename Rule>
 std::unique_ptr<p::parse_tree::node>
 genericParse(const std::string& str)
 {
-	return parse::NodeParser::ParseNode<p::sor<
+	return parse::PegtlParser::Parse<p::sor<
 		p::seq<Rule, p::eof>,
 		TAO_PEGTL_RAISE_MESSAGE("failed to match whole string")>>(
 		p::memory_input<p::tracking_mode::eager>{str, "tests"}
@@ -100,4 +100,4 @@ T(std::vector<NodeStructure> children)
 
 #define REQUIRE_PARSE(str, ns) REQUIRE_NODE(decompose(parse(str), {0}), ns)
 
-#endif // HAM_TESTS_UTILS_HPP
+#endif // HAM_TESTS_PARSEUTILS_HPP

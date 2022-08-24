@@ -1,9 +1,9 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
-#include "parse/NodeParser.hpp"
+#include "parse/PegtlParser.hpp"
 #include "tao/pegtl/string_input.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -143,11 +143,11 @@ TEST_CASE("Escape sequences must be valid", "[grammar]")
  */
 TEST_CASE("Bracket expressions recognized as leafs", "[grammar]")
 {
-	REQUIRE_PARSE("[ Rule ]", T<Leaf>({T<RuleInvocation>("Rule")}));
+	REQUIRE_PARSE("[ Rule ]", T<Leaf>({T<RuleActionInvocation>("Rule")}));
 	REQUIRE_PARSE(
 		"[ on target Rule ]",
 		T<Leaf>({T<TargetRuleInvocation>(
-			{T<Leaf>("target"), T<RuleInvocation>("Rule")}
+			{T<Leaf>("target"), T<RuleActionInvocation>("Rule")}
 		)})
 	);
 }

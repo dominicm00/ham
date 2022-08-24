@@ -3,7 +3,7 @@
 #include "parse/Grammar.hpp"
 #include "tao/pegtl/contrib/trace.hpp"
 #include "tao/pegtl/string_input.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -23,7 +23,7 @@ TEST_CASE("Target statements, rule invocations", "[grammar]")
 		"on target Echo $(X) ;",
 		T<TargetStatement>(
 			{T<Leaf>("target"),
-			 T<RuleInvocation>({T<Identifier>("Echo"), T<List>()})}
+			 T<RuleActionInvocation>({T<Identifier>("Echo"), T<List>()})}
 		)
 	);
 }

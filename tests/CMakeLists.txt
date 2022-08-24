@@ -1,7 +1,7 @@
 add_executable(
   tests
 
-  Utils.cpp
+  ParseUtils.cpp
 
   parse/ActionDefinitions.cpp
   parse/BracketExpressions.cpp

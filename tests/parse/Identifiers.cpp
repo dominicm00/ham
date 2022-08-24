@@ -1,7 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -66,8 +66,8 @@ TEST_CASE("Invalid whitespace in identifiers", "[grammar]")
 TEST_CASE("Variables in identifiers", "[grammar]")
 {
 	REQUIRE_PARSE(
-		"a$(b)",
-		T<Identifier>({T<IdChar>("a"), T<Variable>("$(b)")})
+		"a12$(b)",
+		T<Identifier>({T<IdString>("a12"), T<Variable>("$(b)")})
 	);
 }
 

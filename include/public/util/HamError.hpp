@@ -1,6 +1,8 @@
 #ifndef HAM_HAM_ERROR
 #define HAM_HAM_ERROR
 
+#include "code/Context.hpp"
+
 #include <cstddef>
 #include <exception>
 #include <initializer_list>
@@ -8,6 +10,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace ham
@@ -22,36 +25,23 @@ struct FilePosition {
 
 class Position {
   public:
-	Position(std::initializer_list<FilePosition> file_positions)
-		: file_positions(file_positions){};
-
-	std::vector<FilePosition> FilePositions() const noexcept
-	{
-		return file_positions;
-	}
+	Position() = delete;
+	Position(FilePosition start, std::optional<FilePosition> end = {})
+		: start(start),
+		  end(end){};
 
 	friend std::ostream& operator<<(std::ostream& os, const Position& pos);
 
-  private:
-	std::vector<FilePosition> file_positions;
+  public:
+	const FilePosition start;
+	const std::optional<FilePosition> end;
 };
 
 class HamError : public std::exception {
   public:
-	enum Phase {
-		PARSE,
-		EVALUATE,
-		MAKE
-	};
-
-  public:
 	HamError() = delete;
-	HamError(
-		Phase phase,
-		std::optional<Position> position,
-		std::string message
-	);
-	HamError(Phase phase, std::string message);
+	HamError(std::optional<Position> position, std::string_view message);
+	HamError(std::string_view message);
 
 	HamError(const HamError& other) noexcept = default;
 
@@ -60,6 +50,9 @@ class HamError : public std::exception {
   private:
 	std::string error_str;
 };
+
+void
+HamWarning(code::GlobalContext&, Position, std::string_view);
 
 } // namespace ham
 

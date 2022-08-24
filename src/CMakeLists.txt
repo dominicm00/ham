@@ -2,9 +2,14 @@
 add_library(
   ham_lib
 
-  HamError.cpp
+  code/Context.cpp
 
-  parse/NodeParser.cpp
+  data/VariableScope.cpp
+
+  parse/PegtlParser.cpp
+  parse/PegtlUtils.cpp
+
+  util/HamError.cpp
 
   ${HAM_PUBLIC_HEADER_FILES}
   )

@@ -1,4 +1,4 @@
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 #include "catch2/catch_message.hpp"
 #include "tao/pegtl/contrib/parse_tree.hpp"
@@ -24,7 +24,7 @@ decompose(NodePointer&& node, std::vector<int> indices)
 			return NodePointer{};
 		node = std::move(node->children[indices[i]]);
 	}
-	return node;
+	return std::move(node);
 };
 
 std::string
@@ -73,11 +73,8 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 
 	for (int i = 0; i < std::min(node->children.size(), ns.children.size());
 		 i++) {
-		isValid = checkParse(
-					  std::forward<NodePointer>(node->children[i]),
-					  ns.children[i],
-					  depth + 1
-				  )
+		isValid =
+			checkParse(std::move(node->children[i]), ns.children[i], depth + 1)
 			&& isValid;
 	}
 
@@ -87,7 +84,7 @@ checkParse(NodePointer&& node, NodeStructure ns, std::size_t depth)
 bool
 checkParse(NodePointer&& node, NodeStructure ns)
 {
-	return checkParse(std::forward<NodePointer>(node), ns, 0);
+	return checkParse(std::move(node), ns, 0);
 }
 
 } // namespace ham::tests

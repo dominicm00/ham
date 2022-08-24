@@ -1,7 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/generators/catch_generators.hpp"
 #include "parse/Grammar.hpp"
-#include "tests/Utils.hpp"
+#include "tests/ParseUtils.hpp"
 
 namespace ham::tests
 {
@@ -45,9 +45,9 @@ TEST_CASE("Nested variables", "[grammar]")
 {
 	REQUIRE_PARSE(
 		"$(a$(b))",
-		T<Variable>(
-			{T<Identifier>({T<IdChar>("a"), T<Variable>({T<Identifier>("b")})})}
-		)
+		T<Variable>({T<Identifier>(
+			{T<IdString>("a"), T<Variable>({T<Identifier>("b")})}
+		)})
 	);
 }
 
