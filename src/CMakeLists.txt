@@ -6,6 +6,9 @@ add_library(
 
   data/VariableScope.cpp
 
+
+  data/VariableScope.cpp
+
   parse/PegtlParser.cpp
   parse/PegtlUtils.cpp
 
