@@ -147,7 +147,6 @@ class VariableAssignment;
 class BooleanExpression;
 class LeafComparator;
 class TargetExpression;
-class VariableExpression;
 
 /**
  * Node interfaces are (rather verbosely) all stored in this file because
