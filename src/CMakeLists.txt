@@ -6,6 +6,7 @@ add_library(
 
   data/VariableScope.cpp
 
+  code/Context.cpp
 
   data/VariableScope.cpp
 
