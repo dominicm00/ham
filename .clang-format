@@ -51,6 +51,9 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"defs/'
+    Priority: 0
 IndentCaseBlocks: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 LambdaBodyIndentation: OuterScope
