@@ -4,6 +4,8 @@ add_executable(
   ParseUtils.cpp
   CodeUtils.cpp
 
+  code/Identifier.cpp
+
   data/VariableScope.cpp
 
   parse/ActionDefinitions.cpp
