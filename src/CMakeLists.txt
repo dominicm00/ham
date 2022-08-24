@@ -4,6 +4,7 @@ add_library(
 
   code/Context.cpp
   code/Identifier.cpp
+  code/Variable.cpp
 
   data/VariableScope.cpp
 

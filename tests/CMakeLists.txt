@@ -5,6 +5,7 @@ add_executable(
   CodeUtils.cpp
 
   code/Identifier.cpp
+  code/Variable.cpp
 
   data/VariableScope.cpp
 
