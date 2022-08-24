@@ -42,7 +42,8 @@ TEST_CASE("Variables", "[code]")
 			);
 		};
 
-		auto hasWarning = [evalSubscript](std::string subscript) -> bool
+		auto subscriptHasWarning = [evalSubscript](std::string subscript
+								   ) -> bool
 		{
 			REQUIRE(evalSubscript(subscript) == data::List{});
 			UNSCOPED_INFO(last_warning);
@@ -82,13 +83,13 @@ TEST_CASE("Variables", "[code]")
 
 		SECTION("Out of bounds subscripts")
 		{
-			REQUIRE(hasWarning("4"));
-			REQUIRE(hasWarning("1-4"));
-			REQUIRE(hasWarning("3-4"));
-			REQUIRE(hasWarning("4-4"));
-			REQUIRE(hasWarning("4-2"));
-			REQUIRE(hasWarning("3-2"));
-			REQUIRE(hasWarning("4-"));
+			REQUIRE(subscriptHasWarning("4"));
+			REQUIRE(subscriptHasWarning("1-4"));
+			REQUIRE(subscriptHasWarning("3-4"));
+			REQUIRE(subscriptHasWarning("4-4"));
+			REQUIRE(subscriptHasWarning("4-2"));
+			REQUIRE(subscriptHasWarning("3-2"));
+			REQUIRE(subscriptHasWarning("4-"));
 		}
 	}
 
