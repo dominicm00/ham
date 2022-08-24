@@ -38,7 +38,7 @@ Variable::Variable(AstContext& ast_context, PegtlNode&& pegtl_node)
 	);
 
 	if (pegtl_node->children.size() > 1) {
-		PegtlNode sub_wrapper = std::move(pegtl_node->children[1]);
+		PegtlNode sub_wrapper = std::move(pegtl_node->children.at(1));
 		assert(sub_wrapper->is_type<parse::Subscript>());
 		assert(sub_wrapper->children.size() == 1);
 		subscript = CreateNode<Identifier>(
