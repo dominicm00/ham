@@ -2,6 +2,8 @@ add_executable(
   tests
 
   ParseUtils.cpp
+  CodeUtils.cpp
+
   data/VariableScope.cpp
 
   parse/ActionDefinitions.cpp
