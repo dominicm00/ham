@@ -9,9 +9,14 @@ namespace ham::parse
 
 namespace p = tao::pegtl;
 
-FilePosition ConvertToHamFilePosition(p::position);
+FilePosition
+ConvertToHamFilePosition(const p::position&);
+
 Position
-ConvertToHamPosition(p::position start, std::optional<p::position> end = {});
+ConvertToHamPosition(
+	const p::position& start,
+	const std::optional<p::position>& end = {}
+);
 
 }
 

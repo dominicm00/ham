@@ -35,7 +35,14 @@ struct NodeDump {
  */
 class Node {
   public:
+	Node() = default;
 	virtual ~Node() = default;
+
+	// Nodes are managed by unique_ptr and cannot be moved/copied
+	Node(Node&) = delete;
+	Node& operator=(const Node&) = delete;
+	Node(Node&&) = delete;
+	Node& operator=(const Node&&) = delete;
 
 	/**
 	 * Evaluate the current node. This generally involves evaluating any
@@ -52,17 +59,17 @@ class Node {
 	/**
 	 * String representation of the node type
 	 */
-	virtual std::string_view Type() const = 0;
+	[[nodiscard]] virtual std::string_view Type() const = 0;
 
 	/**
 	 * String representation of current node (error/warning output)
 	 */
-	virtual std::string String() const = 0;
+	[[nodiscard]] virtual std::string String() const = 0;
 
 	/**
 	 * This method is used for testing. Dumps all node information.
 	 */
-	virtual NodeDump Dump() const = 0;
+	[[nodiscard]] virtual NodeDump Dump() const = 0;
 };
 
 } // namespace ham::code

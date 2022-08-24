@@ -14,14 +14,13 @@ class Identifier : public BasicNode<Identifier> {
   public:
 	Identifier(AstContext& ast_context, PegtlNode&& pegtl_node);
 
-	data::List Evaluate(EvaluationContext& eval_context) const;
-	std::string String() const;
-	NodeDump Dump() const;
+	data::List Evaluate(EvaluationContext& eval_context) const override;
+	[[nodiscard]] std::string String() const override;
+	[[nodiscard]] NodeDump Dump() const override;
 
   private:
-	bool IsIdChar(unsigned char) const;
+	[[nodiscard]] static bool IsIdChar(unsigned char);
 
-  private:
 	std::string content;
 	std::vector<IdPart> id_parts;
 };

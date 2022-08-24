@@ -20,23 +20,24 @@ namespace ham::parse
 class PegtlParser {
   public:
 	template<typename Rule, typename Input>
-	static std::unique_ptr<p::parse_tree::node> Parse(Input&& in)
+	static std::unique_ptr<p::parse_tree::node> Parse(Input&& input)
 	{
 		try {
 			auto node =
-				p::parse_tree::parse<Rule, Selector, p::nothing, Control>(in);
+				p::parse_tree::parse<Rule, Selector, p::nothing, Control>(input
+				);
 			if (node) {
 				return node;
-			} else {
-				return {};
 			}
-		} catch (p::parse_error err) {
+
+			return {};
+		} catch (p::parse_error& err) {
 			throw ConvertToHamError(err);
 		}
 	}
 
 	template<typename Rule>
-	static void DebugParse(std::string str, Parser::Debug debug)
+	static void DebugParse(const std::string& str, Parser::Debug debug)
 	{
 		try {
 			switch (debug) {
@@ -44,20 +45,22 @@ class PegtlParser {
 					p::print_debug<Rule>(std::cout);
 					break;
 				case Parser::XDOT:
-					if (auto node = Parse<Rule>(p::memory_input{str, "debug"}))
+					if (auto node =
+							Parse<Rule>(p::memory_input{str, "debug"})) {
 						p::parse_tree::print_dot(std::cout, *node);
+					}
 					break;
 				case Parser::TRACE:
 					p::standard_trace<Rule>(p::memory_input{str, "debug"});
 					break;
 			}
-		} catch (p::parse_error err) {
+		} catch (p::parse_error& err) {
 			throw ConvertToHamError(err);
 		}
 	}
 
   private:
-	static HamError ConvertToHamError(tao::pegtl::parse_error);
+	static HamError ConvertToHamError(const tao::pegtl::parse_error&);
 };
 
 } // namespace ham::parse

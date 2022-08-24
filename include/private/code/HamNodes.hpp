@@ -33,12 +33,18 @@ template<typename T>
 class BasicNode : public Node {
   public:
 	BasicNode<T>() = delete;
-	BasicNode<T>(AstContext& ast_context, PegtlNode& pegtl_node)
+	BasicNode<T>(AstContext&, PegtlNode& pegtl_node)
 		: pos(
 			parse::ConvertToHamPosition(pegtl_node->begin(), pegtl_node->end())
 		){};
 
-	virtual ~BasicNode<T>() = default;
+	// Nodes are handled by unique_ptr, and should not be copied/moved
+	BasicNode<T>(BasicNode<T>&) = delete;
+	BasicNode<T>& operator=(BasicNode<T>&) = delete;
+	BasicNode<T>(BasicNode<T>&&) = delete;
+	BasicNode<T>& operator=(BasicNode<T>&&) = delete;
+
+	~BasicNode<T>() override = default;
 
 	void Warning(GlobalContext& global_context, std::string_view message) const
 	{
@@ -47,20 +53,16 @@ class BasicNode : public Node {
 
 	[[nodiscard]] HamError Error(std::string_view message) const
 	{
-		return HamError(pos, message);
+		return {pos, message};
 	}
 
-	std::string_view Type() const override { return type; }
+	[[nodiscard]] std::string_view Type() const override { return type; }
 
 	// TODO: Redesign the class heiarchy to avoid this nonsense
-	virtual data::List Evaluate(EvaluationContext&) const override
-	{
-		assert(false);
-	};
-	virtual std::string String() const override { assert(false); };
-	virtual NodeDump Dump() const override { assert(false); };
+	data::List Evaluate(EvaluationContext&) const override { assert(false); };
+	[[nodiscard]] std::string String() const override { assert(false); };
+	[[nodiscard]] NodeDump Dump() const override { assert(false); };
 
-  public:
 	static constexpr std::string_view type = tao::pegtl::demangle<T>();
 
   private:
@@ -76,9 +78,10 @@ class TestNode : public tao::pegtl::parse_tree::node {
 	TestNode(std::string a_str_info)
 		: str_info(std::move(a_str_info))
 	{
-		m_begin = tao::pegtl::internal::frobnicator(str_info.data());
+		m_begin = tao::pegtl::internal::frobnicator(str_info.c_str());
 		m_end = tao::pegtl::internal::frobnicator(
-			str_info.data() + str_info.size()
+			// NOLINTNEXTLINE(*-pointer-arithmetic)
+			str_info.c_str() + str_info.size()
 		);
 		source = std::string_view{str_info};
 	};
@@ -92,7 +95,8 @@ class Identity : public Node {
   public:
 	Identity<T>(PegtlNode&& pnode)
 	{
-		const TestNode* node = static_cast<const TestNode*>(pnode.get());
+		// NOLINTNEXTLINE(*-static-cast-downcast)
+		const auto* node = static_cast<const TestNode*>(pnode.get());
 		if (node->str_info != tao::pegtl::demangle<T>()) {
 			std::stringstream err;
 			err << "tried to build " << tao::pegtl::demangle<T>() << " with "
@@ -102,14 +106,18 @@ class Identity : public Node {
 
 		// Use children as list elements
 		for (const PegtlNode& child : node->children) {
+			// NOLINTNEXTLINE(*-static-cast-downcast)
 			list.push_back(static_cast<const TestNode*>(child.get())->str_info);
 		}
 	};
 
-	data::List Evaluate(EvaluationContext&) const { return list; }
-	std::string String() const { return "Identity"; }
-	std::string_view Type() const { return tao::pegtl::demangle<T>(); }
-	NodeDump Dump() const { return {}; }
+	data::List Evaluate(EvaluationContext&) const override { return list; }
+	[[nodiscard]] std::string String() const override { return "Identity"; }
+	[[nodiscard]] std::string_view Type() const override
+	{
+		return tao::pegtl::demangle<T>();
+	}
+	[[nodiscard]] NodeDump Dump() const override { return {}; }
 
   private:
 	data::List list;
@@ -121,17 +129,10 @@ CreateNode(AstContext& ast_context, PegtlNode&& pegtl_node)
 {
 	if (ast_context.global_context.testing) {
 		return std::make_unique<Identity<T>>(std::move(pegtl_node));
-	} else {
-		return std::make_unique<T>(ast_context, std::move(pegtl_node));
 	}
-}
 
-/**
- * Node interfaces are (rather verbosely) all stored in this file because
- * they are _very_ recursive, and trying to manage imports/forward
- * declarations across header files in a way that doesn't care about import
- * order and works well with editors is annoying.
- */
+	return std::make_unique<T>(ast_context, std::move(pegtl_node));
+}
 
 // Helper type for visiting variants
 template<class... Ts>

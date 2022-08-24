@@ -31,7 +31,7 @@ Variable::Variable(AstContext& ast_context, PegtlNode&& pegtl_node)
 	// A variable consists of an identifier, and optionally, a subscript and
 	// variable modifier sequence.
 	// TODO: support variable modifiers
-	assert(pegtl_node->children.size() > 0);
+	assert(!pegtl_node->children.empty());
 	id = CreateNode<Identifier>(
 		ast_context,
 		std::move(pegtl_node->children.front())
@@ -73,9 +73,9 @@ Variable::Evaluate(EvaluationContext& eval_context) const
 		std::string& sub_str = sub_list.at(0);
 
 		return DoSubscript(eval_context, sub_str, var_content);
-	} else {
-		return var_content;
 	}
+
+	return var_content;
 }
 
 std::string
@@ -89,10 +89,11 @@ Variable::Dump() const
 {
 	std::vector<std::reference_wrapper<const Node>> children;
 	assert(id);
-	children.push_back(*id);
+	children.emplace_back(*id);
 
-	if (subscript)
-		children.push_back(*subscript);
+	if (subscript) {
+		children.emplace_back(*subscript);
+	}
 
 	return {.type = type, .content = content, .children = std::move(children)};
 }
@@ -131,13 +132,14 @@ Variable::DoSubscript(
 	auto parseNum = [invalidSubscriptError](const std::string& str)
 	{
 		try {
-			std::size_t pos;
+			std::size_t pos = 0;
 			int n = std::stoi(str, &pos);
-			if (pos != str.size())
+			if (pos != str.size()) {
 				throw invalidSubscriptError();
-			return n;
+			}
 
-		} catch (std::invalid_argument) {
+			return n;
+		} catch (std::invalid_argument&) {
 			throw invalidSubscriptError();
 		}
 	};
@@ -151,8 +153,9 @@ Variable::DoSubscript(
 
 	// start/end are Ham indexed; array starts at 1 and end is inclusive.
 	// NOTE: Ham only _warns_ on out of bound accesses.
-	std::size_t start;
-	std::size_t end;
+	long start = 0;
+	long end = 0;
+	long content_size = static_cast<long>(content.size());
 	if (separator == std::string::npos) {
 		// [<integer>]
 		start = parseNum(subscript_str);
@@ -160,7 +163,7 @@ Variable::DoSubscript(
 	} else if (separator == subscript_str.size() - 1) {
 		// [<integer>-]
 		start = parseNum(subscript_str.substr(0, subscript_str.size() - 1));
-		end = content.size();
+		end = content_size;
 	} else {
 		start = parseNum(subscript_str.substr(0, separator));
 		end = parseNum(subscript_str.substr(separator + 1));
@@ -170,7 +173,7 @@ Variable::DoSubscript(
 		throw zeroError();
 	}
 
-	if (start > content.size() || end > content.size() || start > end) {
+	if (start > content_size || end > content_size || start > end) {
 		outOfBoundsWarning();
 		return {};
 	}
@@ -180,7 +183,7 @@ Variable::DoSubscript(
 	// Ham uses indexes that start at 1 and are inclusive at the end. All
 	// subscripts should be converted to start at 0 and have an exclusive
 	// end (i.e. subtract 1 from start, keep end).
-	return data::List(content.begin() + start - 1, content.begin() + end);
+	return {content.begin() + start - 1, content.begin() + end};
 }
 
 } // namespace ham::code

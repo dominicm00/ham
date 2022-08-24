@@ -408,7 +408,7 @@ inline constexpr auto error_message<Condition> = "expected a condition";
 
 struct RearrangeUnaryOperator : p::parse_tree::apply<RearrangeUnaryOperator> {
 	template<typename Node, typename... States>
-	static void transform(std::unique_ptr<Node>& n, States&&... st)
+	static void transform(std::unique_ptr<Node>& n)
 	{
 		if (n->children.size() == 2) {
 			// Make operands child of operator if present
@@ -424,7 +424,7 @@ struct RearrangeUnaryOperator : p::parse_tree::apply<RearrangeUnaryOperator> {
 
 struct RearrangeBinaryOperator : p::parse_tree::apply<RearrangeBinaryOperator> {
 	template<typename Node, typename... States>
-	static void transform(std::unique_ptr<Node>& n, States&&... st)
+	static void transform(std::unique_ptr<Node>& n)
 	{
 		if (n->children.size() == 3) {
 			// Make operands child of operator if present

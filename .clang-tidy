@@ -1,0 +1,17 @@
+Checks: 'clang-analyzer-*,
+cppcoreguidelines-*,
+modernize-*,
+misc-*,
+performance-*,
+portability-*,
+readability-*,
+clang-analyzer-*,
+-cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+-modernize-use-trailing-return-type,
+-readability-named-parameter,
+-readability-identifier-length,
+-misc-no-recursion'
+HeaderFilterRegex: 'ham/include/'
+CheckOptions:
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 'true'

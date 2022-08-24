@@ -35,9 +35,9 @@ Identifier::Identifier(AstContext& ast_context, PegtlNode&& pegtl_node)
 	// Store children, and make sure only id strings and variables are present.
 	for (PegtlNode& child : pegtl_node->children) {
 		if (child->is_type<parse::IdString>()) {
-			id_parts.push_back(child->string());
+			id_parts.emplace_back(child->string());
 		} else if (child->is_type<parse::Variable>()) {
-			id_parts.push_back(
+			id_parts.emplace_back(
 				CreateNode<Variable>(ast_context, std::move(child))
 			);
 		} else {
@@ -54,7 +54,7 @@ Identifier::Identifier(AstContext& ast_context, PegtlNode&& pegtl_node)
 data::List
 Identifier::Evaluate(EvaluationContext& eval_context) const
 {
-	std::string id;
+	std::string id{};
 
 	auto appendLiteral = [&id](const std::string& literal) { id += literal; };
 
@@ -115,9 +115,10 @@ Identifier::Dump() const
 }
 
 bool
-Identifier::IsIdChar(unsigned char c) const
+Identifier::IsIdChar(unsigned char c)
 {
-	return std::isalnum(c) || c == '/' || c == '\\' || c == '_' || c == '-';
+	return (std::isalnum(c) != 0) || c == '/' || c == '\\' || c == '_'
+		|| c == '-';
 }
 
 } // namespace ham::code

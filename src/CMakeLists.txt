@@ -1,3 +1,5 @@
+set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+
 # create library
 add_library(
   ham_lib
@@ -19,6 +21,13 @@ add_library(
 
   ${HAM_PUBLIC_HEADER_FILES}
   )
+
+# warning level
+if(MSVC)
+  target_compile_options(ham_lib PRIVATE /W4 /WX)
+else()
+  target_compile_options(ham_lib PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
 
 # include headers
 target_include_directories(

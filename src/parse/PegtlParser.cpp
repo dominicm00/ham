@@ -10,12 +10,11 @@ namespace ham::parse
 {
 
 HamError
-PegtlParser::ConvertToHamError(p::parse_error pegtl_err)
+PegtlParser::ConvertToHamError(const p::parse_error& pegtl_err)
 {
-	return HamError(
+	return {
 		ConvertToHamPosition(pegtl_err.positions().back()),
-		std::string{pegtl_err.message()}
-	);
+		std::string{pegtl_err.message()}};
 }
 
 } // namespace ham::parse

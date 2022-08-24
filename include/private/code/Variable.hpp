@@ -12,16 +12,15 @@ class Variable : public BasicNode<Variable> {
   public:
 	Variable(AstContext& ast_context, PegtlNode&& pegtl_node);
 
-	data::List Evaluate(EvaluationContext& eval_context) const;
-	std::string String() const;
-	NodeDump Dump() const;
+	data::List Evaluate(EvaluationContext& eval_context) const override;
+	[[nodiscard]] std::string String() const override;
+	[[nodiscard]] NodeDump Dump() const override;
 
   private:
-	data::List
+	[[nodiscard]] data::List
 	DoSubscript(EvaluationContext& eval_context, const std::string&, const data::List&)
 		const;
 
-  private:
 	std::string content;
 	std::unique_ptr<Node> id;
 	std::unique_ptr<Node> subscript;

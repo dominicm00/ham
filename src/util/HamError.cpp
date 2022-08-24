@@ -2,17 +2,18 @@
 
 #include "code/Context.hpp"
 
+#include <memory>
 #include <sstream>
 
 namespace ham
 {
 
 std::ostream&
-operator<<(std::ostream& os, const Position& pos)
+operator<<(std::ostream& ostream, const Position& pos)
 {
 	auto file_pos = pos.start;
-	os << file_pos.line << ':' << file_pos.column << ':';
-	return os;
+	ostream << file_pos.line << ':' << file_pos.column << ':';
+	return ostream;
 }
 
 HamError::HamError(std::string_view message)
@@ -28,19 +29,19 @@ HamError::HamError(std::optional<Position> position, std::string_view message)
 	}
 
 	error_ss << message;
-	error_str = error_ss.str();
+	error_str = std::make_shared<std::string>(error_ss.str());
 }
 
 const char*
 HamError::what() const noexcept
 {
-	return error_str.c_str();
+	return error_str->c_str();
 }
 
 void
 HamWarning(
 	code::GlobalContext& global_context,
-	Position pos,
+	const Position& pos,
 	std::string_view message
 )
 {

@@ -38,9 +38,10 @@ class GlobalContext {
 	GlobalContext(GlobalContext&&) = default;
 
 	// Contexts cannot be overwritten
-	GlobalContext& operator=(GlobalContext&) = delete;
+	GlobalContext& operator=(GlobalContext&&) = delete;
 
-  public:
+	~GlobalContext() = default;
+
 	data::List targets;
 	std::ostream& warning_stream;
 	bool testing;
@@ -53,7 +54,9 @@ class AstContext {
   public:
 	AstContext() = delete;
 	AstContext(GlobalContext& global_context)
-		: global_context(global_context){};
+		: global_context(global_context),
+		  loop_depth(0),
+		  block_depth(0){};
 
 	// Contexts cannot be copied
 	AstContext(const AstContext&) = delete;
@@ -63,7 +66,9 @@ class AstContext {
 	AstContext(AstContext&&) = default;
 
 	// Contexts cannot be overwritten
-	AstContext& operator=(AstContext&) = delete;
+	AstContext& operator=(AstContext&&) = delete;
+
+	~AstContext() = default;
 
 	operator GlobalContext&() { return global_context; }
 
@@ -75,10 +80,9 @@ class AstContext {
 
 	void EnterBlock() { block_depth++; }
 
-  public:
+	GlobalContext& global_context;
 	unsigned int loop_depth;
 	unsigned int block_depth;
-	GlobalContext& global_context;
 };
 
 /**
@@ -94,7 +98,6 @@ class EvaluationContext {
 		EXIT
 	};
 
-  public:
 	EvaluationContext() = delete;
 	// TODO: initialize global variables
 	EvaluationContext(GlobalContext& global_context);
@@ -114,7 +117,9 @@ class EvaluationContext {
 	EvaluationContext(EvaluationContext&&) = default;
 
 	// Contexts cannot be overwritten
-	EvaluationContext& operator=(EvaluationContext&) = delete;
+	EvaluationContext& operator=(EvaluationContext&&) = delete;
+
+	~EvaluationContext() = default;
 
 	operator GlobalContext&() const { return global_context; }
 
@@ -125,10 +130,9 @@ class EvaluationContext {
 			variable_scope.CreateSubscope()};
 	};
 
-  public:
-	JumpCondition jump_condition;
-	data::VariableScope variable_scope;
 	GlobalContext& global_context;
+	data::VariableScope variable_scope;
+	JumpCondition jump_condition;
 };
 
 } // namespace ham::code

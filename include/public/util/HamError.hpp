@@ -11,48 +11,54 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace ham
 {
 
 struct FilePosition {
-	std::size_t byte;
-	std::size_t column;
-	std::size_t line;
-	std::string file;
+	std::size_t byte{};
+	std::size_t column{};
+	std::size_t line{};
+	std::string file{};
 };
 
 class Position {
   public:
 	Position() = delete;
 	Position(FilePosition start, std::optional<FilePosition> end = {})
-		: start(start),
-		  end(end){};
+		: start(std::move(start)),
+		  end(std::move(end)){};
 
-	friend std::ostream& operator<<(std::ostream& os, const Position& pos);
+	friend std::ostream& operator<<(std::ostream&, const Position&);
 
-  public:
 	const FilePosition start;
 	const std::optional<FilePosition> end;
 };
 
-class HamError : public std::exception {
+class HamError : public virtual std::exception {
   public:
 	HamError() = delete;
 	HamError(std::optional<Position> position, std::string_view message);
 	HamError(std::string_view message);
 
 	HamError(const HamError& other) noexcept = default;
+	HamError& operator=(const HamError& other) noexcept = default;
+	HamError(HamError&& other) noexcept = default;
+	HamError& operator=(HamError&& other) noexcept = default;
 
-	const char* what() const noexcept override;
+	~HamError() override = default;
+
+	[[nodiscard]] const char* what() const noexcept override;
 
   private:
-	std::string error_str;
+	// Use shared_ptr here to prevent exceptions with copying
+	std::shared_ptr<const std::string> error_str;
 };
 
 void
-HamWarning(code::GlobalContext&, Position, std::string_view);
+HamWarning(code::GlobalContext&, const Position&, std::string_view);
 
 } // namespace ham
 

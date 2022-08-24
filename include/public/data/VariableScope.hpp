@@ -18,6 +18,7 @@ namespace ham::data
 class VariableScope {
   public:
 	VariableScope() = default;
+	~VariableScope() = default;
 
 	// Copying scopes are expensive; avoid when possible
 	VariableScope(const VariableScope&) = default;

@@ -16,7 +16,6 @@ class Parser {
 		GRAMMAR
 	};
 
-  public:
 	// static code::Node Parse(std::string in);
 };
 

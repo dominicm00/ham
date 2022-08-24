@@ -15,11 +15,13 @@ VariableScope::Find(std::string_view var)
 	auto entry = var_map.find(var);
 	if (entry != var_map.end()) {
 		return entry->second;
-	} else if (parent) {
-		return parent.value().get().Find(var);
-	} else {
-		return {};
 	}
+
+	if (parent) {
+		return parent.value().get().Find(var);
+	}
+
+	return {};
 }
 
 VariableScope
@@ -27,7 +29,7 @@ VariableScope::CreateSubscope()
 {
 	VariableScope scope{};
 	scope.parent = *this;
-	return std::move(scope);
+	return scope;
 }
 
 } // namespace ham::data

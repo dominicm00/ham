@@ -6,7 +6,7 @@ namespace ham::parse
 {
 
 FilePosition
-ConvertToHamFilePosition(p::position pegtl_file_pos)
+ConvertToHamFilePosition(const p::position& pegtl_file_pos)
 {
 	FilePosition file_pos;
 	file_pos.file = pegtl_file_pos.source;
@@ -17,16 +17,17 @@ ConvertToHamFilePosition(p::position pegtl_file_pos)
 }
 
 Position
-ConvertToHamPosition(p::position start, std::optional<p::position> end)
+ConvertToHamPosition(
+	const p::position& start,
+	const std::optional<p::position>& end
+)
 {
 	if (end) {
-		return Position(
+		return {
 			ConvertToHamFilePosition(start),
-			ConvertToHamFilePosition(end.value())
-		);
-	} else {
-		return Position(ConvertToHamFilePosition(start));
+			ConvertToHamFilePosition(end.value())};
 	}
+	return {ConvertToHamFilePosition(start)};
 }
 
 } // namespace ham::parse
