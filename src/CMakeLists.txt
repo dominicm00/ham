@@ -3,6 +3,7 @@ add_library(
   ham_lib
 
   code/Context.cpp
+  code/Identifier.cpp
 
   data/VariableScope.cpp
 
