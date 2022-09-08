@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -I./src
-AM_CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic -Werror
+AM_CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 
 SUBDIRS = src
 

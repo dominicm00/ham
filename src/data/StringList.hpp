@@ -124,7 +124,7 @@ class StringList
 		int32_t fReferenceCount;
 		size_t fSize;
 		size_t fCapacity;
-		String fElements[1];
+		String fElements[0];
 
 		static Data sEmptyData;
 	};
