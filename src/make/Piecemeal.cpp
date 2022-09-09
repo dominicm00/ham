@@ -67,7 +67,7 @@ Piecemeal::Words(
 	data::StringListList piecemealSources{};
 
 	// Helpers
-	const auto genDomain = [context](std::vector<const char*> vars) {
+	const auto genDomain = [&context](std::vector<const char*> vars) {
 		StringList list{};
 		for (auto var : vars) {
 			list.Append(var);

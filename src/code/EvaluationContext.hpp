@@ -36,6 +36,8 @@ class EvaluationContext
 		data::VariableDomain& globalVariables,
 		data::TargetPool& targets
 	);
+	EvaluationContext(const EvaluationContext&) = delete;
+	EvaluationContext& operator=(const EvaluationContext&) = delete;
 
 	behavior::Compatibility GetCompatibility() const { return fCompatibility; }
 	void SetCompatibility(behavior::Compatibility compatibility);
