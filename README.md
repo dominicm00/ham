@@ -1,12 +1,10 @@
-# Ham - WIP {#index}
+# Ham {#index}
 
 ## Disclaimer
-Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for experimental/development purposes.
-
-This branch is an in-progress rewrite of the original Ham project. The rationale behind the rewrite is in [ADR #8](docs/development/decisions/0008-creating-a-version-2.md). The original code is in the `legacy` branch.
+This branch is an in-progress rewrite of the original Ham project. The rationale behind the rewrite is in [ADR #8](docs/development/decisions/0008-creating-a-version-2.md). You can find the original Ham project in the `legacy` branch; please use that until the rewrite is complete.
 
 ## Introduction
-Ham is a replacement for the [Jam build system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). Its primary goal is to replace [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), as Haiku's official build system. However, any idiomatic Jam project should also work with Ham.
+Ham is a replacement for the [Jam build system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). Its primary goal is to replace [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), as Haiku's official build system. However, any idiomatic Jam project should also work with Ham, and porting to Ham is relatively straightforward.
 
 ## Motivation
 Jam's legacy codebase makes it difficult to fix bugs or introduce new features. Ham uses a modern, friendly C++ codebase, is rigorously tested, and provides much better debugging output. Backed by [Ninja](https://ninja-build.org/), it has fast incremental build times, exact header dependency scanning, and more. Detailed project goals can be found in the [goals document](docs/development/decisions/0009-ham-project-goals.md).
