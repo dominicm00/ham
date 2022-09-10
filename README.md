@@ -10,7 +10,7 @@ Ham is a replacement for the [Jam build system](https://swarm.workshop.perforce.
 Jam's legacy codebase makes it difficult to fix bugs or introduce new features. Ham uses a modern, friendly C++ codebase, is rigorously tested, and provides much better debugging output. Backed by [Ninja](https://ninja-build.org/), it has fast incremental build times, exact header dependency scanning, and more. Detailed project goals can be found in the [goals document](docs/development/decisions/0009-ham-project-goals.md).
 
 ## Usage
-Ham's command line input is undergoing design.
+Ham's command line input is undergoing design. Documentation for the Ham language can be found in the [language specification](https://github.com/dominicm00/ham/blob/master/docs/Language-specification.md).
 
 ## Building Ham
 Ham is built using [CMake](https://cmake.org/). Currently, no distribution packages are available, so Ham must be built from the repository source code.
