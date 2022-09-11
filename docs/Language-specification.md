@@ -178,9 +178,9 @@ path/with/'Weird $Directory'/file.cpp    => path/with/Weird $Directory/file.cpp
 ```
 
 ### Bracket expressions
-Bracket expressions have the following form (literal `[]`, not optional):
+Bracket expressions have the following form:
 ```text
-[ <rule_invocation>|on <target> <rule_invocation> ]
+'[' rule_invocation | 'on' target rule_invocation ']'
 ```
 
 A bracket expression evaluates to the result of the `rule_invocation`. 
@@ -310,7 +310,7 @@ Variables names are identifiers. Variables hold lists. Variables are either glob
 ### Variable expressions
 Data inside variables must be accessed via variable expressions. Evaluating a variable expression always results in a list, even if the list contains 0 or 1 element. Variables are evaluated with the following form: 
 ```text
-$( <identifier>[subscript][modifiers] )
+'$(' identifier[subscript][modifiers] ')'
 ```
 
 #### Variable identifier
@@ -333,10 +333,10 @@ Echo $($(Y)Z) ; # 456
 This can be nested arbitrarily.
 
 #### Variable subscripts
-A subscript is of the form `[<identifier>]` (literal `[]`, not optional), where the identifier evaluates to one of the following:
-- `<integer>`
-- `<integer>-`
-- `<integer>-<integer>`
+A subscript is of the form `'[' identifier ']'`, where the identifier evaluates to one of the following:
+- `integer`
+- `integer-`
+- `integer-integer`
 
 
 These correspond, respectively, to selecting via index from the variable's list:
@@ -455,7 +455,7 @@ Echo $(B:UJ=x) ;     # FILE1xFILE2xFILE3
 ### Variable assignment
 Variables are assigned to with the following form:
 ```text
-[local] <identifier> [on <targets>] <operator> <list> ';'
+[ 'local' ] identifier [ 'on' targets ] operator list ';'
 ```
 
 The assignment operators are:
@@ -464,11 +464,11 @@ The assignment operators are:
 - `+=`: append the list to the variables data, and set the variable to the result
 - `?=`: set the variable to the list if and only if the variable is unset or contains the empty list
 
-The optional `on <targets>` form sets the target-local variable instead of the global variable.
+The optional `'on' targets` form scopes the variable to be target-local.
 
-The optional `local` form only sets the variable within the current scope.
+The optional `'local'` form scopes the variable to the current block.
 
-The `local` and `on <targets>` form are mutually exclusive; including them both in an assignment is an error.
+The `'local'` and `'on' targets` form are mutually exclusive; including them both in an assignment is an error.
 
 **Examples:**
 ```text
@@ -495,9 +495,9 @@ Rules are Ham's version of functions, and the core of its functionality.
 ### Defining rules
 Rules are defined with the following form:
 ```text
-rule <identifier> [<identifier> [: <identifier>]*] { 
-    <statements>
-}
+'rule' identifier [identifier [ ':' identifier]*] '{'
+    statements
+'}'
 ```
 
 Arguments are bound as `local` variables with the names specified in the rule header. Arguments are also represented positionally with built-in variables:
@@ -509,7 +509,7 @@ Global and local variables are bound within the rule statement, but local variab
 
 **TODO:** Taking local variables from the call site is a necessary evil for compatibility. This should be a compatibility behavior.
 
-Rule definitions have access to the special statement `return <list> ;`. When this statement is evaluated, the rule immediately stops and the value is the result of the rule evaluation. Passing more than one argument to `return` is an error. A single argument that is a list is valid.
+Rule definitions have access to the special statement `'return' list ';'`. When this statement is evaluated, the rule immediately stops and the value is the result of the rule evaluation. Passing more than one argument to `'return'` is an error. A single argument that is a list is valid.
 
 ```text
 return 1 2 3 ;      # ok
@@ -521,10 +521,10 @@ return 1 : 2 : 3 ;  # error
 ### Invoking rules
 Rules are invoked with the form:
 ```text
-<word> [<list> [: <list>]*] ;
+identifier [ list [':' list]*] ';'
 ```
 
-The `word` should evaluate to an identifier representing a previously-defined rule.
+The `identifier` should evaluate to a previously defined rule.
 
 Any arguments not passed to the rule default to the empty list. Additional arguments past what the rule accepts are ignored.
 
@@ -586,9 +586,9 @@ Any non-leaf target **must** have an action to build it.
 ### Defining actions
 Actions are defined with the following form:
 ```text
-actions <modifiers> <identifier> {
-    <string>
-}
+'actions' modifiers identifier '{'
+	shell-input
+'}'
 ```
 
 `shell-input` is treated as a literal strings to be passed to the system's command shell, with the exception of the following special sequences:
@@ -664,7 +664,7 @@ Let `a` and `b` be leaf expressions, and `cond` represent another condition. A c
 ### If statement
 An if statement is of the form:
 ```text
-if <condition> { <statements> } [ else { <statements> } ]
+'if' condition '{' statements '}' [ 'else' '{' statements '}' ]
 ```
 
 If the condition is true, the first statement block is evaluated. Otherwise, the else block is evaluated (if present).
@@ -672,7 +672,7 @@ If the condition is true, the first statement block is evaluated. Otherwise, the
 ### While loop
 A while loop is of the form:
 ```text
-while <condition> { <statements> }
+'while' condition '{' statements '}'
 ```
 
 Repeatedly executes `statements` while `condition` is true upon entry.
@@ -680,7 +680,7 @@ Repeatedly executes `statements` while `condition` is true upon entry.
 ### For loop
 A for loop is of the form:
 ```text
-for <identifier> in <leaf> { <statements> }
+'for' identifier 'in' leaf '{' statements '}'
 ```
 
 For each element in `leaf`, `statements` are executed with `identifier` bound to the element.
@@ -691,7 +691,7 @@ The `break ;` and `continue ;` statements may be used inside loops to exit the l
 ## Target statements
 A statement may be run under the influence of target specific variables with the following form:
 ```text
-on <target> <statement> ;
+'on' target statement ';'
 ```
 
 The statement may be a rule invocation or control flow, but _not_ a definition.
