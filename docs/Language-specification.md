@@ -87,7 +87,7 @@ Leafs are the core data structure in Ham, and consist of everything that can be 
 ### Words
 Words are character sequences of all printable, non-whitespace characters (ASCII 33-126), _excluding the following:_ `$ ' " : ; { } ( ) [ ] # ! & | = + ?`.
 
-The `$` character indicates the start of a variable expression. Not having a valid variable expression after a `$` in a word is an error.
+The `$` character indicates the start of a variable expression. Not having a valid variable expression after a `$` is an error.
 
 **Examples:**
 ```text
@@ -751,7 +751,7 @@ The `MaybeIncludes` and `MaybeDepends` rules create order-only dependencies, whe
 - The child is built before the parent, but
 - Updating the child does not update the parent
 
-This is useful if you don't know ahead of time if a source file includes a generated header. Using `MaybeIncludes` will generate the header on the first run, but only rebuild the parent if it actually ended up using the header.
+This is useful if you don't know ahead of time if a source file includes a generated header. Using `MaybeIncludes` will generate the header on the first run, but only rebuild the parent if it actually ended up using the header (assuming you use the `deps*` action modifier).
 
 ### Source dependencies
 Source dependencies are targets that don't have any associated actions, and cannot be built (e.g. source files). All source dependencies must be [bound](#target-binding) to an existing file, and cannot have any dependencies.
