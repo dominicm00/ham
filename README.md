@@ -1,7 +1,9 @@
 # Ham - WIP {#index}
 
 ## Disclaimer
-Ham is a work-in-progress, and currently **does not work**. Please do not attempt to use Ham other than for experimental/development purposes.
+This repository holds Ham v1, based on Ingo Weinhold's original work, and is in _maintenance mode_. Bug fixes and quality-of-life changes are still being merged, but new features are not being added.
+
+Development is currently underway on Ham v2, which is a heavily rewritten version with better parsing, exact header scanning, improved incremental builds, and more. You can check it out [here](https://sr.ht/~dominicm/ham/).
 
 ## Introduction
 Ham is a drop-in replacement for the [Jam build system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). Its primary goal is to be compatible with and extend [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), and eventually become Haiku's official build system. However, compatibility with [Perforce Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html), [Boost.Build](https://www.boost.org/build), and possibly other variants are planned.
