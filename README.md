@@ -8,6 +8,9 @@ Development is currently underway on Ham v2, which is a heavily rewritten versio
 ## Known bugs
 There are currently command execution bugs blocking the build for [Haiku](https://www.haiku-os.org/) that are being addressed. Although Ham currently works for some smaller builds, until Ham is stress-tested on Haiku and other Jam projects, it is not recommended to be used in production.
 
+## Documentation
+Most available documentation is for Ham v2; although not all of it is applicable to Ham v1, the [language specification](https://man.sr.ht/~dominicm/ham/language-specification.md) is still a good resource. For strictly Ham v1 compatible documentation, check out the [Perforce Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html) docs.
+
 ## Introduction
 Ham is a drop-in replacement for the [Jam build system](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html). Its primary goal is to be compatible with and extend [Haiku Jam](https://git.haiku-os.org/buildtools/tree/jam), and eventually become Haiku's official build system. However, compatibility with [Perforce Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html), [Boost.Build](https://www.boost.org/build), and possibly other variants are planned.
 
