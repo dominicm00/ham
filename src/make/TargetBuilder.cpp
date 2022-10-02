@@ -234,18 +234,28 @@ TargetBuilder::_ExecuteCommand(Command* command)
 	snprintf(slotString, sizeof(slotString), "%d", jobSlot + 1);
 
 	// prepare the command line argument vector
-	size_t argumentCount = fJamShell.Size() + 1;
-	const char** arguments = new const char*[argumentCount + 1];
+	size_t argumentCount = fJamShell.Size();
+	const char** arguments = new const char*[argumentCount + 2];
+	bool addedCommand = false;
 	for (size_t i = 0; i < argumentCount; i++) {
 		String argument = fJamShell.ElementAt(i);
-		if (argument == "%")
+		if (argument == "%") {
 			arguments[i] = command->CommandLine().ToCString();
-		else if (argument == "!")
+			addedCommand = true;
+		} else if (argument == "!") {
 			arguments[i] = slotString;
-		else
+		} else {
 			arguments[i] = argument.ToCString();
+		}
 	}
-	arguments[argumentCount] = nullptr;
+
+	if (!addedCommand) {
+		// Append command to end if not explicitly added
+		arguments[argumentCount] = command->CommandLine().ToCString();
+		arguments[argumentCount + 1] = nullptr;
+	} else {
+		arguments[argumentCount] = nullptr;
+	}
 
 	// launch the command
 	bool launched = fJobSlots[jobSlot].fProcess.Launch(
