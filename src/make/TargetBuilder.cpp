@@ -12,6 +12,8 @@
 #include "make/TargetBuildInfo.hpp"
 #include "process/ChildInfo.hpp"
 
+#include <stdexcept>
+
 namespace ham::make
 {
 
@@ -225,8 +227,9 @@ TargetBuilder::_ExecuteCommand(Command* command)
 
 	int jobSlot = _FindFreeJobSlot();
 	// TODO:...
-	//	if (jobSlot < 0)
-	//		throw InternalError();
+	if (jobSlot < 0) {
+		throw std::logic_error("Could not find job slot for command");
+	}
 	char slotString[16];
 	snprintf(slotString, sizeof(slotString), "%d", jobSlot + 1);
 
