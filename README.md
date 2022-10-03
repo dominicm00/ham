@@ -5,8 +5,8 @@ This repository holds Ham v1, based on Ingo Weinhold's original work, and is in 
 
 Development is currently underway on Ham v2, which is a heavily rewritten version with better parsing, exact header scanning, improved incremental builds, and more. You can check it out [here](https://sr.ht/~dominicm/ham/).
 
-## Known bugs
-There are currently command execution bugs blocking the build for [Haiku](https://www.haiku-os.org/) that are being addressed. Although Ham currently works for some smaller builds, until Ham is stress-tested on Haiku and other Jam projects, it is not recommended to be used in production.
+## Issues building Haiku
+There are currently bugs in Haiku's build system (at least [#17965](https://dev.haiku-os.org/ticket/17965)) that are preventing Ham from being used with Haiku. Validation on other projects is ongoing, and any bugs in Ham itself should be reported.
 
 ## Documentation
 Most available documentation is for Ham v2; although not all of it is applicable to Ham v1, the [language specification](https://man.sr.ht/~dominicm/ham/language-specification.md) is still a good resource. For strictly Ham v1 compatible documentation, check out the [Perforce Jam](https://swarm.workshop.perforce.com/view/guest/perforce_software/jam/src/Jam.html) docs.
