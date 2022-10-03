@@ -12,6 +12,8 @@
 #include "make/TargetBuildInfo.hpp"
 #include "process/ChildInfo.hpp"
 
+#include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
 
 namespace ham::make
@@ -148,10 +150,27 @@ TargetBuilder::NextFinishedBuildInfo(bool canWait)
 		fJobSlots[jobSlot].fProcess.Unset();
 
 		fFinishedCommands.push_back(command);
-		command->SetState(
-			// TODO: Support RuleActions::IGNORE
-			processInfo.fExitCode == 0 ? Command::SUCCEEDED : Command::FAILED
-		);
+		Command::State state = processInfo.fExitCode == 0
+				|| command->Actions()->Actions()->IsIgnore()
+			? Command::SUCCEEDED
+			: Command::FAILED;
+		command->SetState(state);
+
+		// TODO: This lets new commands enter the queue before quitting. Make
+		// this quit immediately.
+		if (state == Command::FAILED && fOptions.IsQuitOnError()) {
+			int exitCode = processInfo.fExitCode;
+
+			printf("...failed to execute command, exiting...\n");
+			printf("%s\n", command->CommandLine().ToCString());
+			printf("...waiting for commands to exit...\n");
+			// Wait for children
+			while (process::Process::WaitForChild(processInfo))
+				;
+			printf("...children done, exiting...\n");
+
+			exit(exitCode);
+		}
 	}
 }
 
