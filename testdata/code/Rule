@@ -357,3 +357,18 @@ Foo 1
 Foo 2: foobar
 main 2
 ---
+rule Foo
+{
+	Echo a ;
+}
+Foo ;
+
+rule Foo
+{
+	Echo b ;
+}
+Foo ;
+-
+a
+b
+---
