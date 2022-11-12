@@ -356,8 +356,7 @@ Processor::_IsPseudoTarget(const MakeTarget* makeTarget) const
 	// hide this error.
 	const Target* target = makeTarget->GetTarget();
 	return target->IsNotAFile()
-		|| (!makeTarget->FileExists() && !target->HasActionsCalls()
-			&& !target->Dependencies().IsEmpty());
+		|| (!target->HasActionsCalls() && !target->Dependencies().IsEmpty());
 }
 
 bool
